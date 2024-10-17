@@ -1,0 +1,27 @@
+/*!
+@file GameStage.h
+@brief ゲームステージ
+*/
+
+#pragma once
+#include "stdafx.h"
+
+namespace basecross {
+
+	//--------------------------------------------------------------------------------------
+	//	ゲームステージクラス
+	//--------------------------------------------------------------------------------------
+	class GameStage : public Stage {
+		void CreateViewLight(); //ビューの作成
+
+	public:
+		//構築と破棄
+		GameStage() :Stage(){}
+		virtual ~GameStage() {}
+		
+		virtual void OnCreate()override; //初期化
+	};
+
+}
+//end basecross
+
