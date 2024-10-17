@@ -13,5 +13,36 @@ namespace basecross{
 	{
 	}
 
+	FixedBox::FixedBox(const shared_ptr<Stage>& StagePtr,
+		const Vec3& Scale,
+		const Vec3& Rotation,
+		const Vec3& Position
+	) :
+		GameObject(StagePtr),
+		m_scale(Scale),
+		m_rotation(Rotation),
+		m_position(Position)
+	{
+	}
+	FixedBox::~FixedBox() {}
+
+	//‰Šú‰»
+	void FixedBox::OnCreate() {
+		auto ptrTransform = GetComponent<Transform>();
+		ptrTransform->SetScale(m_scale);
+		ptrTransform->SetRotation(m_rotation);
+		ptrTransform->SetPosition(m_position);
+		//OBBÕ“Ëj”»’è‚ğ•t‚¯‚é
+		auto ptrColl = AddComponent<CollisionObb>();
+		ptrColl->SetFixed(true);
+		//ƒ^ƒO‚ğ‚Â‚¯‚é
+		AddTag(L"FixedBox");
+
+		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
+		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
+
+	}
+
+
 }
 //end basecross
