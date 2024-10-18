@@ -17,6 +17,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Character.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Enemy.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStage.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)GameStageHemmi.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Player.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Project.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ProjectBehavior.h" />
@@ -27,6 +28,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Character.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Enemy.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStage.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)GameStageHemmi.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Player.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ProjectBehavior.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ProjectShader.cpp" />
