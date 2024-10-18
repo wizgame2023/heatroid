@@ -21,8 +21,17 @@ namespace basecross {
 		InputHandler<Player> m_InputHandler;
 		//スピード
 		float m_Speed;
+		//ジャンプ高度
+		float m_jumpHeight;
 
-		bool m_jamp;
+		enum Stats {
+			stand,		//地上
+			air,		//空中
+			hit			//やられ
+		};
+
+		Stats m_stat;
+
 	public:
 		//構築と破棄
 
@@ -41,6 +50,26 @@ namespace basecross {
 		void OnPushA();
 	};
 
+//--------------------------------------------------------------------------------------
+//	プレイヤー 接地判定オブジェクト
+//--------------------------------------------------------------------------------------
+	class LandingCollider : public GameObject
+	{
+		shared_ptr<Player> m_Player;
+	public:
+		// 構築と破棄
+		LandingCollider(const shared_ptr<Stage>& stage) :
+			GameObject(stage)
+		{
+		}
+		virtual ~LandingCollider()
+		{
+		}
+
+		virtual void OnCreate() override; // 初期化
+		//virtual void OnUpdate() override; // 更新
+		//virtual void OnDraw() override; // 描画
+	};
 }
 //end basecross
 

@@ -11,7 +11,8 @@ namespace basecross{
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
 		m_Speed(10.0f),
-		m_jamp(false)
+		m_jumpHeight(20.0f),
+		m_stat(stand)
 	{}
 	
 	Vec2 Player::GetInputState() const {
@@ -27,22 +28,10 @@ namespace basecross{
 		}
 		//キーボードの取得(キーボード優先)
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-		if (KeyState.m_bPushKeyTbl['W']) {
-			//前
-			ret.y = 1.0f;
-		}
-		else if (KeyState.m_bPushKeyTbl['A']) {
-			//左
-			ret.x = -1.0f;
-		}
-		else if (KeyState.m_bPushKeyTbl['S']) {
-			//後ろ
-			ret.y = -1.0f;
-		}
-		else if (KeyState.m_bPushKeyTbl['D']) {
-			//右
-			ret.x = 1.0f;
-		}
+		if (KeyState.m_bPushKeyTbl['W']) ret.y = 1.0f;
+		if (KeyState.m_bPushKeyTbl['A']) ret.x = -1.0f;
+		if (KeyState.m_bPushKeyTbl['S']) ret.y = -1.0f;
+		if (KeyState.m_bPushKeyTbl['D']) ret.x = 1.0f;
 		return ret;
 	}
 
@@ -50,10 +39,10 @@ namespace basecross{
 	Vec3 Player::GetMoveVector() const {
 		Vec3 angle(0, 0, 0);
 		//入力の取得
-		auto inPut = GetInputState();
-		float moveX = inPut.x;
-		float moveZ = inPut.y;
-		if (moveX != 0 || moveZ != 0) {
+		float moveX = GetInputState().x;
+		float moveZ = GetInputState().y;
+
+		if (moveX * moveZ != 0) {
 			float moveLength = 0;	//動いた時のスピード
 			auto ptrTransform = GetComponent<Transform>();
 			auto ptrCamera = OnGetDrawCamera();
@@ -132,7 +121,7 @@ namespace basecross{
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 		auto grav = GetComponent<Gravity>();
-		if (m_jamp == false)
+		if (m_stat == stand)
 		{
 			grav->SetGravity(Vec3(0, -30.0f, 0));
 		}
@@ -143,14 +132,30 @@ namespace basecross{
 	void Player::OnPushA()
 	{
 		auto grav = GetComponent<Gravity>();
-		if (m_jamp == true)grav->StartJump(Vec3(0, 20.0f, 0)); m_jamp = false;
+		if (m_stat == stand) {
+			grav->StartJump(Vec3(0, m_jumpHeight, 0)); m_stat = air;
+		}
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		if (Other->FindTag(L"FixedBox")) {
-			m_jamp = true;
+			m_stat = stand;
 		}
 	}
+
+	void LandingCollider::OnCreate() {
+		//初期位置などの設定
+		auto ptr = AddComponent<Transform>();
+		ptr->SetScale(.25f, .25f, .25f);	//直径25センチの球体
+		ptr->SetRotation(0.0f, 0.0f, 0.0f);
+		ptr->SetPosition(Vec3(0, 0.125f, 0));
+
+		//CollisionSphere衝突判定を付ける
+		auto ptrColl = AddComponent<CollisionSphere>();
+		ptrColl->
+
+	}
+
 
 }
 //end basecross
