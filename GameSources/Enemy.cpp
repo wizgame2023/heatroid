@@ -9,7 +9,10 @@
 namespace basecross {
 	//èâä˙âª
 	Enemy::Enemy(const shared_ptr<Stage>& stage):
-		GameObject(stage)
+		GameObject(stage),
+		m_pos(0.0f,0.0,0.0f),
+		m_rot(0.0f,0.0f,0.0f),
+		m_scal(1.0f,1.0f,1.0f)
 	{}
 
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
@@ -29,13 +32,22 @@ namespace basecross {
 		m_trans->SetRotation(m_rot);
 		m_trans->SetScale(m_scal);
 
+		//ï`âÊ
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
-		ptrDraw->SetMeshResource(L"DEFALUT_CUBE");
-
-		auto ptrColl = AddComponent<Collision>();
+		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//è’ìÀîªíË
+		auto ptrColl = AddComponent<CollisionObb>();
 		ptrColl->SetFixed(true);
 		ptrColl->SetDrawActive(true);
+		//âe
+		auto shadowPtr = AddComponent<Shadowmap>();
+		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		//èdóÕ
+		auto ptrGra = AddComponent<Gravity>();
 
+		GetStage()->SetCollisionPerformanceActive(true);
+		GetStage()->SetUpdatePerformanceActive(true);
+		GetStage()->SetDrawPerformanceActive(true);
 
 	}
 }

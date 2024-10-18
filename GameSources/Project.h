@@ -10,6 +10,7 @@
 #include "ProjectBehavior.h"
 #include "Scene.h"
 #include "GameStage.h"
+#include "GameStageHemmi.h"
 #include "Character.h"
 #include "Player.h"
 

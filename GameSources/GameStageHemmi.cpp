@@ -46,14 +46,14 @@ namespace basecross {
 	void GameStageHemmi::CreateEnemy() {
 		vector<vector<Vec3>> vec = {
 			{
+				Vec3(0.0f,-3.0f,0.0f),
 				Vec3(0.0f,0.0f,0.0f),
-				Vec3(0.0f),
 				Vec3(1.0f,1.0f,1.0f)
 			}
 		};
 
 		for (auto v : vec) {
-			
+			AddGameObject<Enemy>(v[0], v[1], v[2]);
 		}
 	}
 
@@ -65,6 +65,8 @@ namespace basecross {
 
 			AddGameObject<Player>();
 			CreateGameBox();
+			CreateEnemy();
+			//AddGameObject<Enemy>();
 		}
 		catch (...) {
 			throw;
