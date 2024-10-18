@@ -55,7 +55,8 @@ namespace basecross {
 //--------------------------------------------------------------------------------------
 	class LandingCollider : public GameObject
 	{
-		shared_ptr<Player> m_Player;
+		weak_ptr<Player> m_Player;
+		Vec3 m_VecToParent;
 	public:
 		// 構築と破棄
 		LandingCollider(const shared_ptr<Stage>& stage) :
@@ -69,6 +70,10 @@ namespace basecross {
 		virtual void OnCreate() override; // 初期化
 		//virtual void OnUpdate() override; // 更新
 		//virtual void OnDraw() override; // 描画
+
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+
+		void FollowPlayer();
 	};
 
 }
