@@ -41,6 +41,14 @@ namespace basecross{
 			//ゲームステージの設定
 			ResetActiveStage<GameStage>();
 		}
+		if (event->m_MsgStr == L"ToGameStage") {
+			//ゲームステージの設定
+			ResetActiveStage<GameStage>();
+		}
+		if (event->m_MsgStr == L"ToGameStage") {
+			//ゲームステージの設定
+			ResetActiveStage<GameStage>();
+		}
 	}
 
 
