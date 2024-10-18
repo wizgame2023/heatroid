@@ -41,6 +41,7 @@ namespace basecross {
 		void OnPushA();
 	};
 
+
 }
 //end basecross
 
