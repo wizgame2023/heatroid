@@ -27,17 +27,9 @@ namespace basecross{
 		}
 		//キーボードの取得(キーボード優先)
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-		if (KeyState.m_bPushKeyTbl['W']) {
-			//前
-			ret.y = 1.0f;
-		}
-		else if (KeyState.m_bPushKeyTbl['A']) {
+		if (KeyState.m_bPushKeyTbl['A']) {
 			//左
 			ret.x = -1.0f;
-		}
-		else if (KeyState.m_bPushKeyTbl['S']) {
-			//後ろ
-			ret.y = -1.0f;
 		}
 		else if (KeyState.m_bPushKeyTbl['D']) {
 			//右

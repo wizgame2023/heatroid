@@ -17,7 +17,7 @@ namespace basecross {
 	void GameStage::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, 2.0f, 15.0f));
+		camera->SetEye(Vec3(0.0f, 2.0f, 60.0f));
 		camera->SetAt(Vec3(0.0f, 0.0f, 0.0f));
 
 		// ビューにカメラを設定
@@ -33,7 +33,7 @@ namespace basecross {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
-				Vec3(30.0f, 1.0f, 3.0f),
+				Vec3(150.0f, 1.0f, 3.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(0.0f, -4.0f, 0.0f)
 			},
