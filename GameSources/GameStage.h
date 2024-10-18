@@ -1,4 +1,5 @@
 /*!
+鎌田大輝
 @file GameStage.h
 @brief ゲームステージ
 */

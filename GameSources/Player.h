@@ -9,6 +9,7 @@
 namespace basecross {
 
 	class Player : public GameObject {
+
 	public:
 		//\’z‚Æ”jŠü
 

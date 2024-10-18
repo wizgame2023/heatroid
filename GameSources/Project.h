@@ -12,3 +12,5 @@
 #include "GameStage.h"
 #include "Character.h"
 #include "Player.h"
+
+#include "Enemy.h"
