@@ -41,11 +41,11 @@ namespace basecross{
 			//ゲームステージの設定
 			ResetActiveStage<GameStage>();
 		}
-		if (event->m_MsgStr == L"ToGameStage") {
+		else if (event->m_MsgStr == L"ToGameStageHemmi") {
 			//ゲームステージの設定
-			ResetActiveStage<GameStage>();
+			ResetActiveStage<GameStageHemmi>();
 		}
-		if (event->m_MsgStr == L"ToGameStage") {
+		else if (event->m_MsgStr == L"ToGameStageTsuboi") {
 			//ゲームステージの設定
 			ResetActiveStage<GameStage>();
 		}
