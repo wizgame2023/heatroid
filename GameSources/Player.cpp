@@ -1,6 +1,6 @@
 /*!
 @file Player.cpp
-@brief ƒvƒŒƒCƒ„[‚È‚ÇÀ‘Ì
+@brief ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãªã©å®Ÿä½“
 */
 
 #include "stdafx.h"
@@ -17,7 +17,7 @@ namespace basecross{
 	
 	Vec2 Player::GetInputState() const {
 		Vec2 ret;
-		//ƒRƒ“ƒgƒ[ƒ‰‚Ìæ“¾
+		//ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã®å–å¾—
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		ret.x = 0.0f;
 		ret.y = 0.0f;
@@ -26,46 +26,47 @@ namespace basecross{
 			ret.x = cntlVec[0].fThumbLX;
 			ret.y = cntlVec[0].fThumbLY;
 		}
-		//ƒL[ƒ{[ƒh‚Ìæ“¾(ƒL[ƒ{[ƒh—Dæ)
+		//ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®å–å¾—(ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰å„ªå…ˆ)
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		if (KeyState.m_bPushKeyTbl['W']) ret.y = 1.0f;
 		if (KeyState.m_bPushKeyTbl['A']) ret.x = -1.0f;
 		if (KeyState.m_bPushKeyTbl['S']) ret.y = -1.0f;
 		if (KeyState.m_bPushKeyTbl['D']) ret.x = 1.0f;
+
 		return ret;
 	}
 
 
 	Vec3 Player::GetMoveVector() const {
 		Vec3 angle(0, 0, 0);
-		//“ü—Í‚Ìæ“¾
+		//å…¥åŠ›ã®å–å¾—
 		float moveX = GetInputState().x;
 		float moveZ = GetInputState().y;
 
 		if (moveX * moveZ != 0) {
-			float moveLength = 0;	//“®‚¢‚½‚ÌƒXƒs[ƒh
+			float moveLength = 0;	//å‹•ã„ãŸæ™‚ã®ã‚¹ãƒ”ãƒ¼ãƒ‰
 			auto ptrTransform = GetComponent<Transform>();
 			auto ptrCamera = OnGetDrawCamera();
-			//is•ûŒü‚ÌŒü‚«‚ğŒvZ
+			//é€²è¡Œæ–¹å‘ã®å‘ãã‚’è¨ˆç®—
 			auto front = ptrTransform->GetPosition() - ptrCamera->GetEye();
 			front.y = 0;
 			front.normalize();
-			//is•ûŒüŒü‚«‚©‚ç‚ÌŠp“x‚ğZo
+			//é€²è¡Œæ–¹å‘å‘ãã‹ã‚‰ã®è§’åº¦ã‚’ç®—å‡º
 			float frontAngle = atan2(front.z, front.x);
-			//ƒRƒ“ƒgƒ[ƒ‰‚ÌŒü‚«ŒvZ
+			//ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã®å‘ãè¨ˆç®—
 			Vec2 moveVec(moveX, moveZ);
 			float moveSize = moveVec.length();
-			//ƒRƒ“ƒgƒ[ƒ‰‚ÌŒü‚«‚©‚çŠp“x‚ğŒvZ
+			//ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã®å‘ãã‹ã‚‰è§’åº¦ã‚’è¨ˆç®—
 			float cntlAngle = atan2(-moveX, moveZ);
-			//ƒg[ƒ^ƒ‹‚ÌŠp“x‚ğZo
+			//ãƒˆãƒ¼ã‚¿ãƒ«ã®è§’åº¦ã‚’ç®—å‡º
 			float totalAngle = frontAngle + cntlAngle;
-			//Šp“x‚©‚çƒxƒNƒgƒ‹‚ğì¬
+			//è§’åº¦ã‹ã‚‰ãƒ™ã‚¯ãƒˆãƒ«ã‚’ä½œæˆ
 			angle = Vec3(cos(totalAngle), 0, sin(totalAngle));
-			//³‹K‰»‚·‚é
+			//æ­£è¦åŒ–ã™ã‚‹
 			angle.normalize();
-			//ˆÚ“®ƒTƒCƒY‚ğİ’èB
+			//ç§»å‹•ã‚µã‚¤ã‚ºã‚’è¨­å®šã€‚
 			angle *= moveSize;
-			//Y²‚Í•Ï‰»‚³‚¹‚È‚¢
+			//Yè»¸ã¯å¤‰åŒ–ã•ã›ãªã„
 			angle.y = 0;
 		}
 		return angle;
@@ -79,7 +80,7 @@ namespace basecross{
 			pos += angle * elapsedTime * m_Speed;
 			GetComponent<Transform>()->SetPosition(pos.x, pos.y, 0);
 		}
-		//‰ñ“]‚ÌŒvZ
+		//å›è»¢ã®è¨ˆç®—
 		if (angle.length() > 0.0f) {
 			auto utilPtr = GetBehavior<UtilBehavior>();
 			utilPtr->RotToHead(angle, 1.0f);
@@ -88,38 +89,38 @@ namespace basecross{
 
 	void Player::OnCreate() {
 
-		//‰ŠúˆÊ’u‚È‚Ç‚Ìİ’è
+		//åˆæœŸä½ç½®ãªã©ã®è¨­å®š
 		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(1.00f, 1.00f, 1.00f);	//’¼Œa25ƒZƒ“ƒ`‚Ì‹…‘Ì
+		ptr->SetScale(1.00f, 1.00f, 1.00f);	//ç›´å¾„25ã‚»ãƒ³ãƒã®çƒä½“
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(Vec3(0, 0.125f, 0));
 
-		//CollisionSphereÕ“Ë”»’è‚ğ•t‚¯‚é
+		//CollisionSphereè¡çªåˆ¤å®šã‚’ä»˜ã‘ã‚‹
 		auto ptrColl = AddComponent<CollisionSphere>();
 		ptrColl->SetDrawActive(true);
 
-		//ŠeƒpƒtƒH[ƒ}ƒ“ƒX‚ğ“¾‚é
+		//å„ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã‚’å¾—ã‚‹
 		GetStage()->SetCollisionPerformanceActive(true);
 		GetStage()->SetUpdatePerformanceActive(true);
 		GetStage()->SetDrawPerformanceActive(true);
 
-		//d—Í‚ğ‚Â‚¯‚é
+		//é‡åŠ›ã‚’ã¤ã‘ã‚‹
 		auto ptrGra = AddComponent<Gravity>();
 
-		//‰e‚ğ‚Â‚¯‚éiƒVƒƒƒhƒEƒ}ƒbƒv‚ğ•`‰æ‚·‚éj
+		//å½±ã‚’ã¤ã‘ã‚‹ï¼ˆã‚·ãƒ£ãƒ‰ã‚¦ãƒãƒƒãƒ—ã‚’æç”»ã™ã‚‹ï¼‰
 		auto shadowPtr = AddComponent<Shadowmap>();
-		//‰e‚ÌŒ`iƒƒbƒVƒ…j‚ğİ’è
+		//å½±ã®å½¢ï¼ˆãƒ¡ãƒƒã‚·ãƒ¥ï¼‰ã‚’è¨­å®š
 		shadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 
-		//•`‰æƒRƒ“ƒ|[ƒlƒ“ƒg‚Ìİ’è
+		//æç”»ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®è¨­å®š
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
-		//•`‰æ‚·‚éƒƒbƒVƒ…‚ğİ’è
+		//æç”»ã™ã‚‹ãƒ¡ãƒƒã‚·ãƒ¥ã‚’è¨­å®š
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetFogEnabled(true);
 	}
 
 	void Player::OnUpdate() {
-		//ƒRƒ“ƒgƒ[ƒ‰ƒ`ƒFƒbƒN‚µ‚Ä“ü—Í‚ª‚ ‚ê‚ÎƒRƒ}ƒ“ƒhŒÄ‚Ño‚µ
+		//ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒã‚§ãƒƒã‚¯ã—ã¦å…¥åŠ›ãŒã‚ã‚Œã°ã‚³ãƒãƒ³ãƒ‰å‘¼ã³å‡ºã—
 		m_InputHandler.PushHandle(GetThis<Player>());
 		auto grav = GetComponent<Gravity>();
 		if (m_stat == stand)
@@ -145,13 +146,13 @@ namespace basecross{
 	}
 
 	void LandingCollider::OnCreate() {
-		//‰ŠúˆÊ’u‚È‚Ç‚Ìİ’è
+		//åˆæœŸä½ç½®ãªã©ã®è¨­å®š
 		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(.25f, .25f, .25f);	//’¼Œa25ƒZƒ“ƒ`‚Ì‹…‘Ì
+		ptr->SetScale(.25f, .25f, .25f);	//ç›´å¾„25ã‚»ãƒ³ãƒã®çƒä½“
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(Vec3(0, 0.125f, 0));
 
-		//CollisionSphereÕ“Ë”»’è‚ğ•t‚¯‚é
+		//CollisionSphereè¡çªåˆ¤å®šã‚’ä»˜ã‘ã‚‹
 		auto ptrColl = AddComponent<CollisionSphere>();
 		ptrColl->SetDrawActive(true);
 
