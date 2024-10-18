@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "Project.h"
 
-namespace basecross{
+namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
@@ -89,6 +89,8 @@ namespace basecross{
 
 	void Player::OnCreate() {
 
+		AddTag(L"Player");
+
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
 		ptr->SetScale(1.00f, 1.00f, 1.00f);	//直径25センチの球体
@@ -135,7 +137,8 @@ namespace basecross{
 	{
 		auto grav = GetComponent<Gravity>();
 		if (m_stat == stand) {
-			grav->StartJump(Vec3(0, m_jumpHeight, 0)); m_stat = air;
+			grav->StartJump(Vec3(0, m_jumpHeight, 0)); 
+			m_stat = air;
 		}
 	}
 
@@ -147,18 +150,49 @@ namespace basecross{
 
 	void LandingCollider::OnCreate() {
 		//初期位置などの設定
-		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(.25f, .25f, .25f);	//直径25センチの球体
-		ptr->SetRotation(0.0f, 0.0f, 0.0f);
-		ptr->SetPosition(Vec3(0, 0.125f, 0));
+		auto ptrTrans = AddComponent<Transform>();
+		ptrTrans->SetScale(.25f, .25f, .25f);	//直径25センチの球体
+		ptrTrans->SetRotation(0.0f, 0.0f, 0.0f);
+		ptrTrans->SetPosition(Vec3(0, 0.125f, 0));
 
 		//CollisionSphere衝突判定を付ける
 		auto ptrColl = AddComponent<CollisionSphere>();
 		ptrColl->SetDrawActive(true);
+		ptrColl->AddExcludeCollisionTag(L"Player");
 
+		auto ptrParent = m_Player.lock();
+		if (ptrParent) {
+			auto posTarget = ptrParent->GetComponent<Transform>()->GetPosition();
+			posTarget += m_VecToParent;
+			ptrTrans->SetPosition(posTarget);
+		}
 	}
 
+	void LandingCollider::FollowPlayer() {
+		auto ptrTrans = GetComponent<Transform>();
+		auto pos = ptrTrans->GetPosition();
+		auto ptrPlayer = m_Player.lock();
+		if (ptrPlayer) {
+			auto matPlayer = ptrPlayer->GetComponent<Transform>()->GetWorldMatrix();
+			matPlayer.scaleIdentity();
+			Mat4x4 mat;
+			mat.affineTransformation(
+				Vec3(1.0),
+				Vec3(0.0),
+				Vec3(0.0),
+				m_VecToParent
+			);
+			mat *= matPlayer;
 
+			auto posTarget = mat.transInMatrix();
+			auto v = Lerp::CalculateLerp(pos, posTarget, 0.0f, 1.0f, 0.2f, Lerp::rate::Linear);
+			ptrTrans->SetPosition(v);
+			ptrTrans->SetQuaternion(mat.quatInMatrix());
+		}
+	}
+
+	void LandingCollider::OnCollisionEnter(shared_ptr<GameObject>& Other) {
+	}
 }
 //end basecross
 
