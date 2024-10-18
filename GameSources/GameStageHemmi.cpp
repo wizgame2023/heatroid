@@ -1,6 +1,7 @@
 /*!
-@file GameStage.cpp
-@brief ゲームステージ実体
+@file GameStageHemmi.cpp
+@brief テストゲームステージ実体
+担当：逸見
 */
 
 #include "stdafx.h"
@@ -13,7 +14,7 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 
 	//ビューとライトの作成
-	void GameStage::CreateViewLight() {
+	void GameStageHemmi::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
 		camera->SetEye(Vec3(0.0f, 2.0f, 15.0f));
@@ -28,7 +29,7 @@ namespace basecross {
 		light->SetDefaultLighting(); //デフォルトのライティングを指定
 	}
 
-	void GameStage::CreateGameBox() {
+	void GameStageHemmi::CreateGameBox() {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
@@ -42,15 +43,30 @@ namespace basecross {
 			AddGameObject<FixedBox>(v[0], v[1], v[2]);
 		}
 	}
+	void GameStageHemmi::CreateEnemy() {
+		vector<vector<Vec3>> vec = {
+			{
+				Vec3(0.0f,-3.0f,0.0f),
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(1.0f,1.0f,1.0f)
+			}
+		};
+
+		for (auto v : vec) {
+			AddGameObject<Enemy>(v[0], v[1], v[2]);
+		}
+	}
 
 
-	void GameStage::OnCreate() {
+	void GameStageHemmi::OnCreate() {
 		try {
 			//ビューとライトの作成
 			CreateViewLight();
 
 			AddGameObject<Player>();
 			CreateGameBox();
+			CreateEnemy();
+			//AddGameObject<Enemy>();
 		}
 		catch (...) {
 			throw;
