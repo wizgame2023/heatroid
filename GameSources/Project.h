@@ -15,3 +15,6 @@
 #include "Player.h"
 
 #include "Enemy.h"
+
+#include "GameStageHemmi.h"
+#include "GameStageTuboi.h"
