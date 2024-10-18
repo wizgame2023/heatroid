@@ -13,7 +13,7 @@
 #include "GameStageHemmi.h"
 #include "Character.h"
 #include "Player.h"
-
+#include "GameStageTuboi.h"
 #include "Enemy.h"
 
 #include "GameStageHemmi.h"

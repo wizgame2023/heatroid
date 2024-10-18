@@ -1,5 +1,5 @@
 /*!
-@file GameStage.h
+@file GameStageTsuboi.h
 @brief ゲームステージ
 */
 
@@ -11,16 +11,16 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	//	ゲームステージクラス
 	//--------------------------------------------------------------------------------------
-	class GameStage : public Stage {
+	class GameStageTsuboi : public Stage {
 		void CreateViewLight(); //ビューの作成
 		void CreateGameBox();//GameStageの生成
 
 	public:
 		//構築と破棄
-		GameStage() :Stage(){}
-		virtual ~GameStage() {}
+		GameStageTsuboi() :Stage(){}
+		virtual ~GameStageTsuboi() {}
 		
-		virtual void OnCreate()override; //初期化
+		virtual void OnCreate() override; //初期化
 	};
 
 }
