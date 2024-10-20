@@ -27,6 +27,7 @@ namespace basecross {
 		enum Stats {
 			stand,		//地上
 			air,		//空中
+			fall,		//落下中
 			hit			//やられ
 		};
 
@@ -44,23 +45,28 @@ namespace basecross {
 		//更新
 		virtual void OnUpdate() override;
 		//virtual void OnUpdate2() override;
+		
+		//何かに接触している判定(接地判定に活用？)
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
-		//virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
+		
 		////Aボタン
 		void OnPushA();
 	};
 
 //--------------------------------------------------------------------------------------
-//	プレイヤー 接地判定オブジェクト
+//	プレイヤー 接地判定オブジェクト(使わない可能性大)
 //--------------------------------------------------------------------------------------
 	class LandingCollider : public GameObject
 	{
-		weak_ptr<Player> m_Player;
+		weak_ptr<GameObject> m_Player;
 		Vec3 m_VecToParent;
 	public:
 		// 構築と破棄
-		LandingCollider(const shared_ptr<Stage>& stage) :
-			GameObject(stage)
+		LandingCollider(const shared_ptr<Stage>& stage,
+			const shared_ptr<GameObject>& parent,
+			const Vec3& VecToParent) :
+			GameObject(stage),
+			m_Player(static_cast<shared_ptr<GameObject>>(parent))
 		{
 		}
 		virtual ~LandingCollider()
@@ -68,7 +74,7 @@ namespace basecross {
 		}
 
 		virtual void OnCreate() override; // 初期化
-		//virtual void OnUpdate() override; // 更新
+		virtual void OnUpdate() override; // 更新
 		//virtual void OnDraw() override; // 描画
 
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;

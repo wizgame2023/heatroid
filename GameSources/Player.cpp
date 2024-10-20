@@ -108,6 +108,7 @@ namespace basecross {
 
 		//重力をつける
 		auto ptrGra = AddComponent<Gravity>();
+		ptrGra->SetGravity(Vec3(0, -30.0f, 0));
 
 		//影をつける（シャドウマップを描画する）
 		auto shadowPtr = AddComponent<Shadowmap>();
@@ -124,10 +125,8 @@ namespace basecross {
 	void Player::OnUpdate() {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
-		auto grav = GetComponent<Gravity>();
 		if (m_stat == stand)
 		{
-			grav->SetGravity(Vec3(0, -30.0f, 0));
 		}
 
 		MovePlayer();
@@ -135,17 +134,19 @@ namespace basecross {
 
 	void Player::OnPushA()
 	{
+		if (m_stat != stand) return;	//立ち状態以外ではジャンプしない
 		auto grav = GetComponent<Gravity>();
-		if (m_stat == stand) {
-			grav->StartJump(Vec3(0, m_jumpHeight, 0)); 
-			m_stat = air;
-		}
+		grav->StartJump(Vec3(0, m_jumpHeight, 0)); 
+		m_stat = air;
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		if (Other->FindTag(L"FixedBox")) {
 			m_stat = stand;
 		}
+
+		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
+
 	}
 
 	void LandingCollider::OnCreate() {
@@ -166,6 +167,12 @@ namespace basecross {
 			posTarget += m_VecToParent;
 			ptrTrans->SetPosition(posTarget);
 		}
+
+
+	}
+
+	void LandingCollider::OnUpdate() {
+		FollowPlayer();
 	}
 
 	void LandingCollider::FollowPlayer() {
@@ -185,8 +192,7 @@ namespace basecross {
 			mat *= matPlayer;
 
 			auto posTarget = mat.transInMatrix();
-			auto v = Lerp::CalculateLerp(pos, posTarget, 0.0f, 1.0f, 0.2f, Lerp::rate::Linear);
-			ptrTrans->SetPosition(v);
+			ptrTrans->SetPosition(posTarget+Vec3(0, -1, 0));
 			ptrTrans->SetQuaternion(mat.quatInMatrix());
 		}
 	}
