@@ -47,7 +47,7 @@ namespace basecross{
 		}
 		else if (event->m_MsgStr == L"ToGameStageTsuboi") {
 			//ゲームステージの設定
-			ResetActiveStage<GameStage>();
+			ResetActiveStage<GameStageTsuboi>();
 		}
 	}
 

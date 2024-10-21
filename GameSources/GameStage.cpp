@@ -17,7 +17,7 @@ namespace basecross {
 	void GameStage::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, 2.0f, 60.0f));
+		camera->SetEye(Vec3(0.0f, 2.0f, 30.0f));
 		camera->SetAt(Vec3(0.0f, 0.0f, 0.0f));
 
 		// ビューにカメラを設定
@@ -44,14 +44,23 @@ namespace basecross {
 		}
 	}
 
+	//プレイヤーの作成
+	void GameStage::CreatePlayer() {
+		//プレーヤーの作成
+		auto ptrPlayer = AddGameObject<Player>();
+		//シェア配列にプレイヤーを追加
+		SetSharedGameObject(L"Player", ptrPlayer);
+		ptrPlayer->AddTag(L"Player");
+	}
+
 
 	void GameStage::OnCreate() {
 		try {
 			//ビューとライトの作成
 			CreateViewLight();
 
-			AddGameObject<Player>();
 			CreateGameBox();
+			CreatePlayer();
 		}
 		catch (...) {
 			throw;
