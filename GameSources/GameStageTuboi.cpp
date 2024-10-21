@@ -1,5 +1,5 @@
 /*!
-@file GameStage.cpp
+@file GameStageTsuboi.cpp
 @brief ゲームステージ実体
 */
 
@@ -49,7 +49,11 @@ namespace basecross {
 			//ビューとライトの作成
 			CreateViewLight();
 
-			AddGameObject<Player>();
+			auto ptrPlayer = AddGameObject<Player>();
+			SetSharedGameObject(L"Player", ptrPlayer);
+			auto ptrLandCol = AddGameObject<LandingCollider>();
+			SetSharedGameObject(L"LandCol", ptrLandCol);
+
 			CreateGameBox();
 		}
 		catch (...) {

@@ -1,6 +1,6 @@
 /*!
 @file Player.h
-@brief ƒLƒƒƒ‰ƒNƒ^[‚È‚Ç
+@brief ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãªã©
 */
 
 #pragma once
@@ -9,40 +9,74 @@
 namespace basecross {
 
 	class Player : public GameObject {
-		//ƒvƒŒƒCƒ„[‚ªg—p‚·‚éƒRƒ“ƒgƒ[ƒ‰‚ÆƒL[ƒ{[ƒh‚Ì“ü—Í
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒä½¿ç”¨ã™ã‚‹ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã¨ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®å…¥åŠ›
 		Vec2 GetInputState() const;
-		// ƒRƒ“ƒgƒ[ƒ‰‚©‚ç•ûŒüƒxƒNƒgƒ‹‚ğ“¾‚é
+		// ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã‹ã‚‰æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’å¾—ã‚‹
 		Vec3 GetMoveVector() const;
-		//ƒvƒŒƒCƒ„[‚ÌˆÚ“®
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•
 		void MovePlayer();
-		//•¶š—ñ‚Ì•\¦
+		//æ–‡å­—åˆ—ã®è¡¨ç¤º
 		void DrawStrings();
-		//“ü—Íƒnƒ“ƒhƒ‰[
+		//å…¥åŠ›ãƒãƒ³ãƒ‰ãƒ©ãƒ¼
 		InputHandler<Player> m_InputHandler;
-		//ƒXƒs[ƒh
+		//ã‚¹ãƒ”ãƒ¼ãƒ‰
 		float m_Speed;
+		//ã‚¸ãƒ£ãƒ³ãƒ—é«˜åº¦
+		float m_jumpHeight;
 
-		bool m_jamp;
+		enum Stats {
+			stand,		//åœ°ä¸Š
+			air,		//ç©ºä¸­
+			hit			//ã‚„ã‚‰ã‚Œ
+		};
+
+		Stats m_stat;
+
 	public:
-		//\’z‚Æ”jŠü
+		//æ§‹ç¯‰ã¨ç ´æ£„
 
 		Player(const shared_ptr<Stage>& StagePtr);
 
 		virtual ~Player() {}
-		//ƒAƒNƒZƒT
-		//‰Šú‰»
+		//ã‚¢ã‚¯ã‚»ã‚µ
+		//åˆæœŸåŒ–
 		virtual void OnCreate() override;
-		//XV
+		//æ›´æ–°
 		virtual void OnUpdate() override;
 		//virtual void OnUpdate2() override;
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 		//virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
-		////Aƒ{ƒ^ƒ“
+		////Aãƒœã‚¿ãƒ³
 		void OnPushA();
 
 		void MoveCamera();
 	};
 
+//--------------------------------------------------------------------------------------
+//	ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ æ¥åœ°åˆ¤å®šã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+//--------------------------------------------------------------------------------------
+	class LandingCollider : public GameObject
+	{
+		weak_ptr<Player> m_Player;
+		Vec3 m_VecToParent;
+	public:
+		// æ§‹ç¯‰ã¨ç ´æ£„
+		LandingCollider(const shared_ptr<Stage>& stage) :
+			GameObject(stage)
+		{
+		}
+		virtual ~LandingCollider()
+		{
+		}
+
+		virtual void OnCreate() override; // åˆæœŸåŒ–
+		//virtual void OnUpdate() override; // æ›´æ–°
+		//virtual void OnDraw() override; // æç”»
+
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+
+		void FollowPlayer();
+	};
 
 }
 //end basecross

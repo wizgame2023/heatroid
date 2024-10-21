@@ -1,5 +1,5 @@
 /*!
-@file GameStage.h
+@file GameStageTsuboi.h
 @brief ゲームステージ
 */
 
@@ -20,7 +20,7 @@ namespace basecross {
 		GameStageTsuboi() :Stage(){}
 		virtual ~GameStageTsuboi() {}
 		
-		virtual void OnCreate()override; //初期化
+		virtual void OnCreate() override; //初期化
 	};
 
 }

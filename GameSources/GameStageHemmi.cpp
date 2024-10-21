@@ -1,6 +1,7 @@
 /*!
-@file GameStage.cpp
-@brief ゲームステージ実体
+@file GameStageHemmi.cpp
+@brief テストゲームステージ実体
+担当：逸見
 */
 
 #include "stdafx.h"
@@ -42,6 +43,19 @@ namespace basecross {
 			AddGameObject<FixedBox>(v[0], v[1], v[2]);
 		}
 	}
+	void GameStageHemmi::CreateEnemy() {
+		vector<vector<Vec3>> vec = {
+			{
+				Vec3(0.0f,-3.0f,0.0f),
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(1.0f,1.0f,1.0f)
+			}
+		};
+
+		for (auto v : vec) {
+			AddGameObject<Enemy>(v[0], v[1], v[2]);
+		}
+	}
 
 
 	void GameStageHemmi::OnCreate() {
@@ -51,6 +65,8 @@ namespace basecross {
 
 			AddGameObject<Player>();
 			CreateGameBox();
+			CreateEnemy();
+			//AddGameObject<Enemy>();
 		}
 		catch (...) {
 			throw;
