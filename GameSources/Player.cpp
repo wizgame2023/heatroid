@@ -89,6 +89,8 @@ namespace basecross {
 	}
 
 	void Player::OnCreate() {
+		//�����ʒu�Ȃǂ̐ݒ�
+		float elapsedTime = App::GetApp()->GetElapsedTime();
 
 		AddTag(L"Player");
 
@@ -124,6 +126,7 @@ namespace basecross {
 		//描画するメッシュを設定
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetFogEnabled(true);
+
 	}
 
 	void Player::OnUpdate() {
@@ -144,8 +147,8 @@ namespace basecross {
 
 			m_prevPos = pos;
 		}
-
 		MovePlayer();
+		MoveCamera();
 
 
 		ShowDebug();
@@ -181,6 +184,25 @@ namespace basecross {
 
 	}
 
+	void Player::MoveCamera()
+	{
+		auto ptrCamera = dynamic_pointer_cast<Camera>(OnGetDrawCamera());
+		auto pos = GetComponent<Transform>()->GetPosition();
+		Vec3 Camera = ptrCamera->GetEye();
+		float differenceX = pos.x - Camera.x;
+		if (differenceX >= 5.0f)
+		{
+			ptrCamera->SetEye(Camera.x + (differenceX - 5.0f), 5.0f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+		}
+		else if (differenceX <= -5.0f)
+		{
+			ptrCamera->SetEye(Camera.x + (differenceX + 5.0f), 5.0f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+		}
+	}
+  
+  
 	void LandingCollider::OnCreate() {
 		//初期位置などの設定
 		auto ptrTrans = AddComponent<Transform>();

@@ -1,6 +1,6 @@
 /*!
 @file Project.h
-@brief コンテンツ用のヘッダをまとめる
+@brief 繧ｳ繝ｳ繝�繝ｳ繝�逕ｨ縺ｮ繝倥ャ繝繧偵∪縺ｨ繧√ｋ
 */
 
 #pragma once
@@ -13,8 +13,7 @@
 #include "GameStageHemmi.h"
 #include "Character.h"
 #include "Player.h"
-#include "GameStageTuboi.h"
 #include "Enemy.h"
-
 #include "GameStageHemmi.h"
 #include "GameStageTuboi.h"
+#include "FixedBox.h"

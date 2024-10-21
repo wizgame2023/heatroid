@@ -39,6 +39,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStageTuboi.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FixedBox.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Character.cpp">
@@ -69,6 +72,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStageHemmi.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FixedBox.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
