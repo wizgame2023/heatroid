@@ -28,10 +28,10 @@ namespace basecross {
 		}
 		//キーボードの取得(キーボード優先)
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-		if (KeyState.m_bPushKeyTbl['W']) ret.y = 1.0f;
-		if (KeyState.m_bPushKeyTbl['A']) ret.x = -1.0f;
-		if (KeyState.m_bPushKeyTbl['S']) ret.y = -1.0f;
-		if (KeyState.m_bPushKeyTbl['D']) ret.x = 1.0f;
+		if (KeyState.m_bPushKeyTbl['W']) { ret.y = 1.0f; }
+		if (KeyState.m_bPushKeyTbl['A']) { ret.x = -1.0f; }
+		if (KeyState.m_bPushKeyTbl['S']) { ret.y = -1.0f; }
+		if (KeyState.m_bPushKeyTbl['D']) { ret.x = 1.0f; }
 
 		return ret;
 	}
@@ -43,7 +43,7 @@ namespace basecross {
 		float moveX = GetInputState().x;
 		float moveZ = GetInputState().y;
 
-		if (moveX * moveZ != 0) {
+		if (moveX + moveZ != 0) {
 			float moveLength = 0;	//動いた時のスピード
 			auto ptrTransform = GetComponent<Transform>();
 			auto ptrCamera = OnGetDrawCamera();
