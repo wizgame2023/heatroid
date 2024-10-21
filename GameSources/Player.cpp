@@ -132,7 +132,7 @@ namespace basecross {
 			grav->SetGravity(Vec3(0, -30.0f, 0));
 		}
 		MovePlayer();
-		//MoveCamera();
+		MoveCamera();
 	}
 
 	void Player::OnPushA()
@@ -156,10 +156,15 @@ namespace basecross {
 		auto pos = GetComponent<Transform>()->GetPosition();
 		Vec3 Camera = ptrCamera->GetEye();
 		float differenceX = pos.x - Camera.x;
-		if (differenceX <= -5.0f || differenceX >= 5.0f)
+		if (differenceX >= 5.0f)
 		{
-			ptrCamera->SetEye(Camera.x+ differenceX, Camera.y, Camera.z);
-			ptrCamera->SetAt(Vec3(pos.x + differenceX, pos.y, pos.z));
+			ptrCamera->SetEye(Camera.x + (differenceX - 5.0f), 5.0f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+		}
+		else if (differenceX <= -5.0f)
+		{
+			ptrCamera->SetEye(Camera.x + (differenceX + 5.0f), 5.0f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
 		}
 	}
   
