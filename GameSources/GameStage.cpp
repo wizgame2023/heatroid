@@ -33,9 +33,34 @@ namespace basecross {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
-				Vec3(150.0f, 1.0f, 3.0f),
+				Vec3(30.0f, 1.0f, 3.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(0.0f, -4.0f, 0.0f)
+			},
+			{
+				Vec3(20.0f, 1.0f, 3.0f),
+				Vec3(0.0f, 0.0f, 0.0f),
+				Vec3(-30.0f, -4.0f, 0.0f)
+			},
+			{
+				Vec3(30.0f, 1.0f, 3.0f),
+				Vec3(0.0f, 0.0f, 0.0f),
+				Vec3(-10.0f, 3.5f, 0.0f)
+			},
+			{
+				Vec3(30.0f, 1.0f, 3.0f),
+				Vec3(0.0f, 0.0f, 0.0f),
+				Vec3(0.0f, 10.0f, 0.0f)
+			},
+			{
+				Vec3(1.0f, 20.0f, 3.0f),
+				Vec3(0.0f, 0.0f, 0.0f),
+				Vec3(15.0f, 5.0f, 0.0f)
+			},
+			{
+				Vec3(1.0f, 20.0f, 3.0f),
+				Vec3(0.0f, 0.0f, 0.0f),
+				Vec3(-24.0f, 14.0f, 0.0f)
 			},
 		};
 		//オブジェクトの作成
@@ -61,6 +86,9 @@ namespace basecross {
 
 			CreateGameBox();
 			CreatePlayer();
+			auto ptrLandCol = AddGameObject<LandingCollider>();
+			SetSharedGameObject(L"LandCol", ptrLandCol);
+
 		}
 		catch (...) {
 			throw;
