@@ -29,25 +29,5 @@ namespace basecross{
 		//virtual void OnDraw() override; // ï`âÊ
 	};
 
-	//--------------------------------------------------------------------------------------
-	//	class FixedBox : public GameObject;
-	//--------------------------------------------------------------------------------------
-	class FixedBox : public GameObject {
-		Vec3 m_scale;
-		Vec3 m_rotation;
-		Vec3 m_position;
-	public:
-		//ç\ízÇ∆îjä¸
-		FixedBox(const shared_ptr<Stage>& StagePtr,
-			const Vec3& Scale,
-			const Vec3& Rotation,
-			const Vec3& Position
-		);
-		virtual ~FixedBox();
-		//èâä˙âª
-		virtual void OnCreate() override;
-		//ëÄçÏ
-	};
-
 }
 //end basecross

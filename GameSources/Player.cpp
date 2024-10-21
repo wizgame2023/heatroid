@@ -6,13 +6,14 @@
 #include "stdafx.h"
 #include "Project.h"
 
-namespace basecross{
+namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
 		m_Speed(10.0f),
 		m_jumpHeight(20.0f),
-		m_stat(stand)
+		m_moveVel(Vec2(0, 0)),
+		m_stateType(stand)
 	{}
 	
 	Vec2 Player::GetInputState() const {
@@ -28,10 +29,10 @@ namespace basecross{
 		}
 		//キーボードの取得(キーボード優先)
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-		if (KeyState.m_bPushKeyTbl['W']) ret.y = 1.0f;
-		if (KeyState.m_bPushKeyTbl['A']) ret.x = -1.0f;
-		if (KeyState.m_bPushKeyTbl['S']) ret.y = -1.0f;
-		if (KeyState.m_bPushKeyTbl['D']) ret.x = 1.0f;
+		if (KeyState.m_bPushKeyTbl['W']) { ret.y = 1.0f; }
+		if (KeyState.m_bPushKeyTbl['A']) { ret.x = -1.0f; }
+		if (KeyState.m_bPushKeyTbl['S']) { ret.y = -1.0f; }
+		if (KeyState.m_bPushKeyTbl['D']) { ret.x = 1.0f; }
 
 		return ret;
 	}
@@ -43,7 +44,7 @@ namespace basecross{
 		float moveX = GetInputState().x;
 		float moveZ = GetInputState().y;
 
-		if (moveX * moveZ != 0) {
+		if (moveX + moveZ != 0) {
 			float moveLength = 0;	//動いた時のスピード
 			auto ptrTransform = GetComponent<Transform>();
 			auto ptrCamera = OnGetDrawCamera();
@@ -88,12 +89,18 @@ namespace basecross{
 	}
 
 	void Player::OnCreate() {
+		//�����ʒu�Ȃǂ̐ݒ�
+		float elapsedTime = App::GetApp()->GetElapsedTime();
+
+		AddTag(L"Player");
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
 		ptr->SetScale(1.00f, 1.00f, 1.00f);	//直径25センチの球体
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(Vec3(0, 0.125f, 0));
+
+		m_prevPos = GetComponent<Transform>()->GetPosition();
 
 		//CollisionSphere衝突判定を付ける
 		auto ptrColl = AddComponent<CollisionSphere>();
@@ -106,6 +113,7 @@ namespace basecross{
 
 		//重力をつける
 		auto ptrGra = AddComponent<Gravity>();
+		ptrGra->SetGravity(Vec3(0, -30.0f, 0));
 
 		//影をつける（シャドウマップを描画する）
 		auto shadowPtr = AddComponent<Shadowmap>();
@@ -114,51 +122,141 @@ namespace basecross{
 
 		//描画コンポーネントの設定
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
+		
 		//描画するメッシュを設定
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetFogEnabled(true);
+
 	}
 
 	void Player::OnUpdate() {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
-		auto grav = GetComponent<Gravity>();
-		if (m_stat == stand)
-		{
-			grav->SetGravity(Vec3(0, -30.0f, 0));
-		}
+		float elapsed = App::GetApp()->GetElapsedTime();
+		frameElapsed += elapsed;
 
+		if (frameElapsed > _frame) {
+			frameElapsed -= _frame;
+
+			auto pos = GetComponent<Transform>()->GetPosition();
+			m_moveVel = pos - m_prevPos;
+
+			if (m_stateType == air && m_moveVel.y < 0) {
+				m_stateType = fall;
+			}
+
+			m_prevPos = pos;
+		}
 		MovePlayer();
+		MoveCamera();
+
+
+		ShowDebug();
+	}
+
+	void Player::ShowDebug() {
+		wstringstream wss;
+		auto pos = GetComponent<Transform>()->GetPosition();
+
+		wss << "stateType : " << m_stateType << endl;
+		wss << "pos : " << pos.x << ", " << pos.y << endl;
+		wss << "prevPos : " << m_prevPos.x << ", " << m_prevPos.y << endl;
+		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
+
+		auto scene = App::GetApp()->GetScene<Scene>();
+		scene->SetDebugString(L"Player\n" + wss.str());
 	}
 
 	void Player::OnPushA()
 	{
+		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
 		auto grav = GetComponent<Gravity>();
-		if (m_stat == stand) {
-			grav->StartJump(Vec3(0, m_jumpHeight, 0)); m_stat = air;
-		}
+		grav->StartJump(Vec3(0, m_jumpHeight, 0)); 
+		m_stateType = air;
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		if (Other->FindTag(L"FixedBox")) {
-			m_stat = stand;
+			m_stateType = stand;
+		}
+
+		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
+
+	}
+
+	void Player::MoveCamera()
+	{
+		auto ptrCamera = dynamic_pointer_cast<Camera>(OnGetDrawCamera());
+		auto pos = GetComponent<Transform>()->GetPosition();
+		Vec3 Camera = ptrCamera->GetEye();
+		float differenceX = pos.x - Camera.x;
+		if (differenceX >= 5.0f)
+		{
+			ptrCamera->SetEye(Camera.x + (differenceX - 5.0f), 5.0f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+		}
+		else if (differenceX <= -5.0f)
+		{
+			ptrCamera->SetEye(Camera.x + (differenceX + 5.0f), 5.0f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
 		}
 	}
 
+	float Player::GetCollisionScale() {
+		return GetComponent<CollisionSphere>()->GetMakedRadius();
+	}
+  
+  
 	void LandingCollider::OnCreate() {
 		//初期位置などの設定
-		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(.25f, .25f, .25f);	//直径25センチの球体
-		ptr->SetRotation(0.0f, 0.0f, 0.0f);
-		ptr->SetPosition(Vec3(0, 0.125f, 0));
+		auto ptrTrans = AddComponent<Transform>();
+		ptrTrans->SetScale(.25f, .25f, .25f);	//直径25センチの球体
+		ptrTrans->SetRotation(0.0f, 0.0f, 0.0f);
+		ptrTrans->SetPosition(Vec3(0, 0.125f, 0));
 
 		//CollisionSphere衝突判定を付ける
 		auto ptrColl = AddComponent<CollisionSphere>();
 		ptrColl->SetDrawActive(true);
+		ptrColl->AddExcludeCollisionTag(L"Player");
+
+		auto ptrParent = m_Player.lock();
+		if (ptrParent) {
+			auto posTarget = ptrParent->GetComponent<Transform>()->GetPosition();
+			posTarget += m_VecToParent;
+			ptrTrans->SetPosition(posTarget);
+		}
+
 
 	}
 
+	void LandingCollider::OnUpdate() {
+		FollowPlayer();
+	}
 
+	void LandingCollider::FollowPlayer() {
+		auto ptrTrans = GetComponent<Transform>();
+		auto pos = ptrTrans->GetPosition();
+		auto ptrPlayer = m_Player.lock();
+		if (ptrPlayer) {
+			auto matPlayer = ptrPlayer->GetComponent<Transform>()->GetWorldMatrix();
+			matPlayer.scaleIdentity();
+			Mat4x4 mat;
+			mat.affineTransformation(
+				Vec3(1.0),
+				Vec3(0.0),
+				Vec3(0.0),
+				m_VecToParent
+			);
+			mat *= matPlayer;
+
+			auto posTarget = mat.transInMatrix();
+			ptrTrans->SetPosition(posTarget+Vec3(0, -1, 0));
+			ptrTrans->SetQuaternion(mat.quatInMatrix());
+		}
+	}
+
+	void LandingCollider::OnCollisionEnter(shared_ptr<GameObject>& Other) {
+	}
 }
 //end basecross
 

@@ -35,6 +35,11 @@ namespace basecross {
 				Vec3(30.0f, 1.0f, 3.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(0.0f, -4.0f, 0.0f)
+			},			
+			{
+				Vec3(10.0f, 1.0f, 3.0f),
+				Vec3(0.0f, 0.0f, 0.0f),
+				Vec3(5.0f, 0.0f, 0.0f)
 			},
 		};
 		//オブジェクトの作成
@@ -49,7 +54,9 @@ namespace basecross {
 			//ビューとライトの作成
 			CreateViewLight();
 
-			AddGameObject<Player>();
+			auto ptrPlayer = AddGameObject<Player>();
+			SetSharedGameObject(L"Player", ptrPlayer);
+
 			CreateGameBox();
 		}
 		catch (...) {
