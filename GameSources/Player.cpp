@@ -12,7 +12,8 @@ namespace basecross {
 		GameObject(StagePtr),
 		m_Speed(10.0f),
 		m_jumpHeight(20.0f),
-		m_stat(stand)
+		m_moveVel(Vec2(0, 0)),
+		m_stateType(stand)
 	{}
 	
 	Vec2 Player::GetInputState() const {
@@ -97,6 +98,8 @@ namespace basecross {
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(Vec3(0, 0.125f, 0));
 
+		m_prevPos = GetComponent<Transform>()->GetPosition();
+
 		//CollisionSphere衝突判定を付ける
 		auto ptrColl = AddComponent<CollisionSphere>();
 		ptrColl->SetDrawActive(true);
@@ -117,6 +120,7 @@ namespace basecross {
 
 		//描画コンポーネントの設定
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
+		
 		//描画するメッシュを設定
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetFogEnabled(true);
@@ -125,24 +129,52 @@ namespace basecross {
 	void Player::OnUpdate() {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
-		if (m_stat == stand)
-		{
+		float elapsed = App::GetApp()->GetElapsedTime();
+		frameElapsed += elapsed;
+
+		if (frameElapsed > _frame) {
+			frameElapsed -= _frame;
+
+			auto pos = GetComponent<Transform>()->GetPosition();
+			m_moveVel = pos - m_prevPos;
+
+			if (m_stateType == air && m_moveVel.y < 0) {
+				m_stateType = fall;
+			}
+
+			m_prevPos = pos;
 		}
 
 		MovePlayer();
+
+
+		ShowDebug();
+	}
+
+	void Player::ShowDebug() {
+		wstringstream wss;
+		auto pos = GetComponent<Transform>()->GetPosition();
+
+		wss << "stateType : " << m_stateType << endl;
+		wss << "pos : " << pos.x << ", " << pos.y << endl;
+		wss << "prevPos : " << m_prevPos.x << ", " << m_prevPos.y << endl;
+		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
+
+		auto scene = App::GetApp()->GetScene<Scene>();
+		scene->SetDebugString(L"Player\n" + wss.str());
 	}
 
 	void Player::OnPushA()
 	{
-		if (m_stat != stand) return;	//立ち状態以外ではジャンプしない
+		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
 		auto grav = GetComponent<Gravity>();
 		grav->StartJump(Vec3(0, m_jumpHeight, 0)); 
-		m_stat = air;
+		m_stateType = air;
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		if (Other->FindTag(L"FixedBox")) {
-			m_stat = stand;
+			m_stateType = stand;
 		}
 
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい

@@ -16,13 +16,18 @@ namespace basecross {
 		//プレイヤーの移動
 		void MovePlayer();
 		//文字列の表示
-		void DrawStrings();
+		void ShowDebug();
 		//入力ハンドラー
 		InputHandler<Player> m_InputHandler;
 		//スピード
 		float m_Speed;
 		//ジャンプ高度
 		float m_jumpHeight;
+		//移動距離と、それを算出するための座標保管用変数
+		Vec3 m_moveVel, m_prevPos;
+		float frameElapsed = .0f;
+		const float _frame = .166f;
+
 
 		enum Stats {
 			stand,		//地上
@@ -31,7 +36,7 @@ namespace basecross {
 			hit			//やられ
 		};
 
-		Stats m_stat;
+		Stats m_stateType;
 
 	public:
 		//構築と破棄
