@@ -58,6 +58,7 @@ namespace basecross {
 		void OnPushA();
 
 		void MoveCamera();
+		float GetCollisionScale();
 	};
 
 //--------------------------------------------------------------------------------------

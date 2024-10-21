@@ -201,6 +201,10 @@ namespace basecross {
 			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
 		}
 	}
+
+	float Player::GetCollisionScale() {
+		return GetComponent<CollisionSphere>()->GetMakedRadius();
+	}
   
   
 	void LandingCollider::OnCreate() {
