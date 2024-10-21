@@ -39,6 +39,8 @@ namespace basecross {
 		//virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 		////Aƒ{ƒ^ƒ“
 		void OnPushA();
+
+		void MoveCamera();
 	};
 
 

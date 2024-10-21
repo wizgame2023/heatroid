@@ -13,7 +13,7 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 
 	//ビューとライトの作成
-	void GameStage::CreateViewLight() {
+	void GameStageTsuboi::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
 		camera->SetEye(Vec3(0.0f, 2.0f, 15.0f));
@@ -28,7 +28,7 @@ namespace basecross {
 		light->SetDefaultLighting(); //デフォルトのライティングを指定
 	}
 
-	void GameStage::CreateGameBox() {
+	void GameStageTsuboi::CreateGameBox() {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
@@ -44,7 +44,7 @@ namespace basecross {
 	}
 
 
-	void GameStage::OnCreate() {
+	void GameStageTsuboi::OnCreate() {
 		try {
 			//ビューとライトの作成
 			CreateViewLight();

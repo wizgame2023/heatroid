@@ -92,6 +92,8 @@ namespace basecross{
 	void Player::OnCreate() {
 
 		//初期位置などの設定
+		float elapsedTime = App::GetApp()->GetElapsedTime();
+
 		auto ptr = AddComponent<Transform>();
 		ptr->SetScale(1.00f, 1.00f, 1.00f);	//直径25センチの球体
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
@@ -109,8 +111,7 @@ namespace basecross{
 		auto ptrGra = AddComponent<Gravity>();
 
 		//影をつける（シャドウマップを描画する）
-		auto shadowPtr = AddComponent<Shadowmap>();
-		//影の形（メッシュ）を設定
+		auto shadowPtr = AddComponent<Shadowmap>();	//影の形（メッシュ）を設定
 		shadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 
 		//描画コンポーネントの設定
@@ -118,6 +119,7 @@ namespace basecross{
 		//描画するメッシュを設定
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetFogEnabled(true);
+
 	}
 
 	void Player::OnUpdate() {
@@ -128,8 +130,8 @@ namespace basecross{
 		{
 			grav->SetGravity(Vec3(0, -30.0f, 0));
 		}
-
 		MovePlayer();
+		//MoveCamera();
 	}
 
 	void Player::OnPushA()
@@ -144,6 +146,18 @@ namespace basecross{
 		}
 	}
 
+	void Player::MoveCamera()
+	{
+		auto ptrCamera = dynamic_pointer_cast<Camera>(OnGetDrawCamera());
+		auto pos = GetComponent<Transform>()->GetPosition();
+		Vec3 Camera = ptrCamera->GetEye();
+		float differenceX = pos.x - Camera.x;
+		if (differenceX <= -5.0f || differenceX >= 5.0f)
+		{
+			ptrCamera->SetEye(Camera.x+ differenceX, Camera.y, Camera.z);
+			ptrCamera->SetAt(Vec3(pos.x + differenceX, pos.y, pos.z));
+		}
+	}
 }
 //end basecross
 
