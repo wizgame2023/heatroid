@@ -10,13 +10,13 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_Speed(10.0f),
-		m_jumpHeight(20.0f),
-		m_gravity(-30.0f),
-		m_moveVel(Vec2(0, 0)),
-		m_stateType(stand)
+		m_speed(.3f),
+		m_jumpHeight(.4f),
+		m_gravity(-.08f),
+		m_moveVel(Vec3(0, 0, 0)),
+		m_stateType(air)
 	{}
-	
+
 	Vec2 Player::GetInputState() const {
 		Vec2 ret;
 		//コントローラの取得
@@ -75,33 +75,23 @@ namespace basecross {
 	}
 
 	void Player::MovePlayer() {
-		float elapsedTime = App::GetApp()->GetElapsedTime();
-		auto angle = GetMoveVector();
-		if (angle.length() > 0.0f) {
-			auto pos = GetComponent<Transform>()->GetPosition();
-			pos += angle * elapsedTime * m_Speed;
-			GetComponent<Transform>()->SetPosition(pos.x, pos.y, 0);
-		}
-		//回転の計算
-		if (angle.length() > 0.0f) {
-			auto utilPtr = GetBehavior<UtilBehavior>();
-			utilPtr->RotToHead(angle, 1.0f);
-		}
+		m_moveVel.x = GetMoveVector().x * m_speed;
+		m_moveVel.y += m_gravity * _elapsed;
+		if (m_stateType == stand) m_moveVel.y = 0;
+
+		auto trans = GetComponent<Transform>();
+		trans->SetPosition((m_moveVel * _elapsed) + trans->GetPosition());
 	}
 
 	void Player::OnCreate() {
-		//経過時間を取得
-		float elapsedTime = App::GetApp()->GetElapsedTime();
 
 		AddTag(L"Player");
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(1.00f, 1.00f, 1.00f);	//直径25センチの球体
+		ptr->SetScale(0.10f, 0.10f, 0.10f);	//直径25センチの球体
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
-		ptr->SetPosition(Vec3(0, 0.125f, 0));
-
-		m_prevPos = GetComponent<Transform>()->GetPosition();
+		ptr->SetPosition(Vec3(0, 1.0f, 0));
 
 		//CollisionSphere衝突判定を付ける
 		auto ptrColl = AddComponent<CollisionSphere>();
@@ -112,10 +102,6 @@ namespace basecross {
 		GetStage()->SetUpdatePerformanceActive(true);
 		GetStage()->SetDrawPerformanceActive(true);
 
-		//重力をつける
-		auto ptrGra = AddComponent<Gravity>();
-		ptrGra->SetGravity(Vec3(0, m_gravity, 0));
-
 		//影をつける（シャドウマップを描画する）
 		auto shadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
@@ -123,7 +109,7 @@ namespace basecross {
 
 		//描画コンポーネントの設定
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
-		
+
 		//描画するメッシュを設定
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetFogEnabled(true);
@@ -133,24 +119,6 @@ namespace basecross {
 	void Player::OnUpdate() {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
-		float elapsed = App::GetApp()->GetElapsedTime();
-		frameElapsed += elapsed;
-
-		if (frameElapsed > _frame) {
-			frameElapsed -= _frame;
-
-			auto pos = GetComponent<Transform>()->GetPosition();
-			RoundOff(pos, 2);
-			m_moveVel = RoundOff(pos - m_prevPos, 2);
-
-			if (m_stateType == air && m_moveVel.y < 0) {
-				m_stateType = fall;
-			}
-
-			m_prevPos = pos;
-		}
-
-		auto grav = GetComponent<Gravity>();
 
 		MovePlayer();
 		MoveCamera();
@@ -160,11 +128,10 @@ namespace basecross {
 
 	void Player::ShowDebug() {
 		wstringstream wss;
-		auto pos = GetComponent<Transform>()->GetPosition();
+		auto pos = RoundOff(GetComponent<Transform>()->GetPosition(), 3);
 
 		wss << "stateType : " << m_stateType << endl;
 		wss << "pos : " << pos.x << ", " << pos.y << endl;
-		wss << "prevPos : " << m_prevPos.x << ", " << m_prevPos.y << endl;
 		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
 
 		auto scene = App::GetApp()->GetScene<Scene>();
@@ -174,22 +141,14 @@ namespace basecross {
 	void Player::OnPushA()
 	{
 		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
-		auto grav = GetComponent<Gravity>();
-		grav->StartJump(Vec3(0, m_jumpHeight, 0)); 
+		m_moveVel.y += m_jumpHeight;
 		m_stateType = air;
 	}
 
-	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other) {
-		if (m_stateType != stand && Other->FindTag(L"FixedBox")) {
+	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
+		if (m_stateType == air && Other->FindTag(L"FixedBox")) {
 			m_stateType = stand;
 		}
-
-		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
-
-	}
-	void Player::OnCollisionExit(shared_ptr<GameObject>& Other) {
-		if (m_stateType == stand) m_stateType = air;
-
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
 
 	}
@@ -212,20 +171,18 @@ namespace basecross {
 		}
 	}
 
-	float Player::GetCollisionScale() {
-		return GetComponent<CollisionSphere>()->GetMakedRadius();
-	}
-
-
 	Vec3 Player::RoundOff(Vec3 number, int point) {
-		Vec3 r;
-		r.x = round(number.x * pow(10, point));
-		r.y = round(number.y * pow(10, point));
-		r.z = round(number.z * pow(10, point));
+		Vec3 r = number *= pow(10, point);
+		r.x = round(r.x);
+		r.y = round(r.y);
+		r.z = round(r.z);
 		r /= pow(10, point);
 		return r;
 	}
-  
+
+	void Player::Gravity() {
+		m_moveVel.y += m_gravity * _elapsed;
+	}
 }
 //end basecross
 

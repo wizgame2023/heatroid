@@ -20,25 +20,23 @@ namespace basecross {
 		//入力ハンドラー
 		InputHandler<Player> m_InputHandler;
 		//スピード
-		float m_Speed;
+		float m_speed;
 		//ジャンプ高度
 		float m_jumpHeight;
 		//重力
 		float m_gravity;
-		//移動距離と、それを算出するための座標保管用変数
-		Vec3 m_moveVel, m_prevPos;
-		float frameElapsed = .0f;
-		const float _frame = .166f;
-
+		//移動方向
+		Vec3 m_moveVel;
 
 		enum Stats {
 			stand,		//地上
 			air,		//空中
-			fall,		//落下中
 			hit			//やられ
 		};
 
 		Stats m_stateType;
+
+		float _elapsed = App::GetApp()->GetElapsedTime();
 
 	public:
 		//構築と破棄
@@ -54,8 +52,7 @@ namespace basecross {
 		//virtual void OnUpdate2() override;
 		
 		//何かに接触している判定(接地判定に活用？)
-		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
-		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
 		
 		////Aボタン
 		void OnPushA();
@@ -63,6 +60,7 @@ namespace basecross {
 		void MoveCamera();
 		float GetCollisionScale();
 		Vec3 RoundOff(Vec3 number, int point);
+		void Gravity();
 	};
 
 }
