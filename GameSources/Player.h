@@ -23,6 +23,8 @@ namespace basecross {
 		float m_Speed;
 		//ジャンプ高度
 		float m_jumpHeight;
+		//重力
+		float m_gravity;
 		//移動距離と、それを算出するための座標保管用変数
 		Vec3 m_moveVel, m_prevPos;
 		float frameElapsed = .0f;
@@ -53,41 +55,14 @@ namespace basecross {
 		
 		//何かに接触している判定(接地判定に活用？)
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 		
 		////Aボタン
 		void OnPushA();
 
 		void MoveCamera();
 		float GetCollisionScale();
-	};
-
-//--------------------------------------------------------------------------------------
-//	プレイヤー 接地判定オブジェクト(使わない可能性大)
-//--------------------------------------------------------------------------------------
-	class LandingCollider : public GameObject
-	{
-		weak_ptr<GameObject> m_Player;
-		Vec3 m_VecToParent;
-	public:
-		// 構築と破棄
-		LandingCollider(const shared_ptr<Stage>& stage,
-			const shared_ptr<GameObject>& parent,
-			const Vec3& VecToParent) :
-			GameObject(stage),
-			m_Player(static_cast<shared_ptr<GameObject>>(parent))
-		{
-		}
-		virtual ~LandingCollider()
-		{
-		}
-
-		virtual void OnCreate() override; // 初期化
-		virtual void OnUpdate() override; // 更新
-		//virtual void OnDraw() override; // 描画
-
-		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
-
-		void FollowPlayer();
+		Vec3 RoundOff(Vec3 number, int point);
 	};
 
 }

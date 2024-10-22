@@ -16,8 +16,8 @@ namespace basecross {
 	void GameStageTsuboi::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, 2.0f, 15.0f));
-		camera->SetAt(Vec3(0.0f, 0.0f, 0.0f));
+		camera->SetEye(Vec3(0.0f, 2.0f, 30.0f));
+		camera->SetAt(Vec3(0.0f, 2.0f, 0.0f));
 
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -35,11 +35,16 @@ namespace basecross {
 				Vec3(30.0f, 1.0f, 3.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(0.0f, -4.0f, 0.0f)
-			},			
+			},
 			{
 				Vec3(10.0f, 1.0f, 3.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(5.0f, 0.0f, 0.0f)
+				Vec3(8.0f, 0.0f, 0.0f)
+			},
+			{
+				Vec3(1.0f, 10.0f, 3.0f),
+				Vec3(0.0f, 0.0f, 0.0f),
+				Vec3(-8.0f, 0.0f, 0.0f)
 			},
 		};
 		//オブジェクトの作成

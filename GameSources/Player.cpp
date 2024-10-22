@@ -12,6 +12,7 @@ namespace basecross {
 		GameObject(StagePtr),
 		m_Speed(10.0f),
 		m_jumpHeight(20.0f),
+		m_gravity(-30.0f),
 		m_moveVel(Vec2(0, 0)),
 		m_stateType(stand)
 	{}
@@ -89,7 +90,7 @@ namespace basecross {
 	}
 
 	void Player::OnCreate() {
-		//�����ʒu�Ȃǂ̐ݒ�
+		//経過時間を取得
 		float elapsedTime = App::GetApp()->GetElapsedTime();
 
 		AddTag(L"Player");
@@ -113,7 +114,7 @@ namespace basecross {
 
 		//重力をつける
 		auto ptrGra = AddComponent<Gravity>();
-		ptrGra->SetGravity(Vec3(0, -30.0f, 0));
+		ptrGra->SetGravity(Vec3(0, m_gravity, 0));
 
 		//影をつける（シャドウマップを描画する）
 		auto shadowPtr = AddComponent<Shadowmap>();
@@ -139,7 +140,8 @@ namespace basecross {
 			frameElapsed -= _frame;
 
 			auto pos = GetComponent<Transform>()->GetPosition();
-			m_moveVel = pos - m_prevPos;
+			RoundOff(pos, 2);
+			m_moveVel = RoundOff(pos - m_prevPos, 2);
 
 			if (m_stateType == air && m_moveVel.y < 0) {
 				m_stateType = fall;
@@ -147,9 +149,11 @@ namespace basecross {
 
 			m_prevPos = pos;
 		}
+
+		auto grav = GetComponent<Gravity>();
+
 		MovePlayer();
 		MoveCamera();
-
 
 		ShowDebug();
 	}
@@ -176,9 +180,15 @@ namespace basecross {
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other) {
-		if (Other->FindTag(L"FixedBox")) {
+		if (m_stateType != stand && Other->FindTag(L"FixedBox")) {
 			m_stateType = stand;
 		}
+
+		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
+
+	}
+	void Player::OnCollisionExit(shared_ptr<GameObject>& Other) {
+		if (m_stateType == stand) m_stateType = air;
 
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
 
@@ -205,58 +215,17 @@ namespace basecross {
 	float Player::GetCollisionScale() {
 		return GetComponent<CollisionSphere>()->GetMakedRadius();
 	}
+
+
+	Vec3 Player::RoundOff(Vec3 number, int point) {
+		Vec3 r;
+		r.x = round(number.x * pow(10, point));
+		r.y = round(number.y * pow(10, point));
+		r.z = round(number.z * pow(10, point));
+		r /= pow(10, point);
+		return r;
+	}
   
-  
-	void LandingCollider::OnCreate() {
-		//初期位置などの設定
-		auto ptrTrans = AddComponent<Transform>();
-		ptrTrans->SetScale(.25f, .25f, .25f);	//直径25センチの球体
-		ptrTrans->SetRotation(0.0f, 0.0f, 0.0f);
-		ptrTrans->SetPosition(Vec3(0, 0.125f, 0));
-
-		//CollisionSphere衝突判定を付ける
-		auto ptrColl = AddComponent<CollisionSphere>();
-		ptrColl->SetDrawActive(true);
-		ptrColl->AddExcludeCollisionTag(L"Player");
-
-		auto ptrParent = m_Player.lock();
-		if (ptrParent) {
-			auto posTarget = ptrParent->GetComponent<Transform>()->GetPosition();
-			posTarget += m_VecToParent;
-			ptrTrans->SetPosition(posTarget);
-		}
-
-
-	}
-
-	void LandingCollider::OnUpdate() {
-		FollowPlayer();
-	}
-
-	void LandingCollider::FollowPlayer() {
-		auto ptrTrans = GetComponent<Transform>();
-		auto pos = ptrTrans->GetPosition();
-		auto ptrPlayer = m_Player.lock();
-		if (ptrPlayer) {
-			auto matPlayer = ptrPlayer->GetComponent<Transform>()->GetWorldMatrix();
-			matPlayer.scaleIdentity();
-			Mat4x4 mat;
-			mat.affineTransformation(
-				Vec3(1.0),
-				Vec3(0.0),
-				Vec3(0.0),
-				m_VecToParent
-			);
-			mat *= matPlayer;
-
-			auto posTarget = mat.transInMatrix();
-			ptrTrans->SetPosition(posTarget+Vec3(0, -1, 0));
-			ptrTrans->SetQuaternion(mat.quatInMatrix());
-		}
-	}
-
-	void LandingCollider::OnCollisionEnter(shared_ptr<GameObject>& Other) {
-	}
 }
 //end basecross
 
