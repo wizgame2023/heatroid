@@ -8,12 +8,16 @@
 
 namespace basecross {
 
-	Player::Player(const shared_ptr<Stage>& StagePtr) :
-		GameObject(StagePtr),
-		m_speed(.3f),
+	Player::Player(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr),
+		m_speed(.25f),
+		m_accel(.1f),
+		m_friction(.9f),
+		m_frictionThreshold(.001f),
 		m_jumpHeight(.4f),
-		m_gravity(-.08f),
+		m_gravity(-.075f),
 		m_moveVel(Vec3(0, 0, 0)),
+		m_collideCountInit(3),
+		m_collideCount(m_collideCountInit),
 		m_stateType(air)
 	{}
 
@@ -75,12 +79,23 @@ namespace basecross {
 	}
 
 	void Player::MovePlayer() {
-		m_moveVel.x = GetMoveVector().x * m_speed;
-		m_moveVel.y += m_gravity * _elapsed;
-		if (m_stateType == stand) m_moveVel.y = 0;
+		m_moveVel.x += GetMoveVector().x * m_accel * _delta;
+		m_moveVel.y += m_gravity * _delta;
+
+		if (m_stateType == stand) {
+			if (GetMoveVector().x == 0) {
+				if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
+				else m_moveVel.x *= m_friction * _delta;
+			}
+		}
+
+		if (m_moveVel.x > m_speed) m_moveVel.x = m_speed;
+		if (m_moveVel.x < -m_speed) m_moveVel.x = -m_speed;
 
 		auto trans = GetComponent<Transform>();
-		trans->SetPosition((m_moveVel * _elapsed) + trans->GetPosition());
+		trans->SetPosition((m_moveVel * _delta) + trans->GetPosition());
+
+		if (m_stateType == stand && m_moveVel.y < m_gravity) m_moveVel.y = m_gravity;
 	}
 
 	void Player::OnCreate() {
@@ -123,6 +138,11 @@ namespace basecross {
 		MovePlayer();
 		MoveCamera();
 
+		m_collideCount--;
+		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
+	}
+
+	void Player::OnUpdate2() {
 		ShowDebug();
 	}
 
@@ -133,6 +153,7 @@ namespace basecross {
 		wss << "stateType : " << m_stateType << endl;
 		wss << "pos : " << pos.x << ", " << pos.y << endl;
 		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
+		wss << "exitcnt : " << m_collideCount << endl;
 
 		auto scene = App::GetApp()->GetScene<Scene>();
 		scene->SetDebugString(L"Player\n" + wss.str());
@@ -141,11 +162,12 @@ namespace basecross {
 	void Player::OnPushA()
 	{
 		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
-		m_moveVel.y += m_jumpHeight;
+		m_moveVel.y = m_jumpHeight;
 		m_stateType = air;
 	}
 
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
+		m_collideCount = m_collideCountInit;
 		if (m_stateType == air && Other->FindTag(L"FixedBox")) {
 			m_stateType = stand;
 		}
@@ -181,7 +203,7 @@ namespace basecross {
 	}
 
 	void Player::Gravity() {
-		m_moveVel.y += m_gravity * _elapsed;
+		m_moveVel.y += m_gravity * _delta;
 	}
 
 	Vec3 Player::GetScale() {
