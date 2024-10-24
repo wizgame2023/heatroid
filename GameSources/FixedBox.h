@@ -1,7 +1,7 @@
 /*!
 @file FixedBox.h
-@brief ‘«êƒuƒƒbƒN‚È‚Ç
-’S“–FˆíŒ©
+@brief è¶³å ´ãƒ–ãƒ­ãƒƒã‚¯ãªã©
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -17,20 +17,43 @@ namespace basecross {
 		Vec3 m_rotation;
 		Vec3 m_scale;
 	public:
-		//\’z‚Æ”jŠü
+		//æ§‹ç¯‰ã¨ç ´æ£„
 		FixedBox(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
 			const Vec3& scale
 		);
 		virtual ~FixedBox();
-		//‰Šú‰»
+		//åˆæœŸåŒ–
 		virtual void OnCreate() override;
 		Vec3 GetPositoin();
 		Vec3 GetScale();
 	};
 
 	//--------------------------------------------------------------------------------------
+//ã€€ã‚¿ã‚¤ãƒªãƒ³ã‚°ã™ã‚‹å›ºå®šã®ãƒœãƒƒã‚¯ã‚¹
+//--------------------------------------------------------------------------------------
+	class TilingFixedBox : public GameObject {
+		Vec3 m_Scale;
+		Vec3 m_Rotation;
+		Vec3 m_Position;
+		float m_UPic;
+		float m_VPic;
+	public:
+		//æ§‹ç¯‰ã¨ç ´æ£„
+		TilingFixedBox(const shared_ptr<Stage>& StagePtr,
+			const Vec3& Scale,
+			const Vec3& Rotation,
+			const Vec3& Position,
+			float UPic,
+			float VPic
+		);
+		virtual ~TilingFixedBox();
+		//åˆæœŸåŒ–
+		virtual void OnCreate() override;
+		//æ“ä½œ
+	};
+
 	//	class BreakWall : public GameObject;
 	//--------------------------------------------------------------------------------------
 	class BreakWall :public GameObject {
