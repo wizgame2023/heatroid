@@ -74,7 +74,7 @@ namespace basecross {
 		m_trans->SetScale(m_scal);
 		m_beforState = m_stateType;
 
-		m_playerScale = m_player->GetCollisionScale();
+		m_playerScale = m_player->GetScale();
 		//ï`âÊ
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
@@ -130,7 +130,7 @@ namespace basecross {
 			auto boxPos = m_box->GetPositoin();
 			auto boxScal = m_box->GetScale();
 			if (m_pos.x > boxPos.x + boxScal.x / 2 - m_scal.x / 2-0.2f) {
-				m_speed=0.0f;
+				m_speed = 0.0f;
 				if (m_pos.x > playerPos.x) {
 					m_speed = 0.3f;
 				}
@@ -159,10 +159,10 @@ namespace basecross {
 		//í«è]ÇÃç∂âEà⁄ìÆ
 		case rightMove:
 			if (m_stateType == rightMove) {
-				if (m_pos.x < playerPos.x - (m_scal.x / 2 + 0.051)) {
+				if (m_pos.x < playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
 					m_dic = -1;
 				}
-				else if (m_pos.x > playerPos.x + (m_scal.x / 2 + 0.051)) {
+				else if (m_pos.x > playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
 					m_dic = 1;
 				}
 				else {

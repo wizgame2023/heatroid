@@ -33,9 +33,9 @@ namespace basecross {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
-				Vec3(3.0f, 0.1f, 0.3f),
+				Vec3(0.0f, -0.4f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(0.0f, -0.4f, 0.0f)
+				Vec3(3.0f, 0.1f, 0.3f)
 			},
 		};
 		//オブジェクトの作成

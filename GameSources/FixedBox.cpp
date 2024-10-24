@@ -10,14 +10,14 @@
 namespace basecross {
 
 	FixedBox::FixedBox(const shared_ptr<Stage>& StagePtr,
-		const Vec3& Scale,
-		const Vec3& Rotation,
-		const Vec3& Position
+		const Vec3& position,
+		const Vec3& rotation,
+		const Vec3& scale
 	) :
 		GameObject(StagePtr),
-		m_scale(Scale),
-		m_rotation(Rotation),
-		m_position(Position)
+		m_position(position),
+		m_rotation(rotation),
+		m_scale(scale)
 	{
 	}
 	FixedBox::~FixedBox() {}
@@ -25,9 +25,9 @@ namespace basecross {
 	//èâä˙âª
 	void FixedBox::OnCreate() {
 		auto ptrTransform = GetComponent<Transform>();
-		ptrTransform->SetScale(m_scale);
-		ptrTransform->SetRotation(m_rotation);
 		ptrTransform->SetPosition(m_position);
+		ptrTransform->SetRotation(m_rotation);
+		ptrTransform->SetScale(m_scale);
 		//OBBè’ìÀjîªíËÇïtÇØÇÈ
 		auto ptrColl = AddComponent<CollisionObb>();
 		ptrColl->SetFixed(true);
@@ -45,5 +45,9 @@ namespace basecross {
 	Vec3 FixedBox::GetScale() {
 		return m_scale;
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	class BreakWall : public GameObject;
+	//--------------------------------------------------------------------------------------
 
 }
