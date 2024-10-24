@@ -73,6 +73,21 @@ namespace basecross {
 		void Gravity();
 	};
 
+	class AttackCollision : public GameObject {
+
+	public:
+		//構築と破棄
+
+		AttackCollision(const shared_ptr<Stage>& StagePtr);
+
+		virtual ~AttackCollision() {}
+		//アクセサ
+		//初期化
+		virtual void OnCreate() override;
+		//更新
+		virtual void OnUpdate() override;
+
+	};
 }
 //end basecross
 

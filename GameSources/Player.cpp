@@ -8,7 +8,8 @@
 
 namespace basecross {
 
-	Player::Player(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr),
+	Player::Player(const shared_ptr<Stage>& StagePtr) : 
+		GameObject(StagePtr),
 		m_speed(.225f),
 		m_accel(.1f),
 		m_friction(.9f),
@@ -131,6 +132,7 @@ namespace basecross {
 
 		m_HP = m_HP_max;
 
+		GetStage()->SetSharedGameObject(L"PlayerAttack", GetStage()->AddGameObject<AttackCollision>());
 	}
 
 	void Player::OnUpdate() {

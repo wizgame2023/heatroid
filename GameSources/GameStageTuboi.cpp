@@ -32,19 +32,19 @@ namespace basecross {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
-				Vec3(3.0f, .1f, .3f),
+				Vec3(0.0f, -.5f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(0.0f, -.5f, 0.0f)
+				Vec3(3.0f, .1f, .3f)
 			},
 			{
-				Vec3(1.0f, .1f, .3f),
+				Vec3(.8f, 0.0f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(.8f, 0.0f, 0.0f)
+				Vec3(1.0f, .1f, .3f)
 			},
 			{
-				Vec3(.1f, 1.0f, .3f),
+				Vec3(-.80f, 0.0f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(-.80f, 0.0f, 0.0f)
+				Vec3(.1f, 1.0f, .3f)
 			},
 		};
 		//オブジェクトの作成
