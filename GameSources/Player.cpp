@@ -183,6 +183,10 @@ namespace basecross {
 	void Player::Gravity() {
 		m_moveVel.y += m_gravity * _elapsed;
 	}
+
+	Vec3 Player::GetScale() {
+		return GetComponent<Transform>()->GetScale();
+	}
 }
 //end basecross
 

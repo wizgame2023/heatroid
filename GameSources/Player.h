@@ -58,7 +58,7 @@ namespace basecross {
 		void OnPushA();
 
 		void MoveCamera();
-		float GetCollisionScale();
+		Vec3 GetScale();
 		Vec3 RoundOff(Vec3 number, int point);
 		void Gravity();
 	};
