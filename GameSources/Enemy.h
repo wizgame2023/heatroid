@@ -34,7 +34,6 @@ namespace basecross {
 		float m_time;
 		float m_bulletTime;  //弾の発射間隔
 		float m_bulletRange; //弾を発射する距離
-		float m_playerScale; //プレイヤーのサイズ
 		int m_dic;           //向いている方向 左-1,右1
 		bool m_bulletFlag;   
 		bool m_jumpFlag;
@@ -46,6 +45,7 @@ namespace basecross {
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
+		Vec3 m_playerScale; //プレイヤーのサイズ
 
 		shared_ptr<Transform> m_trans;
 		shared_ptr<Player> m_player;
