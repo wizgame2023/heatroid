@@ -1,16 +1,24 @@
 /*!
 @file Enemy.cpp
 @brief ìGÇ»Ç«é¿ëÃ
+íSìñÅFàÌå©
 */
 
 #include "stdafx.h"
 #include "Project.h"
 
 namespace basecross {
-	//-----     ìG     -----
-	Enemy::Enemy(const shared_ptr<Stage>& stage, const shared_ptr<Player>& player) :
+
+	//--------------------------------------------------------------------------------------
+	//	class Enemy : public GameObject;  //ìG
+	//--------------------------------------------------------------------------------------
+	Enemy::Enemy(const shared_ptr<Stage>& stage, 
+		const shared_ptr<Player>& player,
+		const shared_ptr<FixedBox>& box
+	) :
 		GameObject(stage),
 		m_player(player),
+		m_box(box),
 		m_stateType(rightMove),
 		m_pos(Vec3(-1.0f, 0.4f, 0.0f)),
 		m_rot(Vec3(0.0f, 0.0f, 0.0f)),
@@ -19,6 +27,7 @@ namespace basecross {
 		m_maxHp(100),
 		m_speed(0.3f),
 		m_upSpeed(0.3f),
+		m_upHeight(0.25f),
 		m_jumpPower(1.0f),
 		m_jumpTime(1.0f),
 		m_dic(-1),
@@ -31,11 +40,15 @@ namespace basecross {
 	{}
 
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
+		const shared_ptr<Player>& player,
 		const Vec3& position,
 		const Vec3& rotatoin,
-		const Vec3& scale
+		const Vec3& scale,
+		const shared_ptr<FixedBox>& box
 	) :
 		GameObject(stage),
+		m_player(player),
+		m_box(box),
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
@@ -59,6 +72,7 @@ namespace basecross {
 		m_trans->SetPosition(m_pos);
 		m_trans->SetRotation(m_rot);
 		m_trans->SetScale(m_scal);
+		m_beforState = m_stateType;
 
 		m_playerScale = m_player->GetCollisionScale();
 		//ï`âÊ
@@ -111,41 +125,111 @@ namespace basecross {
 		}
 /*------------------ÉeÉXÉgóp-------------------------*/
 
-		//ÉvÉåÉCÉÑÅ[ÇÃÇ¢ÇÈï˚å¸Ç…ç∂âEà⁄ìÆ
-		if (m_stateType == rightMove) {
-			if (m_pos.x < playerPos.x - (m_scal.x / 2 + 0.051)) {
-				m_dic = -1;
+		//ë´èÍÇ©ÇÁóéâ∫ñhé~
+		if (m_box != nullptr) {
+			auto boxPos = m_box->GetPositoin();
+			auto boxScal = m_box->GetScale();
+			if (m_pos.x > boxPos.x + boxScal.x / 2 - m_scal.x / 2-0.2f) {
+				m_speed=0.0f;
+				if (m_pos.x > playerPos.x) {
+					m_speed = 0.3f;
+				}
 			}
-			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + 0.051)) {
-				m_dic = 1;
+			else if (m_pos.x < boxPos.x - boxScal.x / 2 + m_scal.x / 2+0.2f) {
+				m_speed = 0;
+				if (m_pos.x < playerPos.x) {
+					m_speed = 0.3f;
+				}
 			}
 			else {
+				m_speed = 0.3f;
+			}
+		}
+
+		//çsìÆÉpÉ^Å[Éì
+		switch (m_stateType)
+		{
+		//à⁄ìÆÇ»Çµ
+		case stay:
+			if (m_stateType == stay) {
 				m_dic = 0;
 			}
-			m_pos.x += -m_dic * m_speed * elapsed;
-		}
+			break;
 
-		//è„â∫Ç…à⁄ìÆ
-		if (m_stateType == upMove) {
-			if (m_pos.y > 0.5f) {
-				m_dic = -1;
+		//í«è]ÇÃç∂âEà⁄ìÆ
+		case rightMove:
+			if (m_stateType == rightMove) {
+				if (m_pos.x < playerPos.x - (m_scal.x / 2 + 0.051)) {
+					m_dic = -1;
+				}
+				else if (m_pos.x > playerPos.x + (m_scal.x / 2 + 0.051)) {
+					m_dic = 1;
+				}
+				else {
+					m_dic = 0;
+				}
+				m_pos.x += -m_dic * m_speed * elapsed;
 			}
-			else if(m_pos.y < -0.25f) {
-				m_dic = 1;
-			}
-			m_pos.y += m_dic * m_upSpeed * elapsed;
-		}
+			break;
 
-		//ïÇóV
-		if (m_stateType == fly) {
-			if (!m_jumpFlag) {
-				EnemyJump();
-				m_jumpFlag = true;
+		case basecross::Enemy::upMove:
+			//è„â∫Ç…à⁄ìÆ
+			if (m_stateType == upMove) {
+				if (m_pos.y > 0.5f) {
+					m_dic = -1;
+				}
+				else if (m_pos.y < -0.25f) {
+					m_dic = 1;
+				}
+				m_pos.y += m_dic * m_upSpeed * elapsed;
 			}
-			if (m_pos.y <= 0.4f) {
-				m_jumpFlag = false;
+			break;
+
+		case basecross::Enemy::flyMove:
+			//í«è]ïÇóV
+			if (m_stateType == flyMove) {
+				if (!m_jumpFlag) {
+					EnemyJump();
+					m_jumpFlag = true;
+				}
+				if (m_pos.y <= 0.4f) {
+					m_jumpFlag = false;
+				}
+				if (m_pos.x < playerPos.x - (m_scal.x / 2 + 0.051)) {
+					m_dic = -1;
+				}
+				else if (m_pos.x > playerPos.x + (m_scal.x / 2 + 0.051)) {
+					m_dic = 1;
+				}
+				else {
+					m_dic = 0;
+				}
+				m_pos.x += -m_dic * m_speed * elapsed;
+
 			}
+			break;
+
+		case basecross::Enemy::fly:
+			//ïÇóV
+			if (m_stateType == fly) {
+				if (!m_jumpFlag) {
+					EnemyJump();
+					m_jumpFlag = true;
+				}
+				if (m_pos.y <= 0.4f) {
+					m_jumpFlag = false;
+				}
+			}
+			break;
+
+		case basecross::Enemy::death:
+			break;
+		case basecross::Enemy::runaway:
+			break;
+		default:
+			break;
 		}
+		m_trans->SetPosition(m_pos);
 
 
 		//íeÇÃê∂ê¨
@@ -177,7 +261,6 @@ namespace basecross {
 		//}
 
 
-		m_trans->SetPosition(m_pos);
 
 		//ìGÇÃì|Ç≥ÇÍÇΩéû
 		if (m_hp <= 0.0f) {
@@ -194,6 +277,10 @@ namespace basecross {
 			<<m_dic
 			<<L"\nfps : "
 			<<fps
+			<<L"\nstate : "
+			<<m_stateType
+			<<L"\npos : "
+			<<m_pos.x
 			<< endl;
 		scene->SetDebugString(wss.str());
 	}
@@ -235,9 +322,20 @@ namespace basecross {
 	void Enemy::SetState(State state) {
 		m_stateType = state;
 	}
+	void Enemy::SetUpMove(float speed, float height) {
+		m_upSpeed = speed;
+		m_upHeight = height;
+	}
+	void Enemy::SetFlyPower(float power) {
+		m_jumpPower = power;
+	}
 
-	//-----     ìGÇÃíe     -----
-	EnemyBullet::EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy):
+
+	//--------------------------------------------------------------------------------------
+	//	class EnemyBullet : public GameObject;  
+	//--------------------------------------------------------------------------------------
+	EnemyBullet::EnemyBullet(const shared_ptr<Stage>& stage, 
+		const shared_ptr<Enemy>& enemy):
 		GameObject(stage),
 		m_enemy(enemy),
 		m_pos(Vec3(0, 0, 0)),
