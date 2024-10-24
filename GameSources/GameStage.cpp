@@ -53,36 +53,6 @@ namespace basecross {
 		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(5, 0.0125f, 0));
 	}
 
-	void GameStage::CreateGameStage()
-	{
-		auto& LineVec = m_GameStage1.GetCsvVec();
-		for (size_t i = 0; i < LineVec.size(); i++)
-		{
-			vector<wstring> Tokens;
-			Util::WStrToTokenVector(Tokens, LineVec[i], L',');
-			for (size_t j = 0; j < Tokens.size(); j++) {
-				float XPos = (float)((int)j - 19);
-				float YPos = (float)(19 - (int)i);
-				if (Tokens[j] == L"1") {
-					AddGameObject<NoneBox>
-						(
-						Vec3(1.0f, 1.0f, 1.0f),
-						Vec3(0.0f, 0.0f, 0.0f),
-						Vec3(XPos, YPos, 0.0f)
-						);
-				}
-				if (Tokens[j] == L"4") {
-					AddGameObject<NoneBox>
-						(
-							Vec3(1.0f, 1.0f, 1.0f),
-							Vec3(0.0f, 0.0f, 0.0f),
-							Vec3(XPos, YPos, 0.0f)
-						);
-
-				}
-			}
- 		}
-	}
 	//ボックスの作成
 	void GameStage::CreateFixedBox() {
 		//CSVの行単位の配列
@@ -127,7 +97,6 @@ namespace basecross {
 			m_GameStage1.ReadCsv();
 			//ビューとライトの作成
 			CreateViewLight();
-			//CreateGameStage();
 			//CreateGameBox();
 			CreatePlayer();
 			CreateFixedBox();

@@ -17,7 +17,6 @@ namespace basecross {
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 		void CreateGameBox();//GameStage‚Ì¶¬
 		void CreatePlayer(); //Player‚Ì¶¬
-		void CreateGameStage();
 		void CreateFixedBox();
 	public:
 		//\’z‚Æ”jŠü
