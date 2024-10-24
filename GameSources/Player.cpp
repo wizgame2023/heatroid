@@ -10,10 +10,12 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_speed(.3f),
+		m_speed(.25f),
 		m_jumpHeight(.4f),
-		m_gravity(-.08f),
+		m_gravity(-.075f),
 		m_moveVel(Vec3(0, 0, 0)),
+		m_collideCountInit(3),
+		m_collideCount(m_collideCountInit),
 		m_stateType(air)
 	{}
 
@@ -77,7 +79,7 @@ namespace basecross {
 	void Player::MovePlayer() {
 		m_moveVel.x = GetMoveVector().x * m_speed;
 		m_moveVel.y += m_gravity * _elapsed;
-		if (m_stateType == stand) m_moveVel.y = 0;
+		if (m_stateType == stand && m_moveVel.y < 0) m_moveVel.y = 0;
 
 		auto trans = GetComponent<Transform>();
 		trans->SetPosition((m_moveVel * _elapsed) + trans->GetPosition());
@@ -124,6 +126,7 @@ namespace basecross {
 		MoveCamera();
 
 		ShowDebug();
+		m_collideCount--;
 	}
 
 	void Player::ShowDebug() {
@@ -133,6 +136,7 @@ namespace basecross {
 		wss << "stateType : " << m_stateType << endl;
 		wss << "pos : " << pos.x << ", " << pos.y << endl;
 		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
+		wss << "exitcnt : " << m_collideCount << endl;
 
 		auto scene = App::GetApp()->GetScene<Scene>();
 		scene->SetDebugString(L"Player\n" + wss.str());
@@ -147,7 +151,16 @@ namespace basecross {
 
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
 		if (m_stateType == air && Other->FindTag(L"FixedBox")) {
+			m_collideCount = m_collideCountInit;
 			m_stateType = stand;
+		}
+		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
+
+	}
+	void Player::OnCollisionExit(shared_ptr<GameObject>& Other) {
+		if (m_stateType == stand && Other->FindTag(L"FixedBox")) {
+			if (m_collideCount > 0) return;
+			m_stateType = air;
 		}
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
 
