@@ -26,7 +26,7 @@ namespace basecross {
 
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
-		light->SetDefaultLighting(); //デフォルトのライティングを指定
+		light->SetDefaultLighting2(); //デフォルトのライティングを指定
 	}
 
 	void GameStage::CreateGameBox() {
@@ -83,7 +83,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Scale, Rot, Pos, 1.0f, 1.0f);
+			AddGameObject<TilingFixedBox>(Scale, -Rot, Pos, 1.0f, 1.0f);
 		}
 	}
 
