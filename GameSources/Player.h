@@ -27,8 +27,6 @@ namespace basecross {
 		float m_gravity;
 		//移動方向
 		Vec3 m_moveVel;
-		//CollisionExitの空中判定の閾値
-		int m_collideCount, m_collideCountInit;
 
 		enum Stats {
 			stand,		//地上
@@ -55,7 +53,6 @@ namespace basecross {
 		
 		//何かに接触している判定(接地判定に活用？)
 		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
-		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 		
 		////Aボタン
 		void OnPushA();
