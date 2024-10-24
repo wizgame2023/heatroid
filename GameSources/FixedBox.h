@@ -1,6 +1,7 @@
 /*!
 @file FixedBox.h
-@brief キャラクターなど
+@brief 足場ブロックなど
+担当：逸見
 */
 
 #pragma once
@@ -8,26 +9,35 @@
 
 namespace basecross {
 
-
 	//--------------------------------------------------------------------------------------
 	//	class FixedBox : public GameObject;
 	//--------------------------------------------------------------------------------------
 	class FixedBox : public GameObject {
-		Vec3 m_scale;
-		Vec3 m_rotation;
 		Vec3 m_position;
+		Vec3 m_rotation;
+		Vec3 m_scale;
 	public:
 		//構築と破棄
-		FixedBox(const shared_ptr<Stage>& StagePtr,
-			const Vec3& Scale,
-			const Vec3& Rotation,
-			const Vec3& Position
+		FixedBox(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale
 		);
 		virtual ~FixedBox();
 		//初期化
 		virtual void OnCreate() override;
-		//操作
+		Vec3 GetPositoin();
+		Vec3 GetScale();
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class BreakWall : public GameObject;
+	//--------------------------------------------------------------------------------------
+	class BreakWall :public GameObject {
+
+	public:
+		BreakWall(const shared_ptr<Stage>& m_stage);
+		virtual ~BreakWall();
+	};
 }
 //end basecross
