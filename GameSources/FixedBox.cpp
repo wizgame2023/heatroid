@@ -1,6 +1,7 @@
 /*!
 @file FixedBox.cpp
-@brief ƒLƒƒƒ‰ƒNƒ^[‚È‚ÇÀ‘Ì
+@brief è¶³å ´ãƒ–ãƒ­ãƒƒã‚¯ãªã©
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -9,29 +10,29 @@
 namespace basecross {
 
 	FixedBox::FixedBox(const shared_ptr<Stage>& StagePtr,
-		const Vec3& Scale,
-		const Vec3& Rotation,
-		const Vec3& Position
+		const Vec3& position,
+		const Vec3& rotation,
+		const Vec3& scale
 	) :
 		GameObject(StagePtr),
-		m_scale(Scale),
-		m_rotation(Rotation),
-		m_position(Position)
+		m_position(position),
+		m_rotation(rotation),
+		m_scale(scale)
 	{
 	}
 	FixedBox::~FixedBox() {}
 
-	//‰Šú‰»
+	//åˆæœŸåŒ–
 	void FixedBox::OnCreate() {
 		auto ptrTransform = GetComponent<Transform>();
-		ptrTransform->SetScale(m_scale);
-		ptrTransform->SetRotation(m_rotation);
 		ptrTransform->SetPosition(m_position);
-		//OBBÕ“Ëj”»’è‚ğ•t‚¯‚é
+		ptrTransform->SetRotation(m_rotation);
+		ptrTransform->SetScale(m_scale);
+		//OBBè¡çªjåˆ¤å®šã‚’ä»˜ã‘ã‚‹
 		auto ptrColl = AddComponent<CollisionObb>();
 		ptrColl->SetFixed(true);
 		ptrColl->SetDrawActive(true);
-		//ƒ^ƒO‚ğ‚Â‚¯‚é
+		//ã‚¿ã‚°ã‚’ã¤ã‘ã‚‹
 		AddTag(L"FixedBox");
 
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
@@ -39,28 +40,11 @@ namespace basecross {
 
 	}
 
-	NoneBox::NoneBox(const shared_ptr<Stage>& StagePtr,
-		const Vec3& Scale,
-		const Vec3& Rotation,
-		const Vec3& Position
-	) :
-		GameObject(StagePtr),
-		m_scale(Scale),
-		m_rotation(Rotation),
-		m_position(Position)
-	{
+  Vec3 FixedBox::GetPositoin() {
+		return m_position;
 	}
-	NoneBox::~NoneBox() {}
-
-	//‰Šú‰»
-	void NoneBox::OnCreate() {
-		auto ptrTransform = GetComponent<Transform>();
-		ptrTransform->SetScale(m_scale);
-		ptrTransform->SetRotation(m_rotation);
-		ptrTransform->SetPosition(m_position);
-		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
-		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
-
+	Vec3 FixedBox::GetScale() {
+		return m_scale;
 	}
 
 	TilingFixedBox::TilingFixedBox(const shared_ptr<Stage>& StagePtr,
@@ -78,7 +62,7 @@ namespace basecross {
 		m_VPic(VPic)
 	{}
 	TilingFixedBox::~TilingFixedBox() {}
-	//‰Šú‰»
+	//åˆæœŸåŒ–
 	void TilingFixedBox::OnCreate() {
 		auto PtrTrans = GetComponent<Transform>();
 		PtrTrans->SetScale(m_Scale);
@@ -103,17 +87,21 @@ namespace basecross {
 				}
 			}
 		}
-		//•`‰æƒRƒ“ƒ|[ƒlƒ“ƒg‚Ì’Ç‰Á
+		//æç”»ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®è¿½åŠ 
 		auto PtrDraw = AddComponent<BcPNTStaticDraw>();
-		//•`‰æƒRƒ“ƒ|[ƒlƒ“ƒg‚ÉŒ`óiƒƒbƒVƒ…j‚ğİ’è
+		//æç”»ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã«å½¢çŠ¶ï¼ˆãƒ¡ãƒƒã‚·ãƒ¥ï¼‰ã‚’è¨­å®š
 		PtrDraw->CreateOriginalMesh(vertices, indices);
 		PtrDraw->SetOriginalMeshUse(true);
 		PtrDraw->SetFogEnabled(true);
-		//©•ª‚É‰e‚ª‰f‚è‚±‚Ş‚æ‚¤‚É‚·‚é
+		//è‡ªåˆ†ã«å½±ãŒæ˜ ã‚Šã“ã‚€ã‚ˆã†ã«ã™ã‚‹
 		PtrDraw->SetOwnShadowActive(true);
-		//ƒ^ƒCƒŠƒ“ƒOİ’è
+		//ã‚¿ã‚¤ãƒªãƒ³ã‚°è¨­å®š
 		PtrDraw->SetSamplerState(SamplerState::LinearWrap);
 	}
 
+
+	//--------------------------------------------------------------------------------------
+	//	class BreakWall : public GameObject;
+	//--------------------------------------------------------------------------------------
 
 }

@@ -1,6 +1,7 @@
 /*!
 @file FixedBox.h
-@brief ƒLƒƒƒ‰ƒNƒ^[‚È‚Ç
+@brief è¶³å ´ãƒ–ãƒ­ãƒƒã‚¯ãªã©
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -8,47 +9,29 @@
 
 namespace basecross {
 
-
 	//--------------------------------------------------------------------------------------
 	//	class FixedBox : public GameObject;
 	//--------------------------------------------------------------------------------------
 	class FixedBox : public GameObject {
-		Vec3 m_scale;
-		Vec3 m_rotation;
 		Vec3 m_position;
+		Vec3 m_rotation;
+		Vec3 m_scale;
 	public:
-		//\’z‚Æ”jŠü
-		FixedBox(const shared_ptr<Stage>& StagePtr,
-			const Vec3& Scale,
-			const Vec3& Rotation,
-			const Vec3& Position
+		//æ§‹ç¯‰ã¨ç ´æ£„
+		FixedBox(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale
 		);
 		virtual ~FixedBox();
-		//‰Šú‰»
+		//åˆæœŸåŒ–
 		virtual void OnCreate() override;
-		//‘€ì
+		Vec3 GetPositoin();
+		Vec3 GetScale();
 	};
 
 	//--------------------------------------------------------------------------------------
-	class NoneBox : public GameObject {
-		Vec3 m_scale;
-		Vec3 m_rotation;
-		Vec3 m_position;
-	public:
-		//\’z‚Æ”jŠü
-		NoneBox(const shared_ptr<Stage>& StagePtr,
-			const Vec3& Scale,
-			const Vec3& Rotation,
-			const Vec3& Position
-		);
-		virtual ~NoneBox();
-		//‰Šú‰»
-		virtual void OnCreate() override;
-		//‘€ì
-	};
-
-	//--------------------------------------------------------------------------------------
-//@ƒ^ƒCƒŠƒ“ƒO‚·‚éŒÅ’è‚Ìƒ{ƒbƒNƒX
+//ã€€ã‚¿ã‚¤ãƒªãƒ³ã‚°ã™ã‚‹å›ºå®šã®ãƒœãƒƒã‚¯ã‚¹
 //--------------------------------------------------------------------------------------
 	class TilingFixedBox : public GameObject {
 		Vec3 m_Scale;
@@ -57,7 +40,7 @@ namespace basecross {
 		float m_UPic;
 		float m_VPic;
 	public:
-		//\’z‚Æ”jŠü
+		//æ§‹ç¯‰ã¨ç ´æ£„
 		TilingFixedBox(const shared_ptr<Stage>& StagePtr,
 			const Vec3& Scale,
 			const Vec3& Rotation,
@@ -66,10 +49,18 @@ namespace basecross {
 			float VPic
 		);
 		virtual ~TilingFixedBox();
-		//‰Šú‰»
+		//åˆæœŸåŒ–
 		virtual void OnCreate() override;
-		//‘€ì
+		//æ“ä½œ
 	};
 
+	//	class BreakWall : public GameObject;
+	//--------------------------------------------------------------------------------------
+	class BreakWall :public GameObject {
+
+	public:
+		BreakWall(const shared_ptr<Stage>& m_stage);
+		virtual ~BreakWall();
+	};
 }
 //end basecross

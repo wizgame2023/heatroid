@@ -16,8 +16,8 @@ namespace basecross {
 	void GameStageTsuboi::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, 2.0f, 15.0f));
-		camera->SetAt(Vec3(0.0f, 0.0f, 0.0f));
+		camera->SetEye(Vec3(0.0f, .2f, 3.0f));
+		camera->SetAt(Vec3(0.0f, .2f, 0.0f));
 
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -32,9 +32,19 @@ namespace basecross {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
-				Vec3(30.0f, 1.0f, 3.0f),
+				Vec3(3.0f, .1f, .3f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(0.0f, -4.0f, 0.0f)
+				Vec3(0.0f, -.5f, 0.0f)
+			},
+			{
+				Vec3(1.0f, .1f, .3f),
+				Vec3(0.0f, 0.0f, 0.0f),
+				Vec3(.8f, 0.0f, 0.0f)
+			},
+			{
+				Vec3(.1f, 1.0f, .3f),
+				Vec3(0.0f, 0.0f, 0.0f),
+				Vec3(-.80f, 0.0f, 0.0f)
 			},
 		};
 		//オブジェクトの作成
@@ -51,8 +61,6 @@ namespace basecross {
 
 			auto ptrPlayer = AddGameObject<Player>();
 			SetSharedGameObject(L"Player", ptrPlayer);
-			auto ptrLandCol = AddGameObject<LandingCollider>();
-			SetSharedGameObject(L"LandCol", ptrLandCol);
 
 			CreateGameBox();
 		}
