@@ -9,7 +9,7 @@
 namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) : GameObject(StagePtr),
-		m_speed(.25f),
+		m_speed(.225f),
 		m_accel(.1f),
 		m_friction(.9f),
 		m_frictionThreshold(.001f),
@@ -18,7 +18,9 @@ namespace basecross {
 		m_moveVel(Vec3(0, 0, 0)),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
-		m_stateType(air)
+		m_stateType(air),
+
+		m_HP_max(100)
 	{}
 
 	Vec2 Player::GetInputState() const {
@@ -34,9 +36,7 @@ namespace basecross {
 		}
 		//キーボードの取得(キーボード優先)
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-		if (KeyState.m_bPushKeyTbl['W']) { ret.y = 1.0f; }
 		if (KeyState.m_bPushKeyTbl['A']) { ret.x = -1.0f; }
-		if (KeyState.m_bPushKeyTbl['S']) { ret.y = -1.0f; }
 		if (KeyState.m_bPushKeyTbl['D']) { ret.x = 1.0f; }
 
 		return ret;
@@ -129,6 +129,8 @@ namespace basecross {
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetFogEnabled(true);
 
+		m_HP = m_HP_max;
+
 	}
 
 	void Player::OnUpdate() {
@@ -154,6 +156,7 @@ namespace basecross {
 		wss << "pos : " << pos.x << ", " << pos.y << endl;
 		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
 		wss << "exitcnt : " << m_collideCount << endl;
+		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
 
 		auto scene = App::GetApp()->GetScene<Scene>();
 		scene->SetDebugString(L"Player\n" + wss.str());

@@ -41,6 +41,9 @@ namespace basecross {
 			hit			//やられ
 		};
 
+		//HP
+		int m_HP, m_HP_max;
+
 		Stats m_stateType;
 
 		float _delta = App::GetApp()->GetElapsedTime();
