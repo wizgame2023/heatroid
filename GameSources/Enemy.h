@@ -6,6 +6,7 @@
 
 #pragma once
 #include "stdafx.h"
+#include "FixedBox.h"
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
@@ -13,14 +14,34 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class Enemy : public GameObject
 	{
-		float m_hp;
-		float m_maxHp;
-		float m_speed;
-		float m_jumpPower;
-		float m_jumpSpeed;
+		enum State {
+			stay,      //移動なし
+			rightMove, //追従左右移動
+			upMove,    //上下移動
+			flyMove,   //追従浮遊移動
+			fly,       //浮遊
+			death,     //
+			runaway    //
+		};
+
+		float m_hp;          //体力
+		float m_maxHp;       //最大体力
+		float m_speed;       //移動速度
+		float m_upSpeed;     //上下の速度
+		float m_upHeight;    //上下の高さ
+		float m_jumpPower;   //ジャンプ力
+		float m_jumpTime;    //ジャンプ速度
 		float m_time;
+		float m_bulletTime;  //弾の発射間隔
+		float m_bulletRange; //弾を発射する距離
+		float m_playerScale; //プレイヤーのサイズ
 		int m_dic;           //向いている方向 左-1,右1
-		bool m_bulletFlag;
+		bool m_bulletFlag;   
+		bool m_jumpFlag;
+		bool m_flyFlag;
+
+		State m_stateType;
+		State m_beforState;
 
 		Vec3 m_pos;
 		Vec3 m_rot;
@@ -29,14 +50,20 @@ namespace basecross {
 		shared_ptr<Transform> m_trans;
 		shared_ptr<Player> m_player;
 		shared_ptr<Transform> m_playerTrans;
+		shared_ptr<FixedBox> m_box;
+		weak_ptr<Gravity> m_gravity;
 
 	public:
 		// 構築と破棄
-		Enemy(const shared_ptr<Stage>& stage,const shared_ptr<Player>& player);
+		Enemy(const shared_ptr<Stage>& stage,
+			const shared_ptr<Player>& player,
+			const shared_ptr<FixedBox>& box = nullptr);
 		Enemy(const shared_ptr<Stage>& stage, 
+			const shared_ptr<Player>& player,
 			const Vec3& position, 
 			const Vec3& rotatoin, 
-			const Vec3& scale);
+			const Vec3& scale,
+			const shared_ptr<FixedBox>& box = nullptr);
 		virtual ~Enemy(){}
 		virtual void OnCreate() override; // 初期化
 		virtual void OnUpdate() override; // 更新
@@ -45,6 +72,11 @@ namespace basecross {
 		void ReceiveDamage(float damage);
 		void ThisDestroy();
 		void EnemyJump();
+		void SetEnemyFlayFlag(bool flag);
+		void SetSpeed(float speed);
+		void SetUpMove(float speed,float height);
+		void SetFlyPower(float power);
+		void SetState(State state);
 
 		int GetDic();
 		Vec3 GetPos();
@@ -58,10 +90,12 @@ namespace basecross {
 	private:
 		
 		float m_speed;   //弾の速さ
+		float m_Range;   //射程
 		int m_dic;       //弾の向き 左-1,右1
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
+		Vec3 m_enemyPos;
 
 		shared_ptr<Transform> m_trans;
 		shared_ptr<Enemy> m_enemy;
@@ -76,4 +110,11 @@ namespace basecross {
 		void ThisDestroy();
 
 	};
+
+	class MyGravity : public Component {
+		explicit MyGravity(const shared_ptr<GameObject>& GameObjectPtr,
+			const bsm::Vec3& gravity = bsm::Vec3(0, -9.8f, 0));
+
+	};
+
 }

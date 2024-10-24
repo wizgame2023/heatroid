@@ -1,13 +1,13 @@
 /*!
 @file FixedBox.h
-@brief キャラクターなど
+@brief 足場ブロックなど
+担当：逸見
 */
 
 #pragma once
 #include "stdafx.h"
 
 namespace basecross {
-
 
 	//--------------------------------------------------------------------------------------
 	//	class FixedBox : public GameObject;
@@ -26,8 +26,18 @@ namespace basecross {
 		virtual ~FixedBox();
 		//初期化
 		virtual void OnCreate() override;
-		//操作
+		Vec3 GetPositoin();
+		Vec3 GetScale();
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class BreakWall : public GameObject;
+	//--------------------------------------------------------------------------------------
+	class BreakWall :public GameObject {
+
+	public:
+		BreakWall(const shared_ptr<Stage>& m_stage);
+		virtual ~BreakWall();
+	};
 }
 //end basecross
