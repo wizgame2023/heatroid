@@ -135,11 +135,6 @@ namespace basecross {
 	void Player::OnUpdate() {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
-		auto grav = GetComponent<Gravity>();
-		if (m_stat == stand)
-		{
-			//grav->SetGravity(Vec3(0, -30.0f, 0));
-		}
 		MovePlayer();
 		MoveCamera();
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
