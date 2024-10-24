@@ -1,6 +1,7 @@
 /*!
 @file FixedBox.cpp
-@brief キャラクターなど実体
+@brief 足場ブロックなど
+担当：逸見
 */
 
 #include "stdafx.h"
@@ -36,6 +37,13 @@ namespace basecross {
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
 
+	}
+
+	Vec3 FixedBox::GetPositoin() {
+		return m_position;
+	}
+	Vec3 FixedBox::GetScale() {
+		return m_scale;
 	}
 
 }
