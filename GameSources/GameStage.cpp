@@ -17,8 +17,8 @@ namespace basecross {
 	void GameStage::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, 2.0f, 30.0f));
-		camera->SetAt(Vec3(0.0f, 0.0f, 0.0f));
+		camera->SetEye(Vec3(5.0f, 0.02f, -5.0f));
+		camera->SetAt(Vec3(-5.0f, -1.0f, 0.0f));
 
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -33,34 +33,9 @@ namespace basecross {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
-				Vec3(30.0f, 1.0f, 3.0f),
+				Vec3(3.0f, 0.1f, 0.3f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(0.0f, -4.0f, 0.0f)
-			},
-			{
-				Vec3(20.0f, 1.0f, 3.0f),
-				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(-30.0f, -4.0f, 0.0f)
-			},
-			{
-				Vec3(30.0f, 1.0f, 3.0f),
-				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(-10.0f, 3.5f, 0.0f)
-			},
-			{
-				Vec3(30.0f, 1.0f, 3.0f),
-				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(0.0f, 10.0f, 0.0f)
-			},
-			{
-				Vec3(1.0f, 20.0f, 3.0f),
-				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(15.0f, 5.0f, 0.0f)
-			},
-			{
-				Vec3(1.0f, 20.0f, 3.0f),
-				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(-24.0f, 14.0f, 0.0f)
+				Vec3(5.0f, -0.4f, 0.0f)
 			},
 		};
 		//オブジェクトの作成
@@ -75,20 +50,87 @@ namespace basecross {
 		auto ptrPlayer = AddGameObject<Player>();
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
-		ptrPlayer->AddTag(L"Player");
+		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(5, 0.0125f, 0));
+	}
+
+	void GameStage::CreateGameStage()
+	{
+		auto& LineVec = m_GameStage1.GetCsvVec();
+		for (size_t i = 0; i < LineVec.size(); i++)
+		{
+			vector<wstring> Tokens;
+			Util::WStrToTokenVector(Tokens, LineVec[i], L',');
+			for (size_t j = 0; j < Tokens.size(); j++) {
+				float XPos = (float)((int)j - 19);
+				float YPos = (float)(19 - (int)i);
+				if (Tokens[j] == L"1") {
+					AddGameObject<NoneBox>
+						(
+						Vec3(1.0f, 1.0f, 1.0f),
+						Vec3(0.0f, 0.0f, 0.0f),
+						Vec3(XPos, YPos, 0.0f)
+						);
+				}
+				if (Tokens[j] == L"4") {
+					AddGameObject<NoneBox>
+						(
+							Vec3(1.0f, 1.0f, 1.0f),
+							Vec3(0.0f, 0.0f, 0.0f),
+							Vec3(XPos, YPos, 0.0f)
+						);
+
+				}
+			}
+ 		}
+	}
+	//ボックスの作成
+	void GameStage::CreateFixedBox() {
+		//CSVの行単位の配列
+		vector<wstring> LineVec;
+		//0番目のカラムがL"TilingFixedBox"である行を抜き出す
+		m_GameStage1.GetSelect(LineVec, 0, L"FixedBox");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			//各値がそろったのでオブジェクト作成
+			AddGameObject<TilingFixedBox>(Scale, Rot, Pos, 1.0f, 1.0f);
+		}
 	}
 
 
 	void GameStage::OnCreate() {
 		try {
+			wstring Datadir;
+			App::GetApp()->GetDataDirectory(Datadir);
+
+			m_GameStage1.SetFileName(Datadir + L"GameStage1.csv");
+			m_GameStage1.ReadCsv();
 			//ビューとライトの作成
 			CreateViewLight();
-
-			CreateGameBox();
+			//CreateGameStage();
+			//CreateGameBox();
 			CreatePlayer();
-			auto ptrLandCol = AddGameObject<LandingCollider>();
-			SetSharedGameObject(L"LandCol", ptrLandCol);
-
+			CreateFixedBox();
 		}
 		catch (...) {
 			throw;

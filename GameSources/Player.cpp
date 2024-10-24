@@ -10,8 +10,8 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_Speed(10.0f),
-		m_jumpHeight(20.0f),
+		m_Speed(1.0f),
+		m_jumpHeight(4.0f),
 		m_stat(stand)
 	{}
 	
@@ -95,7 +95,7 @@ namespace basecross {
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(1.00f, 1.00f, 1.00f);	//直径25センチの球体
+		ptr->SetScale(0.10f, 0.10f, 0.10f);	//直径25センチの球体
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(Vec3(0, 0.125f, 0));
 
@@ -129,10 +129,21 @@ namespace basecross {
 		auto grav = GetComponent<Gravity>();
 		if (m_stat == stand)
 		{
-			grav->SetGravity(Vec3(0, -30.0f, 0));
+			//grav->SetGravity(Vec3(0, -30.0f, 0));
 		}
 		MovePlayer();
 		MoveCamera();
+		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
+		wstring fpsStr(L"FPS: ");
+		fpsStr += Util::UintToWStr(fps);
+		fpsStr += L"\nElapsedTime: ";
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		fpsStr += Util::FloatToWStr(ElapsedTime);
+		fpsStr += L"\n";
+		wstring str = fpsStr;
+		auto ptrString = AddComponent<StringSprite>();
+		ptrString->SetText(str);
+
 	}
 
 	void Player::OnPushA()
@@ -156,15 +167,15 @@ namespace basecross {
 		auto pos = GetComponent<Transform>()->GetPosition();
 		Vec3 Camera = ptrCamera->GetEye();
 		float differenceX = pos.x - Camera.x;
-		if (differenceX >= 5.0f)
+		if (differenceX >= 0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX - 5.0f), 5.0f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), 0.5f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
 		}
-		else if (differenceX <= -5.0f)
+		else if (differenceX <= -0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX + 5.0f), 5.0f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), 0.5f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
 		}
 	}
   
