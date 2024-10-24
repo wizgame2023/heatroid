@@ -17,8 +17,8 @@ namespace basecross {
 	void GameStageHemmi::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, 2.0f, 15.0f));
-		camera->SetAt(Vec3(0.0f, 0.0f, 0.0f));
+		camera->SetEye(Vec3(0.0f, 0.5f, 3.0f));
+		camera->SetAt(Vec3(0.0f, 0.5f, 0.0f));
 
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -33,27 +33,28 @@ namespace basecross {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
-				Vec3(30.0f, 1.0f, 3.0f),
+				Vec3(3.0f, 0.1f, 0.3f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(0.0f, -4.0f, 0.0f)
+				Vec3(0.0f, -0.4f, 0.0f)
 			},
 		};
 		//オブジェクトの作成
 		for (auto v : vec) {
-			AddGameObject<FixedBox>(v[0], v[1], v[2]);
+			auto box = AddGameObject<FixedBox>(v[0], v[1], v[2]);
+			SetSharedGameObject(L"box",box);
 		}
 	}
 	void GameStageHemmi::CreateEnemy() {
 		vector<vector<Vec3>> vec = {
 			{
-				Vec3(5.0f,5.0f,0.0f),
 				Vec3(0.0f,0.0f,0.0f),
-				Vec3(1.0f,1.0f,1.0f)
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(0.1f,0.1f,0.1f)
 			}
 		};
 
 		for (auto v : vec) {
-			AddGameObject<Enemy>(v[0], v[1], v[2]);
+			//AddGameObject<Enemy>(v[0], v[1], v[2]);
 		}
 	}
 
@@ -65,7 +66,8 @@ namespace basecross {
 
 			auto player = AddGameObject<Player>();
 			CreateGameBox();
-			AddGameObject<Enemy>(player);
+			auto box = GetSharedGameObject<FixedBox>(L"box");
+			auto enemy = AddGameObject<Enemy>(player,box);
 		}
 		catch (...) {
 			throw;
