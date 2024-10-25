@@ -13,9 +13,9 @@ namespace basecross {
 	//	class FixedBox : public GameObject;
 	//--------------------------------------------------------------------------------------
 	class FixedBox : public GameObject {
-		Vec3 m_position;
-		Vec3 m_rotation;
-		Vec3 m_scale;
+		Vec3 m_pos;
+		Vec3 m_rot;
+		Vec3 m_scal;
 	public:
 		//ç\ízÇ∆îjä¸
 		FixedBox(const shared_ptr<Stage>& stage,
@@ -23,7 +23,7 @@ namespace basecross {
 			const Vec3& rotation,
 			const Vec3& scale
 		);
-		virtual ~FixedBox();
+		virtual ~FixedBox(){}
 		//èâä˙âª
 		virtual void OnCreate() override;
 		Vec3 GetPositoin();
@@ -34,10 +34,18 @@ namespace basecross {
 	//	class BreakWall : public GameObject;
 	//--------------------------------------------------------------------------------------
 	class BreakWall :public GameObject {
-
+		Vec3 m_pos;
+		Vec3 m_rot;
+		Vec3 m_scal;
 	public:
-		BreakWall(const shared_ptr<Stage>& m_stage);
-		virtual ~BreakWall();
+		BreakWall(const shared_ptr<Stage>& m_stage,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale);
+		virtual ~BreakWall(){}
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+
 	};
 }
 //end basecross
