@@ -14,16 +14,18 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class Enemy : public GameObject
 	{
+	public:
 		enum State {
 			stay,      //移動なし
 			rightMove, //追従左右移動
 			upMove,    //上下移動
 			flyMove,   //追従浮遊移動
 			fly,       //浮遊
-			death,     //
-			runaway    //
+			fixedStay, //プレイヤーに触れた位置で固定
+			runaway    //プレイヤーと逆方向に移動
 		};
 
+	private:
 		float m_hp;          //体力
 		float m_maxHp;       //最大体力
 		float m_speed;       //移動速度
@@ -41,17 +43,20 @@ namespace basecross {
 
 		State m_stateType;
 		State m_beforState;
+		State m_deathState;
 
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
+		Vec3 m_deathPos;
 		Vec3 m_playerScale; //プレイヤーのサイズ
 
 		shared_ptr<Transform> m_trans;
 		shared_ptr<Player> m_player;
 		shared_ptr<Transform> m_playerTrans;
 		shared_ptr<FixedBox> m_box;
-		weak_ptr<Gravity> m_gravity;
+		shared_ptr<Gravity> m_gravity;
+		shared_ptr<CollisionObb> m_collision;
 
 	public:
 		// 構築と破棄
