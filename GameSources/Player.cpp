@@ -19,7 +19,6 @@ namespace basecross {
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
 		m_stateType(air),
-
 		m_HP_max(100)
 	{}
 
@@ -136,6 +135,15 @@ namespace basecross {
 	void Player::OnUpdate() {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
+		MovePlayer();
+		MoveCamera();
+		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
+		wstring fpsStr(L"FPS: ");
+		fpsStr += Util::UintToWStr(fps);
+		fpsStr += L"\nElapsedTime: ";
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		fpsStr += Util::FloatToWStr(ElapsedTime);
+		fpsStr += L"\n";
 
 		MovePlayer();
 		MoveCamera();
@@ -184,15 +192,15 @@ namespace basecross {
 		auto pos = GetComponent<Transform>()->GetPosition();
 		Vec3 Camera = ptrCamera->GetEye();
 		float differenceX = pos.x - Camera.x;
-		if (differenceX >= 5.0f)
+		if (differenceX >= 0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX - 5.0f), 5.0f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), 0.5f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
 		}
-		else if (differenceX <= -5.0f)
+		else if (differenceX <= -0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX + 5.0f), 5.0f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), 0.5f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
 		}
 	}
 
