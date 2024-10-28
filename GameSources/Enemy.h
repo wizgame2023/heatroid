@@ -60,14 +60,13 @@ namespace basecross {
 
 	public:
 		// \’z‚Æ”jŠü
-		Enemy(const shared_ptr<Stage>& stage,
-			const shared_ptr<Player>& player,
-			const shared_ptr<FixedBox>& box = nullptr);
 		Enemy(const shared_ptr<Stage>& stage, 
-			const shared_ptr<Player>& player,
 			const Vec3& position, 
 			const Vec3& rotatoin, 
 			const Vec3& scale,
+			const State& state,
+			const State& deathState,
+			const shared_ptr<Player>& player,
 			const shared_ptr<FixedBox>& box = nullptr);
 		virtual ~Enemy(){}
 		virtual void OnCreate() override; // ‰Šú‰»

@@ -71,8 +71,9 @@ namespace basecross {
 			}
 		};
 
+		auto player = GetSharedGameObject<Player>(L"Player");
 		for (auto v : vec) {
-			//AddGameObject<Enemy>(v[0], v[1], v[2]);
+			AddGameObject<Enemy>(v[0], v[1], v[2],Enemy::rightMove,Enemy::runaway,player);
 		}
 	}
 
@@ -83,10 +84,12 @@ namespace basecross {
 			CreateViewLight();
 
 			auto player = AddGameObject<Player>();
+			SetSharedGameObject(L"Player", player);
 			CreateGameBox();
 			auto box = GetSharedGameObject<FixedBox>(L"box");
-			auto enemy = AddGameObject<Enemy>(player,box);
-			enemy->SetState(Enemy::rightMove);
+			//auto enemy = AddGameObject<Enemy>(player,box);
+			//enemy->SetState(Enemy::rightMove);
+			CreateEnemy();
 			CreateBreakWall();
 		}
 		catch (...) {
