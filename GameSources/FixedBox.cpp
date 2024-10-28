@@ -41,7 +41,7 @@ namespace basecross {
 	}
 
 	Vec3 FixedBox::GetPositoin() {
-		return m_position;
+		return m_pos;
 	}
 	Vec3 FixedBox::GetScale() {
 		return m_scal;
