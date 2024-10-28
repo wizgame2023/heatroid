@@ -116,10 +116,22 @@ namespace basecross {
 
 	};
 
+
 	class MyGravity : public Component {
+	public:
 		explicit MyGravity(const shared_ptr<GameObject>& GameObjectPtr,
 			const bsm::Vec3& gravity = bsm::Vec3(0, -9.8f, 0));
+		MyGravity::~MyGravity() {}
 
+	private:
+		Vec3 m_gravity;
+		//struct Impl;
+		//unique_ptr<Impl> pImpl;
+	public:
+		Vec3 GetGravity() const;
+		void SetGravity(const bsm::Vec3& gravity);
+		void SetGravityZero();
+		void OnUpdate();
 	};
 
 }

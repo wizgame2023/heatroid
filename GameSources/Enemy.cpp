@@ -19,8 +19,8 @@ namespace basecross {
 		GameObject(stage),
 		m_player(player),
 		m_box(box),
-		m_stateType(flyMove),
-		m_deathState(stay),
+		m_stateType(rightMove),
+		m_deathState(runaway),
 		m_pos(Vec3(-1.0f, 0.4f, 0.0f)),
 		m_rot(Vec3(0.0f, 0.0f, 0.0f)),
 		m_scal(Vec3(0.1f, 0.1f, 0.1f)),
@@ -99,6 +99,7 @@ namespace basecross {
 	}
 
 	void Enemy::OnUpdate() {
+
 		auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto stage = GetStage();
@@ -149,6 +150,7 @@ namespace basecross {
 				m_speed = 0.3f;
 			}
 		}
+
 
 		//行動パターン
 		switch (m_stateType)
@@ -307,6 +309,13 @@ namespace basecross {
 			m_deathPos = m_pos;
 			ReceiveDamage(100.0f);
 		}
+		if (other->FindTag(L"BreakWall")) {
+			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
+			if (m_stateType == runaway) {
+				breakWall->ThisDestory();
+			}
+		}
+
 	}
 	//ダメージを受ける
 	void Enemy::ReceiveDamage(float damage) {
@@ -413,4 +422,45 @@ namespace basecross {
 		GetStage()->RemoveGameObject<EnemyBullet>(GetThis<EnemyBullet>());
 	}
 
+	//struct MyGravity::Impl{
+	//	bsm::Vec3 m_Gravity;
+	//	bsm::Vec3 m_GravityVelocity;
+	//	Impl():
+	//		m_Gravity(0),
+	//		m_GravityVelocity(0)
+	//	{}
+	//	~Impl() {}
+	//};
+
+	MyGravity::MyGravity(const shared_ptr<GameObject>& GameObjectPtr,
+		const bsm::Vec3& gravity
+	):
+		Component(GameObjectPtr)
+	{
+		m_gravity = gravity;
+	}
+
+	Vec3 MyGravity::GetGravity() const{
+		return m_gravity;
+	}
+	void MyGravity::SetGravity(const bsm::Vec3& gravity) {
+		m_gravity = gravity;
+	}
+	void MyGravity::SetGravityZero() {
+		m_gravity = Vec3(0.0f);
+	}
+	void MyGravity::OnUpdate() {
+		auto ptrCollision = GetGameObject()->GetComponent<Collision>(false);
+		if (ptrCollision && ptrCollision->IsSleep()) {
+			return;
+		}
+
+		auto transform = GetGameObject()->GetComponent<Transform>();
+		auto pos = transform->GetPosition();
+		float elapsed = App::GetApp()->GetElapsedTime();
+		m_gravity += m_gravity * elapsed;
+		pos += m_gravity * elapsed;
+		transform->SetPosition(pos);
+
+	}
 }
