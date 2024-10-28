@@ -78,4 +78,7 @@ namespace basecross {
 	void BreakWall::OnUpdate() {
 
 	}
+	void BreakWall::ThisDestory() {
+		GetStage()->RemoveGameObject<BreakWall>(GetThis<BreakWall>());
+	}
 }

@@ -45,6 +45,8 @@ namespace basecross {
 		virtual ~BreakWall(){}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		//virtual void OnCollisionEnter(shared_ptr<GameObject>& other) override;
+		void ThisDestory();
 
 	};
 }
