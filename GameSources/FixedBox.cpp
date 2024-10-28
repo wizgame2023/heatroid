@@ -236,10 +236,14 @@ namespace basecross {
 
 		if (m_open)
 		{
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 1; i++)
 			{
-				ptrTransform->SetPosition(Vec3(pos.x, pos.y++, pos.z));
+				ptrTransform->SetPosition(Vec3(pos.x, pos.y+=0.01f, pos.z));
 			}
+		}
+		else
+		{
+			ptrTransform->SetPosition(m_position);
 		}
 	}
 	//--------------------------------------------------------------------------------------
