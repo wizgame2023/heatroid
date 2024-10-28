@@ -12,51 +12,29 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	//	class Enemy : public GameObject;  //“G
 	//--------------------------------------------------------------------------------------
-	Enemy::Enemy(const shared_ptr<Stage>& stage, 
+
+	Enemy::Enemy(const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotatoin,
+		const Vec3& scale,
+		const State& state,
+		const State& deathState,
 		const shared_ptr<Player>& player,
 		const shared_ptr<FixedBox>& box
 	) :
 		GameObject(stage),
+		m_pos(position),
+		m_rot(rotatoin),
+		m_scal(scale),
+		m_stateType(state),
+		m_deathState(deathState),
 		m_player(player),
 		m_box(box),
-		m_stateType(rightMove),
-		m_deathState(runaway),
-		m_pos(Vec3(-1.0f, 0.4f, 0.0f)),
-		m_rot(Vec3(0.0f, 0.0f, 0.0f)),
-		m_scal(Vec3(0.1f, 0.1f, 0.1f)),
 		m_hp(100),
 		m_maxHp(100),
 		m_speed(0.3f),
 		m_upSpeed(0.3f),
 		m_upHeight(0.25f),
-		m_jumpPower(1.0f),
-		m_jumpTime(1.0f),
-		m_dic(-1),
-		m_time(3.0f),
-		m_bulletTime(0.0f),
-		m_bulletRange(1.0f),
-		m_bulletFlag(false),
-		m_jumpFlag(false),
-		m_flyFlag(false)
-	{}
-
-	Enemy::Enemy(const shared_ptr<Stage>& stage,
-		const shared_ptr<Player>& player,
-		const Vec3& position,
-		const Vec3& rotatoin,
-		const Vec3& scale,
-		const shared_ptr<FixedBox>& box
-	) :
-		GameObject(stage),
-		m_player(player),
-		m_box(box),
-		m_pos(position),
-		m_rot(rotatoin),
-		m_scal(scale),
-		m_hp(100),
-		m_maxHp(100),
-		m_speed(0.0f),
-		m_upSpeed(0.3f),
 		m_jumpPower(1.0f),
 		m_jumpTime(1.0f),
 		m_dic(-1),
