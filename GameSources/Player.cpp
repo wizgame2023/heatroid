@@ -175,6 +175,7 @@ namespace basecross {
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
 
 	}
+
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)
 	{
 		if ((Other->FindTag(L"GimmickButton")))
@@ -182,6 +183,13 @@ namespace basecross {
 			GimmickButton::SetButton(true);
 		}
 
+	}
+	void Player::OnCollisionExit(shared_ptr<GameObject>& Other)
+	{
+		if ((Other->FindTag(L"GimmickButton")))
+		{
+			GimmickButton::SetButton(false);
+		}
 	}
 
 	void Player::MoveCamera()
