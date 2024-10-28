@@ -20,6 +20,7 @@ namespace basecross {
 		m_player(player),
 		m_box(box),
 		m_stateType(rightMove),
+		m_deathState(runaway),
 		m_pos(Vec3(-1.0f, 0.4f, 0.0f)),
 		m_rot(Vec3(0.0f, 0.0f, 0.0f)),
 		m_scal(Vec3(0.1f, 0.1f, 0.1f)),
@@ -36,7 +37,7 @@ namespace basecross {
 		m_bulletRange(1.0f),
 		m_bulletFlag(false),
 		m_jumpFlag(false),
-		m_flyFlag(true)
+		m_flyFlag(false)
 	{}
 
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
@@ -79,15 +80,15 @@ namespace basecross {
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
 		//è’ìÀîªíË
-		auto ptrColl = AddComponent<CollisionObb>();
-		ptrColl->SetFixed(false);
-		ptrColl->SetDrawActive(true);
+		m_collision = AddComponent<CollisionObb>();
+		m_collision->SetFixed(false);
+		m_collision->SetDrawActive(true);
 		//âe
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 		//èdóÕ
 		if (m_stateType == stay || m_stateType == rightMove) {
-			m_gravity.lock() = AddComponent<Gravity>();
+			m_gravity = AddComponent<Gravity>();
 		}
 
 		GetStage()->SetCollisionPerformanceActive(true);
@@ -98,6 +99,7 @@ namespace basecross {
 	}
 
 	void Enemy::OnUpdate() {
+
 		auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto stage = GetStage();
@@ -123,6 +125,9 @@ namespace basecross {
 		if (keyState.m_bPressedKeyTbl[VK_UP]) {
 			stage->AddGameObject<EnemyBullet>(GetThis<Enemy>());
 		}
+		if (keyState.m_bPushKeyTbl['W']) {
+			m_stateType = stay;
+		}
 /*------------------ÉeÉXÉgóp-------------------------*/
 
 		//ë´èÍÇ©ÇÁóéâ∫ñhé~
@@ -146,86 +151,95 @@ namespace basecross {
 			}
 		}
 
+
 		//çsìÆÉpÉ^Å[Éì
 		switch (m_stateType)
 		{
 		//à⁄ìÆÇ»Çµ
 		case stay:
-			if (m_stateType == stay) {
-				m_dic = 0;
+			m_dic = 0;
+			if (m_gravity) {
+				m_gravity->SetGravity(Vec3(0.0f,-9.8/5,0.0f));
 			}
+			else {
+				m_gravity = AddComponent<Gravity>();
+			}
+
 			break;
 
 		//í«è]ÇÃç∂âEà⁄ìÆ
 		case rightMove:
-			if (m_stateType == rightMove) {
-				if (m_pos.x < playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
-					m_dic = -1;
-				}
-				else if (m_pos.x > playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
-					m_dic = 1;
-				}
-				else {
-					m_dic = 0;
-				}
-				m_pos.x += -m_dic * m_speed * elapsed;
+			if (m_pos.x < playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
+				m_dic = -1;
+			}
+			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
+				m_dic = 1;
+			}
+			else {
+				m_dic = 0;
+			}
+			m_pos.x += -m_dic * m_speed * elapsed;
+			break;
+		//è„â∫Ç…à⁄ìÆ
+		case upMove:
+			if (m_pos.y > 0.5f) {
+				m_dic = -1;
+			}
+			else if (m_pos.y < -0.25f) {
+				m_dic = 1;
+			}
+			m_pos.y += m_dic * m_upSpeed * elapsed;
+			break;
+		//í«è]ïÇóV
+		case flyMove:
+			if (!m_jumpFlag) {
+				EnemyJump();
+				m_jumpFlag = true;
+			}
+			if (m_pos.y <= 0.4f) {
+				m_jumpFlag = false;
+			}
+			if (m_pos.x < playerPos.x - (m_scal.x / 2 + 0.051)) {
+				m_dic = -1;
+			}
+			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + 0.051)) {
+				m_dic = 1;
+			}
+			else {
+				m_dic = 0;
+			}
+			m_pos.x += -m_dic * m_speed * elapsed;
+			break;
+		//ïÇóV
+		case fly:
+			if (!m_jumpFlag) {
+				EnemyJump();
+				m_jumpFlag = true;
+			}
+			if (m_pos.y <= 0.4f) {
+				m_jumpFlag = false;
 			}
 			break;
-
-		case basecross::Enemy::upMove:
-			//è„â∫Ç…à⁄ìÆ
-			if (m_stateType == upMove) {
-				if (m_pos.y > 0.5f) {
-					m_dic = -1;
-				}
-				else if (m_pos.y < -0.25f) {
-					m_dic = 1;
-				}
-				m_pos.y += m_dic * m_upSpeed * elapsed;
+		//ÉvÉåÉCÉÑÅ[Ç…êGÇÍÇΩà íuÇ≈å≈íË
+		case fixedStay:
+			m_pos = m_deathPos;
+			m_collision->SetFixed(true);
+			if (m_gravity) {
+				m_gravity->SetGravityVerocityZero();
 			}
+			AddTag(L"FixedBox");
 			break;
-
-		case basecross::Enemy::flyMove:
-			//í«è]ïÇóV
-			if (m_stateType == flyMove) {
-				if (!m_jumpFlag) {
-					EnemyJump();
-					m_jumpFlag = true;
-				}
-				if (m_pos.y <= 0.4f) {
-					m_jumpFlag = false;
-				}
-				if (m_pos.x < playerPos.x - (m_scal.x / 2 + 0.051)) {
-					m_dic = -1;
-				}
-				else if (m_pos.x > playerPos.x + (m_scal.x / 2 + 0.051)) {
-					m_dic = 1;
-				}
-				else {
-					m_dic = 0;
-				}
-				m_pos.x += -m_dic * m_speed * elapsed;
-
+		//ÉvÉåÉCÉÑÅ[Ç∆ãtï˚å¸Ç…à⁄ìÆ
+		case runaway:
+			if (m_pos.x < playerPos.x) {
+				m_dic = -1;
 			}
-			break;
-
-		case basecross::Enemy::fly:
-			//ïÇóV
-			if (m_stateType == fly) {
-				if (!m_jumpFlag) {
-					EnemyJump();
-					m_jumpFlag = true;
-				}
-				if (m_pos.y <= 0.4f) {
-					m_jumpFlag = false;
-				}
+			else {
+				m_dic = 1;
 			}
+			m_pos.x += m_dic * m_speed * 5.0f * elapsed;
 			break;
 
-		case basecross::Enemy::death:
-			break;
-		case basecross::Enemy::runaway:
-			break;
 		default:
 			break;
 		}
@@ -264,7 +278,11 @@ namespace basecross {
 
 		//ìGÇÃì|Ç≥ÇÍÇΩéû
 		if (m_hp <= 0.0f) {
-			ThisDestroy();
+			m_stateType = m_deathState;
+			//if (m_stateType == rightMove) {
+			//}
+
+			//ThisDestroy();
 		}
 
 		//ÉfÉoÉbÉNóp
@@ -288,8 +306,16 @@ namespace basecross {
 	//è’ìÀîªíË
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
-			ReceiveDamage(0.0f);
+			m_deathPos = m_pos;
+			ReceiveDamage(100.0f);
 		}
+		if (other->FindTag(L"BreakWall")) {
+			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
+			if (m_stateType == runaway) {
+				breakWall->ThisDestory();
+			}
+		}
+
 	}
 	//É_ÉÅÅ[ÉWÇéÛÇØÇÈ
 	void Enemy::ReceiveDamage(float damage) {
@@ -300,12 +326,12 @@ namespace basecross {
 	void Enemy::ThisDestroy() {
 		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
 	}
-
+	
 	void Enemy::EnemyJump() {
 		m_gravity = AddComponent<Gravity>();
-		m_gravity.lock()->SetGravity(Vec3(0.0f, -9.8f/5, 0.0f));
+		m_gravity->SetGravity(Vec3(0.0f, -9.8f/5, 0.0f));
 		auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
-		m_gravity.lock()->StartJump(Vec3(0, m_jumpPower, 0));
+		m_gravity->StartJump(Vec3(0, m_jumpPower, 0));
 	}
 	int Enemy::GetDic() {
 		return m_dic;
@@ -396,4 +422,45 @@ namespace basecross {
 		GetStage()->RemoveGameObject<EnemyBullet>(GetThis<EnemyBullet>());
 	}
 
+	//struct MyGravity::Impl{
+	//	bsm::Vec3 m_Gravity;
+	//	bsm::Vec3 m_GravityVelocity;
+	//	Impl():
+	//		m_Gravity(0),
+	//		m_GravityVelocity(0)
+	//	{}
+	//	~Impl() {}
+	//};
+
+	MyGravity::MyGravity(const shared_ptr<GameObject>& GameObjectPtr,
+		const bsm::Vec3& gravity
+	):
+		Component(GameObjectPtr)
+	{
+		m_gravity = gravity;
+	}
+
+	Vec3 MyGravity::GetGravity() const{
+		return m_gravity;
+	}
+	void MyGravity::SetGravity(const bsm::Vec3& gravity) {
+		m_gravity = gravity;
+	}
+	void MyGravity::SetGravityZero() {
+		m_gravity = Vec3(0.0f);
+	}
+	void MyGravity::OnUpdate() {
+		auto ptrCollision = GetGameObject()->GetComponent<Collision>(false);
+		if (ptrCollision && ptrCollision->IsSleep()) {
+			return;
+		}
+
+		auto transform = GetGameObject()->GetComponent<Transform>();
+		auto pos = transform->GetPosition();
+		float elapsed = App::GetApp()->GetElapsedTime();
+		m_gravity += m_gravity * elapsed;
+		pos += m_gravity * elapsed;
+		transform->SetPosition(pos);
+
+	}
 }

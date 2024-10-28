@@ -9,25 +9,27 @@
 
 namespace basecross {
 
-	FixedBox::FixedBox(const shared_ptr<Stage>& StagePtr,
+	FixedBox::FixedBox(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotation,
 		const Vec3& scale
 	) :
-		GameObject(StagePtr),
-		m_position(position),
-		m_rotation(rotation),
-		m_scale(scale)
-	{
-	}
-	FixedBox::~FixedBox() {}
+		GameObject(stage),
+		m_pos(position),
+		m_rot(rotation),
+		m_scal(scale)
+	{}
 
 	//初期化
 	void FixedBox::OnCreate() {
 		auto ptrTransform = GetComponent<Transform>();
-		ptrTransform->SetPosition(m_position);
-		ptrTransform->SetRotation(m_rotation);
-		ptrTransform->SetScale(m_scale);
+		ptrTransform->SetPosition(m_pos);
+		ptrTransform->SetRotation(m_rot);
+		ptrTransform->SetScale(m_scal);
+		//�`��
+		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
+		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
+
 		//OBB衝突j判定を付ける
 		auto ptrColl = AddComponent<CollisionObb>();
 		ptrColl->SetFixed(true);
@@ -35,16 +37,13 @@ namespace basecross {
 		//タグをつける
 		AddTag(L"FixedBox");
 
-		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
-		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
-
 	}
 
-  Vec3 FixedBox::GetPositoin() {
-		return m_position;
+	Vec3 FixedBox::GetPositoin() {
+		return m_pos;
 	}
 	Vec3 FixedBox::GetScale() {
-		return m_scale;
+		return m_scal;
 	}
 
 	TilingFixedBox::TilingFixedBox(const shared_ptr<Stage>& StagePtr,
@@ -103,5 +102,38 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	//	class BreakWall : public GameObject;
 	//--------------------------------------------------------------------------------------
+	BreakWall::BreakWall(const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotation,
+		const Vec3& scale
+		):
+		GameObject(stage),
+		m_pos(position),
+		m_rot(rotation),
+		m_scal(scale)
 
+	{}
+	void BreakWall::OnCreate() {
+		auto ptrTransform = GetComponent<Transform>();
+		ptrTransform->SetPosition(m_pos);
+		ptrTransform->SetRotation(m_rot);
+		ptrTransform->SetScale(m_scal);
+		//�`��
+		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
+		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//�Փ˔���
+		auto ptrColl = AddComponent<CollisionObb>();
+		ptrColl->SetFixed(true);
+		//�^�O������
+		AddTag(L"FixedBox");
+		AddTag(L"BreakWall");
+
+
+	}
+	void BreakWall::OnUpdate() {
+
+	}
+	void BreakWall::ThisDestory() {
+		GetStage()->RemoveGameObject<BreakWall>(GetThis<BreakWall>());
+	}
 }

@@ -44,6 +44,24 @@ namespace basecross {
 			SetSharedGameObject(L"box",box);
 		}
 	}
+	void GameStageHemmi::CreateBreakWall() {
+		vector<vector<Vec3>> vec = {
+			{
+				Vec3(0.0f,0.5f,0.0f),
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(0.5f,0.1f,0.1f)
+			},
+			{
+				Vec3(-1.3f,-0.2f,0.0f),
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(0.1f,0.3f,0.1f)
+			},
+		};
+
+		for (auto v : vec) {
+			AddGameObject<BreakWall>(v[0], v[1], v[2]);
+		}
+	}
 	void GameStageHemmi::CreateEnemy() {
 		vector<vector<Vec3>> vec = {
 			{
@@ -68,6 +86,8 @@ namespace basecross {
 			CreateGameBox();
 			auto box = GetSharedGameObject<FixedBox>(L"box");
 			auto enemy = AddGameObject<Enemy>(player,box);
+			enemy->SetState(Enemy::rightMove);
+			CreateBreakWall();
 		}
 		catch (...) {
 			throw;
