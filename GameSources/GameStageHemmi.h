@@ -16,6 +16,7 @@ namespace basecross {
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 		void CreateGameBox();//GameStage‚Ì¶¬
 		void CreateEnemy();
+		void CreateBreakWall();
 	public:
 		//\’z‚Æ”jŠü
 		GameStageHemmi() :Stage(){}
