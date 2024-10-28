@@ -59,8 +59,10 @@ namespace basecross {
 			//ビューとライトの作成
 			CreateViewLight();
 
-			auto ptrPlayer = AddGameObject<Player>();
+			//プレイヤーとその攻撃判定を生成
+			shared_ptr<GameObject> ptrPlayer = AddGameObject<Player>();
 			SetSharedGameObject(L"Player", ptrPlayer);
+			ptrPlayer = AddGameObject<AttackCollision>(ptrPlayer);
 
 			CreateGameBox();
 		}

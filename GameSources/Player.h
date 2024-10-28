@@ -73,12 +73,20 @@ namespace basecross {
 		void Gravity();
 	};
 
+	//====================================================================
+	// class AttackCollision
+	// プレイヤーの攻撃判定
+	//====================================================================
+
 	class AttackCollision : public GameObject {
+		weak_ptr<GameObject> m_player;
+		Vec3 m_distFromPlayer;
 
 	public:
 		//構築と破棄
 
-		AttackCollision(const shared_ptr<Stage>& StagePtr);
+		AttackCollision(const shared_ptr<Stage>& StagePtr,
+			const shared_ptr<GameObject>& player);
 
 		virtual ~AttackCollision() {}
 		//アクセサ
@@ -87,7 +95,25 @@ namespace basecross {
 		//更新
 		virtual void OnUpdate() override;
 
+		void FollowPlayer();
+
 	};
+
+	//====================================================================
+	// class TriggerColl
+	// 独自のコリジョンコンポーネント
+	//====================================================================
+
+	class TriggerColl : public CollisionSphere {
+	protected:
+		TriggerColl(const shared_ptr<GameObject>& GameObjectPtr);
+		~TriggerColl();
+
+	private:
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
+
 }
 //end basecross
 

@@ -12,7 +12,7 @@ namespace basecross {
 		GameObject(StagePtr),
 		m_speed(.225f),
 		m_accel(.1f),
-		m_friction(.9f),
+		m_friction(.84f),
 		m_frictionThreshold(.001f),
 		m_jumpHeight(.4f),
 		m_gravity(-.075f),
@@ -105,7 +105,7 @@ namespace basecross {
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(0.10f, 0.10f, 0.10f);	//直径25センチの球体
+		ptr->SetScale(0.10f, 0.10f, 0.10f);
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(Vec3(0, 1.0f, 0));
 
@@ -132,7 +132,6 @@ namespace basecross {
 
 		m_HP = m_HP_max;
 
-		GetStage()->SetSharedGameObject(L"PlayerAttack", GetStage()->AddGameObject<AttackCollision>());
 	}
 
 	void Player::OnUpdate() {
@@ -153,6 +152,7 @@ namespace basecross {
 	void Player::ShowDebug() {
 		wstringstream wss;
 		auto pos = RoundOff(GetComponent<Transform>()->GetPosition(), 3);
+		auto rot = RoundOff(GetComponent<Transform>()->GetRotation(), 3);
 
 		wss << "stateType : " << m_stateType << endl;
 		wss << "pos : " << pos.x << ", " << pos.y << endl;
@@ -214,6 +214,76 @@ namespace basecross {
 	Vec3 Player::GetScale() {
 		return GetComponent<Transform>()->GetScale();
 	}
+
+	//====================================================================
+	// class AttackCollision
+	// プレイヤーの攻撃判定
+	//====================================================================
+
+	AttackCollision::AttackCollision(const shared_ptr<Stage>& StagePtr,
+		const shared_ptr<GameObject>& player) :
+		GameObject(StagePtr),
+		m_player(player),
+		m_distFromPlayer(Vec3(.1f, 0, 0))
+	{}
+
+	void AttackCollision::OnCreate() {
+		auto trans = GetComponent<Transform>();
+		trans->SetScale(0.10f, 0.10f, 0.10f);	//直径25センチの球体
+		trans->SetRotation(0.0f, 0.0f, 0.0f);
+		trans->SetPosition(Vec3(0, 0, 0));
+
+		//仮(本実装時は、押し出しのないTrigger判定を独自に作る？)
+		auto coll = AddComponent<CollisionSphere>();
+		coll->SetUpdateActive(true);
+		coll->SetDrawActive(true);
+
+		coll->AddExcludeCollisionTag(L"Player");
+		coll->AddExcludeCollisionTag(L"FixedBox");
+
+	}
+
+	void AttackCollision::OnUpdate() {
+		FollowPlayer();
+	}
+
+	void AttackCollision::FollowPlayer() {
+		auto trans = GetComponent<Transform>();
+		//weakからsharedに格上げ
+		auto ptrPlayer = m_player.lock();
+
+		if (ptrPlayer != nullptr) {
+			auto matPlayer = ptrPlayer->GetComponent<Transform>()->GetWorldMatrix();
+			matPlayer.scaleIdentity();
+			Mat4x4 matrix;
+			matrix.affineTransformation(
+				Vec3(1),
+				Vec3(0),
+				Vec3(0),
+				m_distFromPlayer);
+			matrix *= matPlayer;
+
+			auto posPlayer = matrix.transInMatrix();
+			trans->SetPosition(posPlayer);
+			trans->SetQuaternion(matrix.quatInMatrix());
+		}
+	}
+
+	//====================================================================
+	// class TriggerColl
+	// 独自のコリジョンコンポーネント
+	//====================================================================
+	struct TriggerColl::Impl {
+
+	};
+	
+	TriggerColl::TriggerColl(const shared_ptr<GameObject>& GameObjectPtr) :
+		CollisionSphere(GameObjectPtr),
+		pImpl(new Impl())
+	{}
+	TriggerColl::~TriggerColl() {}
+
+
 }
 //end basecross
 
