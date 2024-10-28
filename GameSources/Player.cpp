@@ -13,8 +13,8 @@ namespace basecross {
 		m_accel(.1f),
 		m_friction(.9f),
 		m_frictionThreshold(.001f),
-		m_jumpHeight(.4f),
-		m_gravity(-.075f),
+		m_jumpHeight(.3f),
+		m_gravity(-.098f),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
@@ -137,17 +137,6 @@ namespace basecross {
 		m_InputHandler.PushHandle(GetThis<Player>());
 		MovePlayer();
 		MoveCamera();
-		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
-		wstring fpsStr(L"FPS: ");
-		fpsStr += Util::UintToWStr(fps);
-		fpsStr += L"\nElapsedTime: ";
-		float ElapsedTime = App::GetApp()->GetElapsedTime();
-		fpsStr += Util::FloatToWStr(ElapsedTime);
-		fpsStr += L"\n";
-
-		MovePlayer();
-		MoveCamera();
-
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 	}
@@ -160,12 +149,13 @@ namespace basecross {
 		wstringstream wss;
 		auto pos = RoundOff(GetComponent<Transform>()->GetPosition(), 3);
 
+		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		wss << "stateType : " << m_stateType << endl;
 		wss << "pos : " << pos.x << ", " << pos.y << endl;
 		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
 		wss << "exitcnt : " << m_collideCount << endl;
 		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
-
+		wss << "fps :" << fps << " / " << endl;
 		auto scene = App::GetApp()->GetScene<Scene>();
 		scene->SetDebugString(L"Player\n" + wss.str());
 	}
@@ -183,6 +173,14 @@ namespace basecross {
 			m_stateType = stand;
 		}
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
+
+	}
+	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)
+	{
+		if ((Other->FindTag(L"GimmickButton")))
+		{
+			GimmickButton::SetButton(true);
+		}
 
 	}
 
