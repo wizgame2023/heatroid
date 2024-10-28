@@ -18,6 +18,7 @@ namespace basecross {
 		void CreateGameBox();//GameStage‚Ì¶¬
 		void CreatePlayer(); //Player‚Ì¶¬
 		void CreateFixedBox();
+		void CreateGimmick();
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage(){}

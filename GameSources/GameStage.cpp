@@ -50,15 +50,47 @@ namespace basecross {
 		auto ptrPlayer = AddGameObject<Player>();
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
-		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(5, 0.0125f, 0));
+		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(-3, 0.0125f, 0));
 	}
 
 	//ボックスの作成
 	void GameStage::CreateFixedBox() {
 		//CSVの行単位の配列
 		vector<wstring> LineVec;
-		//0番目のカラムがL"TilingFixedBox"である行を抜き出す
+		//0番目のカラムがL"FixedBox"である行を抜き出す
 		m_GameStage1.GetSelect(LineVec, 0, L"FixedBox");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				-(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			//各値がそろったのでオブジェクト作成
+			AddGameObject<TilingFixedBox>(Scale, Rot, Pos, 1.0f, 1.0f);
+		}
+	}
+
+	void GameStage::CreateGimmick()
+	{
+		vector<wstring> LineVec;
+		m_GameStage1.GetSelect(LineVec, 0, L"GimmickDoor");
 		for (auto& v : LineVec) {
 			//トークン（カラム）の配列
 			vector<wstring> Tokens;
@@ -83,9 +115,33 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Scale, -Rot, Pos, 1.0f, 1.0f);
+			AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f);
 		}
+
+		m_GameStage1.GetSelect(LineVec, 0, L"GimmickButton");
+		for (auto& v : LineVec) {
+			vector<wstring> Tokens;
+			Util::WStrToTokenVector(Tokens, v, L',');
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+			AddGameObject<GimmickButton>(Pos, Rot, Scale, 1.0f, 1.0f);
+		}
+
 	}
+
 
 
 	void GameStage::OnCreate() {
@@ -98,6 +154,8 @@ namespace basecross {
 			//ビューとライトの作成
 			CreateViewLight();
 			//CreateGameBox();
+			CreateGimmick();
+
 			CreatePlayer();
 			CreateFixedBox();
 		}
