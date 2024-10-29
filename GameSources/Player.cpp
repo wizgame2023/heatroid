@@ -17,16 +17,18 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) : 
 		GameObject(StagePtr),
-		m_speed(.225f),
-		m_accel(.1f),
-		m_friction(.84f),
-		m_frictionThreshold(.001f),
-		m_jumpHeight(.4f),
-		m_gravity(-.075f),
+		m_speed(2.25f),
+		m_accel(2.0f),
+		m_friction(.6f),
+		m_frictionThreshold(.05f),
+		m_airSpeedRate(.6f),
+		m_jumpHeight(2.5f),
+		m_gravity(-4.0f),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
 		m_stateType(air),
+		m_face(1),
 
 		m_HP_max(100)
 	{}
@@ -87,7 +89,14 @@ namespace basecross {
 	}
 
 	void Player::MovePlayer() {
-		m_moveVel.x += GetMoveVector().x * m_accel * _delta;
+		auto trans = GetComponent<Transform>();
+		
+		//逆方向に移動しようとしたとき、加速度が上がる(急ブレーキ)
+		if (m_face * GetMoveVector().x < 0)
+			m_moveVel.x += GetMoveVector().x * m_accel * 5.0f * _delta;
+		else
+			m_moveVel.x += GetMoveVector().x * m_accel * _delta;
+
 		m_moveVel.y += m_gravity * _delta;
 
 		if (m_stateType == stand) {
@@ -97,13 +106,28 @@ namespace basecross {
 			}
 		}
 
+		//地上にいるときの処理
+		if (m_stateType == stand) {
+			if (m_moveVel.y < m_gravity * .1f) m_moveVel.y = m_gravity * .1f;
+
+			if (abs(m_moveVel.x) >= (m_speed * .1f)) {
+				if (m_moveVel.x > 0) { 
+					m_face = 1;
+					trans->SetRotation(0, 0, 0);
+				}
+				else {
+					m_face = -1;
+					trans->SetRotation(0, XM_PI, 0);
+				}
+			}
+		}
+
 		if (m_moveVel.x > m_speed) m_moveVel.x = m_speed;
 		if (m_moveVel.x < -m_speed) m_moveVel.x = -m_speed;
 
-		auto trans = GetComponent<Transform>();
-		trans->SetPosition((m_moveVel * _delta) + trans->GetPosition());
+		if (m_stateType == air && abs(m_moveVel.x) > m_speed * m_airSpeedRate) m_moveVel.x = m_speed * m_airSpeedRate * m_face;
 
-		if (m_stateType == stand && m_moveVel.y < m_gravity) m_moveVel.y = m_gravity;
+		trans->SetPosition((m_moveVel * _delta) + trans->GetPosition());
 	}
 
 	void Player::OnCreate() {
@@ -142,6 +166,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate() {
+		_delta = App::GetApp()->GetElapsedTime();
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 
@@ -166,6 +191,8 @@ namespace basecross {
 		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
 		wss << "exitcnt : " << m_collideCount << endl;
 		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
+		wss << "fps : " << App::GetApp()->GetStepTimer().GetFramesPerSecond() << endl;
+		wss << "delta : " << _delta << endl;
 
 		auto scene = App::GetApp()->GetScene<Scene>();
 		scene->SetDebugString(L"Player\n" + wss.str());
@@ -205,6 +232,10 @@ namespace basecross {
 		}
 	}
 
+	void Player::Gravity() {
+		m_moveVel.y += m_gravity * _delta;
+	}
+
 	Vec3 Player::RoundOff(Vec3 number, int point) {
 		Vec3 r = number *= pow(10, point);
 		r.x = round(r.x);
@@ -212,10 +243,6 @@ namespace basecross {
 		r.z = round(r.z);
 		r /= pow(10, point);
 		return r;
-	}
-
-	void Player::Gravity() {
-		m_moveVel.y += m_gravity * _delta;
 	}
 
 	Vec3 Player::GetScale() {

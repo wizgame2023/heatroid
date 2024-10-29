@@ -32,6 +32,8 @@ namespace basecross {
 		//摩擦係数(地上)
 		float m_friction;
 		float m_frictionThreshold;
+		//空中制動
+		float m_airSpeedRate;
 		//ジャンプ高度
 		float m_jumpHeight;
 		//重力
@@ -41,15 +43,22 @@ namespace basecross {
 		//CollisionExitの空中判定の閾値
 		int m_collideCount, m_collideCountInit;
 
+		//プレイヤーの状態を表す列挙型
 		enum Stats {
 			stand,		//地上
 			air,		//空中
-			hit			//やられ
+			hit,		//やられ
+			fire,		//長押し攻撃
+			attack1,	//攻撃1
 		};
+
+		//向き(1が右、-1が左)
+		int m_face;
 
 		//HP
 		int m_HP, m_HP_max;
-
+		
+		//プレイヤーの状態
 		Stats m_stateType;
 
 		float _delta = App::GetApp()->GetElapsedTime();
@@ -73,10 +82,16 @@ namespace basecross {
 		////Aボタン
 		void OnPushA();
 
+		//カメラの移動
 		void MoveCamera();
-		Vec3 GetScale();
-		Vec3 RoundOff(Vec3 number, int point);
+		//重力
 		void Gravity();
+
+		//四捨五入
+		Vec3 RoundOff(Vec3 number, int point);
+
+		//Transform.Scaleのゲッタ
+		Vec3 GetScale();
 	};
 
 //====================================================================
