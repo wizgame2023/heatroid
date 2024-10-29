@@ -9,7 +9,6 @@
 
 namespace basecross {
 
-
 //====================================================================
 // class Player
 // プレイヤークラス
@@ -162,10 +161,8 @@ namespace basecross {
 		_delta = App::GetApp()->GetElapsedTime();
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
-
 		MovePlayer();
 		MoveCamera();
-
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 	}
@@ -179,6 +176,7 @@ namespace basecross {
 		auto pos = RoundOff(GetComponent<Transform>()->GetPosition(), 3);
 		auto rot = RoundOff(GetComponent<Transform>()->GetRotation(), 3);
 
+		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		wss << "stateType : " << m_stateType << endl;
 		wss << "pos : " << pos.x << ", " << pos.y << endl;
 		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
@@ -207,21 +205,37 @@ namespace basecross {
 
 	}
 
+	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)
+	{
+		if ((Other->FindTag(L"GimmickButton")))
+		{
+			GimmickButton::SetButton(true);
+		}
+
+	}
+	void Player::OnCollisionExit(shared_ptr<GameObject>& Other)
+	{
+		if ((Other->FindTag(L"GimmickButton")))
+		{
+			GimmickButton::SetButton(false);
+		}
+	}
+
 	void Player::MoveCamera()
 	{
 		auto ptrCamera = dynamic_pointer_cast<Camera>(OnGetDrawCamera());
 		auto pos = GetComponent<Transform>()->GetPosition();
 		Vec3 Camera = ptrCamera->GetEye();
 		float differenceX = pos.x - Camera.x;
-		if (differenceX >= 5.0f)
+		if (differenceX >= 0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX - 5.0f), 5.0f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), 0.5f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
 		}
-		else if (differenceX <= -5.0f)
+		else if (differenceX <= -0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX + 5.0f), 5.0f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 5.0f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), 0.5f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
 		}
 	}
 

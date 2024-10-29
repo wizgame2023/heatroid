@@ -14,16 +14,18 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class Enemy : public GameObject
 	{
+	public:
 		enum State {
 			stay,      //移動なし
 			rightMove, //追従左右移動
 			upMove,    //上下移動
 			flyMove,   //追従浮遊移動
 			fly,       //浮遊
-			death,     //
-			runaway    //
+			fixedStay, //プレイヤーに触れた位置で固定
+			runaway    //プレイヤーと逆方向に移動
 		};
 
+	private:
 		float m_hp;          //体力
 		float m_maxHp;       //最大体力
 		float m_speed;       //移動速度
@@ -41,28 +43,30 @@ namespace basecross {
 
 		State m_stateType;
 		State m_beforState;
+		State m_deathState;
 
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
+		Vec3 m_deathPos;
 		Vec3 m_playerScale; //プレイヤーのサイズ
 
 		shared_ptr<Transform> m_trans;
 		shared_ptr<Player> m_player;
 		shared_ptr<Transform> m_playerTrans;
 		shared_ptr<FixedBox> m_box;
-		weak_ptr<Gravity> m_gravity;
+		shared_ptr<Gravity> m_gravity;
+		shared_ptr<CollisionObb> m_collision;
 
 	public:
 		// 構築と破棄
-		Enemy(const shared_ptr<Stage>& stage,
-			const shared_ptr<Player>& player,
-			const shared_ptr<FixedBox>& box = nullptr);
 		Enemy(const shared_ptr<Stage>& stage, 
-			const shared_ptr<Player>& player,
 			const Vec3& position, 
 			const Vec3& rotatoin, 
 			const Vec3& scale,
+			const State& state,
+			const State& deathState,
+			const shared_ptr<Player>& player,
 			const shared_ptr<FixedBox>& box = nullptr);
 		virtual ~Enemy(){}
 		virtual void OnCreate() override; // 初期化
@@ -111,10 +115,22 @@ namespace basecross {
 
 	};
 
+
 	class MyGravity : public Component {
+	public:
 		explicit MyGravity(const shared_ptr<GameObject>& GameObjectPtr,
 			const bsm::Vec3& gravity = bsm::Vec3(0, -9.8f, 0));
+		MyGravity::~MyGravity() {}
 
+	private:
+		Vec3 m_gravity;
+		//struct Impl;
+		//unique_ptr<Impl> pImpl;
+	public:
+		Vec3 GetGravity() const;
+		void SetGravity(const bsm::Vec3& gravity);
+		void SetGravityZero();
+		void OnUpdate();
 	};
 
 }

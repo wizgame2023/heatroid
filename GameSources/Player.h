@@ -78,6 +78,8 @@ namespace basecross {
 
 		//何かに接触している判定(接地判定に活用？)
 		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 
 		////Aボタン
 		void OnPushA();
