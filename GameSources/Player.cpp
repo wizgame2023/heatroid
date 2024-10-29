@@ -5,8 +5,357 @@
 
 #include "stdafx.h"
 #include "Project.h"
+#include "Collision.h"
 
 namespace basecross {
+
+//====================================================================
+// class TriggerColl
+// 押し合い処理を行わない球形コライダ
+//====================================================================
+
+	struct TriggerColl::Impl {
+		float m_MadeDiameter;					//作成時の直径
+		//配列ボリュームと衝突時に衝突した配列を特定するインデックス
+		size_t m_IsHitVolumeIndex;
+		CalcScaling m_CalcScaling;
+		Impl() :
+			m_MadeDiameter(1.0f),
+			m_IsHitVolumeIndex(0),
+			m_CalcScaling(CalcScaling::YScale)
+		{}
+		~Impl() {};
+	};
+
+	TriggerColl::TriggerColl(const shared_ptr<GameObject>& GameObjectPtr) :
+		Collision(GameObjectPtr),
+		pImpl(new Impl())
+	{}
+	TriggerColl::~TriggerColl() {}
+
+	//アクセサ
+	float TriggerColl::GetMadeDiameter() const {
+		return pImpl->m_MadeDiameter;
+	}
+	void TriggerColl::SetMadeDiameter(float f) {
+		pImpl->m_MadeDiameter = f;
+	}
+	float TriggerColl::GetMadeRadius() const {
+		return pImpl->m_MadeDiameter * 0.5f;
+	}
+	void TriggerColl::SetMadeRadius(float f) {
+		pImpl->m_MadeDiameter = f * 2.0f;
+	}
+
+	CalcScaling TriggerColl::GetCalcScaling() const {
+		return pImpl->m_CalcScaling;
+
+	}
+	void TriggerColl::SetCalcScaling(CalcScaling s) {
+		pImpl->m_CalcScaling = s;
+	}
+
+
+	SPHERE TriggerColl::GetSphere() const {
+		auto TransPtr = GetGameObject()->GetComponent<Transform>();
+		bsm::Mat4x4 MatBase;
+		MatBase.scale(bsm::Vec3(pImpl->m_MadeDiameter, pImpl->m_MadeDiameter, pImpl->m_MadeDiameter));
+		MatBase *= TransPtr->GetWorldMatrix();
+		//このオブジェクトのSPHEREを作成
+		SPHERE Ret(MatBase.transInMatrix(), MatBase.scaleInMatrix().x * 0.5f);
+		switch (pImpl->m_CalcScaling) {
+		case CalcScaling::XScale:
+			Ret.m_Radius = MatBase.scaleInMatrix().x * 0.5f;
+			break;
+		case CalcScaling::YScale:
+			Ret.m_Radius = MatBase.scaleInMatrix().y * 0.5f;
+			break;
+		case CalcScaling::ZScale:
+			Ret.m_Radius = MatBase.scaleInMatrix().z * 0.5f;
+			break;
+		default:
+			break;
+		}
+		return Ret;
+	}
+
+
+	SPHERE TriggerColl::GetBeforeSphere() const {
+		auto TransPtr = GetGameObject()->GetComponent<Transform>();
+		bsm::Mat4x4 MatBase;
+		MatBase.scale(bsm::Vec3(pImpl->m_MadeDiameter, pImpl->m_MadeDiameter, pImpl->m_MadeDiameter));
+		MatBase *= TransPtr->GetBeforeWorldMatrix();
+		//このオブジェクトのSPHEREを作成
+		SPHERE Ret(MatBase.transInMatrix(), MatBase.scaleInMatrix().x * 0.5f);
+		switch (pImpl->m_CalcScaling) {
+		case CalcScaling::XScale:
+			Ret.m_Radius = MatBase.scaleInMatrix().x * 0.5f;
+			break;
+		case CalcScaling::YScale:
+			Ret.m_Radius = MatBase.scaleInMatrix().y * 0.5f;
+			break;
+		case CalcScaling::ZScale:
+			Ret.m_Radius = MatBase.scaleInMatrix().z * 0.5f;
+			break;
+		default:
+			break;
+		}
+		return Ret;
+	}
+
+	bool TriggerColl::SimpleCollisionCall(const shared_ptr<Collision>& Src) {
+		return Src->SimpleCollision(GetThis<CollisionSphere>());
+	}
+	
+	bool TriggerColl::SimpleCollision(const shared_ptr<CollisionSphere>& DestColl) {
+		auto SrcSp = GetSphere();
+		auto DestSp = DestColl->GetSphere();
+		if (!HitTest::AABB_AABB(SrcSp.GetWrappedAABB(), DestSp.GetWrappedAABB())) {
+			return false;
+		}
+		if (HitTest::SPHERE_SPHERE(SrcSp, DestSp)) {
+			return true;
+		}
+		return false;
+	}
+
+	bool TriggerColl::SimpleCollision(const shared_ptr<CollisionCapsule>& DestColl) {
+		auto SrcSp = GetSphere();
+		auto DestCap = DestColl->GetCapsule();
+		if (!HitTest::AABB_AABB(SrcSp.GetWrappedAABB(), DestCap.GetWrappedAABB())) {
+			return false;
+		}
+		bsm::Vec3 d;
+		if (HitTest::SPHERE_CAPSULE(SrcSp, DestCap, d)) {
+			return true;
+		}
+		return false;
+
+	}
+
+	bool TriggerColl::SimpleCollision(const shared_ptr<CollisionObb>& DestColl) {
+		auto SrcSp = GetSphere();
+		auto DestObb = DestColl->GetObb();
+		if (!HitTest::AABB_AABB(SrcSp.GetWrappedAABB(), DestObb.GetWrappedAABB())) {
+			return false;
+		}
+		bsm::Vec3 d;
+		if (HitTest::SPHERE_OBB(SrcSp, DestObb, d)) {
+			return true;
+		}
+		return false;
+	}
+
+	bool TriggerColl::SimpleCollision(const shared_ptr<CollisionRect>& DestColl) {
+		auto SrcSp = GetSphere();
+		auto DestCol = DestColl->GetColRect();
+		if (!HitTest::AABB_AABB(SrcSp.GetWrappedAABB(), DestCol.GetWrappedAABB())) {
+			return false;
+		}
+		bsm::Vec3 d;
+		if (HitTest::SPHERE_COLRECT(SrcSp, DestCol, d)) {
+			return true;
+		}
+		return false;
+	}
+
+	void TriggerColl::CollisionCall(const shared_ptr<Collision>& Src) {
+		Src->CollisionTest(GetThis<TriggerColl>());
+	}
+
+	void TriggerColl::CollisionTest(const shared_ptr<TriggerColl>& DestColl) {
+
+		auto PtrTransform = GetGameObject()->GetComponent<Transform>();
+		auto PtrDestTransform = DestColl->GetGameObject()->GetComponent<Transform>();
+		bsm::Vec3 SrcVelocity = PtrTransform->GetVelocity();
+		bsm::Vec3 DestVelocity = PtrDestTransform->GetVelocity();
+		//前回のターンからの時間
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		//球の場合は、すべて移動以外変化なしとする
+		SPHERE SrcSphere = GetSphere();
+		SPHERE SrcBeforSphere = GetBeforeSphere();
+		//相手のCollisionSphere
+		SPHERE DestSphere = DestColl->GetSphere();
+		SPHERE DestBeforeSphere = DestColl->GetBeforeSphere();
+		//簡易的な判定
+		if (!HitTest::SPHERE_SPHERE(SrcSphere, DestSphere)) {
+			return;
+		}
+		bsm::Vec3 SpanVelocity = SrcVelocity - DestVelocity;
+		float HitTime = 0;
+		if (HitTest::CollisionTestSphereSphere(SrcBeforSphere, SpanVelocity, DestBeforeSphere, 0, ElapsedTime, HitTime)) {
+			CollisionPair pair;
+			pair.m_Src = GetThis<Collision>();
+			pair.m_Dest = DestColl;
+			GetCollisionManager()->InsertNewPair(pair);
+		}
+	}
+
+	void TriggerColl::CollisionTest(const shared_ptr<CollisionSphere>& DestColl) {
+
+		auto PtrTransform = GetGameObject()->GetComponent<Transform>();
+		auto PtrDestTransform = DestColl->GetGameObject()->GetComponent<Transform>();
+		bsm::Vec3 SrcVelocity = PtrTransform->GetVelocity();
+		bsm::Vec3 DestVelocity = PtrDestTransform->GetVelocity();
+		//前回のターンからの時間
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		//球の場合は、すべて移動以外変化なしとする
+		SPHERE SrcSphere = GetSphere();
+		SPHERE SrcBeforSphere = GetBeforeSphere();
+		//相手のCollisionSphere
+		SPHERE DestSphere = DestColl->GetSphere();
+		SPHERE DestBeforeSphere = DestColl->GetBeforeSphere();
+		//簡易的な判定
+		if (!HitTest::SPHERE_SPHERE(SrcSphere, DestSphere)) {
+			return;
+		}
+		bsm::Vec3 SpanVelocity = SrcVelocity - DestVelocity;
+		float HitTime = 0;
+		if (HitTest::CollisionTestSphereSphere(SrcBeforSphere, SpanVelocity, DestBeforeSphere, 0, ElapsedTime, HitTime)) {
+			CollisionPair pair;
+			pair.m_Src = GetThis<Collision>();
+			pair.m_Dest = DestColl;
+			GetCollisionManager()->InsertNewPair(pair);
+		}
+	}
+
+	void TriggerColl::CollisionTest(const shared_ptr<CollisionCapsule>& DestColl) {
+
+		auto PtrTransform = GetGameObject()->GetComponent<Transform>();
+		auto PtrDestTransform = DestColl->GetGameObject()->GetComponent<Transform>();
+		bsm::Vec3 SrcVelocity = PtrTransform->GetVelocity();
+		bsm::Vec3 DestVelocity = PtrDestTransform->GetVelocity();
+		//前回のターンからの時間
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		//移動以外変化なし
+		SPHERE SrcSphere = GetSphere();
+		SPHERE SrcBeforSphere = GetBeforeSphere();
+		//相手
+		CAPSULE DestCap = DestColl->GetCapsule();
+		CAPSULE DestBeforeCap = DestColl->GetBeforeCapsule();
+		//簡易的な判定
+		bsm::Vec3 ret;
+		if (!HitTest::SPHERE_CAPSULE(SrcSphere, DestCap, ret)) {
+			return;
+		}
+		bsm::Vec3 SpanVelocity = SrcVelocity - DestVelocity;
+		float HitTime = 0;
+		if (HitTest::CollisionTestSphereCapsule(SrcBeforSphere, SpanVelocity, DestBeforeCap, 0, ElapsedTime, HitTime)) {
+			CollisionPair pair;
+			pair.m_Src = GetThis<Collision>();
+			pair.m_Dest = DestColl;
+			GetCollisionManager()->InsertNewPair(pair);
+		}
+	}
+
+
+	void TriggerColl::CollisionTest(const shared_ptr<CollisionObb>& DestColl) {
+
+		auto PtrTransform = GetGameObject()->GetComponent<Transform>();
+		auto PtrDestTransform = DestColl->GetGameObject()->GetComponent<Transform>();
+		bsm::Vec3 SrcVelocity = PtrTransform->GetVelocity();
+		bsm::Vec3 DestVelocity = PtrDestTransform->GetVelocity();
+		//前回のターンからの時間
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		//移動以外変化なし
+		SPHERE SrcSphere = GetSphere();
+		SPHERE SrcBeforSphere = GetBeforeSphere();
+		//相手
+		OBB DestObb = DestColl->GetObb();
+		OBB DestBeforeObb = DestColl->GetBeforeObb();
+		//簡易的な判定
+		bsm::Vec3 ret;
+		if (!HitTest::SPHERE_OBB(SrcSphere, DestObb, ret)) {
+			return;
+		}
+		bsm::Vec3 SpanVelocity = SrcVelocity - DestVelocity;
+		float HitTime = 0;
+		if (HitTest::CollisionTestSphereObb(SrcBeforSphere, SpanVelocity, DestBeforeObb, 0, ElapsedTime, HitTime)) {
+			CollisionPair pair;
+			pair.m_Src = GetThis<Collision>();
+			pair.m_Dest = DestColl;
+			GetCollisionManager()->InsertNewPair(pair);
+		}
+	}
+
+	void TriggerColl::CollisionTest(const shared_ptr<CollisionRect>& DestColl) {
+
+		auto PtrTransform = GetGameObject()->GetComponent<Transform>();
+		auto PtrDestTransform = DestColl->GetGameObject()->GetComponent<Transform>();
+		bsm::Vec3 SrcVelocity = PtrTransform->GetVelocity();
+		bsm::Vec3 DestVelocity = PtrDestTransform->GetVelocity();
+		//前回のターンからの時間
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		//移動以外変化なし
+		SPHERE SrcSphere = GetSphere();
+		SPHERE SrcBeforSphere = GetBeforeSphere();
+		//相手
+		COLRECT DestRect = DestColl->GetColRect();
+		COLRECT DestBeforeRect = DestColl->GetBeforeColRect();
+		//簡易的な判定
+		bsm::Vec3 ret;
+		if (!HitTest::SPHERE_COLRECT(SrcSphere, DestRect, ret)) {
+			return;
+		}
+		bsm::Vec3 SpanVelocity = SrcVelocity - DestVelocity;
+		float HitTime = 0;
+		if (HitTest::CollisionTestSphereRect(SrcBeforSphere, SpanVelocity, DestBeforeRect, 0, ElapsedTime, HitTime)) {
+			CollisionPair pair;
+			pair.m_Src = GetThis<Collision>();
+			pair.m_Dest = DestColl;
+			GetCollisionManager()->InsertNewPair(pair);
+		}
+	}
+
+
+	bsm::Vec3 TriggerColl::GetCenterPosition()const {
+		SPHERE SrcSphere = GetSphere();
+		return SrcSphere.m_Center;
+	}
+
+	AABB TriggerColl::GetEnclosingAABB()const {
+		AABB enc = GetBeforeSphere().GetWrappedAABB();
+		enc.UnionAABB(GetSphere().GetWrappedAABB());
+		return enc;
+	}
+
+	AABB TriggerColl::GetWrappedAABB()const {
+		return GetSphere().GetWrappedAABB();
+	}
+
+	void TriggerColl::OnCreate() {
+		SetDrawActive(false);
+	}
+	void TriggerColl::OnUpdate() {
+	}
+	void TriggerColl::OnDraw() {
+		GenericDraw Draw;
+		bsm::Mat4x4 MeshToTransformMatrix;
+
+		auto PtrTransform = GetGameObject()->GetComponent<Transform>();
+		auto Scale = PtrTransform->GetScale();
+		bsm::Vec3 CollScale(Scale.x, Scale.x, Scale.x);
+		switch (pImpl->m_CalcScaling) {
+		case CalcScaling::YScale:
+			CollScale = bsm::Vec3(Scale.y, Scale.y, Scale.y);
+			break;
+		case CalcScaling::ZScale:
+			CollScale = bsm::Vec3(Scale.z, Scale.z, Scale.z);
+			break;
+		default:
+			break;
+		}
+		bsm::Vec3 ColcScale(CollScale.x / Scale.x, CollScale.y / Scale.y, CollScale.z / Scale.z);
+		bsm::Mat4x4 mat;
+		mat.scale(ColcScale);
+
+		Draw.DrawWireFrame(GetGameObject(), App::GetApp()->GetResource<MeshResource>(L"DEFAULT_PC_SPHERE"),mat);
+	}
+
+//====================================================================
+// class Player
+// プレイヤークラス
+//====================================================================
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) : 
 		GameObject(StagePtr),
@@ -215,10 +564,10 @@ namespace basecross {
 		return GetComponent<Transform>()->GetScale();
 	}
 
-	//====================================================================
-	// class AttackCollision
-	// プレイヤーの攻撃判定
-	//====================================================================
+//====================================================================
+// class AttackCollision
+// プレイヤーの攻撃判定
+//====================================================================
 
 	AttackCollision::AttackCollision(const shared_ptr<Stage>& StagePtr,
 		const shared_ptr<GameObject>& player) :
@@ -234,12 +583,9 @@ namespace basecross {
 		trans->SetPosition(Vec3(0, 0, 0));
 
 		//仮(本実装時は、押し出しのないTrigger判定を独自に作る？)
-		auto coll = AddComponent<CollisionSphere>();
+		auto coll = AddComponent<TriggerColl>();
 		coll->SetUpdateActive(true);
 		coll->SetDrawActive(true);
-
-		coll->AddExcludeCollisionTag(L"Player");
-		coll->AddExcludeCollisionTag(L"FixedBox");
 
 	}
 
@@ -268,22 +614,6 @@ namespace basecross {
 			trans->SetQuaternion(matrix.quatInMatrix());
 		}
 	}
-
-	//====================================================================
-	// class TriggerColl
-	// 独自のコリジョンコンポーネント
-	//====================================================================
-	struct TriggerColl::Impl {
-
-	};
-	
-	TriggerColl::TriggerColl(const shared_ptr<GameObject>& GameObjectPtr) :
-		CollisionSphere(GameObjectPtr),
-		pImpl(new Impl())
-	{}
-	TriggerColl::~TriggerColl() {}
-
-
 }
 //end basecross
 

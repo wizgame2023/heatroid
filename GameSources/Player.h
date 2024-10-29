@@ -5,8 +5,58 @@
 
 #pragma once
 #include "stdafx.h"
+#include "Collision.h"
 
 namespace basecross {
+
+//====================================================================
+// class TriggerColl
+// 押し合い処理を行わない球形コライダ
+//====================================================================
+
+	class TriggerColl : public Collision {
+	public:
+		TriggerColl(const shared_ptr<GameObject>& GameObjectPtr);
+		~TriggerColl();
+
+		float GetMadeDiameter() const;
+		void SetMadeDiameter(float f);
+		float GetMadeRadius() const;
+		void SetMadeRadius(float f);
+
+		void CollideTest(const shared_ptr<CollisionSphere>& DestColl);
+		CalcScaling GetCalcScaling() const;
+		void SetCalcScaling(CalcScaling s);
+		SPHERE GetSphere() const;
+		SPHERE GetBeforeSphere() const;
+		virtual bool SimpleCollisionCall(const shared_ptr<Collision>& Src) override;
+		virtual bool SimpleCollision(const shared_ptr<CollisionSphere>& DestColl) override;
+		virtual bool SimpleCollision(const shared_ptr<CollisionCapsule>& DestColl) override;
+		virtual bool SimpleCollision(const shared_ptr<CollisionObb>& DestColl) override;
+		virtual bool SimpleCollision(const shared_ptr<CollisionRect>& DestColl) override;
+		virtual void CollisionCall(const shared_ptr<Collision>& Src)override;
+		virtual void CollisionTest(const shared_ptr<TriggerColl>& DestColl)override;
+		virtual void CollisionTest(const shared_ptr<CollisionSphere>& DestColl)override;
+		virtual void CollisionTest(const shared_ptr<CollisionCapsule>& DestColl)override;
+		virtual void CollisionTest(const shared_ptr<CollisionObb>& DestColl)override;
+		virtual void CollisionTest(const shared_ptr<CollisionRect>& DestColl) override;
+		virtual bsm::Vec3 GetCenterPosition()const override;
+		virtual AABB GetEnclosingAABB()const override;
+		virtual AABB GetWrappedAABB()const override;
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		virtual void OnDraw() override;
+
+	private:
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
+
+//====================================================================
+// class Player
+// プレイヤークラス
+//====================================================================
 
 	class Player : public GameObject {
 		//プレイヤーが使用するコントローラとキーボードの入力
@@ -73,10 +123,10 @@ namespace basecross {
 		void Gravity();
 	};
 
-	//====================================================================
-	// class AttackCollision
-	// プレイヤーの攻撃判定
-	//====================================================================
+//====================================================================
+// class AttackCollision
+// プレイヤーの攻撃判定
+//====================================================================
 
 	class AttackCollision : public GameObject {
 		weak_ptr<GameObject> m_player;
@@ -97,21 +147,6 @@ namespace basecross {
 
 		void FollowPlayer();
 
-	};
-
-	//====================================================================
-	// class TriggerColl
-	// 独自のコリジョンコンポーネント
-	//====================================================================
-
-	class TriggerColl : public CollisionSphere {
-	protected:
-		TriggerColl(const shared_ptr<GameObject>& GameObjectPtr);
-		~TriggerColl();
-
-	private:
-		struct Impl;
-		unique_ptr<Impl> pImpl;
 	};
 
 }
