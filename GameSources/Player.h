@@ -92,6 +92,10 @@ namespace basecross {
 
 		//Transform.Scaleのゲッタ
 		Vec3 GetScale();
+
+		//移動速度に応じて向きを変える
+		void FacingWithVel();
+
 	};
 
 //====================================================================
@@ -102,6 +106,7 @@ namespace basecross {
 	class AttackCollision : public GameObject {
 		weak_ptr<GameObject> m_player;
 		Vec3 m_distFromPlayer;
+		bool m_isMoveHit;
 
 	public:
 		//構築と破棄
@@ -115,6 +120,10 @@ namespace basecross {
 		virtual void OnCreate() override;
 		//更新
 		virtual void OnUpdate() override;
+
+		//何かに接触している判定
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 
 		void FollowPlayer();
 

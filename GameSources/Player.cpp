@@ -18,9 +18,9 @@ namespace basecross {
 	Player::Player(const shared_ptr<Stage>& StagePtr) : 
 		GameObject(StagePtr),
 		m_speed(2.25f),
-		m_accel(2.0f),
+		m_accel(2.25f),
 		m_friction(.6f),
-		m_frictionThreshold(.05f),
+		m_frictionThreshold(.025f),
 		m_airSpeedRate(.6f),
 		m_jumpHeight(2.5f),
 		m_gravity(-4.0f),
@@ -91,13 +91,13 @@ namespace basecross {
 	void Player::MovePlayer() {
 		auto trans = GetComponent<Transform>();
 		
-		//逆方向に移動しようとしたとき、加速度が上がる(急ブレーキ)
-		if (m_face * GetMoveVector().x < 0)
+		//地上で逆方向に移動しようとしたとき、加速度が上がる(急ブレーキ)
+		if (m_stateType == stand && m_face * GetMoveVector().x < 0)
 			m_moveVel.x += GetMoveVector().x * m_accel * 5.0f * _delta;
 		else
 			m_moveVel.x += GetMoveVector().x * m_accel * _delta;
-
-		m_moveVel.y += m_gravity * _delta;
+		
+		Gravity();
 
 		if (m_stateType == stand) {
 			if (GetMoveVector().x == 0) {
@@ -106,26 +106,18 @@ namespace basecross {
 			}
 		}
 
-		//地上にいるときの処理
+		//地上にいるときの処理(振り向き)
 		if (m_stateType == stand) {
-			if (m_moveVel.y < m_gravity * .1f) m_moveVel.y = m_gravity * .1f;
-
-			if (abs(m_moveVel.x) >= (m_speed * .1f)) {
-				if (m_moveVel.x > 0) { 
-					m_face = 1;
-					trans->SetRotation(0, 0, 0);
-				}
-				else {
-					m_face = -1;
-					trans->SetRotation(0, XM_PI, 0);
-				}
-			}
+			FacingWithVel();
 		}
 
 		if (m_moveVel.x > m_speed) m_moveVel.x = m_speed;
 		if (m_moveVel.x < -m_speed) m_moveVel.x = -m_speed;
 
-		if (m_stateType == air && abs(m_moveVel.x) > m_speed * m_airSpeedRate) m_moveVel.x = m_speed * m_airSpeedRate * m_face;
+		if (m_stateType == air && abs(m_moveVel.x) > m_speed * m_airSpeedRate) {
+			if (m_moveVel.x > 0) m_moveVel.x = m_speed * m_airSpeedRate;
+			else m_moveVel.x = -m_speed * m_airSpeedRate;
+		}
 
 		trans->SetPosition((m_moveVel * _delta) + trans->GetPosition());
 	}
@@ -166,6 +158,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate() {
+
 		_delta = App::GetApp()->GetElapsedTime();
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
@@ -234,6 +227,7 @@ namespace basecross {
 
 	void Player::Gravity() {
 		m_moveVel.y += m_gravity * _delta;
+		if (m_stateType == stand && m_moveVel.y < m_gravity * .1f) m_moveVel.y = m_gravity * .1f;
 	}
 
 	Vec3 Player::RoundOff(Vec3 number, int point) {
@@ -249,6 +243,20 @@ namespace basecross {
 		return GetComponent<Transform>()->GetScale();
 	}
 
+	void Player::FacingWithVel(){
+		auto trans = GetComponent<Transform>();
+		if (abs(m_moveVel.x) >= (m_speed * .1f)) {
+			if (m_moveVel.x > 0) {
+				m_face = 1;
+				trans->SetRotation(0, 0, 0);
+			}
+			else {
+				m_face = -1;
+				trans->SetRotation(0, XM_PI, 0);
+			}
+		}
+	}
+
 //====================================================================
 // class AttackCollision
 // プレイヤーの攻撃判定
@@ -258,7 +266,8 @@ namespace basecross {
 		const shared_ptr<GameObject>& player) :
 		GameObject(StagePtr),
 		m_player(player),
-		m_distFromPlayer(Vec3(.1f, 0, 0))
+		m_distFromPlayer(Vec3(.1f, 0, 0)),
+		m_isMoveHit(false)
 	{}
 
 	void AttackCollision::OnCreate() {
@@ -268,11 +277,11 @@ namespace basecross {
 		trans->SetPosition(Vec3(0, 0, 0));
 
 		//仮(本実装時は、押し出しのないTrigger判定を独自に作る？)
-		auto coll = AddComponent<TriggerColl>();
-		coll->SetUpdateActive(true);
+		auto coll = AddComponent<TriggerSphere>();
 		coll->SetDrawActive(true);
 
 	}
+
 
 	void AttackCollision::OnUpdate() {
 		FollowPlayer();
@@ -299,6 +308,23 @@ namespace basecross {
 			trans->SetQuaternion(matrix.quatInMatrix());
 		}
 	}
+
+	void AttackCollision::OnCollisionEnter(shared_ptr<GameObject>& Other) {
+		//
+		if (!m_isMoveHit && Other->FindTag(L"Enemy")) {
+			MessageBox(0, 0, 0, MB_ICONINFORMATION);
+			//攻撃
+			m_isMoveHit = true;
+		}
+	}
+
+	void AttackCollision::OnCollisionExit(shared_ptr<GameObject>& Other) {
+		//
+		if (m_isMoveHit && Other->FindTag(L"Enemy")) {
+			//攻撃
+		}
+	}
+
 }
 //end basecross
 
