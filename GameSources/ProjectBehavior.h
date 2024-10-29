@@ -20,12 +20,21 @@ namespace basecross {
 				Obj->OnPushA();
 				return;
 			}
+			auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+			if (KeyState.m_bPressedKeyTbl[VK_CONTROL]) {
+				Obj->OnPushB();
+				return;
+			}
 			//コントローラの取得
 			auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 			if (cntlVec[0].bConnected) {
 				//Aボタン
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A) {
 					Obj->OnPushA();
+				}
+				//Bボタン
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B) {
+					Obj->OnPushB();
 				}
 			}
 		}

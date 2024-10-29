@@ -32,24 +32,26 @@ namespace basecross {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
-				Vec3(3.0f, .1f, .3f),
+				Vec3(0.0f, -.5f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(0.0f, -.5f, 0.0f)
+				Vec3(3.0f, .1f, .3f)
 			},
 			{
-				Vec3(1.0f, .1f, .3f),
+				Vec3(.8f, 0.0f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(.8f, 0.0f, 0.0f)
+				Vec3(1.0f, .1f, .3f)
 			},
 			{
-				Vec3(.1f, 1.0f, .3f),
+				Vec3(-.80f, 0.0f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(-.80f, 0.0f, 0.0f)
+				Vec3(.1f, 1.0f, .3f)
 			},
 		};
+		int i = 0;
 		//オブジェクトの作成
 		for (auto v : vec) {
-			AddGameObject<FixedBox>(v[0], v[1], v[2]);
+			auto box = AddGameObject<FixedBox>(v[0], v[1], v[2]);
+			SetSharedGameObject(L"box" + to_wstring(i++), box);
 		}
 	}
 
@@ -59,10 +61,19 @@ namespace basecross {
 			//ビューとライトの作成
 			CreateViewLight();
 
-			auto ptrPlayer = AddGameObject<Player>();
+			//プレイヤーを生成
+			shared_ptr<GameObject> ptrPlayer = AddGameObject<Player>();
 			SetSharedGameObject(L"Player", ptrPlayer);
+			//プレイヤーの攻撃判定
+			ptrPlayer = AddGameObject<AttackCollision>(ptrPlayer);
 
 			CreateGameBox();
+
+			auto box = GetSharedGameObject<FixedBox>(L"box0");
+			auto player = GetSharedGameObject<Player>(L"Player");
+			auto enemy = AddGameObject<Enemy>(player, box);
+
+
 		}
 		catch (...) {
 			throw;
