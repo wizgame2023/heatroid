@@ -20,7 +20,7 @@ namespace basecross {
 				Obj->OnPushA();
 				return;
 			}
-			auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+			KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 			if (KeyState.m_bPressedKeyTbl[VK_CONTROL]) {
 				Obj->OnPushB();
 				return;
