@@ -83,6 +83,10 @@ namespace basecross {
 
 		////Aボタン
 		void OnPushA();
+		////Bボタン
+		void OnPushB() {
+
+		}
 
 		//カメラの移動
 		void MoveCamera();
