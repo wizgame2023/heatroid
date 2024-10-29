@@ -22,7 +22,9 @@ namespace basecross {
 			flyMove,   //追従浮遊移動
 			fly,       //浮遊
 			fixedStay, //プレイヤーに触れた位置で固定
-			runaway    //プレイヤーと逆方向に移動
+			runaway,   //プレイヤーと逆方向に移動
+			hitDrop,
+			attack
 		};
 
 	private:
@@ -36,10 +38,16 @@ namespace basecross {
 		float m_time;
 		float m_bulletTime;  //弾の発射間隔
 		float m_bulletRange; //弾を発射する距離
+		Vec3 m_grav;
+		Vec3 m_gravVel;
+		float m_test;
 		int m_dic;           //向いている方向 左-1,右1
+
 		bool m_bulletFlag;   
 		bool m_jumpFlag;
 		bool m_flyFlag;
+		bool m_floorFlag;
+		bool m_hitDropFlag;
 
 		State m_stateType;
 		State m_beforState;
@@ -50,13 +58,16 @@ namespace basecross {
 		Vec3 m_scal;
 		Vec3 m_deathPos;
 		Vec3 m_playerScale; //プレイヤーのサイズ
+		Vec3 m_floorPos;
+		Vec3 m_jumpPos;
 
 		shared_ptr<Transform> m_trans;
-		shared_ptr<Player> m_player;
-		shared_ptr<Transform> m_playerTrans;
-		shared_ptr<FixedBox> m_box;
+		weak_ptr<Player> m_player;
+		weak_ptr<Transform> m_playerTrans;
+		weak_ptr<FixedBox> m_box;
 		shared_ptr<Gravity> m_gravity;
 		shared_ptr<CollisionObb> m_collision;
+		weak_ptr<FixedBox> m_fixedBox;
 
 	public:
 		// 構築と破棄
@@ -73,17 +84,28 @@ namespace basecross {
 		virtual void OnUpdate() override; // 更新
 
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
-		void ReceiveDamage(float damage);
-		void ThisDestroy();
+		void OnCollisionExcute(shared_ptr<GameObject>& other);
+		void OnCollisionExit(shared_ptr<GameObject>& other);
 		void EnemyJump();
+		void HipDrop();
+		void ThisDestroy();
+		void ReceiveDamage(float damage);
 		void SetEnemyFlayFlag(bool flag);
 		void SetSpeed(float speed);
 		void SetUpMove(float speed,float height);
 		void SetFlyPower(float power);
 		void SetState(State state);
-
 		int GetDic();
 		Vec3 GetPos();
+
+		//重力に関する関数
+		void Grav();
+		void SetGrav(Vec3 grav);
+		void AddGrav(Vec3 grav);
+		void GravZero();
+		void GravVelZero();
+		void SetGravVel(Vec3 grav);
+
 	};
 
 
@@ -100,12 +122,14 @@ namespace basecross {
 		Vec3 m_rot;
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
+		Vec3 m_fixedPos;
 
 		shared_ptr<Transform> m_trans;
 		shared_ptr<Enemy> m_enemy;
+		
 
 	public :
-		EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
+		EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy,const Vec3& fixedPos = Vec3(0.0f));
 		virtual ~EnemyBullet(){}
 		virtual void OnCreate();
 		virtual void OnUpdate();
