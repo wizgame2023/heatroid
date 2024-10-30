@@ -9,6 +9,7 @@
 
 namespace basecross {
 
+
 //====================================================================
 // class Player
 // プレイヤークラス
@@ -95,13 +96,18 @@ namespace basecross {
 			m_moveVel.x += GetMoveVector().x * m_accel * 5.0f * _delta;
 		else
 			m_moveVel.x += GetMoveVector().x * m_accel * _delta;
-		
+
+		if (abs(GetMoveVector().x) > 0)
+			SetAnim(L"Run");
+		else
+			SetAnim(L"Idle");
+
 		Gravity();
 
 		if (m_stateType == stand) {
 			if (GetMoveVector().x == 0) {
 				if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
-				else m_moveVel.x *= m_friction * _delta;
+				else m_moveVel.x *= m_friction * (1000.0f / 60.0f) * _delta;
 			}
 		}
 
@@ -146,25 +152,44 @@ namespace basecross {
 		shadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 
 		//描画コンポーネントの設定
-		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
+		auto ptrDraw = AddComponent<PNTBoneModelDraw>();
+		Mat4x4 meshMat;
+		meshMat.affineTransformation(
+			Vec3(.1f, .1f, .1f), //(.1f, .1f, .1f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, XMConvertToRadians(300.0f), 0.0f),
+			Vec3(0.0f, -.5f, 0.0f)
+		);
 
-		//描画するメッシュを設定
-		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		ptrDraw->SetFogEnabled(true);
+		ptrDraw->SetMeshResource(L"PLAYER");
+		ptrDraw->SetMeshToTransformMatrix(meshMat);
+		ptrDraw->SetOwnShadowActive(true);
+
+		auto anim_fps = 30.0f;
+		ptrDraw->AddAnimation(L"Idle", 30, 60, true, anim_fps);
+		ptrDraw->AddAnimation(L"Run", 100, 12, true, anim_fps);
+		ptrDraw->ChangeCurrentAnimation(L"Idle");
+
+		auto ptrShadow = AddComponent<Shadowmap>();
 
 		m_HP = m_HP_max;
 
 	}
 
 	void Player::OnUpdate() {
-
 		_delta = App::GetApp()->GetElapsedTime();
+		auto ptrDraw = GetComponent<PNTBoneModelDraw>();
+
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
+
 		MovePlayer();
 		MoveCamera();
+
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
+
+		ptrDraw->UpdateAnimation(_delta);
 	}
 
 	void Player::OnUpdate2() {
@@ -253,9 +278,7 @@ namespace basecross {
 		return r;
 	}
 
-	Vec3 Player::GetScale() {
-		return GetComponent<Transform>()->GetScale();
-	}
+
 
 	void Player::FacingWithVel(){
 		auto trans = GetComponent<Transform>();

@@ -97,10 +97,24 @@ namespace basecross {
 		Vec3 RoundOff(Vec3 number, int point);
 
 		//Transform.Scaleのゲッタ
-		Vec3 GetScale();
+		Vec3 GetScale() {
+			return GetComponent<Transform>()->GetScale();
+		}
 
 		//移動速度に応じて向きを変える
 		void FacingWithVel();
+
+		//m_faceのゲッタ
+		int GetFace() {
+			return m_face;
+		}
+
+		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
+		void SetAnim(wstring animname) {
+			auto draw = GetComponent<PNTBoneModelDraw>();
+			if (draw->GetCurrentAnimation() != animname)
+				draw->ChangeCurrentAnimation(animname);
+		}
 
 	};
 
