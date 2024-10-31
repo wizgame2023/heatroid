@@ -162,7 +162,7 @@ namespace basecross {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 		MovePlayer();
-		MoveCamera();
+		//MoveCamera();
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 	}
@@ -229,13 +229,13 @@ namespace basecross {
 		float differenceX = pos.x - Camera.x;
 		if (differenceX >= 0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), 0.5f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), -0.3f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
 		}
 		else if (differenceX <= -0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), 0.5f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), -0.3f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
 		}
 	}
 
@@ -257,6 +257,7 @@ namespace basecross {
 		return GetComponent<Transform>()->GetScale();
 	}
 
+  
 	void Player::FacingWithVel(){
 		auto trans = GetComponent<Transform>();
 		if (abs(m_moveVel.x) >= (m_speed * .1f)) {
