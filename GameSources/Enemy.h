@@ -36,15 +36,21 @@ namespace basecross {
 		float m_upHeight;    //上下の高さ
 		float m_jumpPower;   //ジャンプ力
 		float m_jumpTime;    //ジャンプ速度
+		float m_jumpHight;   //ジャンプする高さ
 		float m_time;
 		float m_bulletTime;  //弾の発射間隔
 		float m_bulletRange; //弾を発射する距離
+		float m_angleSpeed;  //回転速度
+		Vec3 m_angle;
+
+		int m_dic;           //向いている方向 左-1,右1
+		int m_firstDic;
+
+		float m_test;
+		//重力
 		float m_gravity;
 		Vec3 m_grav;
 		Vec3 m_gravVel;
-		float m_test;
-		int m_dic;           //向いている方向 左-1,右1
-		int m_dic2;
 
 		bool m_bulletFlag;   
 		bool m_jumpFlag;
@@ -61,6 +67,7 @@ namespace basecross {
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
+		Vec3 m_beforePos;
 		Vec3 m_deathPos;
 		Vec3 m_playerScale; //プレイヤーのサイズ
 		Vec3 m_floorPos;
@@ -88,8 +95,6 @@ namespace basecross {
 		virtual void OnUpdate() override; // 更新
 
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
-		void OnCollisionExcute(shared_ptr<GameObject>& other);
-		void OnCollisionExit(shared_ptr<GameObject>& other);
 		void EnemyJump();
 		void HipDrop();
 		void ThisDestroy();
@@ -101,6 +106,9 @@ namespace basecross {
 		void SetState(State state);
 		int GetDic();
 		Vec3 GetPos();
+		void PlayerDic(bool zero = true, float addSpeed = 1.0f);
+		void OneJump(float jumpHight);
+		void Debug();
 
 		//重力に関する関数
 		void Grav();
@@ -133,7 +141,8 @@ namespace basecross {
 		
 
 	public :
-		EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy,const Vec3& fixedPos = Vec3(0.0f));
+		EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy,
+			const Vec3& fixedPos = Vec3(0.0f));
 		virtual ~EnemyBullet(){}
 		virtual void OnCreate();
 		virtual void OnUpdate();
@@ -144,21 +153,5 @@ namespace basecross {
 	};
 
 
-	class MyGravity : public Component {
-	public:
-		explicit MyGravity(const shared_ptr<GameObject>& GameObjectPtr,
-			const bsm::Vec3& gravity = bsm::Vec3(0, -9.8f, 0));
-		MyGravity::~MyGravity() {}
-
-	private:
-		Vec3 m_gravity;
-		//struct Impl;
-		//unique_ptr<Impl> pImpl;
-	public:
-		Vec3 GetGravity() const;
-		void SetGravity(const bsm::Vec3& gravity);
-		void SetGravityZero();
-		void OnUpdate();
-	};
 
 }
