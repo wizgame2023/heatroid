@@ -47,59 +47,83 @@ namespace basecross {
 		return m_scal;
 	}
 
-	TilingFixedBox::TilingFixedBox(const shared_ptr<Stage>& StagePtr,
-		const Vec3& Scale,
-		const Vec3& Rotation,
-		const Vec3& Position,
-		float UPic,
-		float VPic
+	BoxColl::BoxColl(const shared_ptr<Stage>& stage,
+		const Vec3& position
 	) :
-		GameObject(StagePtr),
-		m_Scale(Scale),
-		m_Rotation(Rotation),
-		m_Position(Position),
-		m_UPic(UPic),
-		m_VPic(VPic)
+		GameObject(stage),
+		m_position(position)
+
 	{}
+
+	void BoxColl::OnCreate()
+	{
+		auto trans = AddComponent<Transform>();
+		trans->SetPosition(m_position);
+		trans->SetRotation(Vec3(0,0,0));
+		trans->SetScale(Vec3(1,1,1));
+
+		auto Coll = AddComponent<CollisionObb>();
+		Coll->SetFixed(true);
+		Coll->SetDrawActive(true);
+		//Coll->SetUpdateActive(false);
+		AddTag(L"FixedBox");
+	}
+
+	vector<Mat4x4> TilingFixedBox::m_Mat4x4;
+	vector<weak_ptr<Transform>> TilingFixedBox::m_moveObject;
+
+
+	TilingFixedBox::TilingFixedBox(const shared_ptr<Stage>& StagePtr) :
+		GameObject(StagePtr)
+	{
+	}
 	TilingFixedBox::~TilingFixedBox() {}
 	//初期化
 	void TilingFixedBox::OnCreate() {
-		auto PtrTrans = GetComponent<Transform>();
-		PtrTrans->SetScale(m_Scale);
-		PtrTrans->SetRotation(m_Rotation);
-		PtrTrans->SetPosition(m_Position);
-		auto Coll = AddComponent<CollisionObb>();
-		AddTag(L"FixedBox");
-		Coll->SetFixed(true);
-		vector<VertexPositionNormalTexture> vertices;
-		vector<uint16_t> indices;
-		MeshUtill::CreateCube(1.0f, vertices, indices);
-		float UCount = m_Scale.x / m_UPic;
-		float VCount = m_Scale.y / m_VPic;
-		for (size_t i = 0; i < vertices.size(); i++) {
-			if (vertices[i].textureCoordinate.x >= 1.0f) {
-				vertices[i].textureCoordinate.x = UCount;
-			}
-			if (vertices[i].textureCoordinate.y >= 1.0f) {
-				float FrontBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, 1, 0));
-				float BackBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, -1, 0));
-				if (FrontBetween < 0.01f || BackBetween < 0.01f) {
-					vertices[i].textureCoordinate.y = VCount;
+		//描画コンポーネントの追加
+		auto PtrDraw = AddComponent<PNTStaticInstanceDraw>();
+		//描画コンポーネントに形状（メッシュ）を設定
+		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		PtrDraw->SetOwnShadowActive(true);
+		wstring Datadir;
+		App::GetApp()->GetDataDirectory(Datadir);
+		CsvFile m_GameStage1;
+		m_GameStage1.SetFileName(Datadir + L"Stage1.csv");
+		auto& LineVec = m_GameStage1.GetCsvVec();
+		m_GameStage1.ReadCsv();
+
+		for (size_t i = 0; i < LineVec.size(); i++) {
+			//トークン（カラム）の配列
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			vector<wstring> Tokens;
+			Util::WStrToTokenVector(Tokens, LineVec[i], L',');
+			for (size_t j = 0; j < Tokens.size(); j++) {
+				if (j < 50)
+				{
+					if (Tokens[j] == L"1" )
+					{
+						float x = (float)j - 25.0f;
+						float y = -(float)i + 15.0f;
+						// インスタンス用の行列を作成する
+						
+						Mat4x4 matrix;
+						matrix.translation(Vec3(x, y, 0.0f));
+						m_Mat4x4.push_back(matrix);
+						PtrDraw->AddMatrix(matrix); // ブロックを表示したい数だけ行列を追加します。この行列が示す位置・向き・大きさで指定したメッシュが描画されます	
+						//Collsionが現在一つのみ生成、
+						//このmatrixを使ってOBBの生成するか、CollsionOBBのみ生成するクラスを作るか
+						auto Coll = GetStage()->AddGameObject<BoxColl>(Vec3(x, y, 0));
+						//AddTag(L"FixedBox");
+
+					}
 				}
 			}
 		}
-		//描画コンポーネントの追加
-		auto PtrDraw = AddComponent<BcPNTStaticDraw>();
-		//描画コンポーネントに形状（メッシュ）を設定
-		PtrDraw->CreateOriginalMesh(vertices, indices);
-		PtrDraw->SetOriginalMeshUse(true);
-		PtrDraw->SetFogEnabled(true);
-		//自分に影が映りこむようにする
-		PtrDraw->SetOwnShadowActive(true);
-		//タイリング設定
-		PtrDraw->SetSamplerState(SamplerState::LinearWrap);
 	}
-
+	void TilingFixedBox::OnUpdate()
+	{
+		
+	}
 	//--------------------------------------------------------------------------------------
 	//	class BreakWall : public GameObject;
 	//--------------------------------------------------------------------------------------
@@ -107,7 +131,7 @@ namespace basecross {
 		const Vec3& position,
 		const Vec3& rotation,
 		const Vec3& scale
-		):
+	) :
 		GameObject(stage),
 		m_pos(position),
 		m_rot(rotation),

@@ -20,12 +20,14 @@ namespace basecross {
 		void CreateFixedBox();
 		void CreateGimmick();
 		void CreateEnemy();
+		void InstanceStage();
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage(){}
 		virtual ~GameStage() {}
 		
 		virtual void OnCreate()override; //‰Šú‰»
+		virtual void OnUpdate()override; //‰Šú‰»
 	};
 
 }

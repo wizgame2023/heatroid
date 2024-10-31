@@ -136,7 +136,7 @@ namespace basecross {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 		MovePlayer();
-		MoveCamera();
+		//MoveCamera();
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 	}
@@ -226,6 +226,7 @@ namespace basecross {
 	Vec3 Player::GetScale() {
 		return GetComponent<Transform>()->GetScale();
 	}
+
 }
 //end basecross
 

@@ -17,8 +17,8 @@ namespace basecross {
 	void GameStage::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(5.0f, 0.02f, -3.0f));
-		camera->SetAt(Vec3(-5.0f, -0.25, 0.0f));
+		camera->SetEye(Vec3(0.0f, 0.02f, -50.0f));
+		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
 
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -50,7 +50,11 @@ namespace basecross {
 		auto ptrPlayer = AddGameObject<Player>();
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
-		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(-3, 0.0125f, 0));
+		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(-3, 5.0125f, 0));
+		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(1, 1, 1));
+		auto playerPos = ptrPlayer->GetComponent<Transform>();
+		TilingFixedBox::m_moveObject.push_back(playerPos);
+
 	}
 
 	//ボックスの作成
@@ -83,7 +87,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Scale, Rot, Pos, 1.0f, 1.0f);
+			AddGameObject<TilingFixedBox>();
 		}
 	}
 
@@ -202,14 +206,40 @@ namespace basecross {
 			//ビューとライトの作成
 			CreateViewLight();
 			//CreateGameBox();
-			CreateGimmick();
+			//CreateGimmick();
+			AddGameObject<TilingFixedBox>();
 
 			CreatePlayer();
-			CreateFixedBox();
-			CreateEnemy();
+			//CreateFixedBox();
+			//CreateEnemy();
 		}
 		catch (...) {
 			throw;
+		}
+	}
+
+	void GameStage::OnUpdate()
+	{
+
+		for (auto& object : GetGameObjectVec())
+		{
+			if (object->FindTag(L"FixedBox"))
+			{
+				for (auto& weaktrans : TilingFixedBox::m_moveObject)
+				{
+					auto trans = weaktrans.lock();
+					if (trans != nullptr)
+					{
+						if (length(trans->GetPosition() - object->GetComponent<Transform>()->GetPosition()) < 1.0f) {
+							object->SetUpdateActive(true);
+						}
+						else
+						{
+							object->SetUpdateActive(false);
+						}
+					}
+				}
+			}
 		}
 	}
 
