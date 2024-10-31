@@ -10,20 +10,22 @@
 namespace basecross {
 
 
-//====================================================================
-// class Player
-// プレイヤークラス
-//====================================================================
+	//====================================================================
+	// class Player
+	// プレイヤークラス
+	//====================================================================
 
-	Player::Player(const shared_ptr<Stage>& StagePtr) : 
+	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_speed(2.25f),
-		m_accel(2.25f),
-		m_friction(.6f),
+		m_speed(2.0f),
+		m_initialSpeed(1.0f),
+		m_accel(2.0f),
+		m_friction(.88f),
 		m_frictionThreshold(.025f),
 		m_airSpeedRate(.6f),
 		m_jumpHeight(2.5f),
 		m_gravity(-4.0f),
+		m_fallTerminal(-4.0f),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
@@ -90,20 +92,35 @@ namespace basecross {
 
 	void Player::MovePlayer() {
 		auto trans = GetComponent<Transform>();
-		
+
 		//地上で逆方向に移動しようとしたとき、加速度が上がる(急ブレーキ)
 		if (m_stateType == stand && m_face * GetMoveVector().x < 0)
 			m_moveVel.x += GetMoveVector().x * m_accel * 5.0f * _delta;
 		else
 			m_moveVel.x += GetMoveVector().x * m_accel * _delta;
 
-		if (abs(GetMoveVector().x) > 0)
-			SetAnim(L"Run");
-		else
+		if (GetDrawPtr()->GetCurrentAnimation() == L"Land" && GetDrawPtr()->GetCurrentAnimationTime() > .23f) {
 			SetAnim(L"Idle");
+		}
+
+		if (m_stateType == stand) {
+			if (abs(GetMoveVector().x) > 0)
+				SetAnim(L"Run");
+			else
+				if (GetDrawPtr()->GetCurrentAnimation() != L"Land") SetAnim(L"Idle");
+		}
+
+		if (m_stateType == air) SetAnim(L"Jumping");
+
+		//初速
+		//if (GetDrawPtr()->GetCurrentAnimation() == L"Run" && abs(m_moveVel.x < m_initialSpeed)) {
+		//	if (m_moveVel.x > 0) m_moveVel.x = m_initialSpeed;
+		//	else m_moveVel.x = -m_initialSpeed;
+		//}
 
 		Gravity();
 
+		//摩擦(地上のみ)
 		if (m_stateType == stand) {
 			if (GetMoveVector().x == 0) {
 				if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
@@ -116,9 +133,14 @@ namespace basecross {
 			FacingWithVel();
 		}
 
+		//最高速度
 		if (m_moveVel.x > m_speed) m_moveVel.x = m_speed;
 		if (m_moveVel.x < -m_speed) m_moveVel.x = -m_speed;
 
+		//落下の終端速度
+		if (m_moveVel.y < m_fallTerminal) m_moveVel.y = m_fallTerminal;
+
+		//空中では最高速度が落ちる
 		if (m_stateType == air && abs(m_moveVel.x) > m_speed * m_airSpeedRate) {
 			if (m_moveVel.x > 0) m_moveVel.x = m_speed * m_airSpeedRate;
 			else m_moveVel.x = -m_speed * m_airSpeedRate;
@@ -168,6 +190,9 @@ namespace basecross {
 		auto anim_fps = 30.0f;
 		ptrDraw->AddAnimation(L"Idle", 30, 60, true, anim_fps);
 		ptrDraw->AddAnimation(L"Run", 100, 12, true, anim_fps);
+		ptrDraw->AddAnimation(L"Jump_Start", 240, 2, false, anim_fps);
+		ptrDraw->AddAnimation(L"Jumping", 242, 28, false, anim_fps);
+		ptrDraw->AddAnimation(L"Land", 270, 7, false, anim_fps);
 		ptrDraw->ChangeCurrentAnimation(L"Idle");
 
 		auto ptrShadow = AddComponent<Shadowmap>();
@@ -178,7 +203,6 @@ namespace basecross {
 
 	void Player::OnUpdate() {
 		_delta = App::GetApp()->GetElapsedTime();
-		auto ptrDraw = GetComponent<PNTBoneModelDraw>();
 
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
@@ -189,7 +213,7 @@ namespace basecross {
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 
-		ptrDraw->UpdateAnimation(_delta);
+		GetDrawPtr()->UpdateAnimation(_delta);
 	}
 
 	void Player::OnUpdate2() {
@@ -205,10 +229,9 @@ namespace basecross {
 		wss << "stateType : " << m_stateType << endl;
 		wss << "pos : " << pos.x << ", " << pos.y << endl;
 		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
-		wss << "exitcnt : " << m_collideCount << endl;
+		wss << "anim : " << GetDrawPtr()->GetCurrentAnimation() << " animtime : " << GetDrawPtr()->GetCurrentAnimationTime() << endl;
 		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
-		wss << "fps : " << App::GetApp()->GetStepTimer().GetFramesPerSecond() << endl;
-		wss << "delta : " << _delta << endl;
+		wss << "fps : " << App::GetApp()->GetStepTimer().GetFramesPerSecond() << " delta : " << _delta << endl;
 
 		auto scene = App::GetApp()->GetScene<Scene>();
 		scene->SetDebugString(L"Player\n" + wss.str());
@@ -224,6 +247,7 @@ namespace basecross {
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
 		m_collideCount = m_collideCountInit;
 		if (m_stateType == air && Other->FindTag(L"FixedBox")) {
+			SetAnim(L"Land");	//たまに2回呼ばれてる？
 			m_stateType = stand;
 		}
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
@@ -280,7 +304,7 @@ namespace basecross {
 
 
 
-	void Player::FacingWithVel(){
+	void Player::FacingWithVel() {
 		auto trans = GetComponent<Transform>();
 		if (abs(m_moveVel.x) >= (m_speed * .1f)) {
 			if (m_moveVel.x > 0) {
@@ -294,10 +318,10 @@ namespace basecross {
 		}
 	}
 
-//====================================================================
-// class AttackCollision
-// プレイヤーの攻撃判定
-//====================================================================
+	//====================================================================
+	// class AttackCollision
+	// プレイヤーの攻撃判定
+	//====================================================================
 
 	AttackCollision::AttackCollision(const shared_ptr<Stage>& StagePtr,
 		const shared_ptr<GameObject>& player) :

@@ -27,6 +27,8 @@ namespace basecross {
 		InputHandler<Player> m_InputHandler;
 		//スピード(最高速)
 		float m_speed;
+		//初動の速度
+		float m_initialSpeed;
 		//加速度
 		float m_accel;
 		//摩擦係数(地上)
@@ -38,6 +40,8 @@ namespace basecross {
 		float m_jumpHeight;
 		//重力
 		float m_gravity;
+		//落下時の終端速度
+		float m_fallTerminal;
 		//移動方向
 		Vec3 m_moveVel;
 		//CollisionExitの空中判定の閾値
@@ -96,16 +100,21 @@ namespace basecross {
 		//四捨五入
 		Vec3 RoundOff(Vec3 number, int point);
 
-		//Transform.Scaleのゲッタ
-		Vec3 GetScale() {
-			return GetComponent<Transform>()->GetScale();
-		}
-
 		//移動速度に応じて向きを変える
 		void FacingWithVel();
 
+		//Transform.Scaleのゲッタ
+		const Vec3 GetScale() {
+			return GetComponent<Transform>()->GetScale();
+		}
+
+		//描画コンポーネントのゲッタ
+		const shared_ptr<PNTBoneModelDraw> GetDrawPtr() {
+			return GetComponent<PNTBoneModelDraw>();
+		}
+
 		//m_faceのゲッタ
-		int GetFace() {
+		const int GetFace() {
 			return m_face;
 		}
 
@@ -147,6 +156,17 @@ namespace basecross {
 
 		void FollowPlayer();
 
+	};
+
+
+	//====================================================================
+	// class PlayerState
+	// プレイヤーの行動を補助するステートクラスの親
+	//====================================================================
+
+	class PlayerState {
+		PlayerState() {};
+		~PlayerState() {};
 	};
 
 }
