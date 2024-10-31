@@ -32,7 +32,8 @@ namespace basecross {
 		m_stateType(air),
 		m_face(1),
 
-		m_HP_max(100)
+		m_HP_max(100),
+		m_invincibleTimeMax(1.2f)
 	{}
 
 	Vec2 Player::GetInputState() const {
@@ -187,13 +188,7 @@ namespace basecross {
 		ptrDraw->SetMeshToTransformMatrix(meshMat);
 		ptrDraw->SetOwnShadowActive(true);
 
-		auto anim_fps = 30.0f;
-		ptrDraw->AddAnimation(L"Idle", 30, 60, true, anim_fps);
-		ptrDraw->AddAnimation(L"Run", 100, 12, true, anim_fps);
-		ptrDraw->AddAnimation(L"Jump_Start", 240, 2, false, anim_fps);
-		ptrDraw->AddAnimation(L"Jumping", 242, 28, false, anim_fps);
-		ptrDraw->AddAnimation(L"Land", 270, 7, false, anim_fps);
-		ptrDraw->ChangeCurrentAnimation(L"Idle");
+		RegisterAnim();
 
 		auto ptrShadow = AddComponent<Shadowmap>();
 
@@ -251,7 +246,6 @@ namespace basecross {
 			m_stateType = stand;
 		}
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
-
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)
@@ -302,7 +296,38 @@ namespace basecross {
 		return r;
 	}
 
+	//アニメーション登録・初期化
+	void Player::RegisterAnim() {
+		auto ptrDraw = GetDrawPtr();
+		auto anim_fps = 30.0f;
 
+		//移動関連
+		ptrDraw->AddAnimation(L"Idle", 30, 60, true, anim_fps);
+		ptrDraw->AddAnimation(L"Run", 100, 12, true, anim_fps);
+		ptrDraw->AddAnimation(L"Jump_Start", 240, 2, false, anim_fps);
+		ptrDraw->AddAnimation(L"Jumping", 242, 28, false, anim_fps);
+		ptrDraw->AddAnimation(L"Land", 270, 7, false, anim_fps);
+		ptrDraw->AddAnimation(L"PushObject", 280, 19, false, anim_fps);
+		//攻撃
+		ptrDraw->AddAnimation(L"Attack1", 120, 9, false, anim_fps);
+		ptrDraw->AddAnimation(L"Attack2", 132, 8, false, anim_fps);
+		ptrDraw->AddAnimation(L"Attack3", 145, 25, false, anim_fps);
+		ptrDraw->AddAnimation(L"Attack4", 175, 12, false, anim_fps);
+		ptrDraw->AddAnimation(L"Attack5", 188, 40, false, anim_fps);
+		//火炎放射+行動
+		ptrDraw->AddAnimation(L"Fire_Idle", 367, 33, true, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_RunFwd", 310, 11, false, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_RunBack", 410, 14, false, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_JumpStart", 330, 2, false, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_Jump", 332, 28, false, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_Land", 188, 40, false, anim_fps);
+		//やられ・死亡
+		ptrDraw->AddAnimation(L"GetHit_Air", 510, 24, false, anim_fps);
+		ptrDraw->AddAnimation(L"GetHit_Stand", 550, 22, false, anim_fps);
+		ptrDraw->AddAnimation(L"Died", 580, 45, false, anim_fps);
+		ptrDraw->ChangeCurrentAnimation(L"Idle");
+
+	}
 
 	void Player::FacingWithVel() {
 		auto trans = GetComponent<Transform>();

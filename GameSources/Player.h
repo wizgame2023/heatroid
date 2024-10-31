@@ -61,6 +61,8 @@ namespace basecross {
 
 		//HP
 		int m_HP, m_HP_max;
+		//無敵時間
+		int m_invincibleTime, m_invincibleTimeMax;
 		
 		//プレイヤーの状態
 		Stats m_stateType;
@@ -99,6 +101,9 @@ namespace basecross {
 
 		//四捨五入
 		Vec3 RoundOff(Vec3 number, int point);
+
+		//アニメーションの登録
+		void RegisterAnim();
 
 		//移動速度に応じて向きを変える
 		void FacingWithVel();
