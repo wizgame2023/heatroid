@@ -23,7 +23,8 @@ namespace basecross {
 			fly,       //浮遊
 			fixedStay, //プレイヤーに触れた位置で固定
 			runaway,   //プレイヤーと逆方向に移動
-			hitDrop,
+			hitDrop,   //ヒップドロップ
+			plunge,    //突っ込み
 			attack
 		};
 
@@ -38,16 +39,20 @@ namespace basecross {
 		float m_time;
 		float m_bulletTime;  //弾の発射間隔
 		float m_bulletRange; //弾を発射する距離
+		float m_gravity;
 		Vec3 m_grav;
 		Vec3 m_gravVel;
 		float m_test;
 		int m_dic;           //向いている方向 左-1,右1
+		int m_dic2;
 
 		bool m_bulletFlag;   
 		bool m_jumpFlag;
 		bool m_flyFlag;
 		bool m_floorFlag;
 		bool m_hitDropFlag;
+		bool m_plungeFlag;
+		bool m_plungeColFlag;
 
 		State m_stateType;
 		State m_beforState;
@@ -65,7 +70,6 @@ namespace basecross {
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<FixedBox> m_box;
-		shared_ptr<Gravity> m_gravity;
 		shared_ptr<CollisionObb> m_collision;
 		weak_ptr<FixedBox> m_fixedBox;
 

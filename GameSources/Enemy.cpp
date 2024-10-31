@@ -26,8 +26,8 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(rightMove),
-		m_deathState(runaway),
+		m_stateType(state),
+		m_deathState(deathState),
 		m_player(player),
 		m_box(box),
 		m_hp(100),
@@ -38,16 +38,20 @@ namespace basecross {
 		m_jumpPower(0.5f),
 		m_jumpTime(1.0f),
 		m_dic(-1),
-		m_time(1.0f),
+		m_dic2(0),
+		m_time(2.0f),
 		m_bulletTime(0.0f),
 		m_bulletRange(1.0f),
-		m_grav(Vec3(0.0f,-0.98f,0.0f)),
+		m_gravity(-0.98f),
+		m_grav(Vec3(0.0f,m_gravity,0.0f)),
 		m_gravVel(Vec3(0.0f)),
 		m_bulletFlag(false),
 		m_jumpFlag(false),
 		m_flyFlag(false),
 		m_floorFlag(false),
-		m_hitDropFlag(false)
+		m_hitDropFlag(false),
+		m_plungeFlag(false),
+		m_plungeColFlag(false)
 	{}
 
 	void Enemy::OnCreate() {
@@ -104,7 +108,8 @@ namespace basecross {
 			HipDrop();
 		}
 		if (keyState.m_bPressedKeyTbl[VK_UP]) {
-			stage->AddGameObject<EnemyBullet>(GetThis<Enemy>());
+			EnemyJump();
+			//stage->AddGameObject<EnemyBullet>(GetThis<Enemy>());
 		}
 		if (keyState.m_bPushKeyTbl['W']) {
 			m_stateType = stay;
@@ -115,12 +120,11 @@ namespace basecross {
 		if (fixed) {
 			Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
 			Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
-			m_test = fixPos.x - fixScal.x / 2;
 			if (m_pos.y - m_scal.y / 2 + fixPos.y <= fixPos.y + fixScal.y / 2 + 0.001f) {
 				m_floorFlag = true;
 			}
-			if (m_pos.x >= fixPos.x + fixScal.x / 2 || 
-				m_pos.x <= fixPos.x - fixScal.x / 2) {
+			if (m_pos.x >= fixPos.x + fixScal.x / 2 +m_scal.x/2|| 
+				m_pos.x <= fixPos.x - fixScal.x / 2- m_scal.x/2 ) {
 				m_floorFlag = false;
 			}
 
@@ -145,12 +149,35 @@ namespace basecross {
 			m_floorFlag = false;
 		}
 
+		//ヒップドロップ中
+		if (m_hitDropFlag) {
+			if (!fixed) return;
+			Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
+			Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
+			//床に衝突した時
+			if (m_floorFlag) {
+				m_time = 2.0f;
+				m_hitDropFlag = false;
+				AddGrav(Vec3(0.0f, -m_jumpPower, 0.0f));
+			}
+			m_time -= elapsed;
+			if (m_time <= 0) {
+				if (m_pos.y - m_scal.y / 2 + fixPos.y >= fixPos.y + fixScal.y / 2+0.01f) {
+					m_pos.y += -m_speed*15 * elapsed;
+				}
+			}
+
+		}
+
+		//重力の処理
 		if (!m_floorFlag) {
 			Grav();
 		}
-		else {
+		if (m_floorFlag) {
 			GravZero();
+			Grav();
 		}
+
 
 		//足場から落下防止
 		//auto box = m_box.lock();
@@ -184,10 +211,10 @@ namespace basecross {
 			break;
 		//追従の左右移動
 		case rightMove:
-			if (m_pos.x < playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
+			if (m_pos.x < playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
 				m_dic = -1;
 			}
-			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
+			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
 				m_dic = 1;
 			}
 			else {
@@ -220,9 +247,9 @@ namespace basecross {
 			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + 0.051)) {
 				m_dic = 1;
 			}
-			else {
-				m_dic = 0;
-			}
+			//else {
+			//	m_dic = 0;
+			//}
 			m_pos.x += -m_dic * m_speed * elapsed;
 			break;
 		//浮遊
@@ -250,11 +277,37 @@ namespace basecross {
 			else {
 				m_dic = 1;
 			}
-			m_pos.x += m_dic * m_speed * 1.0f * elapsed;
+			m_pos.x += m_dic * m_speed * 5.0f * elapsed;
 			break;
 		//ヒップドロップ
 		case hitDrop:
+			break;
+		//突っ込み
+		case plunge:
+			//プレイヤーの方向取得
+			if (m_pos.x < playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
+				m_dic = -1;
+			}
+			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
+				m_dic = 1;
+			}
+			else {
+				m_dic = 0;
+			}
+			if (!m_plungeFlag&&!m_plungeColFlag) {
+				m_dic2 = m_dic;
+				m_plungeFlag = true;
+			}
 
+			//if (m_dic == 0) {
+			//	m_plungeFlag = false;
+			//}
+			if (m_plungeColFlag) {
+				m_dic2 *= -1;
+				m_plungeColFlag = false;
+				m_test = m_dic2;
+			}
+			m_pos.x += -m_dic2 * m_speed * 3.0f * elapsed;
 			break;
 		default:
 			break;
@@ -275,13 +328,6 @@ namespace basecross {
 			m_bulletFlag = false;
 		}
 
-		if (m_hitDropFlag) {
-			m_time -= elapsed;
-			if (m_time <= 0) {
-				SetGrav(Vec3(0.0f, -0.98f, 0.0f));
-			}
-
-		}
 
 		//浮遊
 		//if (m_flyFlag) {
@@ -302,9 +348,6 @@ namespace basecross {
 		//敵の倒された時
 		if (m_hp <= 0.0f) {
 			m_stateType = m_deathState;
-			//if (m_stateType == rightMove) {
-			//}
-
 			//ThisDestroy();
 		}
 
@@ -324,10 +367,13 @@ namespace basecross {
 			<<m_pos.y
 			<<L"\nfloor : "
 			<<m_floorFlag
+			<< L"\nhipDrop : "
+			<< m_hitDropFlag
 			<<L"\ntest : "
 			<<m_test
 			<< endl;
 		scene->SetDebugString(wss.str());
+
 	}
 
 	//衝突判定
@@ -338,17 +384,14 @@ namespace basecross {
 		//auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
 		//m_gravity->StartJump(Vec3(0, m_jumpPower, 0));
 		m_floorFlag = false;
-		SetGrav(Vec3(0.0f,-0.98f,0.0f));
 		AddGrav(Vec3(0.0f,m_jumpPower,0.0f));
-		m_jumpPos = m_pos;
+		SetGrav(Vec3(0.0f,-0.98f,0.0f));
 		Grav();
 	}
 	void Enemy::HipDrop() {
 		m_hitDropFlag = true;
 		EnemyJump();
 		GravZero();
-		m_pos = m_jumpPos;
-		Grav();
 	}
 	//自分の削除
 	void Enemy::ThisDestroy() {
@@ -370,6 +413,7 @@ namespace basecross {
 			if (m_stateType == runaway) {
 				breakWall->ThisDestory();
 			}
+			m_plungeColFlag = true;
 		}
 		if (other->FindTag(L"FixedBox")) {
 			m_fixedBox = dynamic_pointer_cast<FixedBox>(other);
@@ -396,6 +440,7 @@ namespace basecross {
 		m_gravVel += m_grav * elapsed;
 		m_pos += m_gravVel * elapsed;
 		m_trans->SetPosition(m_pos);
+		m_test = m_grav.y;
 	}
 	void Enemy::GravZero() {
 		m_grav = Vec3(0.0f);
@@ -411,7 +456,7 @@ namespace basecross {
 	}
 	void Enemy::SetGravVel(Vec3 grav) {
 		auto elapsed = App::GetApp()->GetElapsedTime();
-		m_gravVel = grav * elapsed;
+		m_gravVel = grav;
 	}
 
 	int Enemy::GetDic() {
