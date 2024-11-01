@@ -28,6 +28,7 @@ namespace basecross {
 			attack
 		};
 
+		
 	private:
 		float m_hp;          //体力
 		float m_maxHp;       //最大体力
@@ -69,7 +70,9 @@ namespace basecross {
 		Vec3 m_scal;
 		Vec3 m_beforePos;
 		Vec3 m_deathPos;
+		Vec3 m_playerPos;
 		Vec3 m_playerScale; //プレイヤーのサイズ
+
 		Vec3 m_floorPos;
 		Vec3 m_jumpPos;
 
@@ -96,7 +99,7 @@ namespace basecross {
 
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
 		void EnemyJump();
-		void HipDrop();
+		void HipDropJump();
 		void ThisDestroy();
 		void ReceiveDamage(float damage);
 		void SetEnemyFlayFlag(bool flag);
@@ -109,6 +112,9 @@ namespace basecross {
 		void PlayerDic(bool zero = true, float addSpeed = 1.0f);
 		void OneJump(float jumpHight);
 		void Debug();
+		void HitDrop();
+		void FindFixed();
+		void Bullet();
 
 		//重力に関する関数
 		void Grav();

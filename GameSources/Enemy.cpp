@@ -26,7 +26,7 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(upMove),
+		m_stateType(rightMove),
 		m_deathState(stay),
 		m_player(player),
 		m_box(box),
@@ -94,8 +94,7 @@ namespace basecross {
 		auto player = m_player.lock();
 		if (!player) return;
 		m_playerTrans = m_player.lock()->GetComponent<Transform>();
-		Vec3 playerPos = m_playerTrans.lock()->GetPosition();
-		auto playerScale = m_playerTrans.lock()->GetScale();
+		m_playerPos = m_playerTrans.lock()->GetPosition();
 
 /*------------------テスト用-------------------------*/
 		//キー操作で移動
@@ -107,8 +106,8 @@ namespace basecross {
 		}
 		//スペースでジャンプ（テスト用）
 		if (keyState.m_bPressedKeyTbl[VK_DOWN]) {
-			EnemyJump();
-			//HipDrop();
+			//EnemyJump();
+			HipDropJump();
 		}
 		if (keyState.m_bPressedKeyTbl[VK_UP]) {
 			//EnemyJump();
@@ -119,66 +118,16 @@ namespace basecross {
 		}
 /*------------------テスト用-------------------------*/
 
-		auto fixed = m_fixedBox.lock();
-		if (fixed) {
-			Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
-			Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
-			if (m_pos.y - m_scal.y / 2 + fixPos.y <= fixPos.y + fixScal.y / 2 + 0.001f) {
-				m_floorFlag = true;
-			}
-			if (m_pos.x >= fixPos.x + fixScal.x / 2 + m_scal.x / 2 ||
-				m_pos.x <= fixPos.x - fixScal.x / 2 - m_scal.x / 2) {
-				m_floorFlag = false;
-			}
-
-			//床から落ちないようにする
-			if (m_pos.x > fixPos.x + fixScal.x / 2 - m_scal.x / 2 - 0.2f) {
-				m_speed = 0.0f;
-				if (m_pos.x > playerPos.x - fixPos.x) {
-					m_speed = 0.3f;
-				}
-			}
-			else if (m_pos.x < fixPos.x - fixScal.x / 2 + m_scal.x / 2 + 0.2f) {
-				m_speed = 0;
-				if (m_pos.x < playerPos.x - fixPos.x) {
-					m_speed = 0.3f;
-				}
-			}
-			else {
-				m_speed = 0.3f;
-			}
-		}
-		else {
-			m_floorFlag = false;
-		}
-
-		//ヒップドロップ中
-		if (m_hitDropFlag) {
-			if (fixed) {
-				Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
-				Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
-				//床に衝突した時
-				if (m_floorFlag) {
-					m_time = 2.0f;
-					m_hitDropFlag = false;
-					AddGrav(Vec3(0.0f, -m_jumpPower, 0.0f));
-				}
-				m_time -= elapsed;
-				if (m_time <= 0) {
-					if (m_pos.y - m_scal.y / 2 + fixPos.y >= fixPos.y + fixScal.y / 2+0.01f) {
-						m_pos.y += -m_speed*15 * elapsed;
-					}
-				}
-
-			}
-		}
-
+		FindFixed();
 
 		//行動パターン
 		switch (m_stateType)
 		{
 		//移動なし
 		case stay:
+			if (!m_hitDropFlag) {
+				SetGrav(Vec3(0.0f, m_gravity, 0.0f));
+			}
 			m_dic = 0;
 			break;
 		//追従の左右移動
@@ -223,11 +172,11 @@ namespace basecross {
 			break;
 		//突っ込み
 		case plunge:
-			PlayerDic(true,3.0f);
-			if (m_pos.x < playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
+			//PlayerDic(true,3.0f);
+			if (m_pos.x < m_playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
 				m_dic = -1;
 			}
-			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
+			else if (m_pos.x > m_playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
 				m_dic = 1;
 			}
 			else {
@@ -258,28 +207,11 @@ namespace basecross {
 			GravZero();
 			Grav();
 		}
-
-
+		HitDrop();
+		Bullet();
 		m_trans->SetPosition(m_pos);
 		m_trans->SetRotation(m_angle);
 
-
-		//弾の生成
-		if (m_pos.x > playerPos.x - m_bulletRange) {
-			m_bulletTime += elapsed;
-			if (!m_bulletFlag && m_dic != 0) {
-				if (fixed) {
-					stage->AddGameObject<EnemyBullet>(GetThis<Enemy>(),
-						fixed->GetComponent<Transform>()->GetPosition());
-					m_bulletFlag = true;
-					m_bulletTime = 0.0f;
-
-				}
-			}
-		}
-		if (m_bulletTime >= 2.0f) {
-			m_bulletFlag = false;
-		}
 
 
 		//敵の倒された時
@@ -295,16 +227,12 @@ namespace basecross {
 	//衝突判定
 	//ジャンプ
 	void Enemy::EnemyJump() {
-		//m_gravity = AddComponent<Gravity>();
-		//m_gravity->SetGravity(Vec3(0.0f, -9.8f/5, 0.0f));
-		//auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
-		//m_gravity->StartJump(Vec3(0, m_jumpPower, 0));
 		m_floorFlag = false;
 		AddGrav(Vec3(0.0f,m_jumpPower,0.0f));
 		SetGrav(Vec3(0.0f,-0.98f,0.0f));
 		Grav();
 	}
-	void Enemy::HipDrop() {
+	void Enemy::HipDropJump() {
 		m_hitDropFlag = true;
 		EnemyJump();
 		GravZero();
@@ -319,20 +247,16 @@ namespace basecross {
 	}
 	//プレイヤーの方向取得、その方向に回転
 	void Enemy::PlayerDic(bool zero, float addSpeed) {
-		auto player = m_player.lock();
-		if (!player) return;
-		m_playerTrans = m_player.lock()->GetComponent<Transform>();
-		Vec3 playerPos = m_playerTrans.lock()->GetPosition();
 
 		auto elapsed = App::GetApp()->GetElapsedTime();
-		if (m_pos.x < playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
+		if (m_pos.x < m_playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
 			if (m_angleSpeed <= XMConvertToRadians(90)) {
 				m_angleSpeed += XMConvertToRadians(1) * 90.0f * elapsed;
 			}
 			m_angle = Vec3(0.0f, m_angleSpeed, 0.0f);
 			m_dic = -1;
 		}
-		else if (m_pos.x > playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
+		else if (m_pos.x > m_playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
 			if (m_angleSpeed >= XMConvertToRadians(-90)) {
 				m_angleSpeed += -XMConvertToRadians(1) * 90.0f * elapsed;
 			}
@@ -358,6 +282,91 @@ namespace basecross {
 		}
 		if (m_pos.y <= jumpHight) {
 			m_jumpFlag = false;
+		}
+
+	}
+	//ヒップドロップ
+	void Enemy::HitDrop() {
+		auto fixed = m_fixedBox.lock();
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		//ヒップドロップ中
+		if (m_hitDropFlag) {
+			if (fixed) {
+				Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
+				Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
+				//床に衝突した時
+				if (m_floorFlag) {
+					m_time = 2.0f;
+					m_hitDropFlag = false;
+					AddGrav(Vec3(0.0f, -m_jumpPower, 0.0f));
+				}
+				m_time -= elapsed;
+				if (m_time <= 0) {
+					if (m_pos.y - m_scal.y / 2 + fixPos.y >= fixPos.y + fixScal.y / 2 + 0.01f) {
+						m_pos.y += -m_speed * 15 * elapsed;
+					}
+				}
+			}
+		}
+
+	}
+	//床に触れたら取得
+	void Enemy::FindFixed() {
+		auto fixed = m_fixedBox.lock();
+		if (fixed) {
+			Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
+			Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
+			if (m_pos.y - m_scal.y / 2 + fixPos.y <= fixPos.y + fixScal.y / 2 + 0.001f) {
+				m_floorFlag = true;
+			}
+			if (m_pos.x >= fixPos.x + fixScal.x / 2 + m_scal.x / 2 ||
+				m_pos.x <= fixPos.x - fixScal.x / 2 - m_scal.x / 2) {
+				m_floorFlag = false;
+			}
+
+			//床から落ちないようにする
+			if (m_pos.x > fixPos.x + fixScal.x / 2 - m_scal.x / 2 - 0.2f) {
+				m_speed = 0.0f;
+				if (m_pos.x > m_playerPos.x - fixPos.x) {
+					m_speed = 0.3f;
+				}
+			}
+			else if (m_pos.x < fixPos.x - fixScal.x / 2 + m_scal.x / 2 + 0.2f) {
+				m_speed = 0;
+				if (m_pos.x < m_playerPos.x - fixPos.x) {
+					m_speed = 0.3f;
+				}
+			}
+			else {
+				m_speed = 0.3f;
+			}
+		}
+		else {
+			m_floorFlag = false;
+		}
+
+	}
+	//弾の発射
+	void Enemy::Bullet() {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		auto stage = GetStage();
+		auto fixed = m_fixedBox.lock();
+
+		//弾の生成
+		if (m_pos.x > m_playerPos.x - m_bulletRange) {
+			m_bulletTime += elapsed;
+			if (!m_bulletFlag && m_dic != 0) {
+				if (fixed) {
+					stage->AddGameObject<EnemyBullet>(GetThis<Enemy>(),
+						fixed->GetComponent<Transform>()->GetPosition());
+					m_bulletFlag = true;
+					m_bulletTime = 0.0f;
+
+				}
+			}
+		}
+		if (m_bulletTime >= 2.0f) {
+			m_bulletFlag = false;
 		}
 
 	}
