@@ -208,7 +208,7 @@ namespace basecross {
 			Grav();
 		}
 		HitDrop();
-		Bullet();
+		//Bullet();
 		m_trans->SetPosition(m_pos);
 		m_trans->SetRotation(m_angle);
 
@@ -247,26 +247,23 @@ namespace basecross {
 	}
 	//プレイヤーの方向取得、その方向に回転
 	void Enemy::PlayerDic(bool zero, float addSpeed) {
-
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		if (m_pos.x < m_playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
-			if (m_angleSpeed <= XMConvertToRadians(90)) {
-				m_angleSpeed += XMConvertToRadians(1) * 90.0f * elapsed;
+			if (m_angleSpeed <= XMConvertToRadians(45)) {
+				m_angleSpeed += XMConvertToRadians(1) * 360.0f * elapsed;
 			}
 			m_angle = Vec3(0.0f, m_angleSpeed, 0.0f);
 			m_dic = -1;
 		}
 		else if (m_pos.x > m_playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
-			if (m_angleSpeed >= XMConvertToRadians(-90)) {
-				m_angleSpeed += -XMConvertToRadians(1) * 90.0f * elapsed;
+			if (m_angleSpeed >= XMConvertToRadians(-45)) {
+				m_angleSpeed += -XMConvertToRadians(1) * 360.0f * elapsed;
 			}
 			m_angle = Vec3(0.0f, m_angleSpeed, 0.0f);
 
 			m_dic = 1;
 		}
 		else {
-			m_angle = Vec3(0.0f, XMConvertToRadians(0), 0.0f);
-			m_angleSpeed = 0.0f;
 			if (zero) {
 				m_dic = 0;
 			}
