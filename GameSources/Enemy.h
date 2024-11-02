@@ -45,6 +45,7 @@ namespace basecross {
 		Vec3 m_angle;
 
 		int m_dic;           //å¸Ç¢ÇƒÇ¢ÇÈï˚å¸ ç∂-1,âE1
+		int m_dicUp;
 		int m_firstDic;
 
 		float m_test;
@@ -102,6 +103,13 @@ namespace basecross {
 		void HipDropJump();
 		void ThisDestroy();
 		void ReceiveDamage(float damage);
+		void PlayerDic(bool zero = true, float addSpeed = 1.0f);
+		void OneJump(float jumpHight);
+		void HitDrop();
+		void FindFixed();
+		void Bullet();
+		void Debug();
+		//get,set
 		void SetEnemyFlayFlag(bool flag);
 		void SetSpeed(float speed);
 		void SetUpMove(float speed,float height);
@@ -109,12 +117,8 @@ namespace basecross {
 		void SetState(State state);
 		int GetDic();
 		Vec3 GetPos();
-		void PlayerDic(bool zero = true, float addSpeed = 1.0f);
-		void OneJump(float jumpHight);
-		void Debug();
-		void HitDrop();
-		void FindFixed();
-		void Bullet();
+		bool GetFloorFlag();
+
 
 		//èdóÕÇ…ä÷Ç∑ÇÈä÷êî
 		void Grav();
@@ -141,6 +145,9 @@ namespace basecross {
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
 		Vec3 m_fixedPos;
+		bool m_floorCheck;
+		bool m_beforFlag;
+		float m_test;
 
 		shared_ptr<Transform> m_trans;
 		shared_ptr<Enemy> m_enemy;
@@ -155,6 +162,7 @@ namespace basecross {
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
 
 		void ThisDestroy();
+		void Debug();
 
 	};
 
