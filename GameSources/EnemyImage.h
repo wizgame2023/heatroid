@@ -18,6 +18,7 @@ namespace basecross {
 		float m_moveY;
 		float m_ratio;
 
+		float m_test;
 		Vec3 m_pos;
 
 		vector<VertexPositionNormalTexture> m_normalVertices;

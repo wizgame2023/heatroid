@@ -14,7 +14,7 @@ namespace basecross {
 		m_sizeX(0),
 		m_sizeY(0),
 		m_width(0.25),
-		m_height(0.25),
+		m_height(0.025),
 		m_moveX(0.0f),
 		m_moveY(0.0f),
 		m_color(1.0f,1.0f,1.0f,1.0f)
@@ -72,7 +72,6 @@ namespace basecross {
 			SetAlphaActive(true);//“§‰ßˆ——LŒø
 			SetDrawLayer(1);
 			m_draw->SetOriginalMeshResource(m_squareMesh);
-			UpdateValue(enemy->GetHpRatio());
 		}
 
 
@@ -87,6 +86,10 @@ namespace basecross {
 			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y, m_pos.z + 1.0f));
 			m_trans->SetScale(1.0f, 1.0f, 1.0f);
 			//auto camera = GetStage()->GetView()->GetTargetCamera();
+
+			UpdateValue(enemy->GetHpRatio());
+			m_test = enemy->GetHpRatio();
+
 			//Debug();
 
 		}
@@ -127,6 +130,8 @@ namespace basecross {
 			<< L"\n,"
 			<< enemyPos.z
 			<< L")"
+			<<L"\n"
+			<<m_test
 			<< endl;
 		scene->SetDebugString(wss.str());
 
