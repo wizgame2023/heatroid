@@ -23,6 +23,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStageHemmi.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStageTuboi.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Gimmick.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MainCamera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Player.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Project.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ProjectBehavior.h" />
@@ -39,6 +40,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStageHemmi.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStageTuboi.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Gimmick.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MainCamera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Player.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ProjectBehavior.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ProjectShader.cpp" />
