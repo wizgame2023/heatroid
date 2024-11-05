@@ -26,7 +26,7 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(flyMove),
+		m_stateType(rightMove),
 		m_deathState(stay),
 		m_player(player),
 		m_box(box),
@@ -46,7 +46,7 @@ namespace basecross {
 		m_gravity(-0.98f),
 		m_grav(Vec3(0.0f, m_gravity, 0.0f)),
 		m_gravVel(Vec3(0.0f)),
-		m_angle(Vec3(0.0f)),
+		m_moveRot(Vec3(0.0f)),
 		m_angleSpeed(0.3f),
 		m_bulletFlag(false),
 		m_jumpFlag(false),
@@ -155,7 +155,7 @@ namespace basecross {
 			break;
 			//ïÇóV
 		case fly:
-			OneJump(0.2f);
+			OneJump(0.1f);
 			break;
 			//ÉvÉåÉCÉÑÅ[Ç…êGÇÍÇΩà íuÇ≈å≈íË
 		case fixedStay:
@@ -206,13 +206,21 @@ namespace basecross {
 			Grav();
 		}
 		if (m_floorFlag) {
+			//auto fixed = m_fixedBox.lock();
+			//if (fixed) {
+			//	auto fixedTrans = fixed->GetComponent<Transform>();
+			//	auto fixedPos = fixedTrans->GetPosition();
+			//	auto fixedScal = fixedTrans->GetScale();
+			//	m_pos.y = fixedPos.y + fixedScal.y / 2 + 0.3;
+			//	m_test = fixedPos.y + fixedScal.y / 2 + m_scal.y;
+			//}
 			GravZero();
 			Grav();
 		}
 		HitDrop();
 		Bullet();
 		m_trans->SetPosition(m_pos);
-		m_trans->SetRotation(m_angle);
+		//m_trans->SetRotation(m_moveRot);
 
 
 
@@ -222,7 +230,7 @@ namespace basecross {
 			//ThisDestroy();
 		}
 
-		//Debug();
+		Debug();
 	}
 
 	//è’ìÀîªíË
@@ -253,14 +261,14 @@ namespace basecross {
 			if (m_angleSpeed <= XMConvertToRadians(45)) {
 				m_angleSpeed += XMConvertToRadians(1) * 360.0f * elapsed;
 			}
-			m_angle = Vec3(0.0f, m_angleSpeed, 0.0f);
+			m_moveRot = Vec3(0.0f, m_angleSpeed, 0.0f);
 			m_dic = -1;
 		}
 		else if (m_pos.x > m_playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
 			if (m_angleSpeed >= XMConvertToRadians(-45)) {
 				m_angleSpeed += -XMConvertToRadians(1) * 360.0f * elapsed;
 			}
-			m_angle = Vec3(0.0f, m_angleSpeed, 0.0f);
+			m_moveRot = Vec3(0.0f, m_angleSpeed, 0.0f);
 
 			m_dic = 1;
 		}
@@ -312,8 +320,8 @@ namespace basecross {
 	void Enemy::FindFixed() {
 		auto fixed = m_fixedBox.lock();
 		if (fixed) {
-			Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
-			Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
+			Vec3 fixPos = fixed->GetComponent<Transform>()->GetPosition();
+			Vec3 fixScal = fixed->GetComponent<Transform>()->GetScale();
 			if (m_pos.y - m_scal.y / 2 + fixPos.y <= fixPos.y + fixScal.y / 2 + 0.001f) {
 				m_floorFlag = true;
 			}
@@ -374,12 +382,13 @@ namespace basecross {
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
 			m_deathPos = m_pos;
-			ReceiveDamage(100.0f);
+			ReceiveDamage(10.0f);
 		}
 		if (other->FindTag(L"BreakWall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
 			if (m_stateType == runaway) {
 				breakWall->ThisDestory();
+				ThisDestroy();
 			}
 			m_plungeColFlag = true;
 		}
@@ -387,6 +396,7 @@ namespace basecross {
 			m_fixedBox = dynamic_pointer_cast<FixedBox>(other);
 			m_trans->SetParent(m_fixedBox.lock());
 			m_pos = m_pos - m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
+			m_floorPos = m_pos;
 		}
 
 	}
@@ -412,6 +422,8 @@ namespace basecross {
 			<< m_hitDropFlag
 			<< L"\ntest : "
 			<< m_test
+			<<L"\n changePos : "
+			<<GetChangePos().y
 			<< endl;
 		scene->SetDebugString(wss.str());
 
@@ -466,6 +478,26 @@ namespace basecross {
 	bool Enemy::GetFloorFlag() {
 		return m_floorFlag;
 	}
+	float Enemy::GetHpRatio() {
+		float ratio = m_hp / m_maxHp;
+		if (ratio <= 0.0f) {
+			return 0.0f;
+		}
+		else {
+			return ratio;
+		}
+	}
+	Vec3 Enemy::GetChangePos() {
+		auto fixed = m_fixedBox.lock();
+		if (fixed) {
+			Vec3 pos = m_pos + fixed->GetComponent<Transform>()->GetPosition();
+			return pos;
+		}
+		else {
+			return m_pos;
+		}
+	}
+
 
 	//--------------------------------------------------------------------------------------
 	//	class EnemyBullet : public GameObject;  
@@ -487,13 +519,14 @@ namespace basecross {
 	{}
 	void EnemyBullet::OnCreate() {
 		m_trans = GetComponent<Transform>();
-		m_enemyPos = m_enemy->GetComponent<Transform>()->GetPosition();
+		m_enemyPos = m_enemy->GetChangePos();
+		//m_enemyPos = m_enemy->GetComponent<Transform>()->GetPosition();
 
-		if (m_fixedPos!=Vec3(0.0f)) {
-			Vec3 pos = m_enemy->GetPos() + m_fixedPos;
-			Vec3 enemyScale = m_enemy->GetComponent<Transform>()->GetScale();
-			m_trans->SetPosition(Vec3(pos.x, pos.y + enemyScale.y / 2, m_pos.z));
-		}
+		//if (m_fixedPos!=Vec3(0.0f)) {
+		//	Vec3 pos = m_enemy->GetPos() + m_fixedPos;
+		//	Vec3 enemyScale = m_enemy->GetComponent<Transform>()->GetScale();
+		//	m_trans->SetPosition(Vec3(pos.x, pos.y + enemyScale.y / 2, m_pos.z));
+		//}
 		m_trans->SetPosition(m_enemyPos);
 		m_trans->SetRotation(m_rot);
 		m_trans->SetScale(m_scal);
@@ -520,28 +553,29 @@ namespace basecross {
 	}
 	void EnemyBullet::OnUpdate() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
-		m_enemyPos = m_enemy->GetComponent<Transform>()->GetPosition();
+		m_enemyPos = m_enemy->GetChangePos();
+		//m_enemyPos = m_enemy->GetComponent<Transform>()->GetPosition();
 
-		if (m_beforFlag != m_enemy->GetFloorFlag()) {
-			m_floorCheck = false;
-		}
-		if (!m_enemy->GetFloorFlag()) {
-			if (!m_floorCheck) {
-				Vec3 pos = m_enemy->GetPos() + m_fixedPos;
-				m_trans->SetPosition(pos);
-				m_beforFlag = m_enemy->GetFloorFlag();
-				m_floorCheck = true;
-			}
-		}
-		if (m_enemy->GetFloorFlag()) {
-			if (!m_floorCheck) {
-				Vec3 pos = m_enemy->GetPos() + m_fixedPos;
-				Vec3 enemyScale = m_enemy->GetComponent<Transform>()->GetScale();
-				m_trans->SetPosition(Vec3(pos.x, pos.y + enemyScale.y / 2, m_pos.z));
-				m_beforFlag = m_enemy->GetFloorFlag();
-				m_floorCheck = true;
-			}
-		}
+		//if (m_beforFlag != m_enemy->GetFloorFlag()) {
+		//	m_floorCheck = false;
+		//}
+		//if (!m_enemy->GetFloorFlag()) {
+		//	if (!m_floorCheck) {
+		//		Vec3 pos = m_enemy->GetPos() + m_fixedPos;
+		//		m_trans->SetPosition(pos);
+		//		m_beforFlag = m_enemy->GetFloorFlag();
+		//		m_floorCheck = true;
+		//	}
+		//}
+		//if (m_enemy->GetFloorFlag()) {
+		//	if (!m_floorCheck) {
+		//		Vec3 pos = m_enemy->GetPos() + m_fixedPos;
+		//		Vec3 enemyScale = m_enemy->GetComponent<Transform>()->GetScale();
+		//		m_trans->SetPosition(Vec3(pos.x, pos.y + enemyScale.y*2, m_pos.z));
+		//		m_beforFlag = m_enemy->GetFloorFlag();
+		//		m_floorCheck = true;
+		//	}
+		//}
 
 		m_trans = GetComponent<Transform>();
 		m_pos = m_trans->GetPosition();
@@ -555,7 +589,7 @@ namespace basecross {
 			ThisDestroy();
 		}
 
-		Debug();
+		//Debug();
 	}
 
 	void EnemyBullet::OnCollisionEnter(shared_ptr<GameObject>& other) {

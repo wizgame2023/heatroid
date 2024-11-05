@@ -42,7 +42,7 @@ namespace basecross {
 		float m_bulletTime;  //’e‚Ì”­ËŠÔŠu
 		float m_bulletRange; //’e‚ğ”­Ë‚·‚é‹——£
 		float m_angleSpeed;  //‰ñ“]‘¬“x
-		Vec3 m_angle;
+		Vec3 m_moveRot;
 
 		int m_dic;           //Œü‚¢‚Ä‚¢‚é•ûŒü ¶-1,‰E1
 		int m_dicUp;
@@ -83,6 +83,7 @@ namespace basecross {
 		weak_ptr<FixedBox> m_box;
 		shared_ptr<CollisionObb> m_collision;
 		weak_ptr<FixedBox> m_fixedBox;
+		
 
 	public:
 		// \’z‚Æ”jŠü
@@ -117,6 +118,7 @@ namespace basecross {
 		void SetState(State state);
 		int GetDic();
 		Vec3 GetPos();
+		Vec3 GetChangePos();
 		bool GetFloorFlag();
 
 
@@ -127,6 +129,7 @@ namespace basecross {
 		void GravZero();
 		void GravVelZero();
 		void SetGravVel(Vec3 grav);
+		float GetHpRatio();
 
 	};
 

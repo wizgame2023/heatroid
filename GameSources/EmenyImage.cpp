@@ -17,7 +17,7 @@ namespace basecross {
 		m_height(0.025),
 		m_moveX(0.0f),
 		m_moveY(0.0f),
-		m_color(1.0f,1.0f,1.0f,1.0f)
+		m_color(1.0f,0.0f,0.0f,1.0f)
 
 	{}
 	void GaugeSquare::OnCreate() {
@@ -25,9 +25,9 @@ namespace basecross {
 		if (!m_enemy.expired()) {
 			auto enemy = m_enemy.lock();
 			auto enemyTrans = enemy->GetComponent<Transform>();
-			auto enemyPos = enemyTrans->GetPosition();
+			auto enemyPos = enemy->GetChangePos();
 			float rad = XMConvertToRadians(180);
-			m_trans->SetPosition(Vec3(enemyPos.x, enemyPos.y, enemyPos.z + 1.0f));
+			m_trans->SetPosition(Vec3(enemyPos.x, enemyPos.y, enemyPos.z + 100.0f));
 			m_trans->SetScale(Vec3(1.0f, 1.0f, 1.0f));
 			m_trans->SetRotation(Vec3(0.0f, rad, 0.0f));
 
@@ -81,9 +81,9 @@ namespace basecross {
 			auto enemy = m_enemy.lock();
 			auto enemyTrans = enemy->GetComponent<Transform>();
 			m_trans = GetComponent<Transform>();
-			m_pos = enemyTrans->GetPosition();
+			m_pos = enemy->GetChangePos();
 			//m_pos.z += 1.0f;
-			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y, m_pos.z + 1.0f));
+			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y, m_pos.z));
 			m_trans->SetScale(1.0f, 1.0f, 1.0f);
 			//auto camera = GetStage()->GetView()->GetTargetCamera();
 
