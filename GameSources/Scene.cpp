@@ -12,7 +12,23 @@ namespace basecross{
 	//--------------------------------------------------------------------------------------
 	///	ゲームシーン
 	//--------------------------------------------------------------------------------------
-	void Scene::CreateResourses() {
+	void Scene::CreateResources() {
+
+		auto& app = App::GetApp();
+
+		// mediaパスを取得
+		auto path = app->GetDataDirWString();
+		// texturesパスを取得
+		auto texPath = path + L"Textures/";
+		// Modelsパス
+		auto mdlPath = path + L"Models/";
+
+		// プレイヤー
+		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HeatRoid.bmf");
+		app->RegisterResource(L"PLAYER", modelMesh);
+
+		// 火、仮テクスチャ
+		app->RegisterTexture(L"FIRE", texPath + L"fire_kari.png");
 
 	}
 
@@ -22,11 +38,11 @@ namespace basecross{
 			SetClearColor(Col4(0.0f, 0.11328125f, 0.2578125, 1.0f)); // ミッドナイトブルー
 			
 			//リソース作成
-			CreateResourses();
+			CreateResources();
 
 			//自分自身にイベントを送る
 			//これにより各ステージやオブジェクトがCreate時にシーンにアクセスできる
-			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToGameStage");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToGameStageTsuboi");
 		}
 		catch (...) {
 			throw;

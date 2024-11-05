@@ -1,7 +1,7 @@
 /*!
 @file Enemy.cpp
-@brief “G‚È‚ÇÀ‘Ì
-’S“–FˆíŒ©
+@brief æ•µãªã©å®Ÿä½“
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -10,7 +10,7 @@
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
-	//	class Enemy : public GameObject;  //“G
+	//	class Enemy : public GameObject;  //æ•µ
 	//--------------------------------------------------------------------------------------
 
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
@@ -68,14 +68,14 @@ namespace basecross {
 		auto player = m_player.lock();
 		if (!player) return;
 		m_playerScale = m_player.lock()->GetScale();
-		//•`‰æ
+		//æç”»
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
-		//Õ“Ë”»’è
+		//è¡çªåˆ¤å®š
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetFixed(false);
 		m_collision->SetDrawActive(true);
-		//‰e
+		//å½±
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 
@@ -91,21 +91,21 @@ namespace basecross {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto stage = GetStage();
 		m_pos = m_trans->GetPosition();
-		//ƒvƒŒƒCƒ„[î•ñ‚ğæ“¾
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æƒ…å ±ã‚’å–å¾—
 		auto player = m_player.lock();
 		if (!player) return;
 		m_playerTrans = m_player.lock()->GetComponent<Transform>();
 		m_playerPos = m_playerTrans.lock()->GetPosition();
 
-		/*------------------ƒeƒXƒg—p-------------------------*/
-				//ƒL[‘€ì‚ÅˆÚ“®
+		/*------------------ãƒ†ã‚¹ãƒˆç”¨-------------------------*/
+				//ã‚­ãƒ¼æ“ä½œã§ç§»å‹•
 		if (keyState.m_bLastKeyTbl[VK_RIGHT]) {
 			m_pos.x += m_dic * m_speed * elapsed;
 		}
 		if (keyState.m_bLastKeyTbl[VK_LEFT]) {
 			m_pos.x += -m_dic * m_speed * elapsed;
 		}
-		//ƒXƒy[ƒX‚ÅƒWƒƒƒ“ƒviƒeƒXƒg—pj
+		//ã‚¹ãƒšãƒ¼ã‚¹ã§ã‚¸ãƒ£ãƒ³ãƒ—ï¼ˆãƒ†ã‚¹ãƒˆç”¨ï¼‰
 		if (keyState.m_bPressedKeyTbl[VK_DOWN]) {
 			//EnemyJump();
 			HipDropJump();
@@ -117,26 +117,26 @@ namespace basecross {
 		if (keyState.m_bPushKeyTbl['W']) {
 			//m_stateType = stay;
 		}
-		/*------------------ƒeƒXƒg—p-------------------------*/
+		/*------------------ãƒ†ã‚¹ãƒˆç”¨-------------------------*/
 
 		FindFixed();
 
-		//s“®ƒpƒ^[ƒ“
+		//è¡Œå‹•ãƒ‘ã‚¿ãƒ¼ãƒ³
 		switch (m_stateType)
 		{
-			//ˆÚ“®‚È‚µ
+			//ç§»å‹•ãªã—
 		case stay:
 			if (!m_hitDropFlag) {
 				SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			}
 			m_dic = 0;
 			break;
-			//’Ç]‚Ì¶‰EˆÚ“®
+			//è¿½å¾“ã®å·¦å³ç§»å‹•
 		case rightMove:
 			PlayerDic();
 			Bullet();
 			break;
-			//ã‰º‚ÉˆÚ“®
+			//ä¸Šä¸‹ã«ç§»å‹•
 		case upMove:
 			GravZero();
 			Grav();
@@ -150,18 +150,18 @@ namespace basecross {
 			m_dic *= -1;
 			m_pos.y += m_dicUp * m_upSpeed * elapsed;
 			break;
-			//’Ç]•‚—V
+			//è¿½å¾“æµ®éŠ
 		case flyMove:
 			OneJump(0.1f);
 			PlayerDic(false);
 			Bullet();
 			break;
-			//•‚—V
+			//æµ®éŠ
 		case fly:
 			OneJump(0.1f);
 			Bullet();
 			break;
-			//ƒvƒŒƒCƒ„[‚ÉG‚ê‚½ˆÊ’u‚ÅŒÅ’è
+			//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«è§¦ã‚ŒãŸä½ç½®ã§å›ºå®š
 		case fixedStay:
 			GravZero();
 			Grav();
@@ -169,14 +169,14 @@ namespace basecross {
 			m_collision->SetFixed(true);
 			AddTag(L"FixedBox");
 			break;
-			//ƒvƒŒƒCƒ„[‚Æ‹t•ûŒü‚ÉˆÚ“®
+			//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨é€†æ–¹å‘ã«ç§»å‹•
 		case runaway:
 			PlayerDic(false, -5.0f);
 			break;
-			//ƒqƒbƒvƒhƒƒbƒv
+			//ãƒ’ãƒƒãƒ—ãƒ‰ãƒ­ãƒƒãƒ—
 		case hitDrop:
 			break;
-			//“Ë‚Á‚İ
+			//çªã£è¾¼ã¿
 		case plunge:
 			if (m_pos.x < m_playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
 				m_dic = -1;
@@ -201,7 +201,7 @@ namespace basecross {
 		default:
 			break;
 		}
-		//d—Í‚Ìˆ—
+		//é‡åŠ›ã®å‡¦ç†
 		if (!m_floorFlag) {
 			Grav();
 		}
@@ -214,7 +214,7 @@ namespace basecross {
 		m_trans->SetPosition(m_pos);
 		m_trans->SetRotation(m_moveRot);
 
-		//HP‚ª0‚É‚È‚Á‚½ê‡
+		//HPãŒ0ã«ãªã£ãŸå ´åˆ
 		if (m_hp <= 0.0f) {
 			m_stateType = m_deathState;
 		}
@@ -222,8 +222,8 @@ namespace basecross {
 		//Debug();
 	}
 
-	//Õ“Ë”»’è
-	//ƒWƒƒƒ“ƒv
+	//è¡çªåˆ¤å®š
+	//ã‚¸ãƒ£ãƒ³ãƒ—
 	void Enemy::EnemyJump() {
 		m_floorFlag = false;
 		AddGrav(Vec3(0.0f, m_jumpPower, 0.0f));
@@ -235,15 +235,15 @@ namespace basecross {
 		EnemyJump();
 		GravZero();
 	}
-	//íœ
+	//å‰Šé™¤
 	void Enemy::ThisDestroy() {
 		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
 	}
-	//ƒ_ƒ[ƒW‚ğó‚¯‚é
+	//ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ã‚‹
 	void Enemy::ReceiveDamage(float damage) {
 		m_hp -= damage;
 	}
-	//ƒvƒŒƒCƒ„[‚Ì•ûŒüæ“¾A‚»‚Ì•ûŒü‚É‰ñ“]
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘å–å¾—ã€ãã®æ–¹å‘ã«å›è»¢
 	void Enemy::PlayerDic(bool zero, float addSpeed) {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		if (m_pos.x < m_playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
@@ -269,7 +269,7 @@ namespace basecross {
 		m_pos.x += -m_dic * m_speed * addSpeed * elapsed;
 
 	}
-	//ƒWƒƒƒ“ƒv
+	//ã‚¸ãƒ£ãƒ³ãƒ—
 	void Enemy::OneJump(float jumpHight) {
 		if (!m_jumpFlag) {
 			EnemyJump();
@@ -280,16 +280,16 @@ namespace basecross {
 		}
 
 	}
-	//ƒqƒbƒvƒhƒƒbƒv
+	//ãƒ’ãƒƒãƒ—ãƒ‰ãƒ­ãƒƒãƒ—
 	void Enemy::HitDrop() {
 		auto fixed = m_fixedBox.lock();
 		auto elapsed = App::GetApp()->GetElapsedTime();
-		//ƒqƒbƒvƒhƒƒbƒv’†
+		//ãƒ’ãƒƒãƒ—ãƒ‰ãƒ­ãƒƒãƒ—ä¸­
 		if (m_hitDropFlag) {
 			if (fixed) {
 				Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
 				Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
-				//°‚ÉÕ“Ë‚µ‚½
+				//åºŠã«è¡çªã—ãŸæ™‚
 				if (m_floorFlag) {
 					m_time = 2.0f;
 					m_hitDropFlag = false;
@@ -305,7 +305,7 @@ namespace basecross {
 		}
 
 	}
-	//°‚ÉG‚ê‚½‚çæ“¾
+	//åºŠã«è§¦ã‚ŒãŸã‚‰å–å¾—
 	void Enemy::FindFixed() {
 		auto fixed = m_fixedBox.lock();
 		if (fixed) {
@@ -319,7 +319,7 @@ namespace basecross {
 				m_floorFlag = false;
 			}
 
-			//°‚©‚ç—‚¿‚È‚¢‚æ‚¤‚É‚·‚é
+			//åºŠã‹ã‚‰è½ã¡ãªã„ã‚ˆã†ã«ã™ã‚‹
 			if (m_pos.x > fixPos.x + fixScal.x / 2 - m_scal.x / 2 - 0.2f) {
 				m_speed = 0.0f;
 				if (m_pos.x > m_playerPos.x - fixPos.x) {
@@ -341,13 +341,13 @@ namespace basecross {
 		}
 
 	}
-	//’e‚Ì”­Ë
+	//å¼¾ã®ç™ºå°„
 	void Enemy::Bullet() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto stage = GetStage();
 		auto fixed = m_fixedBox.lock();
 
-		//’e‚Ì¶¬
+		//å¼¾ã®ç”Ÿæˆ
 		if (m_pos.x > m_playerPos.x - m_bulletRange) {
 			m_bulletTime += elapsed;
 			if (!m_bulletFlag && m_dic != 0) {
@@ -367,7 +367,7 @@ namespace basecross {
 		}
 
 	}
-	//Õ“Ë”»’è
+	//è¡çªåˆ¤å®š
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
 			m_deathPos = m_pos;
@@ -389,9 +389,9 @@ namespace basecross {
 		}
 
 	}
-	//ƒfƒoƒbƒN
+	//ãƒ‡ãƒãƒƒã‚¯
 	void Enemy::Debug() {
-		//ƒfƒoƒbƒN—p
+		//ãƒ‡ãƒãƒƒã‚¯ç”¨
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		auto scene = App::GetApp()->GetScene<Scene>();
 		wstringstream wss(L"");
@@ -417,7 +417,7 @@ namespace basecross {
 		scene->SetDebugString(wss.str());
 
 	}
-	//d—Í
+	//é‡åŠ›
 	void Enemy::Grav() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		m_gravVel += m_grav * elapsed;
@@ -441,7 +441,7 @@ namespace basecross {
 		m_gravVel = grav;
 	}
 
-	//ƒQƒbƒ^[ƒZƒbƒ^[
+	//ã‚²ãƒƒã‚¿ãƒ¼ã‚»ãƒƒã‚¿ãƒ¼
 	int Enemy::GetDic() {
 		return m_dic;
 	}
@@ -515,16 +515,16 @@ namespace basecross {
 		m_dic = m_enemy->GetDic();
 		m_beforFlag = m_enemy->GetFloorFlag();
 
-		//•`‰æ
+		//æç”»
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 
-		//Õ“Ë”»’è
+		//è¡çªåˆ¤å®š
 		auto ptrColl = AddComponent<CollisionSphere>();
 		ptrColl->SetAfterCollision(AfterCollision::None);
-		ptrColl->SetFixed(false); //‹óŠÔ‚ÉŒÅ’è‚·‚é‚©
+		ptrColl->SetFixed(false); //ç©ºé–“ã«å›ºå®šã™ã‚‹ã‹
 		ptrColl->SetDrawActive(true);
-		//‰e
+		//å½±
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 
@@ -560,6 +560,7 @@ namespace basecross {
 	void EnemyBullet::ThisDestroy() {
 		GetStage()->RemoveGameObject<EnemyBullet>(GetThis<EnemyBullet>());
 	}
+
 	void EnemyBullet::Debug() {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		auto scene = App::GetApp()->GetScene<Scene>();
@@ -581,6 +582,7 @@ namespace basecross {
 			<<m_test
 			<< endl;
 		scene->SetDebugString(wss.str());
+
 
 	}
 }

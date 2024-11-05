@@ -14,6 +14,7 @@ namespace basecross {
 	class GameStageTsuboi : public Stage {
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 		void CreateGameBox();//GameStage‚Ì¶¬
+		void CreateEnemy();
 
 	public:
 		//\’z‚Æ”jŠü
