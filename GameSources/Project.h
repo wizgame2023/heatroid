@@ -20,3 +20,4 @@
 #include "GameStageTuboi.h"
 #include "FixedBox.h"
 #include "Gimmick.h"
+#include "MainCamera.h"
