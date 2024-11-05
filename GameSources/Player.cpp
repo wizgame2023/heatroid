@@ -18,10 +18,9 @@ namespace basecross {
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
 		m_speed(2.0f),
-		m_initialSpeed(1.0f),
 		m_accel(2.0f),
 		m_friction(.88f),
-		m_frictionThreshold(.025f),
+		m_frictionThreshold(.05f),
 		m_airSpeedRate(.6f),
 		m_jumpHeight(2.5f),
 		m_gravity(-4.0f),
@@ -31,6 +30,8 @@ namespace basecross {
 		m_collideCount(m_collideCountInit),
 		m_stateType(air),
 		m_face(1),
+		m_isAttacking(false),
+		m_isFiring(false),
 
 		m_HP_max(100),
 		m_invincibleTimeMax(1.2f)
@@ -94,24 +95,37 @@ namespace basecross {
 	void Player::MovePlayer() {
 		auto trans = GetComponent<Transform>();
 
-		//地上で逆方向に移動しようとしたとき、加速度が上がる(急ブレーキ)
-		if (m_stateType == stand && m_face * GetMoveVector().x < 0)
-			m_moveVel.x += GetMoveVector().x * m_accel * 5.0f * _delta;
-		else
-			m_moveVel.x += GetMoveVector().x * m_accel * _delta;
+		//地上で逆方向に移動しようとしたときの処理(急ブレーキ)
+		if (m_stateType == stand && m_face * GetMoveVector().x < 0) {
+			m_moveVel.x -= m_moveVel.x * m_friction * (7000.0f / 60.0f) * _delta;
+		}
 
-		if (GetDrawPtr()->GetCurrentAnimation() == L"Land" && GetDrawPtr()->GetCurrentAnimationTime() > .23f) {
-			SetAnim(L"Idle");
+		//摩擦(地上のみ)
+		if (m_stateType == stand) {
+			if (GetMoveVector().x == 0) {
+				if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
+				else m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
+			}
+		}
+
+		//加速
+		m_moveVel.x += GetMoveVector().x * m_accel * _delta;
+
+		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .23f) {
+			SetAnim(AddFire() + L"Idle");
 		}
 
 		if (m_stateType == stand) {
 			if (abs(GetMoveVector().x) > 0)
-				SetAnim(L"Run");
+				SetAnim(AddFire() + L"Run");
 			else
-				if (GetDrawPtr()->GetCurrentAnimation() != L"Land") SetAnim(L"Idle");
+				if (GetDrawPtr()->GetCurrentAnimation() != L"Land" && GetDrawPtr()->GetCurrentAnimation() != L"Fire_Land") { 
+					SetAnim(AddFire() + L"Idle");
+				}
 		}
 
-		if (m_stateType == air) SetAnim(L"Jumping");
+		if (m_stateType == air)
+			SetAnim(AddFire() + L"Jumping");
 
 		//初速
 		//if (GetDrawPtr()->GetCurrentAnimation() == L"Run" && abs(m_moveVel.x < m_initialSpeed)) {
@@ -121,17 +135,9 @@ namespace basecross {
 
 		Gravity();
 
-		//摩擦(地上のみ)
-		if (m_stateType == stand) {
-			if (GetMoveVector().x == 0) {
-				if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
-				else m_moveVel.x *= m_friction * (1000.0f / 60.0f) * _delta;
-			}
-		}
-
 		//地上にいるときの処理(振り向き)
-		if (m_stateType == stand) {
-			FacingWithVel();
+		if (m_stateType == stand && !m_isFiring) {
+			FacingWithInput();
 		}
 
 		//最高速度
@@ -162,7 +168,7 @@ namespace basecross {
 
 		//CollisionSphere衝突判定を付ける
 		auto ptrColl = AddComponent<CollisionSphere>();
-		ptrColl->SetDrawActive(true);
+		ptrColl->SetDrawActive(false);
 
 		//各パフォーマンスを得る
 		GetStage()->SetCollisionPerformanceActive(true);
@@ -199,6 +205,10 @@ namespace basecross {
 	void Player::OnUpdate() {
 		_delta = App::GetApp()->GetElapsedTime();
 
+
+		auto key = App::GetApp()->GetInputDevice().GetKeyState();
+		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
+
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 
@@ -208,7 +218,21 @@ namespace basecross {
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 
+		SwitchFireAnim(GetDrawPtr()->GetCurrentAnimationTime());
+
 		GetDrawPtr()->UpdateAnimation(_delta);
+
+		//Bボタンで火炎放射
+		Firing(pad[0].wButtons & XINPUT_GAMEPAD_B || key.m_bPushKeyTbl[VK_LCONTROL] == true);
+
+		m_fireCount += _delta;
+		if (!m_isFiring) m_fireCount = 0.0f;
+
+		if (m_fireCount > .2f) {
+			GetStage()->AddGameObject<FireProjectile>(GetComponent<Transform>()->GetPosition(), m_face);
+			m_fireCount -= .2f;
+		}
+			
 	}
 
 	void Player::OnUpdate2() {
@@ -224,7 +248,9 @@ namespace basecross {
 		wss << "stateType : " << m_stateType << endl;
 		wss << "pos : " << pos.x << ", " << pos.y << endl;
 		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
+		wss << "face : " << m_face << endl;
 		wss << "anim : " << GetDrawPtr()->GetCurrentAnimation() << " animtime : " << GetDrawPtr()->GetCurrentAnimationTime() << endl;
+		wss << "fire : " << m_isFiring << endl;
 		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
 		wss << "fps : " << App::GetApp()->GetStepTimer().GetFramesPerSecond() << " delta : " << _delta << endl;
 
@@ -232,17 +258,21 @@ namespace basecross {
 		scene->SetDebugString(L"Player\n" + wss.str());
 	}
 
-	void Player::OnPushA()
-	{
+	void Player::OnPushA() {
 		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
 		m_moveVel.y = m_jumpHeight;
 		m_stateType = air;
 	}
 
+	void Player::Firing(bool fire) {
+		m_isFiring = fire;
+	}
+
+
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
 		m_collideCount = m_collideCountInit;
 		if (m_stateType == air && Other->FindTag(L"FixedBox")) {
-			SetAnim(L"Land");	//たまに2回呼ばれてる？
+			SetAnim(AddFire() + L"Land");
 			m_stateType = stand;
 		}
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
@@ -315,18 +345,17 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Attack4", 175, 12, false, anim_fps);
 		ptrDraw->AddAnimation(L"Attack5", 188, 40, false, anim_fps);
 		//火炎放射+行動
-		ptrDraw->AddAnimation(L"Fire_Idle", 367, 33, true, anim_fps);
-		ptrDraw->AddAnimation(L"Fire_RunFwd", 310, 11, false, anim_fps);
-		ptrDraw->AddAnimation(L"Fire_RunBack", 410, 14, false, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_Idle", 367, 33, true, 16.5f);//通常立ちモーションと合わせるため
+		ptrDraw->AddAnimation(L"Fire_Run", 310, 12, true, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_RunBack", 410, 14, true, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_JumpStart", 330, 2, false, anim_fps);
-		ptrDraw->AddAnimation(L"Fire_Jump", 332, 28, false, anim_fps);
-		ptrDraw->AddAnimation(L"Fire_Land", 188, 40, false, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_Jumping", 332, 28, false, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_Land", 360, 7, false, anim_fps);
 		//やられ・死亡
 		ptrDraw->AddAnimation(L"GetHit_Air", 510, 24, false, anim_fps);
 		ptrDraw->AddAnimation(L"GetHit_Stand", 550, 22, false, anim_fps);
 		ptrDraw->AddAnimation(L"Died", 580, 45, false, anim_fps);
 		ptrDraw->ChangeCurrentAnimation(L"Idle");
-
 	}
 
 	void Player::FacingWithVel() {
@@ -339,6 +368,44 @@ namespace basecross {
 			else {
 				m_face = -1;
 				trans->SetRotation(0, XM_PI, 0);
+			}
+		}
+	}
+
+	void Player::FacingWithInput() {
+		auto trans = GetComponent<Transform>();
+		if (abs(GetMoveVector().x) > 0) {
+			if (GetMoveVector().x > 0) {
+				m_face = 1;
+				trans->SetRotation(0, 0, 0);
+			}
+			else {
+				m_face = -1;
+				trans->SetRotation(0, XM_PI, 0);
+			}
+		}
+	}
+
+	void Player::SwitchFireAnim(float time) {
+		auto draw = GetComponent<PNTBoneModelDraw>();
+		if (m_isFiring) {
+			vector<wstring> target = { (L"Idle"), (L"Run"), (L"Jump_Start"), (L"Jumping"), (L"Land") };
+			for (auto anim : target) {
+				if (draw->GetCurrentAnimation() == anim) {
+					wstring changeanim = L"Fire_" + anim;
+					draw->ChangeCurrentAnimation(changeanim, time);
+					return;
+				}
+			}
+		}
+		if (!m_isFiring) {
+			vector<wstring> target = { (L"Fire_Idle"), (L"Fire_Run"), (L"Fire_Jump_Start"), (L"Fire_Jumping"), (L"Fire_Land") };
+			for (auto anim : target) {
+				if (draw->GetCurrentAnimation() == anim) {
+					wstring changeanim = anim.replace(0, 5, L"");
+					draw->ChangeCurrentAnimation(changeanim, time);
+					return;
+				}
 			}
 		}
 	}
@@ -362,15 +429,15 @@ namespace basecross {
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
 		trans->SetPosition(Vec3(0, 0, 0));
 
-		//仮(本実装時は、押し出しのないTrigger判定を独自に作る？)
 		auto coll = AddComponent<TriggerSphere>();
-		coll->SetDrawActive(true);
+		coll->SetDrawActive(false);//debug
 
 	}
 
 
 	void AttackCollision::OnUpdate() {
 		FollowPlayer();
+
 	}
 
 	void AttackCollision::FollowPlayer() {
@@ -410,6 +477,58 @@ namespace basecross {
 			//攻撃
 		}
 	}
+
+	//====================================================================
+	// class FireProjectile
+	// プレイヤーの火炎放射
+	//====================================================================
+
+	FireProjectile::FireProjectile(const shared_ptr<Stage>& StagePtr,
+		const Vec3 dist, const int face) :
+		GameObject(StagePtr),
+		m_dist(dist),
+		m_distAdd(Vec3(.1f, 0, 0)),
+		m_speed(Vec3(.8f, 0, 0)),
+		m_face(face),
+		m_range(.8f)
+	{}
+
+	void FireProjectile::OnCreate() {
+		m_dist.y += .08f;
+
+		auto trans = GetComponent<Transform>();
+		trans->SetScale(0.10f, 0.10f, 0.10f);	//直径25センチの球体
+		trans->SetRotation(0.0f, 0.0f, 0.0f);
+		trans->SetPosition(m_dist + (m_distAdd * m_face));
+
+		auto coll = AddComponent<TriggerSphere>();
+		coll->SetDrawActive(false);//debug
+		coll->SetAfterCollision(AfterCollision::None);
+
+		//描画コンポーネントの設定
+		auto ptrDraw = AddComponent<PNTStaticDraw>();
+		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+
+		ptrDraw->SetTextureResource(L"FIRE");
+
+		AddTag(L"Player");//テスト用。後にFIREとかにする
+	}
+
+
+	void FireProjectile::OnUpdate() {
+		auto delta = App::GetApp()->GetElapsedTime();
+
+		auto trans = GetComponent<Transform>();
+		trans->SetPosition(trans->GetPosition() + (m_speed * delta * m_face));
+
+		m_range -= delta;
+
+		if (m_range <= 0) {
+			GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
+		}
+
+	}
+
 
 }
 //end basecross

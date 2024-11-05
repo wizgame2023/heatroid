@@ -55,6 +55,23 @@ namespace basecross {
 		}
 	}
 
+	void GameStageTsuboi::CreateEnemy() {
+
+		vector<vector<Vec3>> vec = {
+			{
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(0.1f,0.1f,0.1f)
+			}
+		};
+
+		auto player = GetSharedGameObject<Player>(L"Player");
+
+		for (auto v : vec) {
+			AddGameObject<Enemy>(v[0], v[1], v[2], Enemy::rightMove, Enemy::runaway, player);
+		}
+
+	}
 
 	void GameStageTsuboi::OnCreate() {
 		try {
@@ -68,10 +85,8 @@ namespace basecross {
 			ptrPlayer = AddGameObject<AttackCollision>(ptrPlayer);
 
 			CreateGameBox();
+			CreateEnemy();
 
-			auto box = GetSharedGameObject<FixedBox>(L"box0");
-			auto player = GetSharedGameObject<Player>(L"Player");
-			//auto enemy = AddGameObject<Enemy>(player, box);
 
 
 		}
