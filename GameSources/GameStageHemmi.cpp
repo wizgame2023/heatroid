@@ -17,8 +17,8 @@ namespace basecross {
 	void GameStageHemmi::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, 0.5f, 3.0f));
-		camera->SetAt(Vec3(0.0f, 0.5f, 0.0f));
+		camera->SetEye(Vec3(0.0f, 0.5f, 3.0f));//0.0f, 0.5f, 3.0f
+		camera->SetAt(Vec3(0.0f, 0.5f, 0.0f)); //0.0f, 0.5f, 0.0f
 
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -27,6 +27,13 @@ namespace basecross {
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
 		light->SetDefaultLighting(); //デフォルトのライティングを指定
+
+		//画像の追加
+		auto& app = App::GetApp();
+		auto path = app->GetDataDirWString();
+		auto texPath = path + L"Textures/";
+		wstring strTexture = texPath + L"White.png";
+		app->RegisterTexture(L"White", strTexture);
 	}
 
 	void GameStageHemmi::CreateGameBox() {
@@ -37,25 +44,32 @@ namespace basecross {
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(3.0f, 0.1f, 0.3f)
 			},
+			//{
+			//	Vec3(0.0f,0.5f,0.0f),
+			//	Vec3(0.0f,0.0f,0.0f),
+			//	Vec3(0.5f,0.1f,0.1f)
+			//},
+
 		};
 		//オブジェクトの作成
 		for (auto v : vec) {
 			auto box = AddGameObject<FixedBox>(v[0], v[1], v[2]);
-			SetSharedGameObject(L"box",box);
+			//SetSharedGameObject(L"box",box);
 		}
 	}
 	void GameStageHemmi::CreateBreakWall() {
 		vector<vector<Vec3>> vec = {
 			{
-				Vec3(0.0f,0.5f,0.0f),
-				Vec3(0.0f,0.0f,0.0f),
-				Vec3(0.5f,0.1f,0.1f)
-			},
-			{
 				Vec3(-1.3f,-0.2f,0.0f),
 				Vec3(0.0f,0.0f,0.0f),
 				Vec3(0.1f,0.3f,0.1f)
 			},
+			//{
+			//	Vec3(1.3f,-0.2f,0.0f),
+			//	Vec3(0.0f,0.0f,0.0f),
+			//	Vec3(0.1f,0.3f,0.1f)
+			//},
+
 		};
 
 		for (auto v : vec) {
@@ -63,17 +77,25 @@ namespace basecross {
 		}
 	}
 	void GameStageHemmi::CreateEnemy() {
+		auto rad = XMConvertToRadians(30.0f);
 		vector<vector<Vec3>> vec = {
 			{
+				Vec3(0.6f,0.2f,0.0f),
 				Vec3(0.0f,0.0f,0.0f),
-				Vec3(0.0f,0.0f,0.0f),
-				Vec3(0.1f,0.1f,0.1f)
-			}
+				Vec3(0.1f,0.1f,0.1f),
+			},
+			//{
+			//	Vec3(-0.6f,0.2f,0.0f),
+			//	Vec3(0.0f,0.0f,0.0f),
+			//	Vec3(0.1f,0.1f,0.1f),
+			//}
+
 		};
 
 		auto player = GetSharedGameObject<Player>(L"Player");
 		for (auto v : vec) {
-			AddGameObject<Enemy>(v[0], v[1], v[2],Enemy::rightMove,Enemy::runaway,player);
+			auto enemy = AddGameObject<Enemy>(v[0], v[1], v[2], Enemy::rightMove, Enemy::runaway, player);
+			AddGameObject<GaugeSquare>(enemy);
 		}
 	}
 
@@ -86,7 +108,7 @@ namespace basecross {
 			auto player = AddGameObject<Player>();
 			SetSharedGameObject(L"Player", player);
 			CreateGameBox();
-			auto box = GetSharedGameObject<FixedBox>(L"box");
+			//auto box = GetSharedGameObject<FixedBox>(L"box");
 			//auto enemy = AddGameObject<Enemy>(player,box);
 			//enemy->SetState(Enemy::rightMove);
 			CreateEnemy();
