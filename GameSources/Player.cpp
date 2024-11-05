@@ -386,6 +386,7 @@ namespace basecross {
 		}
 	}
 
+	//火炎放射しているアニメとしていないアニメの切り替え
 	void Player::SwitchFireAnim(float time) {
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		if (m_isFiring) {
@@ -495,11 +496,12 @@ namespace basecross {
 
 	void FireProjectile::OnCreate() {
 		m_dist.y += .08f;
+		m_distAdd.x *= m_face;
 
 		auto trans = GetComponent<Transform>();
 		trans->SetScale(0.10f, 0.10f, 0.10f);	//直径25センチの球体
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
-		trans->SetPosition(m_dist + (m_distAdd * m_face));
+		trans->SetPosition(m_dist + m_distAdd);
 
 		auto coll = AddComponent<TriggerSphere>();
 		coll->SetDrawActive(false);//debug
