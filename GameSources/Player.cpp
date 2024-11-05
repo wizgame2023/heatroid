@@ -171,10 +171,6 @@ namespace basecross {
 		m_InputHandler.PushHandle(GetThis<Player>());
 		MovePlayer();
 		//MoveCamera();
-<<<<<<< Updated upstream
-=======
-    
->>>>>>> Stashed changes
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 	}
