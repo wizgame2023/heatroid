@@ -27,35 +27,29 @@ namespace basecross {
 			auto enemyTrans = enemy->GetComponent<Transform>();
 			auto enemyPos = enemy->GetChangePos();
 			float rad = XMConvertToRadians(180);
-			m_trans->SetPosition(Vec3(enemyPos.x, enemyPos.y, enemyPos.z + 100.0f));
+			m_trans->SetPosition(Vec3(enemyPos.x, enemyPos.y, enemyPos.z));
 			m_trans->SetScale(Vec3(1.0f, 1.0f, 1.0f));
 			m_trans->SetRotation(Vec3(0.0f, rad, 0.0f));
+			//MeshUtill::CreateSquare(1.0f, m_normalVertices, m_indices);
+		
+			//m_normalVertices = {
+			//	{Vec3(-m_width * 0.0f, m_height * 0.0f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(0.0f,0.0f)},
+			//	{Vec3( m_width * 1.0f, m_height * 0.0f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(1.0f,0.0f)},
+			//	{Vec3(-m_width * 0.0f,-m_height * 1.0f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(0.0f,1.0f)},
+			//	{Vec3( m_width * 1.0f,-m_height * 1.0f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(1.0f,1.0f)}
+			//};
 
-			MeshUtill::CreateSquare(1.0f, m_normalVertices, m_indices);
+			//頂点データ
 			m_normalVertices = {
-				{Vec3(0,0,0),Vec3(1.0f),Vec2(0.0f,0.0f)},
-				{Vec3(m_width,0,0),Vec3(1.0f),Vec2(1.0f,0.0f)},
-				{Vec3(0,-m_height,0),Vec3(1.0f),Vec2(0.0f,1.0f)},
-				{Vec3(m_width,-m_height,0.0f),Vec3(1.0f),Vec2(1.0f,1.0f)}
+				{Vec3(-m_width * 0.5f, m_height * 0.5f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(0.0f,0.0f)},
+				{Vec3( m_width * 0.5f, m_height * 0.5f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(1.0f,0.0f)},
+				{Vec3(-m_width * 0.5f,-m_height * 0.5f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(0.0f,1.0f)},
+				{Vec3( m_width * 0.5f,-m_height * 0.5f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(1.0f,1.0f)}
 			};
-		
-			//m_normalVertices[0].textureCoordinate = Vec2(0.0f, 0.0f);
-			//m_normalVertices[1].textureCoordinate = Vec2(1.0f, 0.0f);
-			//m_normalVertices[2].textureCoordinate = Vec2(0.0f, 1.0f);
-			//m_normalVertices[3].textureCoordinate = Vec2(1.0f, 1.0f);
-
-
-			//m_vertices = {
-			//	{Vec3(0,0,0),m_color,Vec2(0.0f,0.0f)},
-			//	{Vec3(m_width,0,0),m_color,Vec2(1.0f,0.0f)},
-			//	{Vec3(0,-m_height,0),m_color,Vec2(0.0f,1.0f)},
-			//	{Vec3(m_width,-m_height,0.0f),m_color,Vec2(1.0f,1.0f)}
-			//};
-			//m_indices = {
-			//	0,1,2,
-			//	2,1,3
-			//};
-		
+			m_indices = {
+				0,1,2,
+				2,1,3
+			};
 			for (auto& v : m_normalVertices) {
 				VertexPositionColorTexture nv;
 				nv.position = v.position;
@@ -69,9 +63,9 @@ namespace basecross {
 			m_draw = AddComponent<PCTStaticDraw>();
 			m_draw->SetMeshResource(m_squareMesh);
 			m_draw->SetTextureResource(L"White");
+			m_draw->SetOriginalMeshResource(m_squareMesh);
 			SetAlphaActive(true);//透過処理有効
 			SetDrawLayer(1);
-			m_draw->SetOriginalMeshResource(m_squareMesh);
 		}
 
 
@@ -82,34 +76,35 @@ namespace basecross {
 			auto enemyTrans = enemy->GetComponent<Transform>();
 			m_trans = GetComponent<Transform>();
 			m_pos = enemy->GetChangePos();
-			//m_pos.z += 1.0f;
-			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y, m_pos.z));
-			m_trans->SetScale(1.0f, 1.0f, 1.0f);
-			//auto camera = GetStage()->GetView()->GetTargetCamera();
+			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + 0.13f, m_pos.z + 0.1f));
 
+			//頂点の更新
 			UpdateValue(enemy->GetHpRatio());
-			m_test = enemy->GetHpRatio();
 
-			//Debug();
-
+			Debug();
+		}
+		else {
+			//ゲージの対象のオブジェクトが消えたら自分も削除
+			ThisDestroy();
 		}
 	}
-
+	//頂点の更新処理
 	void GaugeSquare::UpdateValue(float ratio) {
 		auto moveX = (m_width * ratio) / m_width;
-		m_vertices[1].position.x = (m_width * ratio);
-		m_vertices[3].position.x = (m_width * ratio);
+		m_vertices[1].position.x = -m_width / 2 + (m_width * ratio);
+		m_vertices[3].position.x = -m_width / 2 + (m_width * ratio);
 
 		m_vertices[1].textureCoordinate.x = moveX;
 		m_vertices[3].textureCoordinate.x = moveX;
 
 		m_draw->UpdateVertices(m_vertices);
 	}
-
+	//削除
 	void GaugeSquare::ThisDestroy() {
 		auto stage = GetStage();
 		stage->RemoveGameObject<GaugeSquare>(GetThis<GaugeSquare>());
 	}
+	//デバック用
 	void GaugeSquare::Debug() {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		auto scene = App::GetApp()->GetScene<Scene>();
