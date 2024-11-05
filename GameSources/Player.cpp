@@ -218,12 +218,10 @@ namespace basecross {
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 
-		SwitchFireAnim(GetDrawPtr()->GetCurrentAnimationTime());
-
-		GetDrawPtr()->UpdateAnimation(_delta);
-
 		//Bボタンで火炎放射
 		Firing(pad[0].wButtons & XINPUT_GAMEPAD_B || key.m_bPushKeyTbl[VK_LCONTROL] == true);
+
+		SwitchFireAnim(GetDrawPtr()->GetCurrentAnimationTime());
 
 		m_fireCount += _delta;
 		if (!m_isFiring) m_fireCount = 0.0f;
@@ -232,6 +230,9 @@ namespace basecross {
 			GetStage()->AddGameObject<FireProjectile>(GetComponent<Transform>()->GetPosition(), m_face);
 			m_fireCount -= .2f;
 		}
+
+		GetDrawPtr()->UpdateAnimation(_delta);
+
 			
 	}
 
@@ -358,20 +359,6 @@ namespace basecross {
 		ptrDraw->ChangeCurrentAnimation(L"Idle");
 	}
 
-	void Player::FacingWithVel() {
-		auto trans = GetComponent<Transform>();
-		if (abs(m_moveVel.x) >= (m_speed * .1f)) {
-			if (m_moveVel.x > 0) {
-				m_face = 1;
-				trans->SetRotation(0, 0, 0);
-			}
-			else {
-				m_face = -1;
-				trans->SetRotation(0, XM_PI, 0);
-			}
-		}
-	}
-
 	void Player::FacingWithInput() {
 		auto trans = GetComponent<Transform>();
 		if (abs(GetMoveVector().x) > 0) {
@@ -387,24 +374,25 @@ namespace basecross {
 	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え
-	void Player::SwitchFireAnim(float time) {
+	void Player::SwitchFireAnim(const float time) {
+		const float animTime = time;
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		if (m_isFiring) {
 			vector<wstring> target = { (L"Idle"), (L"Run"), (L"Jump_Start"), (L"Jumping"), (L"Land") };
-			for (auto anim : target) {
+			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
 					wstring changeanim = L"Fire_" + anim;
-					draw->ChangeCurrentAnimation(changeanim, time);
+					GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
 					return;
 				}
 			}
 		}
 		if (!m_isFiring) {
 			vector<wstring> target = { (L"Fire_Idle"), (L"Fire_Run"), (L"Fire_Jump_Start"), (L"Fire_Jumping"), (L"Fire_Land") };
-			for (auto anim : target) {
+			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
-					wstring changeanim = anim.replace(0, 5, L"");
-					draw->ChangeCurrentAnimation(changeanim, time);
+ 					wstring changeanim = anim.replace(0, 5, L"");
+					GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
 					return;
 				}
 			}
@@ -466,7 +454,8 @@ namespace basecross {
 	void AttackCollision::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		//
 		if (!m_isMoveHit && Other->FindTag(L"Enemy")) {
-			MessageBox(0, 0, 0, MB_ICONINFORMATION);
+			//MessageBox(0, 0, 0, MB_ICONINFORMATION);
+			
 			//攻撃
 			m_isMoveHit = true;
 		}
@@ -491,7 +480,7 @@ namespace basecross {
 		m_distAdd(Vec3(.1f, 0, 0)),
 		m_speed(Vec3(.8f, 0, 0)),
 		m_face(face),
-		m_range(.8f)
+		m_rangeMax(.8f)
 	{}
 
 	void FireProjectile::OnCreate() {
@@ -510,10 +499,13 @@ namespace basecross {
 		//描画コンポーネントの設定
 		auto ptrDraw = AddComponent<PNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		ptrDraw->SetBlendState(BlendState::Additive);
 
 		ptrDraw->SetTextureResource(L"FIRE");
 
 		AddTag(L"Player");//テスト用。後にFIREとかにする
+
+		m_range = m_rangeMax;
 	}
 
 
@@ -524,6 +516,7 @@ namespace basecross {
 		trans->SetPosition(trans->GetPosition() + (m_speed * delta * m_face));
 
 		m_range -= delta;
+		GetComponent<PNTStaticDraw>()->SetDiffuse(Col4(1, 1, 1, m_range*2 / m_rangeMax));
 
 		if (m_range <= 0) {
 			GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());

@@ -112,8 +112,6 @@ namespace basecross {
 		//アニメーションの登録
 		void RegisterAnim();
 
-		//移動速度に応じて向きを変える
-		void FacingWithVel();
 		//入力ベクトルに応じて向きを変える
 		void FacingWithInput();
 
@@ -133,13 +131,13 @@ namespace basecross {
 		}
 
 		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
-		const void SetAnim(wstring animname) {
+		const void SetAnim(wstring animname, float time = 0.0f) {
 			auto draw = GetComponent<PNTBoneModelDraw>();
 			if (draw->GetCurrentAnimation() != animname)
-				draw->ChangeCurrentAnimation(animname);
+				draw->ChangeCurrentAnimation(animname, time);
 		}
 
-		void SwitchFireAnim(float time);
+		void SwitchFireAnim(const float time);
 
 		const wstring AddFire() {
 			if (m_isFiring) return L"Fire_";
@@ -193,10 +191,8 @@ namespace basecross {
 		int m_face;
 		//速度
 		Vec3 m_speed;
-		//攻撃が当たったか否か
-		bool m_isMoveHit;
 		//射程
-		float m_range;
+		float m_range = 0, m_rangeMax;
 
 	public:
 		//構築と破棄
