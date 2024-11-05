@@ -26,8 +26,8 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(rightMove),
-		m_deathState(stay),
+		m_stateType(fly),
+		m_deathState(fixedStay),
 		m_player(player),
 		m_box(box),
 		m_hp(100),
@@ -134,11 +134,13 @@ namespace basecross {
 			//’Ç]‚Ì¶‰EˆÚ“®
 		case rightMove:
 			PlayerDic();
+			Bullet();
 			break;
 			//ã‰º‚ÉˆÚ“®
 		case upMove:
 			GravZero();
 			Grav();
+			Bullet();
 			if (m_pos.y >= m_beforePos.y) {
 				m_dicUp = -1;
 			}
@@ -152,10 +154,12 @@ namespace basecross {
 		case flyMove:
 			OneJump(0.1f);
 			PlayerDic(false);
+			Bullet();
 			break;
 			//•‚—V
 		case fly:
 			OneJump(0.1f);
+			Bullet();
 			break;
 			//ƒvƒŒƒCƒ„[‚ÉG‚ê‚½ˆÊ’u‚ÅŒÅ’è
 		case fixedStay:
@@ -174,7 +178,6 @@ namespace basecross {
 			break;
 			//“Ë‚Á‚İ
 		case plunge:
-			//PlayerDic(true,3.0f);
 			if (m_pos.x < m_playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
 				m_dic = -1;
 			}
@@ -189,9 +192,6 @@ namespace basecross {
 				m_plungeFlag = true;
 			}
 
-			//if (m_dic == 0) {
-			//	m_plungeFlag = false;
-			//}
 			if (m_plungeColFlag) {
 				m_firstDic *= -1;
 				m_plungeColFlag = false;
@@ -206,31 +206,20 @@ namespace basecross {
 			Grav();
 		}
 		if (m_floorFlag) {
-			//auto fixed = m_fixedBox.lock();
-			//if (fixed) {
-			//	auto fixedTrans = fixed->GetComponent<Transform>();
-			//	auto fixedPos = fixedTrans->GetPosition();
-			//	auto fixedScal = fixedTrans->GetScale();
-			//	m_pos.y = fixedPos.y + fixedScal.y / 2 + 0.3;
-			//	m_test = fixedPos.y + fixedScal.y / 2 + m_scal.y;
-			//}
 			GravZero();
 			Grav();
 		}
 		HitDrop();
-		Bullet();
+		//Bullet();
 		m_trans->SetPosition(m_pos);
-		//m_trans->SetRotation(m_moveRot);
+		m_trans->SetRotation(m_moveRot);
 
-
-
-		//“G‚Ì“|‚³‚ê‚½
+		//HP‚ª0‚É‚È‚Á‚½ê‡
 		if (m_hp <= 0.0f) {
 			m_stateType = m_deathState;
-			//ThisDestroy();
 		}
 
-		Debug();
+		//Debug();
 	}
 
 	//Õ“Ë”»’è
@@ -246,7 +235,7 @@ namespace basecross {
 		EnemyJump();
 		GravZero();
 	}
-	//©•ª‚Ìíœ
+	//íœ
 	void Enemy::ThisDestroy() {
 		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
 	}
@@ -382,7 +371,7 @@ namespace basecross {
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
 			m_deathPos = m_pos;
-			ReceiveDamage(10.0f);
+			ReceiveDamage(50.0f);
 		}
 		if (other->FindTag(L"BreakWall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
@@ -520,13 +509,6 @@ namespace basecross {
 	void EnemyBullet::OnCreate() {
 		m_trans = GetComponent<Transform>();
 		m_enemyPos = m_enemy->GetChangePos();
-		//m_enemyPos = m_enemy->GetComponent<Transform>()->GetPosition();
-
-		//if (m_fixedPos!=Vec3(0.0f)) {
-		//	Vec3 pos = m_enemy->GetPos() + m_fixedPos;
-		//	Vec3 enemyScale = m_enemy->GetComponent<Transform>()->GetScale();
-		//	m_trans->SetPosition(Vec3(pos.x, pos.y + enemyScale.y / 2, m_pos.z));
-		//}
 		m_trans->SetPosition(m_enemyPos);
 		m_trans->SetRotation(m_rot);
 		m_trans->SetScale(m_scal);
@@ -554,28 +536,6 @@ namespace basecross {
 	void EnemyBullet::OnUpdate() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		m_enemyPos = m_enemy->GetChangePos();
-		//m_enemyPos = m_enemy->GetComponent<Transform>()->GetPosition();
-
-		//if (m_beforFlag != m_enemy->GetFloorFlag()) {
-		//	m_floorCheck = false;
-		//}
-		//if (!m_enemy->GetFloorFlag()) {
-		//	if (!m_floorCheck) {
-		//		Vec3 pos = m_enemy->GetPos() + m_fixedPos;
-		//		m_trans->SetPosition(pos);
-		//		m_beforFlag = m_enemy->GetFloorFlag();
-		//		m_floorCheck = true;
-		//	}
-		//}
-		//if (m_enemy->GetFloorFlag()) {
-		//	if (!m_floorCheck) {
-		//		Vec3 pos = m_enemy->GetPos() + m_fixedPos;
-		//		Vec3 enemyScale = m_enemy->GetComponent<Transform>()->GetScale();
-		//		m_trans->SetPosition(Vec3(pos.x, pos.y + enemyScale.y*2, m_pos.z));
-		//		m_beforFlag = m_enemy->GetFloorFlag();
-		//		m_floorCheck = true;
-		//	}
-		//}
 
 		m_trans = GetComponent<Transform>();
 		m_pos = m_trans->GetPosition();
