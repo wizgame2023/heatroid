@@ -29,3 +29,9 @@ FixedBox,5.1,0.55,0,0,0,0,0.9,0.2,0.1
 FixedBox,3.85,0.55,0,0,0,0,0.45,0.2,0.1
 GimmickDoor,1.7,-1.05,0,0,0,0,0.3,0.6,0.1
 GimmickButton,1.3,-1.325,0,0,0,0,0.1,0.01,0.1
+EnemyrightMove,-4.1,-1.25,0,0,0,0,0.1,0.2,0.1
+EnemyrightMove,-1.4,-1.25,0,0,0,0,0.1,0.2,0.1
+EnemyrightMoveStay,-5.4,-1.5,0,0,0,0,0.1,0.2,0.1
+EnemyrightMoveStay,-5.1,8.9,0,0,0,0,0.1,0.2,0.1
+EnemyrightMoveStay,-1.2,0.5,0,0,0,0,0.1,0.2,0.1
+EnemyrightMoveStay,1,-1.15,0,0,0,0,0.1,0.2,0.1

@@ -214,7 +214,7 @@ namespace basecross {
 
 		MovePlayer();
 		MoveCamera();
-
+    
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 
@@ -302,13 +302,13 @@ namespace basecross {
 		float differenceX = pos.x - Camera.x;
 		if (differenceX >= 0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), 0.5f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), -0.3f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
 		}
 		else if (differenceX <= -0.5f)
 		{
-			ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), 0.5f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, 0.5f, pos.z);
+			ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), -0.3f, Camera.z);
+			ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
 		}
 	}
 

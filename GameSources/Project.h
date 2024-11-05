@@ -19,3 +19,4 @@
 #include "GameStageHemmi.h"
 #include "GameStageTuboi.h"
 #include "FixedBox.h"
+#include "Gimmick.h"

@@ -429,9 +429,10 @@ namespace basecross {
 	}
 	void MyGravity::OnUpdate() {
 		auto ptrCollision = GetGameObject()->GetComponent<Collision>(false);
-		if (ptrCollision && ptrCollision->IsSleep()) {
-			return;
-		}
+		//if (ptrCollision && ptrCollision->Is
+		//()) {
+		//	return;
+		//}
 
 		auto transform = GetGameObject()->GetComponent<Transform>();
 		auto pos = transform->GetPosition();
