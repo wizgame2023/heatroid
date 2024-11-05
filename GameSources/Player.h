@@ -216,15 +216,15 @@ namespace basecross {
 	//PlayerStateAttack(1～5)	攻撃
 
 	//====================================================================
-	// class PlayerStateAttack1
-	// プレイヤー攻撃1段目
+	// class PlayerStateCtrl
+	// プレイヤーの移動操作中ステート
 	//====================================================================
-	class PlayerStateAttack1 : public ObjState<Player> {
+	class PlayerStateCtrl : public ObjState<Player> {
 	protected:
-		PlayerStateAttack1() {};
-		~PlayerStateAttack1() {};
+		PlayerStateCtrl() {};
+		~PlayerStateCtrl() {};
 	public:
-		static shared_ptr<PlayerStateAttack1> Instance();
+		static shared_ptr<PlayerStateCtrl> Instance();
 		virtual void Enter(const shared_ptr<Player>& Obj) override;
 		virtual void Execute(const shared_ptr<Player>& Obj) override;
 		virtual void Exit(const shared_ptr<Player>& Obj) override;

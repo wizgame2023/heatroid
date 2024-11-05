@@ -34,7 +34,7 @@ namespace basecross {
 			{
 				Vec3(0.0f, -.5f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(3.0f, .1f, .3f)
+				Vec3(3.0f, .1f, 3.0f)
 			},
 			{
 				Vec3(.8f, 0.0f, 0.0f),
@@ -85,7 +85,7 @@ namespace basecross {
 			ptrPlayer = AddGameObject<AttackCollision>(ptrPlayer);
 
 			CreateGameBox();
-			CreateEnemy();
+			//CreateEnemy();
 
 
 

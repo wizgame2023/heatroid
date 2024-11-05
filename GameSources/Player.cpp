@@ -17,11 +17,11 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_speed(2.0f),
-		m_accel(2.0f),
-		m_friction(.88f),
+		m_speed(5.0f),
+		m_accel(50.0f),
+		m_friction(.9f),
 		m_frictionThreshold(.05f),
-		m_airSpeedRate(.6f),
+		m_airSpeedRate(.3f),
 		m_jumpHeight(2.5f),
 		m_gravity(-4.0f),
 		m_fallTerminal(-4.0f),
@@ -50,6 +50,8 @@ namespace basecross {
 		}
 		//キーボードの取得(キーボード優先)
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		if (KeyState.m_bPushKeyTbl['W']) { ret.y = 1.0f; }
+		if (KeyState.m_bPushKeyTbl['S']) { ret.y = -1.0f; }
 		if (KeyState.m_bPushKeyTbl['A']) { ret.x = -1.0f; }
 		if (KeyState.m_bPushKeyTbl['D']) { ret.x = 1.0f; }
 
@@ -64,15 +66,16 @@ namespace basecross {
 		float moveZ = GetInputState().y;
 
 		if (moveX + moveZ != 0) {
-			float moveLength = 0;	//動いた時のスピード
 			auto ptrTransform = GetComponent<Transform>();
 			auto ptrCamera = OnGetDrawCamera();
+
 			//進行方向の向きを計算
 			auto front = ptrTransform->GetPosition() - ptrCamera->GetEye();
 			front.y = 0;
 			front.normalize();
 			//進行方向向きからの角度を算出
 			float frontAngle = atan2(front.z, front.x);
+			
 			//コントローラの向き計算
 			Vec2 moveVec(moveX, moveZ);
 			float moveSize = moveVec.length();
@@ -80,6 +83,8 @@ namespace basecross {
 			float cntlAngle = atan2(-moveX, moveZ);
 			//トータルの角度を算出
 			float totalAngle = frontAngle + cntlAngle;
+			ptrTransform->SetRotation(0, totalAngle, 0);
+
 			//角度からベクトルを作成
 			angle = Vec3(cos(totalAngle), 0, sin(totalAngle));
 			//正規化する
@@ -95,21 +100,18 @@ namespace basecross {
 	void Player::MovePlayer() {
 		auto trans = GetComponent<Transform>();
 
-		//地上で逆方向に移動しようとしたときの処理(急ブレーキ)
-		if (m_stateType == stand && m_face * GetMoveVector().x < 0) {
-			m_moveVel.x -= m_moveVel.x * m_friction * (7000.0f / 60.0f) * _delta;
-		}
-
 		//摩擦(地上のみ)
 		if (m_stateType == stand) {
-			if (GetMoveVector().x == 0) {
+			m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
+			m_moveVel.z -= m_moveVel.z * m_friction * (1000.0f / 60.0f) * _delta;
+			if (GetMoveVector() == Vec3(0)) {
 				if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
-				else m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
+				if (abs(m_moveVel.z) <= m_frictionThreshold) m_moveVel.z = 0;
 			}
 		}
 
 		//加速
-		m_moveVel.x += GetMoveVector().x * m_accel * _delta;
+		m_moveVel += GetMoveVector() * m_accel * _delta;
 
 		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .23f) {
 			SetAnim(AddFire() + L"Idle");
@@ -119,7 +121,7 @@ namespace basecross {
 			if (abs(GetMoveVector().x) > 0)
 				SetAnim(AddFire() + L"Run");
 			else
-				if (GetDrawPtr()->GetCurrentAnimation() != L"Land" && GetDrawPtr()->GetCurrentAnimation() != L"Fire_Land") { 
+				if (GetDrawPtr()->GetCurrentAnimation() != L"Land" && GetDrawPtr()->GetCurrentAnimation() != L"Fire_Land") {
 					SetAnim(AddFire() + L"Idle");
 				}
 		}
@@ -135,10 +137,6 @@ namespace basecross {
 
 		Gravity();
 
-		//地上にいるときの処理(振り向き)
-		if (m_stateType == stand && !m_isFiring) {
-			FacingWithInput();
-		}
 
 		//最高速度
 		if (m_moveVel.x > m_speed) m_moveVel.x = m_speed;
@@ -186,7 +184,7 @@ namespace basecross {
 		meshMat.affineTransformation(
 			Vec3(.1f, .1f, .1f), //(.1f, .1f, .1f),
 			Vec3(0.0f, 0.0f, 0.0f),
-			Vec3(0.0f, XMConvertToRadians(300.0f), 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, -.5f, 0.0f)
 		);
 
@@ -214,7 +212,7 @@ namespace basecross {
 
 		MovePlayer();
 		MoveCamera();
-    
+
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 
@@ -233,7 +231,7 @@ namespace basecross {
 
 		GetDrawPtr()->UpdateAnimation(_delta);
 
-			
+
 	}
 
 	void Player::OnUpdate2() {
@@ -247,9 +245,9 @@ namespace basecross {
 
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		wss << "stateType : " << m_stateType << endl;
-		wss << "pos : " << pos.x << ", " << pos.y << endl;
-		wss << "vel : " << m_moveVel.x << ", " << m_moveVel.y << endl;
-		wss << "face : " << m_face << endl;
+		wss << "input : " << GetMoveVector().x << " / " << GetMoveVector().y << " / " << GetMoveVector().z << endl;
+		wss << "move : " << m_moveVel.x << " / " << m_moveVel.y << " / " << m_moveVel.z << endl;
+		wss << "rotate : " << XMConvertToDegrees(rot.x) << " / " << XMConvertToDegrees(rot.y) << " / " << XMConvertToDegrees(rot.z) << endl;
 		wss << "anim : " << GetDrawPtr()->GetCurrentAnimation() << " animtime : " << GetDrawPtr()->GetCurrentAnimationTime() << endl;
 		wss << "fire : " << m_isFiring << endl;
 		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
@@ -382,22 +380,36 @@ namespace basecross {
 			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
 					wstring changeanim = L"Fire_" + anim;
-					GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
+					if (changeanim == L"Fire_Run" && m_face * m_moveVel.x < 0)
+						changeanim += L"Back";
+						GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
 					return;
 				}
 			}
 		}
 		if (!m_isFiring) {
-			vector<wstring> target = { (L"Fire_Idle"), (L"Fire_Run"), (L"Fire_Jump_Start"), (L"Fire_Jumping"), (L"Fire_Land") };
+			vector<wstring> target = { (L"Fire_Idle"), (L"Fire_Run"), (L"Fire_RunBack"), (L"Fire_Jump_Start"), (L"Fire_Jumping"), (L"Fire_Land") };
 			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
- 					wstring changeanim = anim.replace(0, 5, L"");
+					wstring changeanim = anim.replace(0, 5, L"");
+					if (changeanim == L"RunBack")
+						changeanim = anim.replace(3, 4, L"");
 					GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
 					return;
 				}
 			}
 		}
 	}
+
+	//====================================================================
+	// class PlayerStateCtrl
+	// プレイヤーの移動操作中ステート
+	//====================================================================
+
+	//shared_ptr<PlayerStateCtrl> PlayerStateCtrl::Instance() {
+	//	static shared_ptr<PlayerStateCtrl> instance = new PlayerStateCtrl;
+	//	return instance;
+	//}
 
 	//====================================================================
 	// class AttackCollision
@@ -455,7 +467,7 @@ namespace basecross {
 		//
 		if (!m_isMoveHit && Other->FindTag(L"Enemy")) {
 			//MessageBox(0, 0, 0, MB_ICONINFORMATION);
-			
+
 			//攻撃
 			m_isMoveHit = true;
 		}
@@ -516,7 +528,7 @@ namespace basecross {
 		trans->SetPosition(trans->GetPosition() + (m_speed * delta * m_face));
 
 		m_range -= delta;
-		GetComponent<PNTStaticDraw>()->SetDiffuse(Col4(1, 1, 1, m_range*2 / m_rangeMax));
+		GetComponent<PNTStaticDraw>()->SetDiffuse(Col4(1, 1, 1, m_range * 2 / m_rangeMax));
 
 		if (m_range <= 0) {
 			GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
