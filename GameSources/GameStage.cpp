@@ -16,10 +16,11 @@ namespace basecross {
 	//ビューとライトの作成
 	void GameStage::CreateViewLight() {
 		// カメラの設定
-		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, 0.02f, -50.0f));
+		auto camera = ObjectFactory::Create<MainCamera>();
+		camera->SetEye(Vec3(0.0f, 5.00f, -5.0f));
 		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
-
+		auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
+		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
 		view->SetCamera(camera);
@@ -33,9 +34,9 @@ namespace basecross {
 		//配列の初期化
 		vector< vector<Vec3> > vec = {
 			{
-				Vec3(3.0f, 0.1f, 0.3f),
+				Vec3(0.0f, 0.01f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(5.0f, -0.4f, 0.0f)
+				Vec3(50.0f, 0.5f, 50.0f)
 			},
 		};
 		//オブジェクトの作成
@@ -51,7 +52,7 @@ namespace basecross {
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
 		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(-3, 5.0125f, 0));
-		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(1, 1, 1));
+		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(0.5f, 0.5f, 0.5f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
 		TilingFixedBox::m_moveObject.push_back(playerPos);
 
@@ -205,9 +206,9 @@ namespace basecross {
 			m_GameStage1.ReadCsv();
 			//ビューとライトの作成
 			CreateViewLight();
-			//CreateGameBox();
+			CreateGameBox();
 			//CreateGimmick();
-			AddGameObject<TilingFixedBox>();
+			//AddGameObject<TilingFixedBox>();
 
 			CreatePlayer();
 			//CreateFixedBox();
@@ -221,26 +222,26 @@ namespace basecross {
 	void GameStage::OnUpdate()
 	{
 
-		for (auto& object : GetGameObjectVec())
-		{
-			if (object->FindTag(L"FixedBox"))
-			{
-				for (auto& weaktrans : TilingFixedBox::m_moveObject)
-				{
-					auto trans = weaktrans.lock();
-					if (trans != nullptr)
-					{
-						if (length(trans->GetPosition() - object->GetComponent<Transform>()->GetPosition()) < 1.0f) {
-							object->SetUpdateActive(true);
-						}
-						else
-						{
-							object->SetUpdateActive(false);
-						}
-					}
-				}
-			}
-		}
+		//for (auto& object : GetGameObjectVec())
+		//{
+		//	if (object->FindTag(L"FixedBox"))
+		//	{
+		//		for (auto& weaktrans : TilingFixedBox::m_moveObject)
+		//		{
+		//			auto trans = weaktrans.lock();
+		//			if (trans != nullptr)
+		//			{
+		//				if (length(trans->GetPosition() - object->GetComponent<Transform>()->GetPosition()) < 1.0f) {
+		//					object->SetUpdateActive(true);
+		//				}
+		//				else
+		//				{
+		//					object->SetUpdateActive(false);
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
 	}
 
 }

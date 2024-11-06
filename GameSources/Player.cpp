@@ -200,6 +200,14 @@ namespace basecross {
 
 		m_HP = m_HP_max;
 
+		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
+		if (ptrCamera) {
+			//MyCameraである
+			//MyCameraに注目するオブジェクト（プレイヤー）の設定
+			ptrCamera->SetTargetObject(GetThis<GameObject>());
+			ptrCamera->SetTargetToAt(Vec3(0, 0.5f, 0));
+		}
+
 	}
 
 	void Player::OnUpdate() {
@@ -297,20 +305,20 @@ namespace basecross {
 
 	void Player::MoveCamera()
 	{
-		auto ptrCamera = dynamic_pointer_cast<Camera>(OnGetDrawCamera());
-		auto pos = GetComponent<Transform>()->GetPosition();
-		Vec3 Camera = ptrCamera->GetEye();
-		float differenceX = pos.x - Camera.x;
-		if (differenceX >= 0.5f)
-		{
-			ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), -0.3f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
-		}
-		else if (differenceX <= -0.5f)
-		{
-			ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), -0.3f, Camera.z);
-			ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
-		}
+		//auto ptrCamera = dynamic_pointer_cast<Camera>(OnGetDrawCamera());
+		//auto pos = GetComponent<Transform>()->GetPosition();
+		//Vec3 Camera = ptrCamera->GetEye();
+		//float differenceX = pos.x - Camera.x;
+		//if (differenceX >= 0.5f)
+		//{
+		//	ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), -0.3f, Camera.z);
+		//	ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
+		//}
+		//else if (differenceX <= -0.5f)
+		//{
+		//	ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), -0.3f, Camera.z);
+		//	ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
+		//}
 	}
 
 	void Player::Gravity() {
