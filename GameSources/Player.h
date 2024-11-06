@@ -230,6 +230,38 @@ namespace basecross {
 		virtual void Exit(const shared_ptr<Player>& Obj) override;
 	};
 
+	//------------------------------------------------------------------
+	class SpriteDebug : public GameObject {
+		shared_ptr<PCTSpriteDraw> m_DrawComp;		
+		vector<VertexPositionColorTexture> m_Vertices;
+	public:
+		SpriteDebug(const shared_ptr<Stage>& stage) :
+			GameObject(stage)
+		{}
+
+		~SpriteDebug() {}
+
+		virtual void SpriteDebug::OnCreate() override {
+			Col4 color(0, 0, 0, 1);
+			const float windowWidth = 1280.0f;
+
+			m_Vertices = {
+				{Vec3(-windowWidth * 0.5f, 400, 0.0f), color, Vec2(0, 0)},
+				{Vec3(-windowWidth * 0.3f, 400, 0.0f), color, Vec2(1, 0)},
+				{Vec3(-windowWidth * 0.5f, 320, 0.0f), color, Vec2(0, 1)},
+				{Vec3(-windowWidth * 0.3f, 320, 0.0f), color, Vec2(1, 1)},
+			};
+			vector<uint16_t> indices = {
+				0, 1, 2,
+				2, 1, 3,
+			};
+			m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
+			m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
+			m_DrawComp->SetTextureResource(L"FIRE");
+			SetAlphaActive(true);
+		}
+	};
+
 }
 //end basecross
 

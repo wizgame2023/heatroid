@@ -9,7 +9,6 @@
 
 namespace basecross {
 
-
 	//====================================================================
 	// class Player
 	// プレイヤークラス
@@ -17,8 +16,8 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_speed(5.0f),
-		m_accel(50.0f),
+		m_speed(4.0f),
+		m_accel(4.0f),
 		m_friction(.9f),
 		m_frictionThreshold(.05f),
 		m_airSpeedRate(.3f),
@@ -83,7 +82,7 @@ namespace basecross {
 			float cntlAngle = atan2(-moveX, moveZ);
 			//トータルの角度を算出
 			float totalAngle = frontAngle + cntlAngle;
-			ptrTransform->SetRotation(0, totalAngle, 0);
+			ptrTransform->SetRotation(0, -totalAngle-XMConvertToRadians(90), 0);
 
 			//角度からベクトルを作成
 			angle = Vec3(cos(totalAngle), 0, sin(totalAngle));
@@ -101,13 +100,11 @@ namespace basecross {
 		auto trans = GetComponent<Transform>();
 
 		//摩擦(地上のみ)
-		if (m_stateType == stand) {
+		if (m_stateType == stand && GetMoveVector() == Vec3(0)) {
 			m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
 			m_moveVel.z -= m_moveVel.z * m_friction * (1000.0f / 60.0f) * _delta;
-			if (GetMoveVector() == Vec3(0)) {
-				if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
-				if (abs(m_moveVel.z) <= m_frictionThreshold) m_moveVel.z = 0;
-			}
+			if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
+			if (abs(m_moveVel.z) <= m_frictionThreshold) m_moveVel.z = 0;
 		}
 
 		//加速
@@ -160,7 +157,7 @@ namespace basecross {
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(0.10f, 0.10f, 0.10f);
+		ptr->SetScale(0.50f, 0.50f, 0.50f);
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(Vec3(0, 1.0f, 0));
 
@@ -255,7 +252,7 @@ namespace basecross {
 		wss << "stateType : " << m_stateType << endl;
 		wss << "input : " << GetMoveVector().x << " / " << GetMoveVector().y << " / " << GetMoveVector().z << endl;
 		wss << "move : " << m_moveVel.x << " / " << m_moveVel.y << " / " << m_moveVel.z << endl;
-		wss << "rotate : " << XMConvertToDegrees(rot.x) << " / " << XMConvertToDegrees(rot.y) << " / " << XMConvertToDegrees(rot.z) << endl;
+		wss << "rotate : " << rot.x << " / " << rot.y << " / " << rot.z << endl;
 		wss << "anim : " << GetDrawPtr()->GetCurrentAnimation() << " animtime : " << GetDrawPtr()->GetCurrentAnimationTime() << endl;
 		wss << "fire : " << m_isFiring << endl;
 		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
@@ -508,7 +505,7 @@ namespace basecross {
 		m_distAdd.x *= m_face;
 
 		auto trans = GetComponent<Transform>();
-		trans->SetScale(0.10f, 0.10f, 0.10f);	//直径25センチの球体
+		trans->SetScale(0.10f, 0.10f, 0.10f);
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
 		trans->SetPosition(m_dist + m_distAdd);
 
