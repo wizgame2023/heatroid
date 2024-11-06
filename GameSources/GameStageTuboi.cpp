@@ -15,17 +15,18 @@ namespace basecross {
 	//ビューとライトの作成
 	void GameStageTsuboi::CreateViewLight() {
 		// カメラの設定
-		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, .2f, 3.0f));
-		camera->SetAt(Vec3(0.0f, .2f, 0.0f));
-
+		auto camera = ObjectFactory::Create<MainCamera>();
+		camera->SetEye(Vec3(0.0f, 5.00f, -5.0f));
+		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
+		auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
+		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
 		view->SetCamera(camera);
 
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
-		light->SetDefaultLighting(); //デフォルトのライティングを指定
+		light->SetDefaultLighting2(); //デフォルトのライティングを指定
 	}
 
 	void GameStageTsuboi::CreateGameBox() {
@@ -34,7 +35,7 @@ namespace basecross {
 			{
 				Vec3(0.0f, -.5f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(3.0f, .1f, .3f)
+				Vec3(3.0f, .1f, 3.0f)
 			},
 			{
 				Vec3(.8f, 0.0f, 0.0f),
@@ -84,8 +85,10 @@ namespace basecross {
 			//プレイヤーの攻撃判定
 			ptrPlayer = AddGameObject<AttackCollision>(ptrPlayer);
 
+			//AddGameObject<SpriteDebug>();
+
 			CreateGameBox();
-			CreateEnemy();
+			//CreateEnemy();
 
 
 
