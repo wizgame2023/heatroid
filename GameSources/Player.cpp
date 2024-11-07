@@ -18,18 +18,16 @@ namespace basecross {
 		GameObject(StagePtr),
 		m_speed(4.0f),
 		m_accel(4.0f),
-		m_friction(.9f),
+		m_friction(.8f),
 		m_frictionThreshold(.05f),
-		m_airSpeedRate(.3f),
 		m_jumpHeight(2.5f),
 		m_gravity(-4.0f),
 		m_fallTerminal(-4.0f),
+		m_firePos(Vec3(0, .8f, 0)),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
 		m_stateType(air),
-		m_face(1),
-		m_isAttacking(false),
 		m_isFiring(false),
 
 		m_HP_max(100),
@@ -126,27 +124,28 @@ namespace basecross {
 		if (m_stateType == air)
 			SetAnim(AddFire() + L"Jumping");
 
-		//初速
-		//if (GetDrawPtr()->GetCurrentAnimation() == L"Run" && abs(m_moveVel.x < m_initialSpeed)) {
-		//	if (m_moveVel.x > 0) m_moveVel.x = m_initialSpeed;
-		//	else m_moveVel.x = -m_initialSpeed;
-		//}
-
 		Gravity();
 
-
 		//最高速度
-		if (m_moveVel.x > m_speed) m_moveVel.x = m_speed;
-		if (m_moveVel.x < -m_speed) m_moveVel.x = -m_speed;
+		auto angle = Vec3(m_moveVel.x, 0, m_moveVel.z);
+		if (angle.length() > 0) {
+			angle.normalize();
+			if (angle.x > 0) {
+				if (m_moveVel.x > angle.x * m_speed) m_moveVel.x = angle.x * m_speed;
+			}
+			else {
+				if (m_moveVel.x < angle.x * m_speed) m_moveVel.x = angle.x * m_speed;
+			}
+			if (angle.z > 0) {
+				if (m_moveVel.z > angle.z * m_speed) m_moveVel.z = angle.z * m_speed;
+			}
+			else {
+				if (m_moveVel.z < angle.z * m_speed) m_moveVel.z = angle.z * m_speed;
+			}
+		}
 
 		//落下の終端速度
 		if (m_moveVel.y < m_fallTerminal) m_moveVel.y = m_fallTerminal;
-
-		//空中では最高速度が落ちる
-		if (m_stateType == air && abs(m_moveVel.x) > m_speed * m_airSpeedRate) {
-			if (m_moveVel.x > 0) m_moveVel.x = m_speed * m_airSpeedRate;
-			else m_moveVel.x = -m_speed * m_airSpeedRate;
-		}
 
 		trans->SetPosition((m_moveVel * _delta) + trans->GetPosition());
 	}
@@ -230,12 +229,15 @@ namespace basecross {
 		if (!m_isFiring) m_fireCount = 0.0f;
 
 		if (m_fireCount > .2f) {
-			GetStage()->AddGameObject<FireProjectile>(GetComponent<Transform>()->GetPosition(), m_face);
+			auto pos = GetComponent<Transform>()->GetPosition();
+			pos += m_firePos;
+			auto rot = GetComponent<Transform>()->GetForward();
+
+			GetStage()->AddGameObject<FireProjectile>(pos, -rot);
 			m_fireCount -= .2f;
 		}
 
 		GetDrawPtr()->UpdateAnimation(_delta);
-
 
 	}
 
@@ -362,19 +364,6 @@ namespace basecross {
 		ptrDraw->ChangeCurrentAnimation(L"Idle");
 	}
 
-	void Player::FacingWithInput() {
-		auto trans = GetComponent<Transform>();
-		if (abs(GetMoveVector().x) > 0) {
-			if (GetMoveVector().x > 0) {
-				m_face = 1;
-				trans->SetRotation(0, 0, 0);
-			}
-			else {
-				m_face = -1;
-				trans->SetRotation(0, XM_PI, 0);
-			}
-		}
-	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え
 	void Player::SwitchFireAnim(const float time) {
@@ -385,9 +374,7 @@ namespace basecross {
 			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
 					wstring changeanim = L"Fire_" + anim;
-					if (changeanim == L"Fire_Run" && m_face * m_moveVel.x < 0)
-						changeanim += L"Back";
-						GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
+					GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
 					return;
 				}
 			}
@@ -397,8 +384,6 @@ namespace basecross {
 			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
 					wstring changeanim = anim.replace(0, 5, L"");
-					if (changeanim == L"RunBack")
-						changeanim = anim.replace(3, 4, L"");
 					GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
 					return;
 				}
@@ -491,23 +476,20 @@ namespace basecross {
 	//====================================================================
 
 	FireProjectile::FireProjectile(const shared_ptr<Stage>& StagePtr,
-		const Vec3 dist, const int face) :
+		const Vec3 dist, const Vec3 angle) :
 		GameObject(StagePtr),
 		m_dist(dist),
-		m_distAdd(Vec3(.1f, 0, 0)),
-		m_speed(Vec3(.8f, 0, 0)),
-		m_face(face),
+		m_angle(angle),
+		m_speed(1.5f),
 		m_rangeMax(.8f)
 	{}
 
 	void FireProjectile::OnCreate() {
-		m_dist.y += .08f;
-		m_distAdd.x *= m_face;
 
 		auto trans = GetComponent<Transform>();
 		trans->SetScale(0.10f, 0.10f, 0.10f);
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
-		trans->SetPosition(m_dist + m_distAdd);
+		trans->SetPosition(m_dist);
 
 		auto coll = AddComponent<TriggerSphere>();
 		coll->SetDrawActive(false);//debug
@@ -516,7 +498,7 @@ namespace basecross {
 		//描画コンポーネントの設定
 		auto ptrDraw = AddComponent<PNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		ptrDraw->SetBlendState(BlendState::Additive);
+		ptrDraw->SetBlendState(BlendState::AlphaBlend);
 
 		ptrDraw->SetTextureResource(L"FIRE");
 
@@ -525,12 +507,12 @@ namespace basecross {
 		m_range = m_rangeMax;
 	}
 
-
 	void FireProjectile::OnUpdate() {
 		auto delta = App::GetApp()->GetElapsedTime();
 
 		auto trans = GetComponent<Transform>();
-		trans->SetPosition(trans->GetPosition() + (m_speed * delta * m_face));
+
+		trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
 
 		m_range -= delta;
 		GetComponent<PNTStaticDraw>()->SetDiffuse(Col4(1, 1, 1, m_range * 2 / m_rangeMax));
