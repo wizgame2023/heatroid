@@ -1,12 +1,39 @@
 /*!
 @file Gimmick.h
 @brief Gimmickなど
+鎌田
 */
 
 #pragma once
 #include "stdafx.h"
 
 namespace basecross {
+//--------------------------------------------------------------------------------------
+//　タイリングする固定のボックス
+//--------------------------------------------------------------------------------------
+	class TilingFixedBox : public GameObject {
+		Vec3 m_Scale;
+		Vec3 m_Rotation;
+		Vec3 m_Position;
+		float m_UPic;
+		float m_VPic;
+	public:
+		//構築と破棄
+		TilingFixedBox(const shared_ptr<Stage>& StagePtr,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale,
+			const float& UPic,
+			const float& VPic
+		);
+		virtual ~TilingFixedBox();
+		//初期化
+		virtual void OnCreate() override;
+		static vector<weak_ptr<Transform>> m_moveObject;
+
+		//操作
+	};
+
 	class GimmickButton;
 	class GimmickDoor : public GameObject {
 		Vec3 m_position;

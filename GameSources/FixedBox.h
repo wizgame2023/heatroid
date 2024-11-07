@@ -32,42 +32,6 @@ namespace basecross {
 		Vec3 GetScale();
 	};
 
-	//--------------------------------------------------------------------------------------
-//　タイリングする固定のボックス
-//--------------------------------------------------------------------------------------
-	class TilingFixedBox : public GameObject {
-		Vec3 m_Scale;
-		Vec3 m_Rotation;
-		Vec3 m_Position;
-		float m_UPic;
-		float m_VPic;
-	public:
-		//構築と破棄
-		TilingFixedBox(const shared_ptr<Stage>& StagePtr,
-			const Vec3& position,
-			const Vec3& rotation,
-			const Vec3& scale,
-			const float& UPic,
-			const float& VPic
-			);
-		virtual ~TilingFixedBox();
-		//初期化
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		static vector<weak_ptr<Transform>> m_moveObject;
-
-		//操作
-	};
-
-	class BoxColl : public GameObject {
-		Vec3 m_position;
-	public :
-		BoxColl(const shared_ptr<Stage>& StagePtr,const Vec3& position);
-		~BoxColl() {};
-		//初期化
-		virtual void OnCreate() override;
-	};
-
 	//	class BreakWall : public GameObject;
 	//--------------------------------------------------------------------------------------
 	class BreakWall :public GameObject {
