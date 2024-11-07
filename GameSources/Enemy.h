@@ -94,8 +94,7 @@ namespace basecross {
 			const Vec3& scale,
 			const State& state,
 			const State& deathState,
-			const shared_ptr<Player>& player,
-			const shared_ptr<FixedBox>& box = nullptr);
+			const shared_ptr<Player>& player);
 		virtual ~Enemy(){}
 		virtual void OnCreate() override; // ‰Šú‰»
 		virtual void OnUpdate() override; // XV

@@ -19,17 +19,15 @@ namespace basecross {
 		const Vec3& scale,
 		const State& state,
 		const State& deathState,
-		const shared_ptr<Player>& player,
-		const shared_ptr<FixedBox>& box
+		const shared_ptr<Player>& player
 	) :
 		GameObject(stage),
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(rightMove),
-		m_deathState(rightMove),
+		m_stateType(state),
+		m_deathState(deathState),
 		m_player(player),
-		m_box(box),
 		m_hp(100),
 		m_maxHp(100),
 		m_speed(0.5f),
@@ -119,6 +117,7 @@ namespace basecross {
 		//	//m_stateType = stay;
 		//}
 		/*------------------テスト用-------------------------*/
+
 
 		FindFixed();
 
