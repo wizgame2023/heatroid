@@ -67,9 +67,25 @@ namespace basecross {
 		if (!player) return;
 		m_playerScale = m_player.lock()->GetScale();
 		//描画
-		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
-		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
-		ptrDraw->SetTextureResource(L"Blue");
+		//auto ptrDraw = AddComponent<BcPNTStaticDraw>();
+		//ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//ptrDraw->SetTextureResource(L"White");
+		//ptrDraw->SetDiffuse(Col4(0.0f,0.0f,1.0f,1.0f));
+		
+		auto ptrDraw = AddComponent<PNTBoneModelDraw>();
+		Mat4x4 meshMat;
+		meshMat.affineTransformation(
+			Vec3(1.0f, 1.0f, 1.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f)
+		);
+
+		ptrDraw->SetMeshResource(L"ENEMYARUKU");
+		ptrDraw->SetMeshToTransformMatrix(meshMat);
+		ptrDraw->SetOwnShadowActive(true);
+
+
 		//衝突判定
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetFixed(false);
@@ -77,10 +93,6 @@ namespace basecross {
 		//影
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
-
-		GetStage()->SetCollisionPerformanceActive(true);
-		GetStage()->SetUpdatePerformanceActive(true);
-		GetStage()->SetDrawPerformanceActive(true);
 
 		AddTag(L"Enemy");
 	}
@@ -121,6 +133,7 @@ namespace basecross {
 
 		FindFixed();
 
+
 		//行動パターン
 		switch (m_stateType)
 		{
@@ -153,7 +166,7 @@ namespace basecross {
 			//追従浮遊
 		case flyMove:
 			OneJump(0.1f);
-			PlayerDic(false);
+			PlayerDic();
 			Bullet();
 			break;
 			//浮遊
@@ -171,7 +184,7 @@ namespace basecross {
 			break;
 			//プレイヤーと逆方向に移動
 		case runaway:
-			PlayerDic(false, -5.0f);
+			PlayerDic();
 			break;
 			//ヒップドロップ
 		case hitDrop:
@@ -209,10 +222,13 @@ namespace basecross {
 			GravZero();
 			Grav();
 		}
+
+		EnemyAngle();
+
 		HitDrop();
 		//Bullet();
 		m_trans->SetPosition(m_pos);
-		m_trans->SetRotation(m_moveRot);
+		//m_trans->SetRotation(m_moveRot);
 
 		//HPが0になった場合
 		if (m_hp <= 0.0f) {
@@ -243,7 +259,7 @@ namespace basecross {
 	void Enemy::ReceiveDamage(float damage) {
 		m_hp -= damage;
 	}
-	void Enemy::PlayerDic(bool zero, float addSpeed) {
+	void Enemy::PlayerDic() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto player = m_player.lock();
 		if (player) {
@@ -253,7 +269,7 @@ namespace basecross {
 			m_direc = playerPos - m_pos;
 			Vec3 dic = Vec3(m_direc.x, 0.0f, m_direc.z);
 			auto direc = dic.normalize();
-			m_pos += m_speed*0.5f* dic * elapsed;
+			m_pos += m_speed * 0.5f * dic * elapsed;
 		}
 	}
 	////プレイヤーの方向取得、その方向に回転
@@ -415,6 +431,17 @@ namespace basecross {
 			m_floorPos = m_pos;
 		}
 
+	}
+
+	void Enemy::EnemyAngle()
+	{
+		auto front = GetDirec();
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		front.y = 0;
+		front.normalize();
+		float frontAngle = atan2(front.z, front.x);
+		float rad = XMConvertToRadians(90.0f);
+		m_trans->SetRotation(Vec3(0.0f, -frontAngle - rad, 0.0f));
 	}
 	//デバック
 	void Enemy::Debug() {
