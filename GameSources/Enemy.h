@@ -22,9 +22,13 @@ namespace basecross {
 			flyMove,   //追従浮遊移動
 			fly,       //浮遊
 			fixedStay, //プレイヤーに触れた位置で固定
-			runaway    //プレイヤーと逆方向に移動
+			runaway,   //プレイヤーと逆方向に移動
+			hitDrop,   //ヒップドロップ
+			plunge,    //突っ込み
+			attack
 		};
 
+		
 	private:
 		float m_hp;          //体力
 		float m_maxHp;       //最大体力
@@ -33,13 +37,30 @@ namespace basecross {
 		float m_upHeight;    //上下の高さ
 		float m_jumpPower;   //ジャンプ力
 		float m_jumpTime;    //ジャンプ速度
+		float m_jumpHight;   //ジャンプする高さ
 		float m_time;
 		float m_bulletTime;  //弾の発射間隔
 		float m_bulletRange; //弾を発射する距離
+		float m_angleSpeed;  //回転速度
+		Vec3 m_moveRot;
+
 		int m_dic;           //向いている方向 左-1,右1
+		int m_dicUp;
+		int m_firstDic;
+
+		float m_test;
+		//重力
+		float m_gravity;
+		Vec3 m_grav;
+		Vec3 m_gravVel;
+
 		bool m_bulletFlag;   
 		bool m_jumpFlag;
 		bool m_flyFlag;
+		bool m_floorFlag;
+		bool m_hitDropFlag;
+		bool m_plungeFlag;
+		bool m_plungeColFlag;
 
 		State m_stateType;
 		State m_beforState;
@@ -48,15 +69,21 @@ namespace basecross {
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
+		Vec3 m_beforePos;
 		Vec3 m_deathPos;
+		Vec3 m_playerPos;
 		Vec3 m_playerScale; //プレイヤーのサイズ
 
+		Vec3 m_floorPos;
+		Vec3 m_jumpPos;
+
 		shared_ptr<Transform> m_trans;
-		shared_ptr<Player> m_player;
-		shared_ptr<Transform> m_playerTrans;
-		shared_ptr<FixedBox> m_box;
-		shared_ptr<Gravity> m_gravity;
+		weak_ptr<Player> m_player;
+		weak_ptr<Transform> m_playerTrans;
+		weak_ptr<FixedBox> m_box;
 		shared_ptr<CollisionObb> m_collision;
+		weak_ptr<FixedBox> m_fixedBox;
+		
 
 	public:
 		// 構築と破棄
@@ -73,17 +100,37 @@ namespace basecross {
 		virtual void OnUpdate() override; // 更新
 
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
-		void ReceiveDamage(float damage);
-		void ThisDestroy();
 		void EnemyJump();
+		void HipDropJump();
+		void ThisDestroy();
+		void ReceiveDamage(float damage);
+		void PlayerDic(bool zero = true, float addSpeed = 1.0f);
+		void OneJump(float jumpHight);
+		void HitDrop();
+		void FindFixed();
+		void Bullet();
+		void Debug();
+		//get,set
 		void SetEnemyFlayFlag(bool flag);
 		void SetSpeed(float speed);
 		void SetUpMove(float speed,float height);
 		void SetFlyPower(float power);
 		void SetState(State state);
-
 		int GetDic();
 		Vec3 GetPos();
+		Vec3 GetChangePos();
+		bool GetFloorFlag();
+
+
+		//重力に関する関数
+		void Grav();
+		void SetGrav(Vec3 grav);
+		void AddGrav(Vec3 grav);
+		void GravZero();
+		void GravVelZero();
+		void SetGravVel(Vec3 grav);
+		float GetHpRatio();
+
 	};
 
 
@@ -100,37 +147,28 @@ namespace basecross {
 		Vec3 m_rot;
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
+		Vec3 m_fixedPos;
+		bool m_floorCheck;
+		bool m_beforFlag;
+		float m_test;
 
 		shared_ptr<Transform> m_trans;
 		shared_ptr<Enemy> m_enemy;
+		
 
 	public :
-		EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
+		EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy,
+			const Vec3& fixedPos = Vec3(0.0f));
 		virtual ~EnemyBullet(){}
 		virtual void OnCreate();
 		virtual void OnUpdate();
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
 
 		void ThisDestroy();
+		void Debug();
 
 	};
 
 
-	class MyGravity : public Component {
-	public:
-		explicit MyGravity(const shared_ptr<GameObject>& GameObjectPtr,
-			const bsm::Vec3& gravity = bsm::Vec3(0, -9.8f, 0));
-		MyGravity::~MyGravity() {}
-
-	private:
-		Vec3 m_gravity;
-		//struct Impl;
-		//unique_ptr<Impl> pImpl;
-	public:
-		Vec3 GetGravity() const;
-		void SetGravity(const bsm::Vec3& gravity);
-		void SetGravityZero();
-		void OnUpdate();
-	};
 
 }

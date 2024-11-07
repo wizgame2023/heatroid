@@ -32,12 +32,14 @@ namespace basecross {
 		//摩擦係数(地上)
 		float m_friction;
 		float m_frictionThreshold;
-		//空中制動
-		float m_airSpeedRate;
 		//ジャンプ高度
 		float m_jumpHeight;
 		//重力
 		float m_gravity;
+		//落下時の終端速度
+		float m_fallTerminal;
+		//飛び道具が出る場所
+		Vec3 m_firePos;
 		//移動方向
 		Vec3 m_moveVel;
 		//CollisionExitの空中判定の閾値
@@ -48,20 +50,28 @@ namespace basecross {
 			stand,		//地上
 			air,		//空中
 			hit,		//やられ
-			fire,		//長押し攻撃
 			attack1,	//攻撃1
 		};
 
-		//向き(1が右、-1が左)
-		int m_face;
+		//プレイヤーの状態
+		Stats m_stateType;
+
+		//移動時の物理学的な計算を行うか否か
+		bool m_doPhysicalProcess;
+		//火炎放射攻撃中
+		bool m_isFiring;
+		//火炎放射の間隔
+		float m_fireCount;
+		//無敵時間
+		int m_invincibleTime, m_invincibleTimeMax;
 
 		//HP
 		int m_HP, m_HP_max;
 		
-		//プレイヤーの状態
-		Stats m_stateType;
-
 		float _delta = App::GetApp()->GetElapsedTime();
+
+		unique_ptr<StateMachine<Player>> m_stateMachine;
+
 
 	public:
 		//構築と破棄
@@ -84,9 +94,7 @@ namespace basecross {
 		////Aボタン
 		void OnPushA();
 		////Bボタン
-		void OnPushB() {
-
-		}
+		void Firing(bool fire);
 
 		//カメラの移動
 		void MoveCamera();
@@ -96,12 +104,32 @@ namespace basecross {
 		//四捨五入
 		Vec3 RoundOff(Vec3 number, int point);
 
+		//アニメーションの登録
+		void RegisterAnim();
+
 		//Transform.Scaleのゲッタ
-		Vec3 GetScale();
+		const Vec3 GetScale() {
+			return GetComponent<Transform>()->GetScale();
+		}
 
-		//移動速度に応じて向きを変える
-		void FacingWithVel();
+		//描画コンポーネントのゲッタ
+		const shared_ptr<PNTBoneModelDraw> GetDrawPtr() {
+			return GetComponent<PNTBoneModelDraw>();
+		}
 
+		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
+		const void SetAnim(wstring animname, float time = 0.0f) {
+			auto draw = GetComponent<PNTBoneModelDraw>();
+			if (draw->GetCurrentAnimation() != animname)
+				draw->ChangeCurrentAnimation(animname, time);
+		}
+
+		void SwitchFireAnim(const float time);
+
+		const wstring AddFire() {
+			if (m_isFiring) return L"Fire_";
+			else return L"";
+		}
 	};
 
 //====================================================================
@@ -111,7 +139,9 @@ namespace basecross {
 
 	class AttackCollision : public GameObject {
 		weak_ptr<GameObject> m_player;
+		//プレイヤーからどれくらいの位置に置くか
 		Vec3 m_distFromPlayer;
+		//攻撃が当たったか否か
 		bool m_isMoveHit;
 
 	public:
@@ -133,6 +163,88 @@ namespace basecross {
 
 		void FollowPlayer();
 
+	};
+
+	//====================================================================
+	// class FireProjectile
+	// プレイヤーの火炎放射
+	//====================================================================
+
+	class FireProjectile : public GameObject {
+		//どれくらいの位置からスタートするか
+		Vec3 m_dist;
+		//速度と方向
+		float m_speed;
+		Vec3 m_angle;
+		//射程
+		float m_range = 0, m_rangeMax;
+
+	public:
+		//構築と破棄
+
+		FireProjectile(const shared_ptr<Stage>& StagePtr,
+			const Vec3 dist, const Vec3 angle);
+
+		virtual ~FireProjectile() {}
+		//アクセサ
+		//初期化
+		virtual void OnCreate() override;
+		//更新
+		virtual void OnUpdate() override;
+
+		//何かに接触している判定
+	};
+
+	//プレイヤーのステート構成？
+	//PlayerStateMovie			演出中などで操作不能状態
+	//PlaywrStateCtrl			プレイヤー移動中
+	//PlayerStateAttack(1～5)	攻撃
+
+	//====================================================================
+	// class PlayerStateCtrl
+	// プレイヤーの移動操作中ステート
+	//====================================================================
+	class PlayerStateCtrl : public ObjState<Player> {
+	protected:
+		PlayerStateCtrl() {};
+		~PlayerStateCtrl() {};
+	public:
+		static shared_ptr<PlayerStateCtrl> Instance();
+		virtual void Enter(const shared_ptr<Player>& Obj) override;
+		virtual void Execute(const shared_ptr<Player>& Obj) override;
+		virtual void Exit(const shared_ptr<Player>& Obj) override;
+	};
+
+	//------------------------------------------------------------------
+	class SpriteDebug : public GameObject {
+		shared_ptr<PCTSpriteDraw> m_DrawComp;		
+		vector<VertexPositionColorTexture> m_Vertices;
+	public:
+		SpriteDebug(const shared_ptr<Stage>& stage) :
+			GameObject(stage)
+		{}
+
+		~SpriteDebug() {}
+
+		virtual void SpriteDebug::OnCreate() override {
+			Col4 color(0, 0, 0, 1);
+			const float windowWidth = 1280.0f;
+
+			m_Vertices = {
+				{Vec3(-windowWidth * 0.5f, 400, 0.0f), color, Vec2(0, 0)},
+				{Vec3(-windowWidth * 0.3f, 400, 0.0f), color, Vec2(1, 0)},
+				{Vec3(-windowWidth * 0.5f, 320, 0.0f), color, Vec2(0, 1)},
+				{Vec3(-windowWidth * 0.3f, 320, 0.0f), color, Vec2(1, 1)},
+			};
+			vector<uint16_t> indices = {
+				0, 1, 2,
+				2, 1, 3,
+			};
+			m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
+			m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
+			m_DrawComp->SetTextureResource(L"FIRE");
+			SetAlphaActive(true);
+		}
 	};
 
 }

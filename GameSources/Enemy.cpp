@@ -1,7 +1,7 @@
 /*!
 @file Enemy.cpp
-@brief “G‚È‚ÇÀ‘Ì
-’S“–FˆíŒ©
+@brief æ•µãªã©å®Ÿä½“
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -10,7 +10,7 @@
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
-	//	class Enemy : public GameObject;  //“G
+	//	class Enemy : public GameObject;  //æ•µ
 	//--------------------------------------------------------------------------------------
 
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
@@ -26,24 +26,35 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(state),
-		m_deathState(deathState),
+		m_stateType(fly),
+		m_deathState(fixedStay),
 		m_player(player),
 		m_box(box),
 		m_hp(100),
 		m_maxHp(100),
 		m_speed(0.3f),
 		m_upSpeed(0.3f),
-		m_upHeight(0.25f),
-		m_jumpPower(1.0f),
+		m_upHeight(0.1f),
+		m_jumpPower(0.5f),
 		m_jumpTime(1.0f),
 		m_dic(-1),
-		m_time(3.0f),
+		m_dicUp(0),
+		m_firstDic(0),
+		m_time(2.0f),
 		m_bulletTime(0.0f),
 		m_bulletRange(1.0f),
+		m_gravity(-0.98f),
+		m_grav(Vec3(0.0f, m_gravity, 0.0f)),
+		m_gravVel(Vec3(0.0f)),
+		m_moveRot(Vec3(0.0f)),
+		m_angleSpeed(0.3f),
 		m_bulletFlag(false),
 		m_jumpFlag(false),
-		m_flyFlag(false)
+		m_flyFlag(false),
+		m_floorFlag(false),
+		m_hitDropFlag(false),
+		m_plungeFlag(false),
+		m_plungeColFlag(false)
 	{}
 
 	void Enemy::OnCreate() {
@@ -52,22 +63,21 @@ namespace basecross {
 		m_trans->SetRotation(m_rot);
 		m_trans->SetScale(m_scal);
 		m_beforState = m_stateType;
+		m_beforePos = m_pos;
 
-		m_playerScale = m_player->GetScale();
-		//•`‰æ
+		auto player = m_player.lock();
+		if (!player) return;
+		m_playerScale = m_player.lock()->GetScale();
+		//æç”»
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
-		//Õ“Ë”»’è
+		//è¡çªåˆ¤å®š
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetFixed(false);
 		m_collision->SetDrawActive(true);
-		//‰e
+		//å½±
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
-		//d—Í
-		if (m_stateType == stay || m_stateType == rightMove) {
-			m_gravity = AddComponent<Gravity>();
-		}
 
 		GetStage()->SetCollisionPerformanceActive(true);
 		GetStage()->SetUpdatePerformanceActive(true);
@@ -77,50 +87,248 @@ namespace basecross {
 	}
 
 	void Enemy::OnUpdate() {
-
 		auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto stage = GetStage();
 		m_pos = m_trans->GetPosition();
-		m_playerTrans = m_player->GetComponent<Transform>();
-		Vec3 playerPos = m_playerTrans->GetPosition();
-		auto playerScale = m_playerTrans->GetScale();
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æƒ…å ±ã‚’å–å¾—
+		auto player = m_player.lock();
+		if (!player) return;
+		m_playerTrans = m_player.lock()->GetComponent<Transform>();
+		m_playerPos = m_playerTrans.lock()->GetPosition();
 
-		Vec3 playerDis = playerPos - m_pos;
-/*------------------ƒeƒXƒg—p-------------------------*/
-		//ƒL[‘€ì‚ÅˆÚ“®
+		/*------------------ãƒ†ã‚¹ãƒˆç”¨-------------------------*/
+				//ã‚­ãƒ¼æ“ä½œã§ç§»å‹•
 		if (keyState.m_bLastKeyTbl[VK_RIGHT]) {
 			m_pos.x += m_dic * m_speed * elapsed;
 		}
 		if (keyState.m_bLastKeyTbl[VK_LEFT]) {
 			m_pos.x += -m_dic * m_speed * elapsed;
 		}
-		//ƒXƒy[ƒX‚ÅƒWƒƒƒ“ƒviƒeƒXƒg—pj
-		if (keyState.m_bLastKeyTbl[VK_DOWN]) {
-			EnemyJump();
-
+		//ã‚¹ãƒšãƒ¼ã‚¹ã§ã‚¸ãƒ£ãƒ³ãƒ—ï¼ˆãƒ†ã‚¹ãƒˆç”¨ï¼‰
+		if (keyState.m_bPressedKeyTbl[VK_DOWN]) {
+			//EnemyJump();
+			HipDropJump();
 		}
 		if (keyState.m_bPressedKeyTbl[VK_UP]) {
+			//EnemyJump();
 			stage->AddGameObject<EnemyBullet>(GetThis<Enemy>());
 		}
 		if (keyState.m_bPushKeyTbl['W']) {
-			m_stateType = stay;
+			//m_stateType = stay;
 		}
-/*------------------ƒeƒXƒg—p-------------------------*/
+		/*------------------ãƒ†ã‚¹ãƒˆç”¨-------------------------*/
 
-		//‘«ê‚©‚ç—‰º–h~
-		if (m_box != nullptr) {
-			auto boxPos = m_box->GetPositoin();
-			auto boxScal = m_box->GetScale();
-			if (m_pos.x > boxPos.x + boxScal.x / 2 - m_scal.x / 2-0.2f) {
+		FindFixed();
+
+		//è¡Œå‹•ãƒ‘ã‚¿ãƒ¼ãƒ³
+		switch (m_stateType)
+		{
+			//ç§»å‹•ãªã—
+		case stay:
+			if (!m_hitDropFlag) {
+				SetGrav(Vec3(0.0f, m_gravity, 0.0f));
+			}
+			m_dic = 0;
+			break;
+			//è¿½å¾“ã®å·¦å³ç§»å‹•
+		case rightMove:
+			PlayerDic();
+			Bullet();
+			break;
+			//ä¸Šä¸‹ã«ç§»å‹•
+		case upMove:
+			GravZero();
+			Grav();
+			Bullet();
+			if (m_pos.y >= m_beforePos.y) {
+				m_dicUp = -1;
+			}
+			else if (m_pos.y <= m_upHeight) {
+				m_dicUp = 1;
+			}
+			m_dic *= -1;
+			m_pos.y += m_dicUp * m_upSpeed * elapsed;
+			break;
+			//è¿½å¾“æµ®éŠ
+		case flyMove:
+			OneJump(0.1f);
+			PlayerDic(false);
+			Bullet();
+			break;
+			//æµ®éŠ
+		case fly:
+			OneJump(0.1f);
+			Bullet();
+			break;
+			//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«è§¦ã‚ŒãŸä½ç½®ã§å›ºå®š
+		case fixedStay:
+			GravZero();
+			Grav();
+			m_pos = m_deathPos;
+			m_collision->SetFixed(true);
+			AddTag(L"FixedBox");
+			break;
+			//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨é€†æ–¹å‘ã«ç§»å‹•
+		case runaway:
+			PlayerDic(false, -5.0f);
+			break;
+			//ãƒ’ãƒƒãƒ—ãƒ‰ãƒ­ãƒƒãƒ—
+		case hitDrop:
+			break;
+			//çªã£è¾¼ã¿
+		case plunge:
+			if (m_pos.x < m_playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
+				m_dic = -1;
+			}
+			else if (m_pos.x > m_playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
+				m_dic = 1;
+			}
+			else {
+				m_dic = 0;
+			}
+			if (!m_plungeFlag && !m_plungeColFlag) {
+				m_firstDic = m_dic;
+				m_plungeFlag = true;
+			}
+
+			if (m_plungeColFlag) {
+				m_firstDic *= -1;
+				m_plungeColFlag = false;
+			}
+			m_pos.x += -m_firstDic * m_speed * 3.0f * elapsed;
+			break;
+		default:
+			break;
+		}
+		//é‡åŠ›ã®å‡¦ç†
+		if (!m_floorFlag) {
+			Grav();
+		}
+		if (m_floorFlag) {
+			GravZero();
+			Grav();
+		}
+		HitDrop();
+		//Bullet();
+		m_trans->SetPosition(m_pos);
+		m_trans->SetRotation(m_moveRot);
+
+		//HPãŒ0ã«ãªã£ãŸå ´åˆ
+		if (m_hp <= 0.0f) {
+			m_stateType = m_deathState;
+		}
+
+		//Debug();
+	}
+
+	//è¡çªåˆ¤å®š
+	//ã‚¸ãƒ£ãƒ³ãƒ—
+	void Enemy::EnemyJump() {
+		m_floorFlag = false;
+		AddGrav(Vec3(0.0f, m_jumpPower, 0.0f));
+		SetGrav(Vec3(0.0f, -0.98f, 0.0f));
+		Grav();
+	}
+	void Enemy::HipDropJump() {
+		m_hitDropFlag = true;
+		EnemyJump();
+		GravZero();
+	}
+	//å‰Šé™¤
+	void Enemy::ThisDestroy() {
+		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
+	}
+	//ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ã‚‹
+	void Enemy::ReceiveDamage(float damage) {
+		m_hp -= damage;
+	}
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘å–å¾—ã€ãã®æ–¹å‘ã«å›è»¢
+	void Enemy::PlayerDic(bool zero, float addSpeed) {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		if (m_pos.x < m_playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2)) {
+			if (m_angleSpeed <= XMConvertToRadians(45)) {
+				m_angleSpeed += XMConvertToRadians(1) * 360.0f * elapsed;
+			}
+			m_moveRot = Vec3(0.0f, m_angleSpeed, 0.0f);
+			m_dic = -1;
+		}
+		else if (m_pos.x > m_playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2)) {
+			if (m_angleSpeed >= XMConvertToRadians(-45)) {
+				m_angleSpeed += -XMConvertToRadians(1) * 360.0f * elapsed;
+			}
+			m_moveRot = Vec3(0.0f, m_angleSpeed, 0.0f);
+
+			m_dic = 1;
+		}
+		else {
+			if (zero) {
+				m_dic = 0;
+			}
+		}
+		m_pos.x += -m_dic * m_speed * addSpeed * elapsed;
+
+	}
+	//ã‚¸ãƒ£ãƒ³ãƒ—
+	void Enemy::OneJump(float jumpHight) {
+		if (!m_jumpFlag) {
+			EnemyJump();
+			m_jumpFlag = true;
+		}
+		if (m_pos.y <= jumpHight) {
+			m_jumpFlag = false;
+		}
+
+	}
+	//ãƒ’ãƒƒãƒ—ãƒ‰ãƒ­ãƒƒãƒ—
+	void Enemy::HitDrop() {
+		auto fixed = m_fixedBox.lock();
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		//ãƒ’ãƒƒãƒ—ãƒ‰ãƒ­ãƒƒãƒ—ä¸­
+		if (m_hitDropFlag) {
+			if (fixed) {
+				Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
+				Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
+				//åºŠã«è¡çªã—ãŸæ™‚
+				if (m_floorFlag) {
+					m_time = 2.0f;
+					m_hitDropFlag = false;
+					AddGrav(Vec3(0.0f, -m_jumpPower, 0.0f));
+				}
+				m_time -= elapsed;
+				if (m_time <= 0) {
+					if (m_pos.y - m_scal.y / 2 + fixPos.y >= fixPos.y + fixScal.y / 2 + 0.01f) {
+						m_pos.y += -m_speed * 15 * elapsed;
+					}
+				}
+			}
+		}
+
+	}
+	//åºŠã«è§¦ã‚ŒãŸã‚‰å–å¾—
+	void Enemy::FindFixed() {
+		auto fixed = m_fixedBox.lock();
+		if (fixed) {
+			Vec3 fixPos = fixed->GetComponent<Transform>()->GetPosition();
+			Vec3 fixScal = fixed->GetComponent<Transform>()->GetScale();
+			if (m_pos.y - m_scal.y / 2 + fixPos.y <= fixPos.y + fixScal.y / 2 + 0.001f) {
+				m_floorFlag = true;
+			}
+			if (m_pos.x >= fixPos.x + fixScal.x / 2 + m_scal.x / 2 ||
+				m_pos.x <= fixPos.x - fixScal.x / 2 - m_scal.x / 2) {
+				m_floorFlag = false;
+			}
+
+			//åºŠã‹ã‚‰è½ã¡ãªã„ã‚ˆã†ã«ã™ã‚‹
+			if (m_pos.x > fixPos.x + fixScal.x / 2 - m_scal.x / 2 - 0.2f) {
 				m_speed = 0.0f;
-				if (m_pos.x > playerPos.x) {
+				if (m_pos.x > m_playerPos.x - fixPos.x) {
 					m_speed = 0.3f;
 				}
 			}
-			else if (m_pos.x < boxPos.x - boxScal.x / 2 + m_scal.x / 2+0.2f) {
+			else if (m_pos.x < fixPos.x - fixScal.x / 2 + m_scal.x / 2 + 0.2f) {
 				m_speed = 0;
-				if (m_pos.x < playerPos.x) {
+				if (m_pos.x < m_playerPos.x - fixPos.x) {
 					m_speed = 0.3f;
 				}
 			}
@@ -128,107 +336,28 @@ namespace basecross {
 				m_speed = 0.3f;
 			}
 		}
-
-
-		//s“®ƒpƒ^[ƒ“
-		switch (m_stateType)
-		{
-		//ˆÚ“®‚È‚µ
-		case stay:
-			m_dic = 0;
-			if (m_gravity) {
-				m_gravity->SetGravity(Vec3(0.0f,-9.8/5,0.0f));
-			}
-			else {
-				m_gravity = AddComponent<Gravity>();
-			}
-
-			break;
-
-		//’Ç]‚Ì¶‰EˆÚ“®
-		case rightMove:
-			if (m_pos.x < playerPos.x - (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
-				m_dic = -1;
-			}
-			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + m_playerScale.x / 2 + 0.01f)) {
-				m_dic = 1;
-			}
-			else {
-				m_dic = 0;
-			}
-			m_pos.x += -m_dic * m_speed * elapsed;
-			break;
-		//ã‰º‚ÉˆÚ“®
-		case upMove:
-			if (m_pos.y > 0.5f) {
-				m_dic = -1;
-			}
-			else if (m_pos.y < -0.25f) {
-				m_dic = 1;
-			}
-			m_pos.y += m_dic * m_upSpeed * elapsed;
-			break;
-		//’Ç]•‚—V
-		case flyMove:
-			if (!m_jumpFlag) {
-				EnemyJump();
-				m_jumpFlag = true;
-			}
-			if (m_pos.y <= 0.4f) {
-				m_jumpFlag = false;
-			}
-			if (m_pos.x < playerPos.x - (m_scal.x / 2 + 0.051)) {
-				m_dic = -1;
-			}
-			else if (m_pos.x > playerPos.x + (m_scal.x / 2 + 0.051)) {
-				m_dic = 1;
-			}
-			else {
-				m_dic = 0;
-			}
-			m_pos.x += -m_dic * m_speed * elapsed;
-			break;
-		//•‚—V
-		case fly:
-			if (!m_jumpFlag) {
-				EnemyJump();
-				m_jumpFlag = true;
-			}
-			if (m_pos.y <= 0.4f) {
-				m_jumpFlag = false;
-			}
-			break;
-		//ƒvƒŒƒCƒ„[‚ÉG‚ê‚½ˆÊ’u‚ÅŒÅ’è
-		case fixedStay:
-			m_pos = m_deathPos;
-			m_collision->SetFixed(true);
-			if (m_gravity) {
-				m_gravity->SetGravityVerocityZero();
-			}
-			AddTag(L"FixedBox");
-			break;
-		//ƒvƒŒƒCƒ„[‚Æ‹t•ûŒü‚ÉˆÚ“®
-		case runaway:
-			if (m_pos.x < playerPos.x) {
-				m_dic = -1;
-			}
-			else {
-				m_dic = 1;
-			}
-			m_pos.x += m_dic * m_speed * 5.0f * elapsed;
-			break;
-
-		default:
-			break;
+		else {
+			m_floorFlag = false;
 		}
-		m_trans->SetPosition(m_pos);
 
+	}
+	//å¼¾ã®ç™ºå°„
+	void Enemy::Bullet() {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		auto stage = GetStage();
+		auto fixed = m_fixedBox.lock();
 
-		//’e‚Ì¶¬
-		if (m_pos.x > playerPos.x - m_bulletRange) {
+		//å¼¾ã®ç”Ÿæˆ
+		if (m_pos.x > m_playerPos.x - m_bulletRange) {
 			m_bulletTime += elapsed;
 			if (!m_bulletFlag && m_dic != 0) {
-				stage->AddGameObject<EnemyBullet>(GetThis<Enemy>());
+				if (fixed) {
+					auto fixedPos = fixed->GetComponent<Transform>()->GetPosition();
+					stage->AddGameObject<EnemyBullet>(GetThis<Enemy>(), fixedPos);
+				}
+				else {
+					stage->AddGameObject<EnemyBullet>(GetThis<Enemy>());
+				}
 				m_bulletFlag = true;
 				m_bulletTime = 0.0f;
 			}
@@ -237,80 +366,82 @@ namespace basecross {
 			m_bulletFlag = false;
 		}
 
-		//•‚—V
-		//if (m_flyFlag) {
-		//	m_jumpTime -= elapsed;
-		//	if (!m_jumpFlag) {
-		//		EnemyJump();
-
-		//		m_jumpFlag = true;
-		//		m_jumpTime = 1.0f;
-		//	
-		//	}
-		//	if (m_jumpTime <= 0.0f) {
-		//		m_jumpFlag = false;
-		//	}
-		//}
-
-
-
-		//“G‚Ì“|‚³‚ê‚½
-		if (m_hp <= 0.0f) {
-			m_stateType = m_deathState;
-			//if (m_stateType == rightMove) {
-			//}
-
-			//ThisDestroy();
-		}
-
-		//ƒfƒoƒbƒN—p
-		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
-		auto scene = App::GetApp()->GetScene<Scene>();
-		wstringstream wss(L"");
-		wss << L"damage : " 
-			<<m_hp
-			<<L"\ndic : "
-			<<m_dic
-			<<L"\nfps : "
-			<<fps
-			<<L"\nstate : "
-			<<m_stateType
-			<<L"\npos : "
-			<<m_pos.x
-			<< endl;
-		scene->SetDebugString(wss.str());
 	}
-
-	//Õ“Ë”»’è
+	//è¡çªåˆ¤å®š
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
 			m_deathPos = m_pos;
-			ReceiveDamage(100.0f);
+			ReceiveDamage(50.0f);
 		}
 		if (other->FindTag(L"BreakWall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
 			if (m_stateType == runaway) {
 				breakWall->ThisDestory();
+				ThisDestroy();
 			}
+			m_plungeColFlag = true;
+		}
+		if (other->FindTag(L"FixedBox")) {
+			m_fixedBox = dynamic_pointer_cast<FixedBox>(other);
+			m_trans->SetParent(m_fixedBox.lock());
+			m_pos = m_pos - m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
+			m_floorPos = m_pos;
 		}
 
 	}
-	//ƒ_ƒ[ƒW‚ğó‚¯‚é
-	void Enemy::ReceiveDamage(float damage) {
-		m_hp -= damage;
+	//ãƒ‡ãƒãƒƒã‚¯
+	void Enemy::Debug() {
+		//ãƒ‡ãƒãƒƒã‚¯ç”¨
+		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
+		auto scene = App::GetApp()->GetScene<Scene>();
+		wstringstream wss(L"");
+		wss << L"damage : "
+			<< m_hp
+			<< L"\ndic : "
+			<< m_dic
+			<< L"\nfps : "
+			<< fps
+			<< L"\nstate : "
+			<< m_stateType
+			<< L"\npos : "
+			<< m_pos.y
+			<< L"\nfloor : "
+			<< m_floorFlag
+			<< L"\nhipDrop : "
+			<< m_hitDropFlag
+			<< L"\ntest : "
+			<< m_test
+			<<L"\n changePos : "
+			<<GetChangePos().y
+			<< endl;
+		scene->SetDebugString(wss.str());
+
+	}
+	//é‡åŠ›
+	void Enemy::Grav() {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		m_gravVel += m_grav * elapsed;
+		m_pos += m_gravVel * elapsed;
+		m_trans->SetPosition(m_pos);
+	}
+	void Enemy::GravZero() {
+		m_grav = Vec3(0.0f);
+	}
+	void Enemy::GravVelZero() {
+		m_gravVel = Vec3(0.0f);
+	}
+	void Enemy::SetGrav(Vec3 grav) {
+		m_grav = grav;
+	}
+	void Enemy::AddGrav(Vec3 grav) {
+		m_gravVel = grav;
+	}
+	void Enemy::SetGravVel(Vec3 grav) {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		m_gravVel = grav;
 	}
 
-	//©•ª‚Ìíœ
-	void Enemy::ThisDestroy() {
-		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
-	}
-	
-	void Enemy::EnemyJump() {
-		m_gravity = AddComponent<Gravity>();
-		m_gravity->SetGravity(Vec3(0.0f, -9.8f/5, 0.0f));
-		auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
-		m_gravity->StartJump(Vec3(0, m_jumpPower, 0));
-	}
+	//ã‚²ãƒƒã‚¿ãƒ¼ã‚»ãƒƒã‚¿ãƒ¼
 	int Enemy::GetDic() {
 		return m_dic;
 	}
@@ -333,40 +464,67 @@ namespace basecross {
 	void Enemy::SetFlyPower(float power) {
 		m_jumpPower = power;
 	}
+	bool Enemy::GetFloorFlag() {
+		return m_floorFlag;
+	}
+	float Enemy::GetHpRatio() {
+		float ratio = m_hp / m_maxHp;
+		if (ratio <= 0.0f) {
+			return 0.0f;
+		}
+		else {
+			return ratio;
+		}
+	}
+	Vec3 Enemy::GetChangePos() {
+		auto fixed = m_fixedBox.lock();
+		if (fixed) {
+			Vec3 pos = m_pos + fixed->GetComponent<Transform>()->GetPosition();
+			return pos;
+		}
+		else {
+			return m_pos;
+		}
+	}
 
 
 	//--------------------------------------------------------------------------------------
 	//	class EnemyBullet : public GameObject;  
 	//--------------------------------------------------------------------------------------
-	EnemyBullet::EnemyBullet(const shared_ptr<Stage>& stage, 
-		const shared_ptr<Enemy>& enemy):
+	EnemyBullet::EnemyBullet(const shared_ptr<Stage>& stage,
+		const shared_ptr<Enemy>& enemy,
+		const Vec3& fixedPos
+	) :
 		GameObject(stage),
 		m_enemy(enemy),
+		m_fixedPos(fixedPos),
 		m_pos(Vec3(0, 0, 0)),
-		m_rot(Vec3(0,0,0)),
-		m_scal(Vec3(0.02f,0.02f,0.02f)),
+		m_rot(Vec3(0, 0, 0)),
+		m_scal(Vec3(0.02f, 0.02f, 0.02f)),
 		m_speed(1.0f),
 		m_Range(1.0f),
+		m_floorCheck(false),
 		m_dic(1)
 	{}
 	void EnemyBullet::OnCreate() {
 		m_trans = GetComponent<Transform>();
-		m_trans->SetPosition(m_enemy->GetPos());
+		m_enemyPos = m_enemy->GetChangePos();
+		m_trans->SetPosition(m_enemyPos);
 		m_trans->SetRotation(m_rot);
 		m_trans->SetScale(m_scal);
 		m_dic = m_enemy->GetDic();
-		m_enemyPos = m_enemy->GetComponent<Transform>()->GetPosition();
-		
-		//•`‰æ
+		m_beforFlag = m_enemy->GetFloorFlag();
+
+		//æç”»
 		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 
-		//Õ“Ë”»’è
+		//è¡çªåˆ¤å®š
 		auto ptrColl = AddComponent<CollisionSphere>();
 		ptrColl->SetAfterCollision(AfterCollision::None);
-		ptrColl->SetFixed(false); //‹óŠÔ‚ÉŒÅ’è‚·‚é‚©
+		ptrColl->SetFixed(false); //ç©ºé–“ã«å›ºå®šã™ã‚‹ã‹
 		ptrColl->SetDrawActive(true);
-		//‰e
+		//å½±
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 
@@ -377,7 +535,8 @@ namespace basecross {
 	}
 	void EnemyBullet::OnUpdate() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
-		
+		m_enemyPos = m_enemy->GetChangePos();
+
 		m_trans = GetComponent<Transform>();
 		m_pos = m_trans->GetPosition();
 		m_pos.x += -m_dic * m_speed * elapsed;
@@ -389,6 +548,8 @@ namespace basecross {
 		if (m_dic == 1 && m_enemyPos.x - m_Range >= m_pos.x) {
 			ThisDestroy();
 		}
+
+		//Debug();
 	}
 
 	void EnemyBullet::OnCollisionEnter(shared_ptr<GameObject>& other) {
@@ -400,46 +561,28 @@ namespace basecross {
 		GetStage()->RemoveGameObject<EnemyBullet>(GetThis<EnemyBullet>());
 	}
 
-	//struct MyGravity::Impl{
-	//	bsm::Vec3 m_Gravity;
-	//	bsm::Vec3 m_GravityVelocity;
-	//	Impl():
-	//		m_Gravity(0),
-	//		m_GravityVelocity(0)
-	//	{}
-	//	~Impl() {}
-	//};
+	void EnemyBullet::Debug() {
+		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
+		auto scene = App::GetApp()->GetScene<Scene>();
+		wstringstream wss(L"");
+		wss << L"pos : ( "
+			<< m_pos.x
+			<< L" , "
+			<< m_pos.y
+			<< L" , "
+			<< m_pos.z
+			<< L" ) "
+			<<L"\nbefor : "
+			<< m_beforFlag
+			<<L"\nfloor : "
+			<< m_enemy->GetFloorFlag()
+			<<L"\ndic : "
+			<<m_beforFlag
+			<<"\n"
+			<<m_test
+			<< endl;
+		scene->SetDebugString(wss.str());
 
-	MyGravity::MyGravity(const shared_ptr<GameObject>& GameObjectPtr,
-		const bsm::Vec3& gravity
-	):
-		Component(GameObjectPtr)
-	{
-		m_gravity = gravity;
-	}
-
-	Vec3 MyGravity::GetGravity() const{
-		return m_gravity;
-	}
-	void MyGravity::SetGravity(const bsm::Vec3& gravity) {
-		m_gravity = gravity;
-	}
-	void MyGravity::SetGravityZero() {
-		m_gravity = Vec3(0.0f);
-	}
-	void MyGravity::OnUpdate() {
-		auto ptrCollision = GetGameObject()->GetComponent<Collision>(false);
-		//if (ptrCollision && ptrCollision->Is
-		//()) {
-		//	return;
-		//}
-
-		auto transform = GetGameObject()->GetComponent<Transform>();
-		auto pos = transform->GetPosition();
-		float elapsed = App::GetApp()->GetElapsedTime();
-		m_gravity += m_gravity * elapsed;
-		pos += m_gravity * elapsed;
-		transform->SetPosition(pos);
 
 	}
 }

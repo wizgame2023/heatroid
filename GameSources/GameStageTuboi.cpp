@@ -1,6 +1,6 @@
 /*!
 @file GameStageTsuboi.cpp
-@brief ƒQ[ƒ€ƒXƒe[ƒWÀ‘Ì
+@brief ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸å®Ÿä½“
 */
 
 #include "stdafx.h"
@@ -9,32 +9,33 @@
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
-	//	ƒQ[ƒ€ƒXƒe[ƒWƒNƒ‰ƒXÀ‘Ì
+	//	ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒ©ã‚¹å®Ÿä½“
 	//--------------------------------------------------------------------------------------
 
-	//ƒrƒ…[‚Æƒ‰ƒCƒg‚Ìì¬
+	//ãƒ“ãƒ¥ãƒ¼ã¨ãƒ©ã‚¤ãƒˆã®ä½œæˆ
 	void GameStageTsuboi::CreateViewLight() {
-		// ƒJƒƒ‰‚Ìİ’è
-		auto camera = ObjectFactory::Create<Camera>();
-		camera->SetEye(Vec3(0.0f, .2f, 3.0f));
-		camera->SetAt(Vec3(0.0f, .2f, 0.0f));
-
-		// ƒrƒ…[‚ÉƒJƒƒ‰‚ğİ’è
+		// ã‚«ãƒ¡ãƒ©ã®è¨­å®š
+		auto camera = ObjectFactory::Create<MainCamera>();
+		camera->SetEye(Vec3(0.0f, 5.00f, -5.0f));
+		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
+		auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
+		//camera->SetCameraObject(cameraObject);
+		// ãƒ“ãƒ¥ãƒ¼ã«ã‚«ãƒ¡ãƒ©ã‚’è¨­å®š
 		auto view = CreateView<SingleView>();
 		view->SetCamera(camera);
 
-		//ƒ}ƒ‹ƒ`ƒ‰ƒCƒg‚Ìì¬
+		//ãƒãƒ«ãƒãƒ©ã‚¤ãƒˆã®ä½œæˆ
 		auto light = CreateLight<MultiLight>();
-		light->SetDefaultLighting(); //ƒfƒtƒHƒ‹ƒg‚Ìƒ‰ƒCƒeƒBƒ“ƒO‚ğw’è
+		light->SetDefaultLighting2(); //ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°ã‚’æŒ‡å®š
 	}
 
 	void GameStageTsuboi::CreateGameBox() {
-		//”z—ñ‚Ì‰Šú‰»
+		//é…åˆ—ã®åˆæœŸåŒ–
 		vector< vector<Vec3> > vec = {
 			{
 				Vec3(0.0f, -.5f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(3.0f, .1f, .3f)
+				Vec3(5.0f, .1f, 5.0f)
 			},
 			{
 				Vec3(.8f, 0.0f, 0.0f),
@@ -48,30 +49,46 @@ namespace basecross {
 			},
 		};
 		int i = 0;
-		//ƒIƒuƒWƒFƒNƒg‚Ìì¬
+		//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆ
 		for (auto v : vec) {
 			auto box = AddGameObject<FixedBox>(v[0], v[1], v[2]);
 			SetSharedGameObject(L"box" + to_wstring(i++), box);
 		}
 	}
 
+	void GameStageTsuboi::CreateEnemy() {
+
+		vector<vector<Vec3>> vec = {
+			{
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(0.1f,0.1f,0.1f)
+			}
+		};
+
+		auto player = GetSharedGameObject<Player>(L"Player");
+
+		for (auto v : vec) {
+			AddGameObject<Enemy>(v[0], v[1], v[2], Enemy::rightMove, Enemy::runaway, player);
+		}
+
+	}
 
 	void GameStageTsuboi::OnCreate() {
 		try {
-			//ƒrƒ…[‚Æƒ‰ƒCƒg‚Ìì¬
+			//ãƒ“ãƒ¥ãƒ¼ã¨ãƒ©ã‚¤ãƒˆã®ä½œæˆ
 			CreateViewLight();
 
-			//ƒvƒŒƒCƒ„[‚ğ¶¬
+			//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ç”Ÿæˆ
 			shared_ptr<GameObject> ptrPlayer = AddGameObject<Player>();
 			SetSharedGameObject(L"Player", ptrPlayer);
-			//ƒvƒŒƒCƒ„[‚ÌUŒ‚”»’è
+			//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ”»æ’ƒåˆ¤å®š
 			ptrPlayer = AddGameObject<AttackCollision>(ptrPlayer);
 
-			CreateGameBox();
+			//AddGameObject<SpriteDebug>();
 
-			auto box = GetSharedGameObject<FixedBox>(L"box0");
-			auto player = GetSharedGameObject<Player>(L"Player");
-			//auto enemy = AddGameObject<Enemy>(player, box);
+			CreateGameBox();
+			//CreateEnemy();
 
 
 		}

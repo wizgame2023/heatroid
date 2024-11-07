@@ -154,7 +154,6 @@ namespace basecross {
 		auto ptrColl = AddComponent<CollisionObb>();
 		ptrColl->SetFixed(true);
 		//�^�O������
-		AddTag(L"FixedBox");
 		AddTag(L"BreakWall");
 
 
