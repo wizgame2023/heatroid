@@ -41,11 +41,15 @@ namespace basecross {
 		Vec3 m_Position;
 		float m_UPic;
 		float m_VPic;
-		static vector<Mat4x4> m_Mat4x4;
 	public:
 		//構築と破棄
-		TilingFixedBox(const shared_ptr<Stage>& StagePtr
-		);
+		TilingFixedBox(const shared_ptr<Stage>& StagePtr,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale,
+			const float& UPic,
+			const float& VPic
+			);
 		virtual ~TilingFixedBox();
 		//初期化
 		virtual void OnCreate() override;

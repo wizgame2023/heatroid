@@ -16,8 +16,8 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) : 
 		GameObject(StagePtr),
-		m_speed(2.25f),
-		m_accel(2.25f),
+		m_speed(20.25f),
+		m_accel(20.25f),
 		m_friction(.6f),
 		m_frictionThreshold(.025f),
 		m_airSpeedRate(.6f),

@@ -71,7 +71,7 @@ namespace basecross {
 
 			auto box = GetSharedGameObject<FixedBox>(L"box0");
 			auto player = GetSharedGameObject<Player>(L"Player");
-			auto enemy = AddGameObject<Enemy>(player, box);
+			//auto enemy = AddGameObject<Enemy>(player, box);
 
 
 		}
