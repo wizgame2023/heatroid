@@ -52,7 +52,7 @@ namespace basecross {
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
 		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(-3, 5.0125f, 0));
-		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(0.5f, 0.5f, 0.5f));
+		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
 		TilingFixedBox::m_moveObject.push_back(playerPos);
 
