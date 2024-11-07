@@ -81,7 +81,7 @@ namespace basecross {
 			//頂点の更新
 			UpdateValue(enemy->GetHpRatio());
 
-			Debug();
+			//Debug();
 		}
 		else {
 			//ゲージの対象のオブジェクトが消えたら自分も削除
