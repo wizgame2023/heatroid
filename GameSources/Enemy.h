@@ -45,6 +45,7 @@ namespace basecross {
 		Vec3 m_moveRot;
 
 		int m_dic;           //Œü‚¢‚Ä‚¢‚é•ûŒü ¶-1,‰E1
+		Vec3 m_direc;
 		int m_dicUp;
 		int m_firstDic;
 
@@ -117,6 +118,7 @@ namespace basecross {
 		void SetFlyPower(float power);
 		void SetState(State state);
 		int GetDic();
+		Vec3 GetDirec();
 		Vec3 GetPos();
 		Vec3 GetChangePos();
 		bool GetFloorFlag();
@@ -143,6 +145,7 @@ namespace basecross {
 		float m_speed;   //’e‚Ì‘¬‚³
 		float m_Range;   //Ë’ö
 		int m_dic;       //’e‚ÌŒü‚« ¶-1,‰E1
+		Vec3 m_direc;
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
