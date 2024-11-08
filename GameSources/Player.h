@@ -32,14 +32,14 @@ namespace basecross {
 		//摩擦係数(地上)
 		float m_friction;
 		float m_frictionThreshold;
-		//空中制動
-		float m_airSpeedRate;
 		//ジャンプ高度
 		float m_jumpHeight;
 		//重力
 		float m_gravity;
 		//落下時の終端速度
 		float m_fallTerminal;
+		//飛び道具が出る場所
+		Vec3 m_firePos;
 		//移動方向
 		Vec3 m_moveVel;
 		//CollisionExitの空中判定の閾値
@@ -58,17 +58,12 @@ namespace basecross {
 
 		//移動時の物理学的な計算を行うか否か
 		bool m_doPhysicalProcess;
-		//攻撃判定出現中
-		bool m_isAttacking;
 		//火炎放射攻撃中
 		bool m_isFiring;
 		//火炎放射の間隔
 		float m_fireCount;
 		//無敵時間
 		int m_invincibleTime, m_invincibleTimeMax;
-
-		//向き(1が右、-1が左)
-		int m_face;
 
 		//HP
 		int m_HP, m_HP_max;
@@ -112,9 +107,6 @@ namespace basecross {
 		//アニメーションの登録
 		void RegisterAnim();
 
-		//入力ベクトルに応じて向きを変える
-		void FacingWithInput();
-
 		//Transform.Scaleのゲッタ
 		const Vec3 GetScale() {
 			return GetComponent<Transform>()->GetScale();
@@ -123,11 +115,6 @@ namespace basecross {
 		//描画コンポーネントのゲッタ
 		const shared_ptr<PNTBoneModelDraw> GetDrawPtr() {
 			return GetComponent<PNTBoneModelDraw>();
-		}
-
-		//m_faceのゲッタ
-		const int GetFace() {
-			return m_face;
 		}
 
 		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
@@ -186,11 +173,9 @@ namespace basecross {
 	class FireProjectile : public GameObject {
 		//どれくらいの位置からスタートするか
 		Vec3 m_dist;
-		Vec3 m_distAdd;
-		//向き
-		int m_face;
-		//速度
-		Vec3 m_speed;
+		//速度と方向
+		float m_speed;
+		Vec3 m_angle;
 		//射程
 		float m_range = 0, m_rangeMax;
 
@@ -198,7 +183,7 @@ namespace basecross {
 		//構築と破棄
 
 		FireProjectile(const shared_ptr<Stage>& StagePtr,
-			const Vec3 dist, const int face);
+			const Vec3 dist, const Vec3 angle);
 
 		virtual ~FireProjectile() {}
 		//アクセサ

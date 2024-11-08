@@ -46,7 +46,7 @@ namespace basecross {
 		m_ArmLen(5.0f),
 		m_MaxArm(30.0f),
 		m_MinArm(2.0f),
-		m_RotSpeed(1.0f),
+		m_RotSpeed(-2.0f),
 		m_ZoomSpeed(0.1f),
 		m_LRBaseMode(true)
 	{}
@@ -61,7 +61,7 @@ namespace basecross {
 		m_ArmLen(5.0f),
 		m_MaxArm(30.0f),
 		m_MinArm(2.0f),
-		m_RotSpeed(1.0f),
+		m_RotSpeed(-2.0f),
 		m_ZoomSpeed(0.1f),
 		m_LRBaseMode(true)
 	{
