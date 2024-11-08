@@ -27,6 +27,10 @@ namespace basecross{
 		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HeatRoid.bmf");
 		app->RegisterResource(L"PLAYER", modelMesh);
 
+		//敵のモデル
+		auto enemyAruki = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_ARUKU.bmf");
+		app->RegisterResource(L"ENEMYARUKU", enemyAruki);
+
 		// 火、仮テクスチャ
 		app->RegisterTexture(L"FIRE", texPath + L"fire_kari.png");
 
