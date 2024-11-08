@@ -27,8 +27,9 @@ namespace basecross{
 		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HeatRoid.bmf");
 		app->RegisterResource(L"PLAYER", modelMesh);
 
-		// 火、仮テクスチャ
+		// 仮テクスチャ
 		app->RegisterTexture(L"FIRE", texPath + L"fire_kari.png");
+		app->RegisterTexture(L"CHARGE", texPath + L"charge.png");
 
 	}
 

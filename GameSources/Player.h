@@ -58,10 +58,10 @@ namespace basecross {
 
 		//移動時の物理学的な計算を行うか否か
 		bool m_doPhysicalProcess;
-		//火炎放射攻撃中
-		bool m_isFiring;
-		//火炎放射の間隔
-		float m_fireCount;
+		//チャージ中orオーバーチャージ中
+		bool m_isCharging, m_isOverCharge;
+		//タメ
+		float m_chargePerc, m_chargeSpeed, m_chargeReduceSpeed;
 		//無敵時間
 		int m_invincibleTime, m_invincibleTimeMax;
 
@@ -93,11 +93,11 @@ namespace basecross {
 
 		////Aボタン
 		void OnPushA();
-		////Bボタン
-		void Firing(bool fire);
 
 		//カメラの移動
 		void MoveCamera();
+		//アニメーション制御
+		void Animate();
 		//重力
 		void Gravity();
 
@@ -117,6 +117,16 @@ namespace basecross {
 			return GetComponent<PNTBoneModelDraw>();
 		}
 
+		//isChargingフラグの取得
+		const bool IsCharging() {
+			return m_isCharging;
+		}
+
+		//ゲージの溜まり具合のゲッタ
+		const float GetChargePerc() {
+			return m_chargePerc;
+		}
+
 		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
 		const void SetAnim(wstring animname, float time = 0.0f) {
 			auto draw = GetComponent<PNTBoneModelDraw>();
@@ -126,8 +136,21 @@ namespace basecross {
 
 		void SwitchFireAnim(const float time);
 
+		void Charging(bool charge) {
+			m_isCharging = charge;
+			if (charge == false) return;
+			if (m_isOverCharge) {
+				m_chargePerc += m_chargeReduceSpeed * m_chargePerc * _delta;
+			}
+			else {
+				m_chargePerc += m_chargeSpeed * _delta;
+			}
+
+			if (m_chargePerc > 1.0f) m_isOverCharge = true;
+		}
+
 		const wstring AddFire() {
-			if (m_isFiring) return L"Fire_";
+			if (m_isCharging) return L"Fire_";
 			else return L"";
 		}
 	};
@@ -174,7 +197,7 @@ namespace basecross {
 		//どれくらいの位置からスタートするか
 		Vec3 m_dist;
 		//速度と方向
-		float m_speed;
+		float m_speed, m_power;
 		Vec3 m_angle;
 		//射程
 		float m_range = 0, m_rangeMax;
@@ -183,7 +206,7 @@ namespace basecross {
 		//構築と破棄
 
 		FireProjectile(const shared_ptr<Stage>& StagePtr,
-			const Vec3 dist, const Vec3 angle);
+			const Vec3 dist, const Vec3 angle, const float power);
 
 		virtual ~FireProjectile() {}
 		//アクセサ
@@ -195,56 +218,28 @@ namespace basecross {
 		//何かに接触している判定
 	};
 
-	//プレイヤーのステート構成？
-	//PlayerStateMovie			演出中などで操作不能状態
-	//PlaywrStateCtrl			プレイヤー移動中
-	//PlayerStateAttack(1～5)	攻撃
-
-	//====================================================================
-	// class PlayerStateCtrl
-	// プレイヤーの移動操作中ステート
-	//====================================================================
-	class PlayerStateCtrl : public ObjState<Player> {
-	protected:
-		PlayerStateCtrl() {};
-		~PlayerStateCtrl() {};
-	public:
-		static shared_ptr<PlayerStateCtrl> Instance();
-		virtual void Enter(const shared_ptr<Player>& Obj) override;
-		virtual void Execute(const shared_ptr<Player>& Obj) override;
-		virtual void Exit(const shared_ptr<Player>& Obj) override;
-	};
-
 	//------------------------------------------------------------------
-	class SpriteDebug : public GameObject {
+	class SpriteCharge : public GameObject {
+		weak_ptr<Player> m_player;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;		
 		vector<VertexPositionColorTexture> m_Vertices;
+
+		const float m_width = 150.0f;
+		const float m_height = 15.0f;
+
+		const float windowWidth = App::GetApp()->GetGameWidth();
+		const float windowHeight = App::GetApp()->GetGameHeight();
 	public:
-		SpriteDebug(const shared_ptr<Stage>& stage) :
-			GameObject(stage)
+		SpriteCharge(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player) :
+			GameObject(StagePtr),
+			m_player(player)
 		{}
 
-		~SpriteDebug() {}
+		~SpriteCharge() {}
 
-		virtual void SpriteDebug::OnCreate() override {
-			Col4 color(0, 0, 0, 1);
-			const float windowWidth = 1280.0f;
+		virtual void OnCreate() override;
 
-			m_Vertices = {
-				{Vec3(-windowWidth * 0.5f, 400, 0.0f), color, Vec2(0, 0)},
-				{Vec3(-windowWidth * 0.3f, 400, 0.0f), color, Vec2(1, 0)},
-				{Vec3(-windowWidth * 0.5f, 320, 0.0f), color, Vec2(0, 1)},
-				{Vec3(-windowWidth * 0.3f, 320, 0.0f), color, Vec2(1, 1)},
-			};
-			vector<uint16_t> indices = {
-				0, 1, 2,
-				2, 1, 3,
-			};
-			m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
-			m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
-			m_DrawComp->SetTextureResource(L"FIRE");
-			SetAlphaActive(true);
-		}
+		virtual void OnUpdate() override;
 	};
 
 }
