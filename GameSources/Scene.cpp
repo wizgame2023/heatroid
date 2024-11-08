@@ -22,7 +22,6 @@ namespace basecross{
 		auto texPath = path + L"Textures/";
 		// Modelsパス
 		auto mdlPath = path + L"Models/";
-
 		// プレイヤー
 		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HeatRoid.bmf");
 		app->RegisterResource(L"PLAYER", modelMesh);
