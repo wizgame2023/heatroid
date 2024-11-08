@@ -104,7 +104,7 @@ namespace basecross {
 		void HipDropJump();
 		void ThisDestroy();
 		void ReceiveDamage(float damage);
-		void PlayerDic(bool zero = true, float addSpeed = 1.0f);
+		void PlayerDic();
 		void OneJump(float jumpHight);
 		void HitDrop();
 		void FindFixed();
@@ -121,6 +121,7 @@ namespace basecross {
 		Vec3 GetPos();
 		Vec3 GetChangePos();
 		bool GetFloorFlag();
+		void EnemyAngle();
 
 
 		//èdóÕÇ…ä÷Ç∑ÇÈä÷êî
