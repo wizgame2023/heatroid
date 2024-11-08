@@ -83,9 +83,11 @@ namespace basecross {
 			shared_ptr<GameObject> ptrPlayer = AddGameObject<Player>();
 			SetSharedGameObject(L"Player", ptrPlayer);
 			//プレイヤーの攻撃判定
+			auto ptrColl = AddGameObject<AttackCollision>(ptrPlayer);
 			ptrPlayer = AddGameObject<AttackCollision>(ptrPlayer);
 
-			//AddGameObject<SpriteDebug>();
+			auto player = GetSharedGameObject<Player>(L"Player");
+			auto ptrSprite = AddGameObject<SpriteCharge>(player);
 
 			CreateGameBox();
 			//CreateEnemy();
