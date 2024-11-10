@@ -36,45 +36,55 @@ namespace basecross {
 
 	class GimmickButton;
 	class GimmickDoor : public GameObject {
-		Vec3 m_position;
-		Vec3 m_rotation;
-		Vec3 m_scale;
+		Vec3 m_Position;
+		Vec3 m_Rotation;
+		Vec3 m_Scale;
 		bool m_open;
+		bool m_open2;
 		float m_UPic;
 		float m_VPic;
 		shared_ptr<GimmickButton> GDoor;
+		int kazu = 1;
+		int m_number;
 	public:
+		float m_OpenSwitch;
 		//ç\ízÇ∆îjä¸
 		GimmickDoor(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
 			const Vec3& scales,
 			float UPic,
-			float VPic
+			float VPic,
+			float m_OpenSwitch,
+			int number
 		);
 		virtual ~GimmickDoor();
 		//èâä˙âª
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
-
+		void OpenDoor();
 	};
 
 	class GimmickButton : public GameObject
 	{
-		Vec3 m_position;
-		Vec3 m_rotation;
-		Vec3 m_scale;
-		static bool m_open;
+		Vec3 m_Position;
+		Vec3 m_Rotation;
+		Vec3 m_Scale;
+		bool m_open;
 		float m_UPic;
 		float m_VPic;
 		shared_ptr<GameObject> GDoor;
+		int m_number;
 	public:
+		int m_switch;
 		GimmickButton(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
 			const Vec3& scale,
 			float UPic,
-			float VPic
+			float VPic,
+			int m_switch,
+			int number
 		);
 		virtual ~GimmickButton();
 		//èâä˙âª
@@ -82,12 +92,17 @@ namespace basecross {
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 
-		static bool GetButton() {
+		bool GetButton() {
 			return m_open;
 		}
-		static void SetButton(const bool& open)
+		void SetButton(const bool& open)
 		{
 			m_open = open;
+		}
+		
+		int GetSwitch()
+		{
+			return m_switch;
 		}
 	};
 

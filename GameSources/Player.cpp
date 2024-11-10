@@ -286,7 +286,16 @@ namespace basecross {
 	{
 		if ((Other->FindTag(L"GimmickButton")))
 		{
-			GimmickButton::SetButton(true);
+
+			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if (Other == shObj) {
+					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+					Switchs->SetButton(true);
+				}
+			}
 		}
 
 	}
@@ -294,7 +303,15 @@ namespace basecross {
 	{
 		if ((Other->FindTag(L"GimmickButton")))
 		{
-			GimmickButton::SetButton(false);
+			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if (shObj) {
+					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+					Switchs->SetButton(false);
+				}
+			}
 		}
 	}
 
