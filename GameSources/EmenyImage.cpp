@@ -76,11 +76,14 @@ namespace basecross {
 			auto enemyTrans = enemy->GetComponent<Transform>();
 			m_trans = GetComponent<Transform>();
 			m_pos = enemy->GetChangePos();
-			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + 0.13f, m_pos.z + 0.1f));
+			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + 0.2f, m_pos.z));
+			auto ptrCamera = GetStage()->GetView()->GetTargetCamera();
 
 			//í∏ì_ÇÃçXêV
 			UpdateValue(enemy->GetHpRatio());
 
+			Quat Qt = RotCorrection(ptrCamera->GetAt() - ptrCamera->GetEye());
+			m_trans->SetQuaternion(Qt);
 			//Debug();
 		}
 		else {
@@ -98,6 +101,24 @@ namespace basecross {
 		m_vertices[3].textureCoordinate.x = moveX;
 
 		m_draw->UpdateVertices(m_vertices);
+	}
+	//âÒì]ÇÃï‚ê≥
+	Quat GaugeSquare::RotCorrection(const Vec3& Line) {
+		Vec3 temp = Line;
+		Vec2 tempVec2(temp.x, temp.z);
+		Vec3 DefUp(0.0f, 1.0f, 0.0f);
+		Mat4x4 RotMatrix;
+
+		//if (tempVec2.length() < 0.1f) {
+		//	DefUp = Vec3(0.0f, 0.0f, 1.0f);
+		//}
+		temp.normalize();
+		RotMatrix = XMMatrixLookAtLH(Vec3(0.0f), temp, DefUp);
+		RotMatrix.inverse();
+		Quat Qt;
+		Qt = RotMatrix.quatInMatrix();
+		Qt.normalize();
+		return Qt;
 	}
 	//çÌèú
 	void GaugeSquare::ThisDestroy() {
