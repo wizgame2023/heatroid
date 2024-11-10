@@ -75,7 +75,8 @@ namespace basecross {
 		const Vec3& scale,
 		float UPic,
 		float VPic,
-		int Switch
+		int Switch,
+		int number
 	) :
 		GameObject(StagePtr),
 		m_Position(position),
@@ -83,7 +84,8 @@ namespace basecross {
 		m_Scale(scale),
 		m_UPic(UPic),
 		m_VPic(VPic),
-		m_switch(Switch)
+		m_switch(Switch),
+		m_number(number)
 	{	}
 	GimmickButton::~GimmickButton() {}
 	//‰Šú‰»
@@ -128,6 +130,7 @@ namespace basecross {
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		group->IntoGroup(GetThis<GameObject>());
 
+
 	}
 
 	void GimmickButton::OnCollisionEnter(shared_ptr<GameObject>& Other)
@@ -152,7 +155,8 @@ namespace basecross {
 		const Vec3& scale,
 		float UPic,
 		float VPic,
-		float OpenSwitch
+		float OpenSwitch,
+		int number
 	) :
 		GameObject(StagePtr),
 		m_Position(position),
@@ -160,7 +164,8 @@ namespace basecross {
 		m_Scale(scale),
 		m_UPic(UPic),
 		m_VPic(VPic),
-		m_OpenSwitch(OpenSwitch)
+		m_OpenSwitch(OpenSwitch),
+		m_number(number)
 	{
 	}
 	GimmickDoor::~GimmickDoor() {}
@@ -212,6 +217,11 @@ namespace basecross {
 
 	void GimmickDoor::OnUpdate()
 	{
+		OpenDoor();
+	}
+
+	void GimmickDoor::OpenDoor()
+	{
 		auto ptrTransform = GetComponent<Transform>();
 		Vec3 pos = ptrTransform->GetPosition();
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
@@ -224,21 +234,49 @@ namespace basecross {
 				if (Switch == m_OpenSwitch)
 				{
 					m_open = Switchs->GetButton();
-					if (m_open)
+					if (m_number == 1)
 					{
-						for (int i = 0; i < 1; i++)
+						if (m_open)
 						{
-							ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.01f, pos.z));
+							for (int i = 0; i < 1; i++)
+							{
+								ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.01f, pos.z));
+							}
+						}
+						else
+						{
+							ptrTransform->SetPosition(m_Position);
 						}
 					}
-					else
+					else if(m_number == 2)
 					{
-						ptrTransform->SetPosition(m_Position);
-					}
+						for (auto& v2 : vec) {
+							auto shObj2 = v2.lock();
+							if (shObj2) {
+								auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
+								auto Switch2 = Switchs2->GetSwitch();
+								if (Switch == m_OpenSwitch && !shObj)
+								{
+									m_open2 = Switchs2->GetButton();
+									if (m_open && m_open2)
+									{
+										for (int i = 0; i < 1; i++)
+										{
+											ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.01f, pos.z));
+										}
+									}
+									else
+									{
+										ptrTransform->SetPosition(m_Position);
+									}
+								}
+							}
+						}
 
+					}
 				}
 			}
-		}		
+		}
 	}
 
 }
