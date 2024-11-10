@@ -23,14 +23,19 @@ namespace basecross {
 		m_jumpHeight(2.5f),
 		m_gravity(-4.0f),
 		m_fallTerminal(-4.0f),
-		m_firePos(Vec3(0, .8f, 0)),
+
+		m_firePos(Vec3(-.4f, .8f, .25f)),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
 		m_stateType(air),
-		m_isFiring(false),
+		m_isCharging(false),
+		m_isOverCharge(false),
+		m_chargePerc(0.0f),	
+		m_chargeSpeed(1.2f),
+		m_chargeReduceSpeed(-.4f),
 
-		m_HP_max(100),
+		m_HP_max(4),
 		m_invincibleTimeMax(1.2f)
 	{}
 
@@ -108,21 +113,8 @@ namespace basecross {
 		//加速
 		m_moveVel += GetMoveVector() * m_accel * _delta;
 
-		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .23f) {
-			SetAnim(AddFire() + L"Idle");
-		}
-
-		if (m_stateType == stand) {
-			if (abs(GetMoveVector().x) > 0)
-				SetAnim(AddFire() + L"Run");
-			else
-				if (GetDrawPtr()->GetCurrentAnimation() != L"Land" && GetDrawPtr()->GetCurrentAnimation() != L"Fire_Land") {
-					SetAnim(AddFire() + L"Idle");
-				}
-		}
-
-		if (m_stateType == air)
-			SetAnim(AddFire() + L"Jumping");
+		//アニメーション関係
+		Animate();
 
 		Gravity();
 
@@ -220,21 +212,32 @@ namespace basecross {
 		m_collideCount--;
 		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
 
-		//Bボタンで火炎放射
-		Firing(pad[0].wButtons & XINPUT_GAMEPAD_B || key.m_bPushKeyTbl[VK_LCONTROL] == true);
+		//Bボタンでチャージ
+		Charging(pad[0].wButtons & XINPUT_GAMEPAD_B || key.m_bPushKeyTbl[VK_LCONTROL] == true);
 
 		SwitchFireAnim(GetDrawPtr()->GetCurrentAnimationTime());
 
-		m_fireCount += _delta;
-		if (!m_isFiring) m_fireCount = 0.0f;
+		//Bボタンで射出
+		if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_B || key.m_bUpKeyTbl[VK_LCONTROL] == true) {
+			auto trans = GetComponent<Transform>();
+			auto pos = trans->GetPosition();
+			auto fwd = trans->GetForward();
+			pos.y += m_firePos.y;
+			pos.x += m_firePos.x * fwd.z;
+			pos.z += m_firePos.z * fwd.x;
+			GetStage()->AddGameObject<FireProjectile>(pos, -fwd, m_chargePerc);
 
-		if (m_fireCount > .2f) {
-			auto pos = GetComponent<Transform>()->GetPosition();
-			pos += m_firePos;
-			auto rot = GetComponent<Transform>()->GetForward();
+			wstringstream wss;
 
-			GetStage()->AddGameObject<FireProjectile>(pos, -rot);
-			m_fireCount -= .2f;
+			auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
+			wss << pos.x << " : " << pos.y << " : " << pos.z << " : " << endl;
+			wss << fwd.x << " : " << fwd.y << " : " << fwd.z << " : " << endl;
+
+			auto scene = App::GetApp()->GetScene<Scene>();
+			scene->SetDebugString(L"Player\n" + wss.str());
+
+			m_chargePerc = 0.0f;
+			m_isOverCharge = false;
 		}
 
 		GetDrawPtr()->UpdateAnimation(_delta);
@@ -242,7 +245,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		ShowDebug();
+		//ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -256,7 +259,7 @@ namespace basecross {
 		wss << "move : " << m_moveVel.x << " / " << m_moveVel.y << " / " << m_moveVel.z << endl;
 		wss << "rotate : " << rot.x << " / " << rot.y << " / " << rot.z << endl;
 		wss << "anim : " << GetDrawPtr()->GetCurrentAnimation() << " animtime : " << GetDrawPtr()->GetCurrentAnimationTime() << endl;
-		wss << "fire : " << m_isFiring << endl;
+		wss << "fire : " << m_isCharging << " " << m_chargePerc << endl;
 		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
 		wss << "fps : " << App::GetApp()->GetStepTimer().GetFramesPerSecond() << " delta : " << _delta << endl;
 
@@ -269,11 +272,6 @@ namespace basecross {
 		m_moveVel.y = m_jumpHeight;
 		m_stateType = air;
 	}
-
-	void Player::Firing(bool fire) {
-		m_isFiring = fire;
-	}
-
 
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
 		m_collideCount = m_collideCountInit;
@@ -335,6 +333,22 @@ namespace basecross {
 		//}
 	}
 
+	void Player::Animate() {
+		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .23f) {
+			SetAnim(AddFire() + L"Idle");
+		}
+		if (m_stateType == stand) {
+			if (abs(GetMoveVector().x) > 0)
+				SetAnim(AddFire() + L"Run");
+			else
+				if (GetDrawPtr()->GetCurrentAnimation() != L"Land" && GetDrawPtr()->GetCurrentAnimation() != L"Fire_Land") {
+					SetAnim(AddFire() + L"Idle");
+				}
+		}
+		if (m_stateType == air)
+			SetAnim(AddFire() + L"Jumping");
+	}
+
 	void Player::Gravity() {
 		m_moveVel.y += m_gravity * _delta;
 		if (m_stateType == stand && m_moveVel.y < m_gravity * .1f) m_moveVel.y = m_gravity * .1f;
@@ -386,7 +400,7 @@ namespace basecross {
 	void Player::SwitchFireAnim(const float time) {
 		const float animTime = time;
 		auto draw = GetComponent<PNTBoneModelDraw>();
-		if (m_isFiring) {
+		if (m_isCharging) {
 			vector<wstring> target = { (L"Idle"), (L"Run"), (L"Jump_Start"), (L"Jumping"), (L"Land") };
 			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
@@ -396,7 +410,7 @@ namespace basecross {
 				}
 			}
 		}
-		if (!m_isFiring) {
+		if (!m_isCharging) {
 			vector<wstring> target = { (L"Fire_Idle"), (L"Fire_Run"), (L"Fire_RunBack"), (L"Fire_Jump_Start"), (L"Fire_Jumping"), (L"Fire_Land") };
 			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
@@ -489,22 +503,23 @@ namespace basecross {
 
 	//====================================================================
 	// class FireProjectile
-	// プレイヤーの火炎放射
+	// プレイヤーの飛び道具
 	//====================================================================
 
 	FireProjectile::FireProjectile(const shared_ptr<Stage>& StagePtr,
-		const Vec3 dist, const Vec3 angle) :
+		const Vec3 dist, const Vec3 angle, const float power) :
 		GameObject(StagePtr),
 		m_dist(dist),
 		m_angle(angle),
-		m_speed(1.5f),
+		m_power(power),
+		m_speed(3.0f),
 		m_rangeMax(.8f)
 	{}
 
 	void FireProjectile::OnCreate() {
 
 		auto trans = GetComponent<Transform>();
-		trans->SetScale(0.10f, 0.10f, 0.10f);
+		trans->SetScale(0.20f, 0.20f, 0.20f);
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
 		trans->SetPosition(m_dist);
 
@@ -519,7 +534,7 @@ namespace basecross {
 
 		ptrDraw->SetTextureResource(L"FIRE");
 
-		AddTag(L"Player");//テスト用。後にFIREとかにする
+		AddTag(L"Attack");
 
 		m_range = m_rangeMax;
 	}
@@ -529,7 +544,7 @@ namespace basecross {
 
 		auto trans = GetComponent<Transform>();
 
-		trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
+		trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * m_power * delta));
 
 		m_range -= delta;
 		GetComponent<PNTStaticDraw>()->SetDiffuse(Col4(1, 1, 1, m_range * 2 / m_rangeMax));
@@ -537,10 +552,56 @@ namespace basecross {
 		if (m_range <= 0) {
 			GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
 		}
-
 	}
 
+	//====================================================================
+	// class SpriteCharge
+	// プレイヤーの長押しゲージ
+	//====================================================================
 
+	void SpriteCharge::OnCreate() {
+		Col4 color(1, 1, 1, 1);
+
+		m_Vertices = {
+			{Vec3(0, 0, 0.0f), color, Vec2(0, 0)},
+			{Vec3(m_width, 0, 0.0f), color, Vec2(1, 0)},
+			{Vec3(0, m_height, 0.0f), color, Vec2(0, 1)},
+			{Vec3(m_width, m_height, 0.0f), color, Vec2(1, 1)},
+		};
+		vector<uint16_t> indices = {
+			0, 1, 2,
+			2, 1, 3,
+		};
+		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
+		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
+		m_DrawComp->SetTextureResource(L"CHARGE");
+		m_DrawComp->SetDrawActive(false);
+		SetDrawLayer(1);
+		SetAlphaActive(true);
+
+		GetComponent<Transform>()->SetPosition(windowWidth * -.45, windowHeight * .45, 0);
+	}
+
+	void SpriteCharge::OnUpdate() {
+		auto draw = GetComponent<PCTSpriteDraw>();
+
+		auto player = m_player.lock();
+		if (player->IsCharging()) {
+			draw->SetDrawActive(true);
+			float perc = player->GetChargePerc();
+			m_Vertices[1].position.x = m_width * perc;
+			m_Vertices[3].position.x = m_width * perc;
+			m_Vertices[1].textureCoordinate.x = perc;
+			m_Vertices[3].textureCoordinate.x = perc;
+
+			draw->UpdateVertices(m_Vertices);
+		}
+		else {
+			draw->SetDrawActive(false);
+		}
+	}
 }
 //end basecross
 
+//長押し始めるとゲージ出現、チャージ開始
+//長押し終えるとゲージ非表示、レーザー射出　チャージの結果を参照して射程決定

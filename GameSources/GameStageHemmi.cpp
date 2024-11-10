@@ -16,7 +16,7 @@ namespace basecross {
 	//ビューとライトの作成
 	void GameStageHemmi::CreateViewLight() {
 		// カメラの設定
-		auto camera = ObjectFactory::Create<Camera>();
+		auto camera = ObjectFactory::Create<MainCamera>();
 		camera->SetEye(Vec3(0.0f, 0.5f, 3.0f));//0.0f, 0.5f, 3.0f
 		camera->SetAt(Vec3(0.0f, 0.5f, 0.0f)); //0.0f, 0.5f, 0.0f
 
@@ -34,6 +34,7 @@ namespace basecross {
 		auto texPath = path + L"Textures/";
 		wstring strTexture = texPath + L"White.png";
 		app->RegisterTexture(L"White", strTexture);
+
 	}
 
 	void GameStageHemmi::CreateGameBox() {
@@ -42,7 +43,7 @@ namespace basecross {
 			{
 				Vec3(0.0f, -0.4f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(3.0f, 0.1f, 0.3f)
+				Vec3(12.0f, 0.1f, 12.0f)
 			},
 			//{
 			//	Vec3(0.0f,0.5f,0.0f),
@@ -54,6 +55,7 @@ namespace basecross {
 		//オブジェクトの作成
 		for (auto v : vec) {
 			auto box = AddGameObject<FixedBox>(v[0], v[1], v[2]);
+			box->GetComponent<BcPNTStaticDraw>()->SetDiffuse(Col4(0.0f, 0.0f, 0.0f, 1.0f));
 			//SetSharedGameObject(L"box",box);
 		}
 	}
@@ -80,7 +82,7 @@ namespace basecross {
 		auto rad = XMConvertToRadians(30.0f);
 		vector<vector<Vec3>> vec = {
 			{
-				Vec3(0.6f,0.2f,0.0f),
+				Vec3(0.6f*4,0.5f,0.0f),
 				Vec3(0.0f,0.0f,0.0f),
 				Vec3(0.1f,0.1f,0.1f),
 			},

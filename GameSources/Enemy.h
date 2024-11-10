@@ -45,6 +45,7 @@ namespace basecross {
 		Vec3 m_moveRot;
 
 		int m_dic;           //向いている方向 左-1,右1
+		Vec3 m_direc;
 		int m_dicUp;
 		int m_firstDic;
 
@@ -93,8 +94,7 @@ namespace basecross {
 			const Vec3& scale,
 			const State& state,
 			const State& deathState,
-			const shared_ptr<Player>& player,
-			const shared_ptr<FixedBox>& box = nullptr);
+			const shared_ptr<Player>& player);
 		virtual ~Enemy(){}
 		virtual void OnCreate() override; // 初期化
 		virtual void OnUpdate() override; // 更新
@@ -104,7 +104,7 @@ namespace basecross {
 		void HipDropJump();
 		void ThisDestroy();
 		void ReceiveDamage(float damage);
-		void PlayerDic(bool zero = true, float addSpeed = 1.0f);
+		void PlayerDic();
 		void OneJump(float jumpHight);
 		void HitDrop();
 		void FindFixed();
@@ -117,9 +117,11 @@ namespace basecross {
 		void SetFlyPower(float power);
 		void SetState(State state);
 		int GetDic();
+		Vec3 GetDirec();
 		Vec3 GetPos();
 		Vec3 GetChangePos();
 		bool GetFloorFlag();
+		void EnemyAngle();
 
 
 		//重力に関する関数
@@ -143,6 +145,7 @@ namespace basecross {
 		float m_speed;   //弾の速さ
 		float m_Range;   //射程
 		int m_dic;       //弾の向き 左-1,右1
+		Vec3 m_direc;
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
