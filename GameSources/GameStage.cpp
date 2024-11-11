@@ -27,7 +27,7 @@ namespace basecross {
 
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
-		light->SetDefaultLighting2(); //デフォルトのライティングを指定
+		light->SetDefaultLighting(); //デフォルトのライティングを指定
 	}
 
 	void GameStage::CreateGameBox() {
@@ -88,7 +88,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f);
+			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
 		}
 		m_GameStage1.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -115,7 +115,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f);
+			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
 		}
 	}
 
@@ -222,7 +222,6 @@ namespace basecross {
 			CreateViewLight();
 			//CreateGameBox();
 			CreateGimmick();
-			//AddGameObject<TilingFixedBox>();
 
 			CreatePlayer();
 			CreateFixedBox();
@@ -248,8 +247,8 @@ namespace basecross {
 		//				if (length(trans->GetPosition() - object->GetComponent<Transform>()->GetPosition()) < 1.0f) {
 		//					object->SetUpdateActive(true);
 		//				}
-		//				else
 		//				{
+		//				else
 		//					object->SetUpdateActive(false);
 		//				}
 		//			}

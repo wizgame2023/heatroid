@@ -17,6 +17,7 @@ namespace basecross {
 		Vec3 m_Position;
 		float m_UPic;
 		float m_VPic;
+		wstring m_Texname;
 	public:
 		//\’z‚Æ”jŠü
 		TilingFixedBox(const shared_ptr<Stage>& StagePtr,
@@ -24,7 +25,8 @@ namespace basecross {
 			const Vec3& rotation,
 			const Vec3& scale,
 			const float& UPic,
-			const float& VPic
+			const float& VPic,
+			const wstring& m_Texname
 		);
 		virtual ~TilingFixedBox();
 		//‰Šú‰»

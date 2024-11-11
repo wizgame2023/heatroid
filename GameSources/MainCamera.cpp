@@ -264,6 +264,4 @@ namespace basecross {
 		UpdateArmLengh();
 		Camera::OnUpdate();
 	}
-
-
 }
