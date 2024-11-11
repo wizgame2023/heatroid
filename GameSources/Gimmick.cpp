@@ -18,14 +18,16 @@ namespace basecross {
 		const Vec3& rotation,
 		const Vec3& scale,
 		const float& UPic,
-		const float& VPic
+		const float& VPic,
+		const wstring& Texname
 	) :
 		GameObject(StagePtr),
 		m_Position(position),
 		m_Rotation(rotation),
 		m_Scale(scale),
 		m_UPic(UPic),
-		m_VPic(VPic)
+		m_VPic(VPic),
+		m_Texname(Texname)
 	{
 	}
 	TilingFixedBox::~TilingFixedBox() {}
@@ -58,15 +60,15 @@ namespace basecross {
 		}
 		AddTag(L"FixedBox");
 		auto PtrDraw = AddComponent<BcPNTStaticDraw>();
-		//描画コンポーネントに形状（メッシュ）を設定
-		//PtrDraw->CreateOriginalMesh(vertices, indices);
-		//PtrDraw->SetOriginalMeshUse(true);
+		PtrDraw->CreateOriginalMesh(vertices, indices);
+		PtrDraw->SetOriginalMeshUse(true);
 		//PtrDraw->SetFogEnabled(true);
 		//自分に影が映りこむようにする
-		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
-		PtrDraw->SetOwnShadowActive(true);
+		//PtrDraw->SetOwnShadowActive(true);
+		//描画コンポーネントテクスチャの設定
+		PtrDraw->SetTextureResource(m_Texname);
 		//タイリング設定
-		//->SetSamplerState(SamplerState::LinearWrap);
+		PtrDraw->SetSamplerState(SamplerState::PointWrap);
 	}
 
 	GimmickButton::GimmickButton(const shared_ptr<Stage>& StagePtr,
@@ -228,53 +230,51 @@ namespace basecross {
 		auto& vec = group->GetGroupVector();
 		for (auto& v : vec) {
 			auto shObj = v.lock();
-			if (shObj) {
-				auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-				auto Switch = Switchs->GetSwitch();
-				if (Switch == m_OpenSwitch)
+			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+			auto Switch = Switchs->GetSwitch();
+			if (Switch == m_OpenSwitch)
+			{
+				m_open = Switchs->GetButton();
+				if (m_open)
 				{
-					m_open = Switchs->GetButton();
 					if (m_number == 1)
 					{
-						if (m_open)
+						for (int i = 0; i < 1; i++)
 						{
-							for (int i = 0; i < 1; i++)
-							{
-								ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.01f, pos.z));
-							}
-						}
-						else
-						{
-							ptrTransform->SetPosition(m_Position);
+							ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.01f, pos.z));
 						}
 					}
-					else if(m_number == 2)
+					else if (m_number == 2)
 					{
 						for (auto& v2 : vec) {
-							auto shObj2 = v2.lock();
-							if (shObj2) {
-								auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
-								auto Switch2 = Switchs2->GetSwitch();
-								if (Switch == m_OpenSwitch && !shObj)
+							auto shObj2 = v2.lock();							
+							auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
+							auto Switch2 = Switchs2->GetSwitch();
+							if (Switch2 == m_OpenSwitch && Switchs2!=Switchs)
+							{
+								m_open2 = Switchs2->GetButton();
+								if (m_open2)
 								{
-									m_open2 = Switchs2->GetButton();
-									if (m_open && m_open2)
+									for (int i = 0; i < 1; i++)
 									{
-										for (int i = 0; i < 1; i++)
-										{
-											ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.01f, pos.z));
-										}
-									}
-									else
-									{
-										ptrTransform->SetPosition(m_Position);
-									}
+										ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.01f, pos.z));
+									}		
 								}
+								else
+								{
+									ptrTransform->SetPosition(m_Position);
+								}									
 							}
 						}
 
 					}
+
 				}
+				else
+				{
+					ptrTransform->SetPosition(m_Position);
+				}
+
 			}
 		}
 	}
