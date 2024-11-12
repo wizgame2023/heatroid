@@ -62,9 +62,9 @@ namespace basecross {
 	void GameStageHemmi::CreateBreakWall() {
 		vector<vector<Vec3>> vec = {
 			{
-				Vec3(-1.3f,-0.2f,0.0f),
+				Vec3(6.0f,-0.2f,6.0f),
 				Vec3(0.0f,0.0f,0.0f),
-				Vec3(0.1f,0.3f,0.1f)
+				Vec3(12.0f,0.3f,0.1f)
 			},
 			//{
 			//	Vec3(1.3f,-0.2f,0.0f),
@@ -84,7 +84,7 @@ namespace basecross {
 			{
 				Vec3(0.6f*4,0.5f,0.0f),
 				Vec3(0.0f,0.0f,0.0f),
-				Vec3(0.1f,0.1f,0.1f),
+				Vec3(1.0f,1.0f,1.0f),
 			},
 			//{
 			//	Vec3(-0.6f,0.2f,0.0f),
