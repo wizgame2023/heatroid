@@ -10,9 +10,6 @@
 namespace basecross {
 
 
-	vector<weak_ptr<Transform>> TilingFixedBox::m_moveObject;
-
-
 	TilingFixedBox::TilingFixedBox(const shared_ptr<Stage>& StagePtr,
 		const Vec3& position,
 		const Vec3& rotation,
@@ -59,7 +56,7 @@ namespace basecross {
 			}
 		}
 		AddTag(L"FixedBox");
-		auto PtrDraw = AddComponent<BcPNTStaticDraw>();
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
 		PtrDraw->CreateOriginalMesh(vertices, indices);
 		PtrDraw->SetOriginalMeshUse(true);
 		//PtrDraw->SetFogEnabled(true);

@@ -21,9 +21,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Project.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)ProjectShader.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Scene.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -52,6 +49,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)MainCamera.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)ProjectShader.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
