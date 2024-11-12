@@ -25,8 +25,8 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(hitDrop),
-		m_deathState(rightMove),
+		m_stateType(state),
+		m_deathState(deathState),
 		m_player(player),
 		m_hp(100),
 		m_maxHp(100),
@@ -77,7 +77,7 @@ namespace basecross {
 			Vec3(1.0f, 1.0f, 1.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
-			Vec3(0.0f, 0.0f, 0.0f)
+			Vec3(0.0f, -0.5f, 0.0f)
 		);
 
 		ptrDraw->SetMeshResource(L"ENEMYARUKU");
