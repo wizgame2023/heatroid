@@ -40,14 +40,13 @@ namespace basecross {
 		float m_jumpHight;   //ƒWƒƒƒ“ƒv‚·‚é‚‚³
 		float m_time;
 		float m_bulletTime;  //’e‚Ì”­ËŠÔŠu
-		float m_bulletRange; //’e‚ğ”­Ë‚·‚é‹——£
-		float m_angleSpeed;  //‰ñ“]‘¬“x
+		float m_trackingRange; //’e‚ğ”­Ë‚·‚é‹——£
+		float m_hitDropTime;
 		Vec3 m_moveRot;
 
-		int m_dic;           //Œü‚¢‚Ä‚¢‚é•ûŒü ¶-1,‰E1
 		Vec3 m_direc;
 		int m_dicUp;
-		int m_firstDic;
+		Vec3 m_firstDirec;
 
 		float m_test;
 		//d—Í
@@ -118,7 +117,6 @@ namespace basecross {
 		void SetUpMove(float speed,float height);
 		void SetFlyPower(float power);
 		void SetState(State state);
-		int GetDic();
 		Vec3 GetDirec();
 		Vec3 GetPos();
 		Vec3 GetChangePos();
@@ -146,7 +144,6 @@ namespace basecross {
 		
 		float m_speed;   //’e‚Ì‘¬‚³
 		float m_Range;   //Ë’ö
-		int m_dic;       //’e‚ÌŒü‚« ¶-1,‰E1
 		Vec3 m_direc;
 		Vec3 m_pos;
 		Vec3 m_rot;
