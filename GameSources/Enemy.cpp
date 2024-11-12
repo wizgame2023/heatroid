@@ -25,7 +25,7 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(plunge),
+		m_stateType(rightMove),
 		m_deathState(stay),
 		m_player(player),
 		m_heat(0),
@@ -87,6 +87,10 @@ namespace basecross {
 		ptrDraw->SetMeshToTransformMatrix(meshMat);
 		ptrDraw->SetOwnShadowActive(true);
 
+		ptrDraw->AddAnimation(L"walk", 10, 30, true, 30);
+		ptrDraw->AddAnimation(L"attack", 50, 40, false, 30);
+		ptrDraw->AddAnimation(L"wait", 90, 25, false, 30);
+		ptrDraw->ChangeCurrentAnimation(L"walk");
 
 		//衝突判定
 		m_collision = AddComponent<CollisionObb>();
@@ -145,10 +149,12 @@ namespace basecross {
 		{
 		//移動なし
 		case stay:
+			EnemyAnime(L"wait");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			break;
 		//追従の左右移動
 		case rightMove:
+			EnemyAnime(L"walk");
 			m_speed = m_maxSpeed;
 			PlayerDic();
 			EnemyAngle();
@@ -204,6 +210,7 @@ namespace basecross {
 			break;
 			//突っ込み
 		case plunge:
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"attack");
 			//PlayerDic();
 			if (m_floorFlag) {
 				if (!m_plungeFlag && !m_plungeColFlag) {
@@ -232,8 +239,6 @@ namespace basecross {
 			Grav();
 		}
 
-		HitDrop();
-
 		m_trans->SetPosition(m_pos);
 
 		//オーバーヒートの時
@@ -245,9 +250,13 @@ namespace basecross {
 		}
 		else if (m_heat <= 0.0f) {
 			m_heat = 0.0f;
-			m_stateType = m_beforState;
+			if (m_stateType != rightMove) {
+				m_stateType = m_beforState;
+			}
 		}
-		m_test = m_heat;
+
+		auto draw = GetComponent<PNTBoneModelDraw>();
+		draw->UpdateAnimation(elapsed);
 		Debug();
 	}
 
@@ -287,7 +296,18 @@ namespace basecross {
 			}
 		}
 	}
-	
+	//プレイヤーの方向を向かせる
+	void Enemy::EnemyAngle()
+	{
+		auto front = GetDirec();
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		front.y = 0;
+		front.normalize();
+		float frontAngle = atan2(front.z, front.x);
+		float rad = XMConvertToRadians(90.0f);
+		m_trans->SetRotation(Vec3(0.0f, -frontAngle - rad, 0.0f));
+	}
+
 
 	//ジャンプ
 	void Enemy::OneJump(float jumpHight) {
@@ -424,7 +444,6 @@ namespace basecross {
 			}
 		}
 		if (other->FindTag(L"Attack")) {
-			//ThisDestroy();
 			m_deathPos = m_pos;
 			m_heat = m_maxHeat;
 		}
@@ -461,15 +480,12 @@ namespace basecross {
 		}
 	}
 
-	void Enemy::EnemyAngle()
-	{
-		auto front = GetDirec();
-		auto elapsed = App::GetApp()->GetElapsedTime();
-		front.y = 0;
-		front.normalize();
-		float frontAngle = atan2(front.z, front.x);
-		float rad = XMConvertToRadians(90.0f);
-		m_trans->SetRotation(Vec3(0.0f, -frontAngle - rad, 0.0f));
+	void Enemy::EnemyAnime(wstring anime) {
+		auto draw = GetComponent<PNTBoneModelDraw>()->GetCurrentAnimation();
+		if ( draw!= anime) {
+			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(anime);
+		}
+
 	}
 	//デバック
 	void Enemy::Debug() {
@@ -591,8 +607,8 @@ namespace basecross {
 		m_fixedPos(fixedPos),
 		m_pos(Vec3(0, 0, 0)),
 		m_rot(Vec3(0, 0, 0)),
-		m_scal(Vec3(0.02f, 0.02f, 0.02f)),
-		m_speed(1.0f),
+		m_scal(Vec3(0.5f, 0.5f, 0.5f)),
+		m_speed(20.0f),
 		m_Range(1.0f),
 		m_floorCheck(false)
 	{}

@@ -115,6 +115,7 @@ namespace basecross {
 		void HitDrop();
 		void FindFixed();
 		void Bullet();
+		void EnemyAnime(wstring anime);
 		void Debug();
 		//get,set
 		void SetEnemyFlayFlag(bool flag);
