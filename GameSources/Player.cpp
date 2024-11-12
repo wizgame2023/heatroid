@@ -16,18 +16,20 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_speed(4.0f),
-		m_accel(4.0f),
-		m_friction(.8f),
+		m_speed(24.0f),
+		m_accel(48.0f),
+		m_friction(.5f),
+		m_frictionDynamic(.15f),
 		m_frictionThreshold(.05f),
-		m_jumpHeight(2.5f),
-		m_gravity(-4.0f),
-		m_fallTerminal(-4.0f),
-
-		m_firePos(Vec3(-.4f, .8f, .25f)),
+		m_jumpHeight(12.0f),
+		m_gravity(-20.0f),
+		m_fallTerminal(-20.0f),
+		m_firePos(Vec3(-.75f, 1.65f, 1.5f)),
 		m_moveVel(Vec3(0, 0, 0)),
+		m_moveAngle(0.0f),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
+
 		m_stateType(air),
 		m_isCharging(false),
 		m_isOverCharge(false),
@@ -61,7 +63,7 @@ namespace basecross {
 	}
 
 
-	Vec3 Player::GetMoveVector() const {
+	Vec3 Player::GetMoveVector() {
 		Vec3 angle(0, 0, 0);
 		//入力の取得
 		float moveX = GetInputState().x;
@@ -85,7 +87,8 @@ namespace basecross {
 			float cntlAngle = atan2(-moveX, moveZ);
 			//トータルの角度を算出
 			float totalAngle = frontAngle + cntlAngle;
-			ptrTransform->SetRotation(0, -totalAngle-XMConvertToRadians(90), 0);
+			//プレイヤーに角度を反映
+			m_moveAngle = -totalAngle - XMConvertToRadians(90);
 
 			//角度からベクトルを作成
 			angle = Vec3(cos(totalAngle), 0, sin(totalAngle));
@@ -101,22 +104,12 @@ namespace basecross {
 
 	void Player::MovePlayer() {
 		auto trans = GetComponent<Transform>();
-
-		//摩擦(地上のみ)
-		if (m_stateType == stand && GetMoveVector() == Vec3(0)) {
-			m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
-			m_moveVel.z -= m_moveVel.z * m_friction * (1000.0f / 60.0f) * _delta;
-			if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
-			if (abs(m_moveVel.z) <= m_frictionThreshold) m_moveVel.z = 0;
-		}
-
+		
 		//加速
 		m_moveVel += GetMoveVector() * m_accel * _delta;
 
 		//アニメーション関係
 		Animate();
-
-		Gravity();
 
 		//最高速度
 		auto angle = Vec3(m_moveVel.x, 0, m_moveVel.z);
@@ -136,10 +129,11 @@ namespace basecross {
 			}
 		}
 
+		GetComponent<Transform>()->SetRotation(0, m_moveAngle, 0);
+
 		//落下の終端速度
 		if (m_moveVel.y < m_fallTerminal) m_moveVel.y = m_fallTerminal;
 
-		trans->SetPosition((m_moveVel * _delta) + trans->GetPosition());
 	}
 
 	void Player::OnCreate() {
@@ -148,7 +142,7 @@ namespace basecross {
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(0.50f, 0.50f, 0.50f);
+		ptr->SetScale(3.0f, 3.0f, 3.0f);
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(Vec3(0, 1.0f, 0));
 
@@ -178,6 +172,7 @@ namespace basecross {
 
 		ptrDraw->SetMeshResource(L"PLAYER");
 		ptrDraw->SetMeshToTransformMatrix(meshMat);
+		ptrDraw->SetBlendState(BlendState::AlphaBlend);
 		ptrDraw->SetOwnShadowActive(true);
 
 		RegisterAnim();
@@ -193,59 +188,100 @@ namespace basecross {
 			ptrCamera->SetTargetObject(GetThis<GameObject>());
 			ptrCamera->SetTargetToAt(Vec3(0, 0.5f, 0));
 		}
-
 	}
 
 	void Player::OnUpdate() {
 		_delta = App::GetApp()->GetElapsedTime();
-
-
 		auto key = App::GetApp()->GetInputDevice().GetKeyState();
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 
-		MovePlayer();
-		MoveCamera();
-
-		m_collideCount--;
-		if (m_stateType == stand && m_collideCount <= 0) m_stateType = air;
-
-		//Bボタンでチャージ
-		Charging(pad[0].wButtons & XINPUT_GAMEPAD_B || key.m_bPushKeyTbl[VK_LCONTROL] == true);
-
-		SwitchFireAnim(GetDrawPtr()->GetCurrentAnimationTime());
-
-		//Bボタンで射出
-		if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_B || key.m_bUpKeyTbl[VK_LCONTROL] == true) {
-			auto trans = GetComponent<Transform>();
-			auto pos = trans->GetPosition();
-			auto fwd = trans->GetForward();
-			pos.y += m_firePos.y;
-			pos.x += m_firePos.x * fwd.z;
-			pos.z += m_firePos.z * fwd.x;
-			GetStage()->AddGameObject<FireProjectile>(pos, -fwd, m_chargePerc);
-
-			wstringstream wss;
-
-			auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
-			wss << pos.x << " : " << pos.y << " : " << pos.z << " : " << endl;
-			wss << fwd.x << " : " << fwd.y << " : " << fwd.z << " : " << endl;
-
-			auto scene = App::GetApp()->GetScene<Scene>();
-			scene->SetDebugString(L"Player\n" + wss.str());
-
-			m_chargePerc = 0.0f;
-			m_isOverCharge = false;
+		if (m_invincibleTime > 0) {
+			m_invincibleTime -= _delta;
+			GetDrawPtr()->SetDiffuse(Col4(1, 1, 1, 0.3f));
+		}
+		else {
+			GetDrawPtr()->SetDiffuse(Col4(1, 1, 1, 1));
 		}
 
-		GetDrawPtr()->UpdateAnimation(_delta);
+		if(GetDrawPtr()->GetCurrentAnimation()==L"Died") m_invincibleTime = m_invincibleTimeMax;
 
+		m_collideCount--;
+
+		switch (m_stateType) {
+
+			//---------------------------------------地上
+		case stand:
+			if (m_HP <= 0) {
+				m_stateType = died;
+			}
+			//プレイヤーの移動
+			MovePlayer();
+			Friction();
+			Gravity();
+
+			//Bボタンで射出
+			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_B || key.m_bUpKeyTbl[VK_LCONTROL] == true)
+				Projectile();
+
+			//Bボタンでチャージ
+			Charging(pad[0].wButtons & XINPUT_GAMEPAD_B || key.m_bPushKeyTbl[VK_LCONTROL] == true);
+
+			//空中判定
+			if (m_collideCount <= 0) m_stateType = air;
+
+			break;
+			//---------------------------------------空中
+		case air:
+			MovePlayer();
+			Gravity();
+
+			//Bボタンで射出
+			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_B || key.m_bUpKeyTbl[VK_LCONTROL] == true)
+				Projectile();
+
+			//Bボタンでチャージ
+			Charging(pad[0].wButtons & XINPUT_GAMEPAD_B || key.m_bPushKeyTbl[VK_LCONTROL] == true);
+
+			break;
+			//---------------------------------------地上のけぞり
+		case hit_stand:
+			SetAnim(L"GetHit_Stand");
+			Friction();
+			Gravity();
+			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Stand" && GetDrawPtr()->GetCurrentAnimationTime() >= .5f) {
+				m_stateType = stand;
+			}
+			if (m_HP <= 0) {
+				m_stateType = died;
+			}
+
+			break;
+			//---------------------------------------空中のけぞり
+		case hit_air:
+			SetAnim(L"GetHit_Air");
+			Gravity();
+			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Air" && GetDrawPtr()->GetCurrentAnimationTime() >= .5f) {
+				m_stateType = air;
+			}
+
+			break;
+			//---------------------------------------死亡
+		case died:
+			Died();
+			Friction();
+			break;
+		}
+
+		GetComponent<Transform>()->SetPosition((m_moveVel * _delta) + GetComponent<Transform>()->GetPosition());
+
+		GetDrawPtr()->UpdateAnimation(_delta);
 	}
 
 	void Player::OnUpdate2() {
-		//ShowDebug();
+		ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -255,7 +291,6 @@ namespace basecross {
 
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		wss << "stateType : " << m_stateType << endl;
-		wss << "input : " << GetMoveVector().x << " / " << GetMoveVector().y << " / " << GetMoveVector().z << endl;
 		wss << "move : " << m_moveVel.x << " / " << m_moveVel.y << " / " << m_moveVel.z << endl;
 		wss << "rotate : " << rot.x << " / " << rot.y << " / " << rot.z << endl;
 		wss << "anim : " << GetDrawPtr()->GetCurrentAnimation() << " animtime : " << GetDrawPtr()->GetCurrentAnimationTime() << endl;
@@ -275,9 +310,16 @@ namespace basecross {
 
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
 		m_collideCount = m_collideCountInit;
+
+		if (m_stateType == hit_air && Other->FindTag(L"FixedBox")) {
+			m_stateType = hit_stand;
+			return;
+		}
+
 		if (m_stateType == air && Other->FindTag(L"FixedBox")) {
 			SetAnim(AddFire() + L"Land");
 			m_stateType = stand;
+			return;
 		}
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
 		if ((Other->FindTag(L"GimmickButton")))
@@ -309,6 +351,10 @@ namespace basecross {
 					Switchs->SetButton(true);
 				}
 			}
+		}
+		if ((Other->FindTag(L"Enemy")))
+		{
+			if (m_invincibleTime <= 0) GetHit();
 		}
 
 	}
@@ -360,11 +406,27 @@ namespace basecross {
 		}
 		if (m_stateType == air)
 			SetAnim(AddFire() + L"Jumping");
+
 	}
 
+	//重力
 	void Player::Gravity() {
 		m_moveVel.y += m_gravity * _delta;
 		if (m_stateType == stand && m_moveVel.y < m_gravity * .1f) m_moveVel.y = m_gravity * .1f;
+	}
+
+	//摩擦(地上のみ)
+	void Player::Friction() {
+		if (GetMoveVector() == Vec3(0)) {
+			m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
+			m_moveVel.z -= m_moveVel.z * m_friction * (1000.0f / 60.0f) * _delta;
+			if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
+			if (abs(m_moveVel.z) <= m_frictionThreshold) m_moveVel.z = 0;
+		}
+		if (GetMoveVector() != Vec3(0)) {
+			m_moveVel.x -= m_moveVel.x * m_frictionDynamic * (1000.0f / 60.0f) * _delta;
+			m_moveVel.z -= m_moveVel.z * m_frictionDynamic * (1000.0f / 60.0f) * _delta;
+		}
 	}
 
 	Vec3 Player::RoundOff(Vec3 number, int point) {
@@ -408,6 +470,56 @@ namespace basecross {
 		ptrDraw->ChangeCurrentAnimation(L"Idle");
 	}
 
+	void Player::GetHit() {
+		if (m_stateType == stand) {
+			m_stateType = hit_stand;
+		}
+		if (m_stateType == air) {
+			m_stateType = hit_air;
+		}
+		
+
+		auto trans = GetComponent<Transform>();
+		auto fwd = trans->GetForward();
+		m_moveVel.x = fwd.x * 30.0f;
+		m_moveVel.z = fwd.z * 30.0f;
+
+		//m_moveType = hit;
+		m_HP -= 1;
+		m_invincibleTime = m_invincibleTimeMax;
+
+	}
+
+	void Player::Died() {
+		SetAnim(L"Died");
+		m_invincibleTime = m_invincibleTimeMax;
+		//摩擦(地上のみ)
+
+	}
+
+	void Player::Projectile() {
+		Charging(false);
+		auto trans = GetComponent<Transform>();
+		auto pos = trans->GetPosition();
+		auto fwd = trans->GetForward();
+		auto scale = trans->GetScale();
+		pos.y += m_firePos.y * scale.y;
+		pos.x += ((m_firePos.x * fwd.z) - (m_firePos.z * fwd.x)) * scale.x;
+		pos.z += ((m_firePos.z * fwd.x) - (m_firePos.x * fwd.z)) * scale.z;
+		GetStage()->AddGameObject<FireProjectile>(pos, -fwd, m_chargePerc);
+
+		wstringstream wss;
+
+		wss << "\n\n" << pos.x << " : " << pos.y << " : " << pos.z << endl;
+		wss << fwd.x << " : " << fwd.y << " : " << fwd.z << endl;
+
+		auto scene = App::GetApp()->GetScene<Scene>();
+		scene->SetDebugString(wss.str());
+
+		m_chargePerc = 0.0f;
+		m_isOverCharge = false;
+
+	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え
 	void Player::SwitchFireAnim(const float time) {
@@ -446,75 +558,6 @@ namespace basecross {
 	//}
 
 	//====================================================================
-	// class AttackCollision
-	// プレイヤーの攻撃判定
-	//====================================================================
-
-	AttackCollision::AttackCollision(const shared_ptr<Stage>& StagePtr,
-		const shared_ptr<GameObject>& player) :
-		GameObject(StagePtr),
-		m_player(player),
-		m_distFromPlayer(Vec3(.1f, 0, 0)),
-		m_isMoveHit(false)
-	{}
-
-	void AttackCollision::OnCreate() {
-		auto trans = GetComponent<Transform>();
-		trans->SetScale(0.10f, 0.10f, 0.10f);	//直径25センチの球体
-		trans->SetRotation(0.0f, 0.0f, 0.0f);
-		trans->SetPosition(Vec3(0, 0, 0));
-
-		auto coll = AddComponent<TriggerSphere>();
-		coll->SetDrawActive(false);//debug
-
-	}
-
-
-	void AttackCollision::OnUpdate() {
-		FollowPlayer();
-
-	}
-
-	void AttackCollision::FollowPlayer() {
-		auto trans = GetComponent<Transform>();
-		//weakからsharedに格上げ
-		auto ptrPlayer = m_player.lock();
-
-		if (ptrPlayer != nullptr) {
-			auto matPlayer = ptrPlayer->GetComponent<Transform>()->GetWorldMatrix();
-			matPlayer.scaleIdentity();
-			Mat4x4 matrix;
-			matrix.affineTransformation(
-				Vec3(1),
-				Vec3(0),
-				Vec3(0),
-				m_distFromPlayer);
-			matrix *= matPlayer;
-
-			auto posPlayer = matrix.transInMatrix();
-			trans->SetPosition(posPlayer);
-			trans->SetQuaternion(matrix.quatInMatrix());
-		}
-	}
-
-	void AttackCollision::OnCollisionEnter(shared_ptr<GameObject>& Other) {
-		//
-		if (!m_isMoveHit && Other->FindTag(L"Enemy")) {
-			//MessageBox(0, 0, 0, MB_ICONINFORMATION);
-
-			//攻撃
-			m_isMoveHit = true;
-		}
-	}
-
-	void AttackCollision::OnCollisionExit(shared_ptr<GameObject>& Other) {
-		//
-		if (m_isMoveHit && Other->FindTag(L"Enemy")) {
-			//攻撃
-		}
-	}
-
-	//====================================================================
 	// class FireProjectile
 	// プレイヤーの飛び道具
 	//====================================================================
@@ -525,14 +568,14 @@ namespace basecross {
 		m_dist(dist),
 		m_angle(angle),
 		m_power(power),
-		m_speed(3.0f),
+		m_speed(9.0f),
 		m_rangeMax(.8f)
 	{}
 
 	void FireProjectile::OnCreate() {
 
 		auto trans = GetComponent<Transform>();
-		trans->SetScale(0.20f, 0.20f, 0.20f);
+		trans->SetScale(Vec3(1.0f));
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
 		trans->SetPosition(m_dist);
 
@@ -549,6 +592,7 @@ namespace basecross {
 
 		AddTag(L"Attack");
 
+		m_speed *= trans->GetScale().z;
 		m_range = m_rangeMax;
 	}
 
@@ -567,6 +611,46 @@ namespace basecross {
 		}
 	}
 
+	//====================================================================
+	// class SpriteHealth
+	// プレイヤーのライフ
+	//====================================================================
+
+	void SpriteHealth::OnCreate() {
+		Col4 color(1, 1, 1, 1);
+
+		m_Vertices = {
+			{Vec3(0, 0, 0.0f), color, Vec2(0, 0)},
+			{Vec3(m_width, 0, 0.0f), color, Vec2(1, 0)},
+			{Vec3(0, m_height, 0.0f), color, Vec2(0, 1)},
+			{Vec3(m_width, m_height, 0.0f), color, Vec2(1, 1)},
+		};
+		vector<uint16_t> indices = {
+			0, 1, 2,
+			2, 1, 3,
+		};
+		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
+		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
+		m_DrawComp->SetTextureResource(L"HEALTH");
+		m_DrawComp->SetDrawActive(true);
+		SetDrawLayer(1);
+		SetAlphaActive(true);
+
+		GetComponent<Transform>()->SetPosition(windowWidth * -.45, windowHeight * .45, 0);
+	}
+
+	void SpriteHealth::OnUpdate() {
+		auto draw = GetComponent<PCTSpriteDraw>();
+
+		auto player = m_player.lock();
+		float perc = player->GetHPRate();
+		m_Vertices[1].position.x = m_width * perc;
+		m_Vertices[3].position.x = m_width * perc;
+		m_Vertices[1].textureCoordinate.x = perc;
+		m_Vertices[3].textureCoordinate.x = perc;
+
+		draw->UpdateVertices(m_Vertices);
+	}
 	//====================================================================
 	// class SpriteCharge
 	// プレイヤーの長押しゲージ
@@ -592,7 +676,7 @@ namespace basecross {
 		SetDrawLayer(1);
 		SetAlphaActive(true);
 
-		GetComponent<Transform>()->SetPosition(windowWidth * -.45, windowHeight * .45, 0);
+		GetComponent<Transform>()->SetPosition(windowWidth * -.45, windowHeight * .42, 0);
 	}
 
 	void SpriteCharge::OnUpdate() {
