@@ -13,8 +13,8 @@ namespace basecross {
 		m_enemy(enemy),
 		m_sizeX(0),
 		m_sizeY(0),
-		m_width(0.25),
-		m_height(0.025),
+		m_width(1.5),
+		m_height(0.15),
 		m_moveX(0.0f),
 		m_moveY(0.0f),
 		m_color(1.0f,0.0f,0.0f,1.0f)
@@ -76,7 +76,7 @@ namespace basecross {
 			auto enemyTrans = enemy->GetComponent<Transform>();
 			m_trans = GetComponent<Transform>();
 			m_pos = enemy->GetChangePos();
-			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + 0.2f, m_pos.z));
+			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + 1.5f, m_pos.z));
 			auto ptrCamera = GetStage()->GetView()->GetTargetCamera();
 
 			//’¸“_‚ÌXV
