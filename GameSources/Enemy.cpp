@@ -237,7 +237,7 @@ namespace basecross {
 			m_stateType = m_deathState;
 		}
 
-		Debug();
+		//Debug();
 	}
 
 	//衝突判定
@@ -400,7 +400,50 @@ namespace basecross {
 			m_trans->SetParent(m_fixedBox.lock());
 			m_floorPos = m_pos;
 		}
+		if ((other->FindTag(L"GimmickButton")))
+		{
+			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if (other == shObj) {
+					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+					Switchs->SetButton(true);
+				}
+			}
+		}
+	}
 
+	void Enemy::OnCollisionExit(shared_ptr<GameObject>& Other)
+	{
+		if ((Other->FindTag(L"GimmickButton")))
+		{
+			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if (Other == shObj) {
+					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+					Switchs->SetButton(false);
+				}
+			}
+		}
+	}
+
+	void Enemy::OnCollisionExcute(shared_ptr<GameObject>& Other)
+	{
+		if ((Other->FindTag(L"GimmickButton")))
+		{
+			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if (Other == shObj) {
+					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+					Switchs->SetButton(true);
+				}
+			}
+		}
 	}
 
 	void Enemy::EnemyAngle()

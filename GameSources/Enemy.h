@@ -99,6 +99,8 @@ namespace basecross {
 		virtual void OnUpdate() override; // çXêV
 
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
+		void OnCollisionExit(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
 		void EnemyJump();
 		void HipDropJump();
 		void ThisDestroy();

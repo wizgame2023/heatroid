@@ -1,7 +1,7 @@
 
 /*!
 @file Scene.cpp
-@brief ƒV[ƒ“À‘Ì
+@brief ã‚·ãƒ¼ãƒ³å®Ÿä½“
 */
 
 #include "stdafx.h"
@@ -10,43 +10,49 @@
 namespace basecross{
 
 	//--------------------------------------------------------------------------------------
-	///	ƒQ[ƒ€ƒV[ƒ“
+	///	ã‚²ãƒ¼ãƒ ã‚·ãƒ¼ãƒ³
 	//--------------------------------------------------------------------------------------
 	void Scene::CreateResources() {
 
 		auto& app = App::GetApp();
 
-		// mediaƒpƒX‚ğæ“¾
+		// mediaãƒ‘ã‚¹ã‚’å–å¾—
 		auto path = app->GetDataDirWString();
-		// texturesƒpƒX‚ğæ“¾
+		// texturesãƒ‘ã‚¹ã‚’å–å¾—
 		auto texPath = path + L"Textures/";
-		// ModelsƒpƒX
+		// Modelsãƒ‘ã‚¹
 		auto mdlPath = path + L"Models/";
 
-		// ƒvƒŒƒCƒ„[
+		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
 		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HeatRoid.bmf");
 		app->RegisterResource(L"PLAYER", modelMesh);
 
-		//“G‚Ìƒ‚ƒfƒ‹
+		//æ•µã®ãƒ¢ãƒ‡ãƒ«
 		auto enemyAruki = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_ARUKU.bmf");
 		app->RegisterResource(L"ENEMYARUKU", enemyAruki);
 
-		// ‰ÎA‰¼ƒeƒNƒXƒ`ƒƒ
+		// ä»®ãƒ†ã‚¯ã‚¹ãƒãƒ£
+		app->RegisterTexture(L"White", texPath + L"White.png");
 		app->RegisterTexture(L"FIRE", texPath + L"fire_kari.png");
+		app->RegisterTexture(L"HEALTH", texPath + L"health.png");
+		app->RegisterTexture(L"CHARGE", texPath + L"charge.png");
 
+		app->RegisterTexture(L"Wall", texPath + L"TX_WALL.png");
+		app->RegisterTexture(L"Floor", texPath + L"TX_FLOOR.png");
+		app->RegisterTexture(L"AreaDoor", texPath + L"TX_AREADOOR.png");
 	}
 
 	void Scene::OnCreate(){
 		try {
-			// ”wŒiF‚ğİ’è
-			SetClearColor(Col4(0.0f, 0.11328125f, 0.2578125, 1.0f)); // ƒ~ƒbƒhƒiƒCƒgƒuƒ‹[
+			// èƒŒæ™¯è‰²ã‚’è¨­å®š
+			SetClearColor(Col4(0.0f, 0.11328125f, 0.2578125, 1.0f)); // ãƒŸãƒƒãƒ‰ãƒŠã‚¤ãƒˆãƒ–ãƒ«ãƒ¼
 			
-			//ƒŠƒ\[ƒXì¬
+			//ãƒªã‚½ãƒ¼ã‚¹ä½œæˆ
 			CreateResources();
 
-			//©•ª©g‚ÉƒCƒxƒ“ƒg‚ğ‘—‚é
-			//‚±‚ê‚É‚æ‚èŠeƒXƒe[ƒW‚âƒIƒuƒWƒFƒNƒg‚ªCreate‚ÉƒV[ƒ“‚ÉƒAƒNƒZƒX‚Å‚«‚é
-			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToGameStage");
+			//è‡ªåˆ†è‡ªèº«ã«ã‚¤ãƒ™ãƒ³ãƒˆã‚’é€ã‚‹
+			//ã“ã‚Œã«ã‚ˆã‚Šå„ã‚¹ãƒ†ãƒ¼ã‚¸ã‚„ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒCreateæ™‚ã«ã‚·ãƒ¼ãƒ³ã«ã‚¢ã‚¯ã‚»ã‚¹ã§ãã‚‹
+			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToGameStageTsuboi");
 		}
 		catch (...) {
 			throw;
@@ -58,15 +64,15 @@ namespace basecross{
 
 	void Scene::OnEvent(const shared_ptr<Event>& event) {
 		if (event->m_MsgStr == L"ToGameStage") {
-			//ƒQ[ƒ€ƒXƒe[ƒW‚Ìİ’è
+			//ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®è¨­å®š
 			ResetActiveStage<GameStage>();
 		}
 		else if (event->m_MsgStr == L"ToGameStageHemmi") {
-			//ƒQ[ƒ€ƒXƒe[ƒW‚Ìİ’è
+			//ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®è¨­å®š
 			ResetActiveStage<GameStageHemmi>();
 		}
 		else if (event->m_MsgStr == L"ToGameStageTsuboi") {
-			//ƒQ[ƒ€ƒXƒe[ƒW‚Ìİ’è
+			//ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®è¨­å®š
 			ResetActiveStage<GameStageTsuboi>();
 		}
 	}
