@@ -31,7 +31,6 @@ namespace basecross {
 		virtual ~TilingFixedBox();
 		//‰Šú‰»
 		virtual void OnCreate() override;
-		static vector<weak_ptr<Transform>> m_moveObject;
 
 		//‘€ì
 	};

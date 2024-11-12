@@ -8,7 +8,28 @@
 #include "stdafx.h"
 
 namespace basecross {
+
+	class CameraCollision :public GameObject
+	{
+		Vec3 GetPos;
+		Vec3 TargetPos;
+		float m_ToPlayerLen;
+		bool m_Hit;
+		float m_ArmLen;
+		float m_ToTargetLerp;	//目標を追いかける際の補間値
+	public:
+		CameraCollision(const shared_ptr<Stage>& StagePtr);
+		virtual ~CameraCollision() {}
+		//初期化
+		virtual void OnCreate();
+		//更新
+		virtual void OnUpdate();
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+		void UpdateArmLengh();
+	};
+
 	class MainCamera : public Camera {
+	public:
 		weak_ptr<GameObject> m_TargetObject;	//目標となるオブジェクト
 		float m_ToTargetLerp;	//目標を追いかける際の補間値
 		bsm::Vec3 m_TargetToAt;	//目標から視点を調整する位置ベクトル
@@ -26,7 +47,10 @@ namespace basecross {
 		float m_ZoomSpeed;
 		//左右スティック変更のモード
 		bool m_LRBaseMode;
-	public:
+
+		bool m_Hit;
+		bool m_Pushbool = false;
+		POINT m_beforeCursorPos{ 0, 0 };
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	コンストラクタ
@@ -189,14 +213,6 @@ namespace basecross {
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
-		void SetUDBaseMode(bool b);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief カメラの視点を設定する
-		@param[in]	At	視点位置
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
 		virtual void SetAt(const bsm::Vec3& At)override;
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -217,20 +233,4 @@ namespace basecross {
 		virtual void OnUpdate()override;
 	};
 
-	class CameraObject : public GameObject
-	{
-		static Vec3 m_pos;
-		Vec3 m_scal;
-	public:
-		//構築と破棄
-		CameraObject(const shared_ptr<Stage>& stage,
-			const Vec3& scale
-		);
-
-		virtual ~CameraObject() {}
-
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		static void  SetPos(Vec3 pos);
-	};
 }
