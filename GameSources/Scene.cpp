@@ -37,6 +37,9 @@ namespace basecross{
 		app->RegisterTexture(L"HEALTH", texPath + L"health.png");
 		app->RegisterTexture(L"CHARGE", texPath + L"charge.png");
 
+		app->RegisterTexture(L"Wall", texPath + L"TX_WALL.png");
+		app->RegisterTexture(L"Floor", texPath + L"TX_FLOOR.png");
+		app->RegisterTexture(L"AreaDoor", texPath + L"TX_AREADOOR.png");
 	}
 
 	void Scene::OnCreate(){

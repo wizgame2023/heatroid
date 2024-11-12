@@ -7,6 +7,7 @@
 #pragma once
 #include "stdafx.h"
 #include "FixedBox.h"
+#include "Gimmick.h"
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
@@ -30,9 +31,10 @@ namespace basecross {
 
 		
 	private:
-		float m_hp;          //体力
-		float m_maxHp;       //最大体力
+		float m_heat;          //オーバーヒート値
+		float m_maxHeat;       //最大オーバーヒート
 		float m_speed;       //移動速度
+		float m_maxSpeed;
 		float m_upSpeed;     //上下の速度
 		float m_upHeight;    //上下の高さ
 		float m_jumpPower;   //ジャンプ力
@@ -40,14 +42,16 @@ namespace basecross {
 		float m_jumpHight;   //ジャンプする高さ
 		float m_time;
 		float m_bulletTime;  //弾の発射間隔
-		float m_bulletRange; //弾を発射する距離
-		float m_angleSpeed;  //回転速度
+		float m_trackingRange; //弾を発射する距離
+		float m_dropTime;
+		float m_maxDropTime;
+		float m_hitDropTime;
+		float m_maxHitDropTime;
 		Vec3 m_moveRot;
 
-		int m_dic;           //向いている方向 左-1,右1
 		Vec3 m_direc;
 		int m_dicUp;
-		int m_firstDic;
+		Vec3 m_firstDirec;
 
 		float m_test;
 		//重力
@@ -83,7 +87,7 @@ namespace basecross {
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<FixedBox> m_box;
 		shared_ptr<CollisionObb> m_collision;
-		weak_ptr<FixedBox> m_fixedBox;
+		weak_ptr<TilingFixedBox> m_fixedBox;
 		
 
 	public:
@@ -100,6 +104,8 @@ namespace basecross {
 		virtual void OnUpdate() override; // 更新
 
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
+		void OnCollisionExit(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
 		void EnemyJump();
 		void HipDropJump();
 		void ThisDestroy();
@@ -116,7 +122,6 @@ namespace basecross {
 		void SetUpMove(float speed,float height);
 		void SetFlyPower(float power);
 		void SetState(State state);
-		int GetDic();
 		Vec3 GetDirec();
 		Vec3 GetPos();
 		Vec3 GetChangePos();
@@ -131,7 +136,7 @@ namespace basecross {
 		void GravZero();
 		void GravVelZero();
 		void SetGravVel(Vec3 grav);
-		float GetHpRatio();
+		float GetHeatRatio();
 
 	};
 
@@ -144,7 +149,6 @@ namespace basecross {
 		
 		float m_speed;   //弾の速さ
 		float m_Range;   //射程
-		int m_dic;       //弾の向き 左-1,右1
 		Vec3 m_direc;
 		Vec3 m_pos;
 		Vec3 m_rot;

@@ -14,6 +14,7 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class GameStage : public Stage {
 		CsvFile m_GameStage1;
+		vector<shared_ptr<Transform>> m_PlayerObject;
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 		void CreateGameBox();//GameStage‚Ì¶¬
 		void CreatePlayer(); //Player‚Ì¶¬
@@ -28,6 +29,8 @@ namespace basecross {
 		
 		virtual void OnCreate()override; //‰Šú‰»
 		virtual void OnUpdate()override; //‰Šú‰»
+		void GetRay(Vec3& Near, Vec3& Far);
+
 	};
 
 }

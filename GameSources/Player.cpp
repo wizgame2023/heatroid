@@ -224,7 +224,7 @@ namespace basecross {
 			//MyCameraである
 			//MyCameraに注目するオブジェクト（プレイヤー）の設定
 			ptrCamera->SetTargetObject(GetThis<GameObject>());
-			ptrCamera->SetTargetToAt(Vec3(0, 0.5f, 0));
+			ptrCamera->SetTargetToAt(Vec3(0, 3.0f, 0));
 		}
 	}
 
@@ -362,13 +362,35 @@ namespace basecross {
 			return;
 		}
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
+		if ((Other->FindTag(L"GimmickButton")))
+		{
+
+			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if (Other == shObj) {
+					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+					Switchs->SetButton(true);
+				}
+			}
+		}
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)
 	{
 		if ((Other->FindTag(L"GimmickButton")))
 		{
-			GimmickButton::SetButton(true);
+
+			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if (Other == shObj) {
+					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+					Switchs->SetButton(true);
+				}
+			}
 		}
 		if ((Other->FindTag(L"Enemy")))
 		{
@@ -380,7 +402,15 @@ namespace basecross {
 	{
 		if ((Other->FindTag(L"GimmickButton")))
 		{
-			GimmickButton::SetButton(false);
+			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if (shObj) {
+					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+					Switchs->SetButton(false);
+				}
+			}
 		}
 	}
 

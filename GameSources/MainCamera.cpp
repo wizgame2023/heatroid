@@ -8,32 +8,135 @@
 
 namespace basecross {
 
-	Vec3 CameraObject::m_pos = Vec3(0, 5.0f, 5.0f);
 
-	CameraObject::CameraObject(const shared_ptr<Stage>& stage,
-		const Vec3& scale
-	) :
-		GameObject(stage),
-		m_scal(scale)
-	{}
+	CameraCollision::CameraCollision(const shared_ptr<Stage>& StagePtr)
+		:GameObject(StagePtr), GetPos(Vec3(0.0f, 3.0f, 0.0f)), TargetPos(Vec3(0.0f, 0.0f, 0.0f)),m_ArmLen(1.0f) {}
 
-	//初期化
-	void CameraObject::OnCreate() {
-		auto ptrTransform = GetComponent<Transform>();
-		ptrTransform->SetPosition(m_pos);
-		ptrTransform->SetScale(m_scal);
-		//OBB衝突j判定を付ける
-		auto ptrColl = AddComponent<CollisionSphere>();
-		ptrColl->SetDrawActive(false);
+	void CameraCollision::OnCreate() {
+		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
+		auto pos = ptrCamera->GetEye();
+		auto rot = ptrCamera->GetAt();
+		auto ptrtrans = GetComponent<Transform>();
+		ptrtrans->SetScale(Vec3(1, 1, 1));
+		ptrtrans->SetPosition(pos);
+		TargetPos = Vec3(0.0f, 0.0f, 0.0f);
+		GetPos = Vec3(0.0f, 5.0f, 0.0f);
+		//当たり判定
+		auto m_camera = AddComponent<CollisionSphere>();
+		m_camera->SetAfterCollision(AfterCollision::Auto);
+		ptrCamera->SetCameraObject(GetThis<GameObject>());
+		ptrCamera->UpdateArmLengh();
 	}
 
-	void CameraObject::OnUpdate() {
-		auto ptrTransform = GetComponent<Transform>();
-		ptrTransform->SetPosition(m_pos);
+	void CameraCollision::OnUpdate() {
+		auto Ptr = GetComponent<Transform>();
+		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
+		GetPos = ptrCamera->GetEye();
+		auto pos = ptrCamera->GetEye();
+		auto rot = ptrCamera->GetAt();
+		if (m_Hit == true)
+		{
+			Vec3 Near, Far;
+			GetTypeStage<GameStage>()->GetRay(Near, Far);
+			auto PsPtr = GetDynamicComponent<RigidbodySingle>(false);
+			if (PsPtr) {
+				auto PsPos = PsPtr->GetPosition();
+				float t;
+				Vec3 RayPos;
+				//現在位置と一番近いレイ上の点を得る
+				HitTest::ClosetPtPointSegment(PsPos, Near, Far, t, RayPos);
+				GetComponent<Transform>()->SetPosition(RayPos);
+			}
+		}
+
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto keyData = App::GetApp()->GetInputDevice().GetKeyState();
+		//前回のターンからの時間
+		float elapsedTime = App::GetApp()->GetElapsedTime();
+		Vec3 newEye = ptrCamera->GetEye();
+		Vec3 newAt = ptrCamera->GetAt();
+		//計算に使うための腕角度（ベクトル）
+		bsm::Vec3 armVec = newEye - newAt;
+		//正規化しておく
+		armVec.normalize();
+		float fThumbRX = 0.0f;
+		if (cntlVec[0].bConnected) {
+			fThumbRX = cntlVec[0].fThumbRX;
+		}
+		//armVec.y = sin(m_RadY);
+		////ここでY軸回転を作成
+		//if (fThumbRX != 0 || keyData.m_bPushKeyTbl[VK_LEFT] || keyData.m_bPushKeyTbl[VK_RIGHT]) {
+		//	//回転スピードを反映
+		//	if (fThumbRX != 0) {
+		//		if (IsLRBaseMode()) {
+		//			m_RadXZ += -fThumbRX * elapsedTime * m_RotSpeed;
+		//		}
+		//		else {
+		//			m_RadXZ += fThumbRX * elapsedTime * m_RotSpeed;
+		//		}
+		//	}
+		//	if (abs(m_RadXZ) >= XM_2PI) {
+		//		//1週回ったら0回転にする
+		//		m_RadXZ = 0;
+		//	}
+		//}
+
+		////クオータニオンでY回転（つまりXZベクトルの値）を計算
+		//Quat qtXZ;
+		//qtXZ.rotation(m_RadXZ, bsm::Vec3(0, 1.0f, 0));
+		//qtXZ.normalize();
+		//移動先行の行列計算することで、XZの値を算出
+		//Mat4x4 Mat;
+		//Mat.strTransformation(
+		//	bsm::Vec3(1.0f, 1.0f, 1.0f),
+		//	bsm::Vec3(0.0f, 0.0f, -1.0f),
+		//	qtXZ
+		//);
+
+		//Vec3 posXZ = Mat.transInMatrix();
+		////XZの値がわかったので腕角度に代入
+		//armVec.x = posXZ.x;
+		//armVec.z = posXZ.z;
+		////腕角度を正規化
+		//armVec.normalize();
+
+		//auto ptrTarget = ptrCamera->GetTargetObject();
+		//if (ptrTarget) {
+		//	//目指したい場所
+		//	Vec3 toAt = ptrTarget->GetComponent<Transform>()->GetWorldMatrix().transInMatrix();
+		//	TargetPos = Lerp::CalculateLerp(rot, toAt, 0, 1.0f, 1.0, Lerp::Linear);
+		//}
+
+		//////目指したい場所にアームの値と腕ベクトルでEyeを調整
+		//Vec3 toEye = newAt + armVec * m_ArmLen;
+		//GetPos = Lerp::CalculateLerp(rot, toEye, 0, 1.0f, m_ToTargetLerp, Lerp::Linear);
+
+		//追尾システム
+		GetComponent<Transform>()->SetPosition(GetPos);
+		GetComponent<Transform>()->SetRotation(TargetPos);
+		UpdateArmLengh();
 	}
 
-	void CameraObject::SetPos(Vec3 pos) {
-		pos = m_pos;
+	void CameraCollision::UpdateArmLengh() {
+		auto Ptr = GetComponent<Transform>();
+		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
+		auto Pos = Ptr->GetPosition();
+		auto Rot = Ptr->GetRotation();
+		auto vec = Pos - Rot;
+		m_ArmLen = bsm::length(vec);
+		if (m_ArmLen >= ptrCamera->m_MaxArm) {
+			//m_MaxArm以上離れないようにする
+			m_ArmLen = ptrCamera->m_MaxArm;
+		}
+		if (m_ArmLen <= ptrCamera->m_MinArm) {
+			//m_MinArm以下近づかないようにする
+			m_ArmLen = ptrCamera->m_MinArm;
+		}
+	}
+
+	void CameraCollision::OnCollisionEnter(shared_ptr<GameObject>& Other)
+	{
+		m_Hit = true;
 	}
 
 	MainCamera::MainCamera() :
@@ -186,13 +289,9 @@ namespace basecross {
 		bsm::Vec3 armVec = newEye - newAt;
 		//正規化しておく
 		armVec.normalize();
-		float fThumbRY = 0.0f;
 		float fThumbRX = 0.0f;
-		WORD wButtons = 0;
 		if (cntlVec[0].bConnected) {
-			fThumbRY = cntlVec[0].fThumbRY;
 			fThumbRX = cntlVec[0].fThumbRX;
-			wButtons = cntlVec[0].wButtons;
 		}
 		armVec.y = sin(m_RadY);
 		//ここでY軸回転を作成
@@ -264,6 +363,4 @@ namespace basecross {
 		UpdateArmLengh();
 		Camera::OnUpdate();
 	}
-
-
 }

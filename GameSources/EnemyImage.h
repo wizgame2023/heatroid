@@ -41,5 +41,6 @@ namespace basecross {
 		void ThisDestroy();
 		void UpdateValue(float ratio);
 		void Debug();
+		Quat RotCorrection(const Vec3& Line);
 	};
 }
