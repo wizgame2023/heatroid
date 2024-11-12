@@ -17,9 +17,8 @@ namespace basecross {
 	void GameStage::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<MainCamera>();
-		camera->SetEye(Vec3(0.0f, 50.00f, -5.0f));
+		camera->SetEye(Vec3(0.0f, 8.00f, -5.0f));
 		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
-		auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
 		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -28,6 +27,8 @@ namespace basecross {
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
 		light->SetDefaultLighting(); //デフォルトのライティングを指定
+		//auto cameraObject = AddGameObject<CameraCollision>();
+
 	}
 
 	void GameStage::CreateGameBox() {
@@ -54,8 +55,8 @@ namespace basecross {
 		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(25, 5.0125f, 0));
 		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
-		TilingFixedBox::m_moveObject.push_back(playerPos);
-
+		m_PlayerObject.push_back(playerPos);
+	
 	}
 
 	//ボックスの作成
@@ -88,7 +89,8 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto ptrFloor = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			ptrFloor->AddTag(L"Floor");
 		}
 		m_GameStage1.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -115,7 +117,8 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto PtrWaal = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			PtrWaal->AddTag(L"Floor");
 		}
 	}
 
@@ -211,6 +214,45 @@ namespace basecross {
 		}
 	}
 
+	void GameStage::GetRay(Vec3& Near, Vec3& Far) {
+		Mat4x4 world, view, proj;
+		world.affineTransformation(
+			Vec3(1.0f, 1.0f, 1.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f)
+		);
+		auto PtrCamera = GetView()->GetTargetCamera();
+		view = PtrCamera->GetViewMatrix();
+		proj = PtrCamera->GetProjMatrix();
+		auto viewport = GetView()->GetTargetViewport();
+		auto playerSh = GetSharedGameObject<Player>(L"Player");
+		auto PlayerPos = playerSh->GetComponent<Transform>()->GetWorldPosition();
+		Vec3 CaeraPos = PtrCamera->GetEye();
+		Near = XMVector3Unproject(
+			Vec3((float)PlayerPos.x, (float)PlayerPos.y, 0),
+			viewport.TopLeftX,
+			viewport.TopLeftY,
+			1280,
+			800,
+			viewport.MinDepth,
+			viewport.MaxDepth,
+			proj,
+			view,
+			world);
+
+		Far = XMVector3Unproject(
+			Vec3((float)CaeraPos.x, (float)CaeraPos.y, 1.0),
+			viewport.TopLeftX,
+			viewport.TopLeftY,
+			1280,
+			800,
+			viewport.MinDepth,
+			viewport.MaxDepth,
+			proj,
+			view,
+			world);
+	}
 	void GameStage::OnCreate() {
 		try {
 			wstring Datadir;

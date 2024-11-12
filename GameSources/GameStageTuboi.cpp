@@ -18,7 +18,7 @@ namespace basecross {
 		auto camera = ObjectFactory::Create<MainCamera>();
 		camera->SetEye(Vec3(0.0f, 50.00f, -5.0f));
 		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
-		auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
+		//auto cameraObject = AddGameObject<CameraCollsion>(Vec3(1, 1, 1));
 		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
