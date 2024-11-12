@@ -7,6 +7,7 @@
 #pragma once
 #include "stdafx.h"
 #include "FixedBox.h"
+#include "Gimmick.h"
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
@@ -30,9 +31,10 @@ namespace basecross {
 
 		
 	private:
-		float m_hp;          //体力
-		float m_maxHp;       //最大体力
+		float m_heat;          //オーバーヒート値
+		float m_maxHeat;       //最大オーバーヒート
 		float m_speed;       //移動速度
+		float m_maxSpeed;
 		float m_upSpeed;     //上下の速度
 		float m_upHeight;    //上下の高さ
 		float m_jumpPower;   //ジャンプ力
@@ -41,7 +43,10 @@ namespace basecross {
 		float m_time;
 		float m_bulletTime;  //弾の発射間隔
 		float m_trackingRange; //弾を発射する距離
+		float m_dropTime;
+		float m_maxDropTime;
 		float m_hitDropTime;
+		float m_maxHitDropTime;
 		Vec3 m_moveRot;
 
 		Vec3 m_direc;
@@ -82,7 +87,7 @@ namespace basecross {
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<FixedBox> m_box;
 		shared_ptr<CollisionObb> m_collision;
-		weak_ptr<FixedBox> m_fixedBox;
+		weak_ptr<TilingFixedBox> m_fixedBox;
 		
 
 	public:
@@ -131,7 +136,7 @@ namespace basecross {
 		void GravZero();
 		void GravVelZero();
 		void SetGravVel(Vec3 grav);
-		float GetHpRatio();
+		float GetHeatRatio();
 
 	};
 
