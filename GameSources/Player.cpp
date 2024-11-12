@@ -16,6 +16,10 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
+		m_initPos(Vec3(0.0f, 3.0f, 0.0f)),
+		m_initRot(Vec3(0.0f, 0.0f, 0.0f)),
+		m_initSca(Vec3(3.0f, 3.0f, 3.0f)),
+
 		m_speed(24.0f),
 		m_accel(48.0f),
 		m_friction(.5f),
@@ -24,7 +28,7 @@ namespace basecross {
 		m_jumpHeight(12.0f),
 		m_gravity(-20.0f),
 		m_fallTerminal(-20.0f),
-		m_firePos(Vec3(-.75f, 1.65f, 1.5f)),
+		m_firePos(Vec3(1.0f, .8f, -.75f)),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_moveAngle(0.0f),
 		m_collideCountInit(3),
@@ -33,7 +37,39 @@ namespace basecross {
 		m_stateType(air),
 		m_isCharging(false),
 		m_isOverCharge(false),
-		m_chargePerc(0.0f),	
+		m_chargePerc(0.0f),
+		m_chargeSpeed(1.2f),
+		m_chargeReduceSpeed(-.4f),
+
+		m_HP_max(4),
+		m_invincibleTimeMax(1.2f)
+	{}
+
+	Player::Player(const shared_ptr<Stage>&StagePtr,
+		const Vec3 & pos, const Vec3 & rot, const Vec3 & sca) :
+		GameObject(StagePtr),
+		m_initPos(pos),
+		m_initRot(rot),
+		m_initSca(sca),
+
+		m_speed(24.0f),
+		m_accel(48.0f),
+		m_friction(.5f),
+		m_frictionDynamic(.15f),
+		m_frictionThreshold(.05f),
+		m_jumpHeight(12.0f),
+		m_gravity(-20.0f),
+		m_fallTerminal(-20.0f),
+		m_firePos(Vec3(1.0f, .8f, -.75f)),
+		m_moveVel(Vec3(0, 0, 0)),
+		m_moveAngle(0.0f),
+		m_collideCountInit(3),
+		m_collideCount(m_collideCountInit),
+
+		m_stateType(air),
+		m_isCharging(false),
+		m_isOverCharge(false),
+		m_chargePerc(0.0f),
 		m_chargeSpeed(1.2f),
 		m_chargeReduceSpeed(-.4f),
 
@@ -142,13 +178,15 @@ namespace basecross {
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
-		ptr->SetScale(3.0f, 3.0f, 3.0f);
-		ptr->SetRotation(0.0f, 0.0f, 0.0f);
-		ptr->SetPosition(Vec3(0, 1.0f, 0));
+		ptr->SetScale(m_initSca);
+		ptr->SetRotation(m_initRot);
+		ptr->SetPosition(m_initPos);
 
 		//CollisionSphere衝突判定を付ける
-		auto ptrColl = AddComponent<CollisionSphere>();
-		ptrColl->SetDrawActive(false);
+		auto ptrColl = AddComponent<CollisionCapsule>();
+		ptrColl->SetDrawActive(false);//debug
+		ptrColl->SetMakedRadius(.8f);
+		ptrColl->SetMakedHeight(1.25f);
 
 		//各パフォーマンスを得る
 		GetStage()->SetCollisionPerformanceActive(true);
@@ -167,7 +205,7 @@ namespace basecross {
 			Vec3(.1f, .1f, .1f), //(.1f, .1f, .1f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
-			Vec3(0.0f, -.5f, 0.0f)
+			Vec3(0.0f, -1.42f, 0.0f)
 		);
 
 		ptrDraw->SetMeshResource(L"PLAYER");
@@ -198,7 +236,7 @@ namespace basecross {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 
-		if (m_invincibleTime > 0) {
+		if (m_invincibleTime > 0 && m_stateType != died) {
 			m_invincibleTime -= _delta;
 			GetDrawPtr()->SetDiffuse(Col4(1, 1, 1, 0.3f));
 		}
@@ -275,13 +313,15 @@ namespace basecross {
 			break;
 		}
 
+		SwitchFireAnim(GetDrawPtr()->GetCurrentAnimationTime());
+
 		GetComponent<Transform>()->SetPosition((m_moveVel * _delta) + GetComponent<Transform>()->GetPosition());
 
 		GetDrawPtr()->UpdateAnimation(_delta);
 	}
 
 	void Player::OnUpdate2() {
-		ShowDebug();
+		//ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -417,11 +457,12 @@ namespace basecross {
 
 	//摩擦(地上のみ)
 	void Player::Friction() {
-		if (GetMoveVector() == Vec3(0)) {
+		if (GetMoveVector() == Vec3(0) || m_stateType == died) {
 			m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
 			m_moveVel.z -= m_moveVel.z * m_friction * (1000.0f / 60.0f) * _delta;
 			if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
 			if (abs(m_moveVel.z) <= m_frictionThreshold) m_moveVel.z = 0;
+			return;
 		}
 		if (GetMoveVector() != Vec3(0)) {
 			m_moveVel.x -= m_moveVel.x * m_frictionDynamic * (1000.0f / 60.0f) * _delta;
@@ -477,7 +518,6 @@ namespace basecross {
 		if (m_stateType == air) {
 			m_stateType = hit_air;
 		}
-		
 
 		auto trans = GetComponent<Transform>();
 		auto fwd = trans->GetForward();
@@ -490,31 +530,40 @@ namespace basecross {
 
 	}
 
+	//死亡
 	void Player::Died() {
 		SetAnim(L"Died");
 		m_invincibleTime = m_invincibleTimeMax;
-		//摩擦(地上のみ)
-
 	}
 
+	//飛び道具を発射
 	void Player::Projectile() {
 		Charging(false);
 		auto trans = GetComponent<Transform>();
 		auto pos = trans->GetPosition();
-		auto fwd = trans->GetForward();
+		auto fwd = -1 * trans->GetForward();
+		auto face = atan2f(fwd.z,fwd.x);
 		auto scale = trans->GetScale();
-		pos.y += m_firePos.y * scale.y;
-		pos.x += ((m_firePos.x * fwd.z) - (m_firePos.z * fwd.x)) * scale.x;
-		pos.z += ((m_firePos.z * fwd.x) - (m_firePos.x * fwd.z)) * scale.z;
-		GetStage()->AddGameObject<FireProjectile>(pos, -fwd, m_chargePerc);
 
-		wstringstream wss;
+		////発射位置の調整
+		//Quat qt;
+		//qt.rotation(face, Vec3(0, 1.0f, 0));
+		//qt.normalize();
+		//Mat4x4 Mat;
+		//Mat.strTransformation(
+		//	scale,
+		//	m_firePos,
+		//	qt);
+		//Vec3 firepos = Mat.transInMatrix();
 
-		wss << "\n\n" << pos.x << " : " << pos.y << " : " << pos.z << endl;
-		wss << fwd.x << " : " << fwd.y << " : " << fwd.z << endl;
+		Vec3 firepos;
+		firepos.x = (cosf(face) * m_firePos.x) - (sinf(face) * m_firePos.z);
+		firepos.y = m_firePos.y;
+		firepos.z = (cosf(face) * m_firePos.z) + (sinf(face) * m_firePos.x);
 
-		auto scene = App::GetApp()->GetScene<Scene>();
-		scene->SetDebugString(wss.str());
+		firepos = firepos * scale;
+		pos += firepos;
+		GetStage()->AddGameObject<FireProjectile>(pos, fwd, m_chargePerc);
 
 		m_chargePerc = 0.0f;
 		m_isOverCharge = false;
@@ -568,14 +617,15 @@ namespace basecross {
 		m_dist(dist),
 		m_angle(angle),
 		m_power(power),
-		m_speed(9.0f),
+		m_speed(18.0f),
+		m_speedBase(4.5f),
 		m_rangeMax(.8f)
 	{}
 
 	void FireProjectile::OnCreate() {
 
 		auto trans = GetComponent<Transform>();
-		trans->SetScale(Vec3(1.0f));
+		trans->SetScale(Vec3(3.0f));
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
 		trans->SetPosition(m_dist);
 
@@ -588,11 +638,20 @@ namespace basecross {
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetBlendState(BlendState::AlphaBlend);
 
+		Mat4x4 meshMat;
+		meshMat.affineTransformation(
+			Vec3(.33f, .33f, .33f), //(.1f, .1f, .1f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f)
+		);
+		ptrDraw->SetMeshToTransformMatrix(meshMat);
+
 		ptrDraw->SetTextureResource(L"FIRE");
 
 		AddTag(L"Attack");
 
-		m_speed *= trans->GetScale().z;
+		m_speed = (m_speed * m_power) + m_speedBase;
 		m_range = m_rangeMax;
 	}
 
@@ -601,12 +660,19 @@ namespace basecross {
 
 		auto trans = GetComponent<Transform>();
 
-		trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * m_power * delta));
+		trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
 
 		m_range -= delta;
 		GetComponent<PNTStaticDraw>()->SetDiffuse(Col4(1, 1, 1, m_range * 2 / m_rangeMax));
 
 		if (m_range <= 0) {
+			GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
+		}
+	}
+
+	//壁に当たったら消える
+	void FireProjectile::OnCollisionEnter(shared_ptr<GameObject>& Other) {
+		if (Other->FindTag(L"FixedBox")) {
 			GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
 		}
 	}

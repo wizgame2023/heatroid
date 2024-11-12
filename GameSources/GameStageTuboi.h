@@ -15,6 +15,7 @@ namespace basecross {
 		CsvFile m_GameStage1;
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 		void CreateGameBox();//GameStage‚Ì¶¬
+		void CreatePlayer();
 		void CreateEnemy();
 
 	public:
