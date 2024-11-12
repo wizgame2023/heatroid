@@ -25,23 +25,26 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(state),
-		m_deathState(deathState),
+		m_stateType(plunge),
+		m_deathState(stay),
 		m_player(player),
-		m_hp(100),
-		m_maxHp(100),
-		m_speed(0.5f),
-		m_upSpeed(0.3f),
-		m_upHeight(0.1f),
-		m_jumpPower(0.5f),
+		m_heat(0),
+		m_maxHeat(100),
+		m_speed(10.0f),
+		m_maxSpeed(10.0f),
+		m_upSpeed(3.0f),
+		m_upHeight(10.0f),
+		m_jumpPower(5.0f),
 		m_jumpTime(1.0f),
 		m_dicUp(0),
-		m_firstDirec(Vec3(0.0f)),
-		m_time(2.0f),
+		m_dropTime(4.0f),
+		m_maxDropTime(m_dropTime),
+		m_hitDropTime(2.0f),
+		m_maxHitDropTime(m_hitDropTime),
 		m_bulletTime(0.0f),
-		m_trackingRange(4.0f),
-		m_hitDropTime(4.0f),
-		m_gravity(-0.98f),
+		m_trackingRange(30.0f),
+		m_firstDirec(Vec3(0.0f)),
+		m_gravity(-9.8f),
 		m_grav(Vec3(0.0f, m_gravity, 0.0f)),
 		m_gravVel(Vec3(0.0f)),
 		m_moveRot(Vec3(0.0f)),
@@ -116,11 +119,13 @@ namespace basecross {
 		//	m_pos.x += -m_dic * m_speed * elapsed;
 		//}
 		//スペースでジャンプ（テスト用）
-		if (keyState.m_bPressedKeyTbl[VK_DOWN]) {
-			//EnemyJump();
-			
+		//if (keyState.m_bPressedKeyTbl[VK_DOWN]) {
+		//	//EnemyJump();
+		//	m_stateType = plunge;
+		//}
+		if (keyState.m_bPushKeyTbl[VK_DOWN]) {
 			m_stateType = plunge;
-			
+
 		}
 		if (keyState.m_bPressedKeyTbl[VK_UP]) {
 			HipDropJump();
@@ -141,12 +146,10 @@ namespace basecross {
 		//移動なし
 		case stay:
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			PlayerDic();
-			m_speed = 0.0f;
 			break;
 		//追従の左右移動
 		case rightMove:
-			m_speed = 0.5f;
+			m_speed = m_maxSpeed;
 			PlayerDic();
 			EnemyAngle();
 			if (m_direc.length() <= m_trackingRange) {
@@ -157,10 +160,10 @@ namespace basecross {
 		case upMove:
 			GravZero();
 			Grav();
-			if (m_pos.y >= m_beforePos.y) {
+			if (m_pos.y >= m_upHeight) {
 				m_dicUp = -1;
 			}
-			else if (m_pos.y <= m_upHeight) {
+			else if (m_pos.y <= m_beforePos.y) {
 				m_dicUp = 1;
 			}
 			m_pos.y += m_dicUp * m_upSpeed * elapsed;
@@ -192,29 +195,30 @@ namespace basecross {
 			break;
 			//ヒップドロップ
 		case hitDrop:
-			//m_speed = 0.5f;
-			//PlayerDic();
-			m_hitDropTime -= elapsed;
-			if (m_hitDropTime <= 0.0f) {
+			m_dropTime -= elapsed;
+			if (m_dropTime <= 0.0f) {
 				HipDropJump();
-				m_hitDropTime = 4.0f;
+				m_dropTime = m_maxDropTime;
 			}
 			HitDrop();
 			break;
 			//突っ込み
 		case plunge:
-			PlayerDic();
-			if (!m_plungeFlag && !m_plungeColFlag) {
-				m_firstDirec = m_playerPos - m_pos;
-				m_plungeFlag = true;
-			}
+			//PlayerDic();
+			if (m_floorFlag) {
+				if (!m_plungeFlag && !m_plungeColFlag) {
+					m_firstDirec = m_playerPos - m_pos;
+					m_plungeFlag = true;
+				}
 
-			if (m_plungeColFlag) {
-				m_stateType = rightMove;
-				m_plungeColFlag = false;
-				m_plungeFlag = false;
+				if (m_plungeColFlag) {
+					m_stateType = rightMove;
+					m_plungeColFlag = false;
+					m_plungeFlag = false;
+				}
+				Vec3 dic = Vec3(m_firstDirec.x, 0.0f, m_firstDirec.z);
+				m_pos += dic * 1.0f * elapsed;
 			}
-			m_pos += m_firstDirec * m_speed * 3.0f * elapsed;
 			break;
 		default:
 			break;
@@ -232,15 +236,21 @@ namespace basecross {
 
 		m_trans->SetPosition(m_pos);
 
-		//HPが0になった場合
-		if (m_hp <= 0.0f) {
+		//オーバーヒートの時
+		if (m_heat >= m_maxHeat) {
 			m_stateType = m_deathState;
 		}
-
-		//Debug();
+		if (m_heat > 0.0f) {
+			m_heat -= elapsed * 50;
+		}
+		else if (m_heat <= 0.0f) {
+			m_heat = 0.0f;
+			m_stateType = m_beforState;
+		}
+		m_test = m_heat;
+		Debug();
 	}
 
-	//衝突判定
 	//ジャンプ
 	void Enemy::EnemyJump() {
 		m_floorFlag = false;
@@ -259,16 +269,16 @@ namespace basecross {
 	}
 	//ダメージを受ける
 	void Enemy::ReceiveDamage(float damage) {
-		m_hp -= damage;
+		m_heat -= damage;
 	}
+	//プレイヤーの向いている方向に進む
 	void Enemy::PlayerDic() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto player = m_player.lock();
 		if (player) {
 			auto playerTrans = player->GetComponent<Transform>();
 			auto playerPos = playerTrans->GetPosition();
-			m_pos = m_trans->GetPosition();
-			m_direc = playerPos - m_pos;
+			m_direc = playerPos - GetChangePos();
 			Vec3 dic = Vec3(m_direc.x, 0.0f, m_direc.z);
 			auto direc = dic.normalize();
 			if (m_direc.length() <= m_trackingRange && m_stateType != plunge) {
@@ -300,15 +310,15 @@ namespace basecross {
 				Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
 				Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
 				//床に衝突した時
-				m_time -= elapsed;
+				m_hitDropTime -= elapsed;
 				if (m_floorFlag) {
-					m_time = 2.0f;
+					m_hitDropTime = m_maxHitDropTime;
 					m_hitDropFlag = false;
 					AddGrav(Vec3(0.0f, -m_jumpPower, 0.0f));
 				}
-				if (m_time <= 0) {
+				if (m_hitDropTime <= 0) {
 					if (m_pos.y - m_scal.y / 2 + fixPos.y >= fixPos.y + fixScal.y / 2 + 0.01f) {
-						m_pos.y += -m_speed * 15 * elapsed;
+						m_pos.y += -m_speed * 3 * elapsed;
 					}
 				}
 			}
@@ -385,18 +395,19 @@ namespace basecross {
 		}
 
 	}
+
 	//衝突判定
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
 			m_deathPos = m_pos;
 			ReceiveDamage(50.0f);
 		}
-		if (other->FindTag(L"BreakWall")) {
+		if (other->FindTag(L"Wall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
 			m_plungeColFlag = true;
 		}
 		if (other->FindTag(L"FixedBox")) {
-			m_fixedBox = dynamic_pointer_cast<FixedBox>(other);
+			m_fixedBox = dynamic_pointer_cast<TilingFixedBox>(other);
 			m_trans->SetParent(m_fixedBox.lock());
 			m_floorPos = m_pos;
 		}
@@ -412,8 +423,12 @@ namespace basecross {
 				}
 			}
 		}
+		if (other->FindTag(L"Attack")) {
+			//ThisDestroy();
+			m_deathPos = m_pos;
+			m_heat = m_maxHeat;
+		}
 	}
-
 	void Enemy::OnCollisionExit(shared_ptr<GameObject>& Other)
 	{
 		if ((Other->FindTag(L"GimmickButton")))
@@ -463,7 +478,7 @@ namespace basecross {
 		auto scene = App::GetApp()->GetScene<Scene>();
 		wstringstream wss(L"");
 		wss << L"damage : "
-			<< m_hp
+			<< m_heat
 			<< L"\nfps : "
 			<< fps
 			<< L"\nstate : "
@@ -542,8 +557,8 @@ namespace basecross {
 	bool Enemy::GetFloorFlag() {
 		return m_floorFlag;
 	}
-	float Enemy::GetHpRatio() {
-		float ratio = m_hp / m_maxHp;
+	float Enemy::GetHeatRatio() {
+		float ratio = m_heat / m_maxHeat;
 		if (ratio <= 0.0f) {
 			return 0.0f;
 		}
