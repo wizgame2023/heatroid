@@ -19,8 +19,6 @@ namespace basecross {
 		auto camera = ObjectFactory::Create<MainCamera>();
 		camera->SetEye(Vec3(0.0f, 50.00f, -5.0f));
 		camera->SetAt(Vec3(0.0f, 2.5f, 0.0f));
-		auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
-		//camera->SetCameraObject(cameraObject);
 		// ƒrƒ…[‚ÉƒJƒƒ‰‚ğİ’è
 		auto view = CreateView<SingleView>();
 		view->SetCamera(camera);
@@ -54,7 +52,6 @@ namespace basecross {
 		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(25, 5.0125f, 0));
 		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
-		TilingFixedBox::m_moveObject.push_back(playerPos);
 
 	}
 

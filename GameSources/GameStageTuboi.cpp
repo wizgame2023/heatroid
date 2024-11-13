@@ -58,7 +58,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f);
+			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
 		}
 		m_GameStage1.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -85,7 +85,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f);
+			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
 		}
 	}
 

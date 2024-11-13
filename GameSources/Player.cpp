@@ -361,7 +361,6 @@ namespace basecross {
 		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
 		if ((Other->FindTag(L"GimmickButton")))
 		{
-
 			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 			auto& vec = group->GetGroupVector();
 			for (auto& v : vec) {
