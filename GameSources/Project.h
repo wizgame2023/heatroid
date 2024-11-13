@@ -24,3 +24,4 @@
 #include "FixedBox.h"
 #include "Gimmick.h"
 #include "MainCamera.h"
+#include "Sprite.h"

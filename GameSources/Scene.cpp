@@ -36,10 +36,17 @@ namespace basecross{
 		app->RegisterTexture(L"FIRE", texPath + L"fire_kari.png");
 		app->RegisterTexture(L"HEALTH", texPath + L"health.png");
 		app->RegisterTexture(L"CHARGE", texPath + L"charge.png");
-
+		//ステージオブジェクトテクスチャ
 		app->RegisterTexture(L"Wall", texPath + L"TX_WALL.png");
 		app->RegisterTexture(L"Floor", texPath + L"TX_FLOOR.png");
 		app->RegisterTexture(L"AreaDoor", texPath + L"TX_AREADOOR.png");
+		//タイトルスプライト
+		app->RegisterTexture(L"TITLETEXT", texPath + L"TitleText.png");
+		app->RegisterTexture(L"TITLEROGO", texPath + L"TitleRogo.png");
+		app->RegisterTexture(L"TITLEEFFECT", texPath + L"TitleEffect.png");
+		app->RegisterTexture(L"TITLEBACKGROUND", texPath + L"TitleBackGround.png");
+
+
 	}
 
 	void Scene::OnCreate(){
@@ -52,7 +59,7 @@ namespace basecross{
 
 			//自分自身にイベントを送る
 			//これにより各ステージやオブジェクトがCreate時にシーンにアクセスできる
-			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToGameStageTsuboi");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToTitleStage");
 		}
 		catch (...) {
 			throw;
@@ -66,6 +73,10 @@ namespace basecross{
 		if (event->m_MsgStr == L"ToGameStage") {
 			//ゲームステージの設定
 			ResetActiveStage<GameStage>();
+		}
+		if (event->m_MsgStr == L"ToTitleStage") {
+			//ゲームステージの設定
+			ResetActiveStage<TitleStage>();
 		}
 		else if (event->m_MsgStr == L"ToGameStageHemmi") {
 			//ゲームステージの設定

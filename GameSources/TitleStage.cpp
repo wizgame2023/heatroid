@@ -8,6 +8,75 @@
 
 namespace basecross {
 
+	void TitleStage::CreateViewLight() {		
+		//ビューのカメラの設定
+		auto cameraView = ObjectFactory::Create<SingleView>(GetThis<Stage>());
+		auto ptrMyCamera = ObjectFactory::Create<Camera>();
+		cameraView->SetCamera(ptrMyCamera);
+		ptrMyCamera->SetEye(Vec3(0.0f, 5.0f, -5.0f));
+		ptrMyCamera->SetAt(Vec3(0.0f, 0.0f, 0.0f));
+		//マルチライトの作成
+		auto ptrMultiLight = CreateLight<MultiLight>();
+		//デフォルトのライティングを指定
+		ptrMultiLight->SetDefaultLighting();
+		SetView(cameraView);
+	}
+
+	void TitleStage::OnCreate() {
+		try {
+			//ビューとライトの作成
+			CreateViewLight();
+			//OnDraw();
+			OnTitleSprite();
+			//PlayBGM();
+		}
+		catch (...) {
+			throw;
+		}
+	}
+
+	void TitleStage::OnDraw()
+	{
+		auto ptrSofa = AddGameObject<Draw>(Vec3(0), Vec3());
+	}
+
+	void TitleStage::OnTitleSprite()
+	{
+		AddGameObject<TitleSprite>(L"TITLEBACKGROUND", true, Vec2(640.0f, 360.0f), Vec3(0.0f, 10.0f, 0.3f));
+		AddGameObject<StartA>(L"TITLETEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, -200.0f, 0.1f));
+		AddGameObject<TitleSprite>(L"TITLEEFFECT", true, Vec2(640.0f, 200.0f), Vec3(0.0f, 0.0f, 0.2f));
+		AddGameObject<TitleSprite>(L"TITLEROGO", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.1f));
+	}
+
+	void TitleStage::OnUpdate() {
+		//コントローラチェックして入力があればコマンド呼び出し
+		InputHandler<TitleStage> m_InputHandler;
+		m_InputHandler.PushHandle(GetThis<TitleStage>());
+		auto time = App::GetApp()->GetElapsedTime();
+
+	}
+
+
+	void TitleStage::OnPushA() {
+		PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+	}
+
+	Draw::Draw(const shared_ptr<Stage>& stage,
+		const Vec3& Scale,
+		const Vec3& Position
+	) :
+		GameObject(stage),
+		m_scale(Scale),
+		m_position(Position)
+	{}
+
+	void Draw::OnCreate()
+	{
+		auto ptrTransform = GetComponent<Transform>();
+		ptrTransform->SetScale(Vec3(0));
+		ptrTransform->SetPosition(Vec3(0));
+	}
+
 
 }
 //end basecross
