@@ -235,7 +235,7 @@ namespace basecross {
 			m_stateType = m_deathState;
 		}
 
-		Debug();
+		//Debug();
 	}
 
 	//衝突判定

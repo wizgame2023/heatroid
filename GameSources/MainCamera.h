@@ -13,10 +13,18 @@ namespace basecross {
 	{
 		Vec3 GetPos;
 		Vec3 TargetPos;
-		float m_ToPlayerLen;
 		bool m_Hit;
 		float m_ArmLen;
 		float m_ToTargetLerp;	//目標を追いかける際の補間値
+		bsm::Vec3 m_TargetToAt;	//目標から視点を調整する位置ベクトル
+		//回転スピード
+		float m_RotSpeed;
+		//左右スティック変更のモード
+		bool m_LRBaseMode;
+		float m_RadY;
+		float m_RadXZ;
+
+
 	public:
 		CameraCollision(const shared_ptr<Stage>& StagePtr);
 		virtual ~CameraCollision() {}
@@ -24,8 +32,13 @@ namespace basecross {
 		virtual void OnCreate();
 		//更新
 		virtual void OnUpdate();
+		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 		void UpdateArmLengh();
+		bool GetLRBaseMode() const;
+		bool IsLRBaseMode() const;
+
 	};
 
 	class MainCamera : public Camera {

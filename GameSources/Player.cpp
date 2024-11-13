@@ -16,11 +16,11 @@ namespace basecross {
 
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_speed(4.0f),
-		m_accel(4.0f),
+		m_speed(8.0f),
+		m_accel(8.0f),
 		m_friction(.8f),
 		m_frictionThreshold(.05f),
-		m_jumpHeight(2.5f),
+		m_jumpHeight(5.5f),
 		m_gravity(-4.0f),
 		m_fallTerminal(-4.0f),
 
@@ -227,14 +227,14 @@ namespace basecross {
 			pos.z += m_firePos.z * fwd.x;
 			GetStage()->AddGameObject<FireProjectile>(pos, -fwd, m_chargePerc);
 
-			wstringstream wss;
+			//wstringstream wss;
 
-			auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
-			wss << pos.x << " : " << pos.y << " : " << pos.z << " : " << endl;
-			wss << fwd.x << " : " << fwd.y << " : " << fwd.z << " : " << endl;
+			//auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
+			//wss << pos.x << " : " << pos.y << " : " << pos.z << " : " << endl;
+			//wss << fwd.x << " : " << fwd.y << " : " << fwd.z << " : " << endl;
 
-			auto scene = App::GetApp()->GetScene<Scene>();
-			scene->SetDebugString(L"Player\n" + wss.str());
+			//auto scene = App::GetApp()->GetScene<Scene>();
+			//scene->SetDebugString(L"Player\n" + wss.str());
 
 			m_chargePerc = 0.0f;
 			m_isOverCharge = false;

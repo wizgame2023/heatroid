@@ -17,7 +17,7 @@ namespace basecross {
 	void GameStage::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<MainCamera>();
-		camera->SetEye(Vec3(0.0f, 8.00f, -5.0f));
+		camera->SetEye(Vec3(0.0f, 3.00f, -5.0f));
 		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
 		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
@@ -27,7 +27,7 @@ namespace basecross {
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
 		light->SetDefaultLighting(); //デフォルトのライティングを指定
-		//auto cameraObject = AddGameObject<CameraCollision>();
+		auto cameraObject = AddGameObject<CameraCollision>();
 
 	}
 
@@ -117,8 +117,8 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto PtrWaal = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
-			PtrWaal->AddTag(L"Floor");
+			auto PtrWall = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			PtrWall->AddTag(L"Wall");
 		}
 	}
 
@@ -262,7 +262,7 @@ namespace basecross {
 			m_GameStage1.ReadCsv();
 			//ビューとライトの作成
 			CreateViewLight();
-			//CreateGameBox();
+			CreateGameBox();
 			CreateGimmick();
 
 			CreatePlayer();
