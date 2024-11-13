@@ -19,7 +19,6 @@ namespace basecross {
 		m_initPos(Vec3(0.0f, 3.0f, 0.0f)),
 		m_initRot(Vec3(0.0f, 0.0f, 0.0f)),
 		m_initSca(Vec3(3.0f, 3.0f, 3.0f)),
-
 		m_speed(24.0f),
 		m_accel(48.0f),
 		m_friction(.5f),
@@ -40,7 +39,6 @@ namespace basecross {
 		m_chargePerc(0.0f),
 		m_chargeSpeed(1.2f),
 		m_chargeReduceSpeed(-.4f),
-
 		m_HP_max(4),
 		m_invincibleTimeMax(1.2f)
 	{}
@@ -294,8 +292,7 @@ namespace basecross {
 			}
 			if (m_HP <= 0) {
 				m_stateType = died;
-			}
-
+      }
 			break;
 			//---------------------------------------空中のけぞり
 		case hit_air:
