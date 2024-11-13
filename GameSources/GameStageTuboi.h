@@ -12,8 +12,10 @@ namespace basecross {
 	//	ゲームステージクラス
 	//--------------------------------------------------------------------------------------
 	class GameStageTsuboi : public Stage {
+		CsvFile m_GameStage1;
 		void CreateViewLight(); //ビューの作成
 		void CreateGameBox();//GameStageの生成
+		void CreatePlayer();
 		void CreateEnemy();
 
 	public:

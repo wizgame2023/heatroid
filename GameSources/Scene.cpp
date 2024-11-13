@@ -32,7 +32,9 @@ namespace basecross{
 		app->RegisterResource(L"ENEMYARUKU", enemyAruki);
 
 		// 仮テクスチャ
+		app->RegisterTexture(L"White", texPath + L"White.png");
 		app->RegisterTexture(L"FIRE", texPath + L"fire_kari.png");
+		app->RegisterTexture(L"HEALTH", texPath + L"health.png");
 		app->RegisterTexture(L"CHARGE", texPath + L"charge.png");
 
 		app->RegisterTexture(L"Wall", texPath + L"TX_WALL.png");
@@ -50,7 +52,7 @@ namespace basecross{
 
 			//自分自身にイベントを送る
 			//これにより各ステージやオブジェクトがCreate時にシーンにアクセスできる
-			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToGameStage");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToGameStageTsuboi");
 		}
 		catch (...) {
 			throw;
