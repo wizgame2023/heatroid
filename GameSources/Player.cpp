@@ -42,7 +42,7 @@ namespace basecross {
 		m_chargeReduceSpeed(-.4f),
 
 		m_HP_max(4),
-		m_invincibleTimeMax(1.2f)
+		m_invincibleTimeMax(1.8f)
 	{}
 
 	Player::Player(const shared_ptr<Stage>&StagePtr,
@@ -351,17 +351,29 @@ namespace basecross {
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
 		m_collideCount = m_collideCountInit;
 
-		if (m_stateType == hit_air && Other->FindTag(L"FixedBox")) {
+		if (m_stateType == hit_air && Other->FindTag(L"Floor")) {
 			m_stateType = hit_stand;
 			return;
 		}
 
-		if (m_stateType == air && Other->FindTag(L"FixedBox")) {
+		if (m_stateType == air && Other->FindTag(L"Floor")) {
 			SetAnim(AddFire() + L"Land");
 			m_stateType = stand;
 			return;
 		}
-		//メモ　地形オブジェクトのタグをWallとFloorに分けて接地判定を実装したい
+
+		//被弾判定
+		if ((Other->FindTag(L"Enemy")))
+		{
+			shared_ptr<Enemy> enemy = dynamic_pointer_cast<Enemy>(Other);
+			// 敵がヒート状態か取得したい
+			// enemy->
+
+
+
+			//if (m_invincibleTime > 0) GetHit();
+		}
+
 		if ((Other->FindTag(L"GimmickButton")))
 		{
 
@@ -392,11 +404,6 @@ namespace basecross {
 				}
 			}
 		}
-		if ((Other->FindTag(L"Enemy")))
-		{
-			if (m_invincibleTime <= 0) GetHit();
-		}
-
 	}
 	void Player::OnCollisionExit(shared_ptr<GameObject>& Other)
 	{
@@ -597,16 +604,6 @@ namespace basecross {
 	}
 
 	//====================================================================
-	// class PlayerStateCtrl
-	// プレイヤーの移動操作中ステート
-	//====================================================================
-
-	//shared_ptr<PlayerStateCtrl> PlayerStateCtrl::Instance() {
-	//	static shared_ptr<PlayerStateCtrl> instance = new PlayerStateCtrl;
-	//	return instance;
-	//}
-
-	//====================================================================
 	// class FireProjectile
 	// プレイヤーの飛び道具
 	//====================================================================
@@ -625,13 +622,15 @@ namespace basecross {
 	void FireProjectile::OnCreate() {
 
 		auto trans = GetComponent<Transform>();
-		trans->SetScale(Vec3(3.0f));
+		trans->SetScale(Vec3(8.0f));
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
 		trans->SetPosition(m_dist);
 
 		auto coll = AddComponent<TriggerSphere>();
 		coll->SetDrawActive(false);//debug
 		coll->SetAfterCollision(AfterCollision::None);
+		coll->AddExcludeCollisionTag(L"Player");
+		coll->AddExcludeCollisionTag(L"Attack");
 
 		//描画コンポーネントの設定
 		auto ptrDraw = AddComponent<PNTStaticDraw>();
@@ -640,7 +639,7 @@ namespace basecross {
 
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(
-			Vec3(.33f, .33f, .33f), //(.1f, .1f, .1f),
+			Vec3(1.0f / trans->GetScale().x, 1.0f / trans->GetScale().y, 1.0f / trans->GetScale().z), //(.1f, .1f, .1f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f)
@@ -676,6 +675,16 @@ namespace basecross {
 			GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
 		}
 	}
+
+	//====================================================================
+	// class ChargePtcl
+	// チャージ中のパーティクル
+	//====================================================================
+
+	void ChargePtcl::OnCreate() {
+		SetAddType(true);
+	}
+
 
 	//====================================================================
 	// class SpriteHealth

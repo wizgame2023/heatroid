@@ -49,7 +49,7 @@ namespace basecross {
 		Vec3 m_firePos;
 		//移動方向
 		Vec3 m_moveVel;
-		//CollisionExitの空中判定の閾値
+		//CollisionExitの空中判定用カウント
 		int m_collideCount, m_collideCountInit;
 
 		//プレイヤーの状態を表す列挙型
@@ -73,6 +73,8 @@ namespace basecross {
 		float m_chargePerc, m_chargeSpeed, m_chargeReduceSpeed;
 		//無敵時間
 		float m_invincibleTime, m_invincibleTimeMax;
+		//何かを押してるか否か
+		bool m_isPushingObject;
 
 		//HP
 		int m_HP, m_HP_max;
@@ -208,7 +210,24 @@ namespace basecross {
 
 	};
 
-	//------------------------------------------------------------------
+	//====================================================================
+	// class ChargePtcl
+	// チャージ中のパーティクル
+	//====================================================================
+
+	class ChargePtcl : public MultiParticle {
+	public:
+		ChargePtcl(const shared_ptr<Stage>& StagePtr) {}
+		virtual ~ChargePtcl() {}
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+	};
+
+	//====================================================================
+	// class SpriteHealth
+	// プレイヤーのライフ
+	//====================================================================
 	class SpriteHealth : public GameObject {
 		weak_ptr<Player> m_player;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
@@ -231,7 +250,11 @@ namespace basecross {
 
 		virtual void OnUpdate() override;
 	};
-	//------------------------------------------------------------------
+
+	//====================================================================
+	// class SpriteCharge
+	// プレイヤーの長押しゲージ
+	//====================================================================
 	class SpriteCharge : public GameObject {
 		weak_ptr<Player> m_player;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
