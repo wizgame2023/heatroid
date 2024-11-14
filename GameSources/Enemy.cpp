@@ -18,15 +18,15 @@ namespace basecross {
 		const Vec3& rotatoin,
 		const Vec3& scale,
 		const State& state,
-		const State& deathState,
+		const State& overHeatState,
 		const shared_ptr<Player>& player
 	) :
 		GameObject(stage),
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(rightMove),
-		m_deathState(stay),
+		m_stateType(state),
+		m_overHeatState(overHeatState),
 		m_player(player),
 		m_heat(0),
 		m_maxHeat(100),
@@ -43,6 +43,8 @@ namespace basecross {
 		m_maxHitDropTime(m_hitDropTime),
 		m_bulletTime(0.0f),
 		m_trackingRange(30.0f),
+		m_plungeColFlag(0),
+		m_plungeTime(3.0f),
 		m_firstDirec(Vec3(0.0f)),
 		m_gravity(-9.8f),
 		m_grav(Vec3(0.0f, m_gravity, 0.0f)),
@@ -53,8 +55,7 @@ namespace basecross {
 		m_flyFlag(false),
 		m_floorFlag(false),
 		m_hitDropFlag(false),
-		m_plungeFlag(false),
-		m_plungeColFlag(false)
+		m_plungeFlag(false)
 	{}
 
 	void Enemy::OnCreate() {
@@ -111,7 +112,7 @@ namespace basecross {
 		//プレイヤー情報を取得
 		auto player = m_player.lock();
 		if (!player) return;
-		m_playerTrans = m_player.lock()->GetComponent<Transform>();
+		m_playerTrans = player->GetComponent<Transform>();
 		m_playerPos = m_playerTrans.lock()->GetPosition();
 
 		/*------------------テスト用-------------------------*/
@@ -210,21 +211,16 @@ namespace basecross {
 			break;
 			//突っ込み
 		case plunge:
-			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(L"attack");
+			EnemyAnime(L"attack");
 			//PlayerDic();
 			if (m_floorFlag) {
-				if (!m_plungeFlag && !m_plungeColFlag) {
-					m_firstDirec = m_playerPos - m_pos;
+				if (!m_plungeFlag) {
+					m_firstDirec = m_playerPos - GetChangePos();
 					m_plungeFlag = true;
 				}
-
-				if (m_plungeColFlag) {
-					m_stateType = rightMove;
-					m_plungeColFlag = false;
-					m_plungeFlag = false;
-				}
 				Vec3 dic = Vec3(m_firstDirec.x, 0.0f, m_firstDirec.z);
-				m_pos += dic * 1.0f * elapsed;
+				m_pos += dic * m_speed * 0.2f * elapsed;
+
 			}
 			break;
 		default:
@@ -238,22 +234,8 @@ namespace basecross {
 			GravZero();
 			Grav();
 		}
-
 		m_trans->SetPosition(m_pos);
 
-		//オーバーヒートの時
-		if (m_heat >= m_maxHeat) {
-			m_stateType = m_deathState;
-		}
-		if (m_heat > 0.0f) {
-			m_heat -= elapsed * 50;
-		}
-		else if (m_heat <= 0.0f) {
-			m_heat = 0.0f;
-			if (m_stateType != rightMove) {
-				m_stateType = m_beforState;
-			}
-		}
 
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
@@ -307,7 +289,22 @@ namespace basecross {
 		float rad = XMConvertToRadians(90.0f);
 		m_trans->SetRotation(Vec3(0.0f, -frontAngle - rad, 0.0f));
 	}
-
+	//オーバーヒート
+	void Enemy::OverHeat() {
+		float elapsed = App::GetApp()->GetElapsedTime();
+		if (m_heat >= m_maxHeat) {
+			m_stateType = m_overHeatState;
+		}
+		if (m_heat > 0.0f) {
+			m_heat -= elapsed * 50;
+		}
+		else if (GetOverHeat()&&m_heat <= 0.0f) {
+			m_heat = 0.0f;
+			if (m_stateType != m_beforState) {
+				m_stateType = m_beforState;
+			}
+		}
+	}
 
 	//ジャンプ
 	void Enemy::OneJump(float jumpHight) {
@@ -420,11 +417,11 @@ namespace basecross {
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
 			m_deathPos = m_pos;
+
 			ReceiveDamage(50.0f);
 		}
 		if (other->FindTag(L"Wall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
-			m_plungeColFlag = true;
 		}
 		if (other->FindTag(L"FixedBox")) {
 			m_fixedBox = dynamic_pointer_cast<TilingFixedBox>(other);
@@ -516,6 +513,10 @@ namespace basecross {
 			<<GetChangePos().y
 			<<L"\ngrav : "
 			<<m_grav.y
+			<<L"\nOverHeat : "
+			<< GetOverHeat()
+			<<L"\n"
+			<< m_plungeTime
 			<< endl;
 		scene->SetDebugString(wss.str());
 
@@ -593,7 +594,14 @@ namespace basecross {
 			return m_pos;
 		}
 	}
-
+	bool Enemy::GetOverHeat() {
+		if (m_stateType == m_overHeatState) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
 	//--------------------------------------------------------------------------------------
 	//	class EnemyBullet : public GameObject;  
