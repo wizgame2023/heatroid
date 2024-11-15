@@ -19,7 +19,7 @@ namespace basecross {
 		auto camera = ObjectFactory::Create<MainCamera>();
 		camera->SetEye(Vec3(0.0f, 50.00f, -5.0f));
 		camera->SetAt(Vec3(0.0f, 2.5f, 0.0f));
-		auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
+		//auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
 		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -54,7 +54,7 @@ namespace basecross {
 		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(25, 5.0125f, 0));
 		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
-		TilingFixedBox::m_moveObject.push_back(playerPos);
+		//m_playerObject.push_back(playerPos);
 
 	}
 
@@ -115,7 +115,8 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto PtrWaal = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			PtrWaal->AddTag(L"Wall");
 		}
 	}
 
@@ -186,28 +187,41 @@ namespace basecross {
 	void GameStageHemmi::CreateEnemy()
 	{
 
-		vector<wstring> LineVec;
-		m_GameStage1.GetSelect(LineVec, 0, L"Enemy");
-		for (auto& v : LineVec) {
-			vector<wstring> Tokens;
-			Util::WStrToTokenVector(Tokens, v, L',');
-			Vec3 Scale(
-				(float)_wtof(Tokens[7].c_str()),
-				(float)_wtof(Tokens[8].c_str()),
-				(float)_wtof(Tokens[9].c_str())
-			);
-			Vec3 Rot;
-			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
-			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
-			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+		//vector<wstring> LineVec;
+		//m_GameStage1.GetSelect(LineVec, 0, L"Enemy");
+		//for (auto& v : LineVec) {
+		//	vector<wstring> Tokens;
+		//	Util::WStrToTokenVector(Tokens, v, L',');
+		//	Vec3 Scale(
+		//		(float)_wtof(Tokens[7].c_str()),
+		//		(float)_wtof(Tokens[8].c_str()),
+		//		(float)_wtof(Tokens[9].c_str())
+		//	);
+		//	Vec3 Rot;
+		//	Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+		//	Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+		//	Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
 
-			Vec3 Pos(
-				(float)_wtof(Tokens[1].c_str()),
-				(float)_wtof(Tokens[2].c_str()),
-				(float)_wtof(Tokens[3].c_str())
-			);
+		//	Vec3 Pos(
+		//		(float)_wtof(Tokens[1].c_str()),
+		//		(float)_wtof(Tokens[2].c_str()),
+		//		(float)_wtof(Tokens[3].c_str())
+		//	);
+		//	auto player = GetSharedGameObject<Player>(L"Player");
+		//	auto enemy = AddGameObject<EnemyObj>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
+		//	AddGameObject<GaugeSquare>(enemy);
+		//}
+
+		vector<vector<Vec3>> vec = {
+			{
+				Vec3(15, 5.0125f, 0),
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(3.0f,3.0f,3.0f)
+			}
+		};
+		for (auto v : vec) {
 			auto player = GetSharedGameObject<Player>(L"Player");
-			auto enemy = AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
+			auto enemy = AddGameObject<EnemyObj>(v[0],v[1],v[2], Enemy::rightMove, Enemy::stay, player);
 			AddGameObject<GaugeSquare>(enemy);
 		}
 	}
