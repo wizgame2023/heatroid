@@ -153,9 +153,8 @@ namespace basecross {
 
 			AddGameObject<GimmickButton>(Pos, Rot, Scale, Button, number, Tokens[12]);
 		}
-
 	}
-
+  
 	//プレイヤーを生成
 	void GameStageTsuboi::CreatePlayer() {
 		vector<Vec3> plVec = {
