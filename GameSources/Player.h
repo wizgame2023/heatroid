@@ -49,7 +49,7 @@ namespace basecross {
 		Vec3 m_firePos;
 		//移動方向
 		Vec3 m_moveVel;
-		//CollisionExitの空中判定の閾値
+		//CollisionExitの空中判定用カウント
 		int m_collideCount, m_collideCountInit;
 
 		//プレイヤーの状態を表す列挙型
@@ -58,8 +58,9 @@ namespace basecross {
 			air,		//空中
 			hit_stand,	//やられ地上
 			hit_air,	//やられ空中
-			shot_stand,	//攻撃地上
-			shot_air,	//攻撃空中
+			shot_stand,	//チャージ地上
+			shot_air,	//チャージ空中
+			release,	//発射
 			died		//死亡
 		};
 		//プレイヤーの状態
@@ -73,6 +74,8 @@ namespace basecross {
 		float m_chargePerc, m_chargeSpeed, m_chargeReduceSpeed;
 		//無敵時間
 		float m_invincibleTime, m_invincibleTimeMax;
+		//何かを押してるか否か
+		bool m_isPushingObject;
 
 		//HP
 		int m_HP, m_HP_max;
@@ -128,9 +131,15 @@ namespace basecross {
 			return GetComponent<Transform>()->GetScale();
 		}
 
+		//HPを1を最大値とした割合で返す
 		const float GetHPRate() {
 			if (m_HP < 0) return 0;
 			return static_cast<float>(m_HP) / static_cast<float>(m_HP_max);
+		}
+
+		//死んだらtrueを返す
+		const bool GetDied() {
+			return (m_stateType == died);
 		}
 
 		//描画コンポーネントのゲッタ
@@ -189,6 +198,7 @@ namespace basecross {
 		Vec3 m_angle;
 		//射程
 		float m_range = 0, m_rangeMax;
+		bool m_stopped;
 
 	public:
 		//構築と破棄
@@ -208,7 +218,24 @@ namespace basecross {
 
 	};
 
-	//------------------------------------------------------------------
+	//====================================================================
+	// class ChargePtcl
+	// チャージ中のパーティクル
+	//====================================================================
+
+	//class ChargePtcl : public MultiParticle {
+	//public:
+	//	ChargePtcl(const shared_ptr<Stage>& StagePtr) {}
+	//	virtual ~ChargePtcl() {}
+
+	//	virtual void OnCreate() override;
+	//	virtual void OnUpdate() override;
+	//};
+
+	//====================================================================
+	// class SpriteHealth
+	// プレイヤーのライフ
+	//====================================================================
 	class SpriteHealth : public GameObject {
 		weak_ptr<Player> m_player;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
@@ -231,7 +258,11 @@ namespace basecross {
 
 		virtual void OnUpdate() override;
 	};
-	//------------------------------------------------------------------
+
+	//====================================================================
+	// class SpriteCharge
+	// プレイヤーの長押しゲージ
+	//====================================================================
 	class SpriteCharge : public GameObject {
 		weak_ptr<Player> m_player;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
