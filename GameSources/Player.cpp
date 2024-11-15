@@ -383,7 +383,6 @@ namespace basecross {
 	{
 		if ((Other->FindTag(L"GimmickButton")))
 		{
-
 			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 			auto& vec = group->GetGroupVector();
 			for (auto& v : vec) {

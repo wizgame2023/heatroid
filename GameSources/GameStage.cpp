@@ -49,7 +49,7 @@ namespace basecross {
 	//ÉvÉåÉCÉÑÅ[ÇÃçÏê¨
 	void GameStage::CreatePlayer() {
 		vector<Vec3> plVec = {
-			Vec3(85.0f, 5.0f, 0.0f),
+			Vec3(80.0f, 5.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(3.0f, 3.0f, 3.0f)
 		};
@@ -290,7 +290,7 @@ namespace basecross {
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
 			CreateFixedBox();
-			CreateEnemy();
+			//CreateEnemy();
 		}
 		catch (...) {
 			throw;
@@ -316,6 +316,14 @@ namespace basecross {
 		//		}
 		//	}
 		//}
+		if (m_Goaltrue)
+		{
+		}
+	}
+
+	void GameStage::CreateSprite()
+	{
+		AddGameObject<ClearSprite>(L"CLEARBackGround", true, Vec2(700.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 	}
 
 }
