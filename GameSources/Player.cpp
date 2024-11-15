@@ -297,20 +297,32 @@ namespace basecross {
 		case hit_air:
 			SetAnim(L"GetHit_Air");
 			Gravity();
-			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Air" && GetDrawPtr()->GetCurrentAnimationTime() >= .33f) {
+			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Air" && GetDrawPtr()->GetCurrentAnimationTime() >= .33f
+				&& m_HP > 0) {
 				m_stateType = air;
 			}
 
+			break;
+			//---------------------------------------発射
+		case release:
+			SetAnim(L"Release");
+			Gravity();
+			Friction();
+			if (GetDrawPtr()->GetCurrentAnimation() == L"Release" && GetDrawPtr()->GetCurrentAnimationTime() >= 8.0f / 30.0f) {
+				m_stateType = stand;
+			}
 			break;
 			//---------------------------------------死亡
 		case died:
 			Died();
 			Friction();
+
 			break;
 			//---------------------------------------ゴール
 		case goal:
-			SetAnim(L"Stand");
+			SetAnim(L"Idle");
 			Friction();
+
 			break;
 		}
 
@@ -359,11 +371,8 @@ namespace basecross {
 				GetHit();
 		}
 
-		if (m_stateType == hit_air && Other->FindTag(L"Floor")) {
-			m_stateType = hit_stand;
-		}
 
-		if (m_stateType == air && Other->FindTag(L"Floor")) {
+		if ((m_stateType == air || m_stateType == hit_air) && Other->FindTag(L"Floor")) {
 			SetAnim(AddFire() + L"Land");
 			m_stateType = stand;
 		}
@@ -450,7 +459,7 @@ namespace basecross {
 		}
 		if (m_stateType == air && m_moveVel.y > 0)
 			SetAnim(L"Jumping");
-		if ((m_stateType == air && m_moveVel.y <= 0) || (GetDrawPtr()->GetCurrentAnimation() != L"Jumping" && GetDrawPtr()->GetCurrentAnimationTime() >= .5f))
+		if (m_stateType == air && (m_moveVel.y <= 0 || (GetDrawPtr()->GetCurrentAnimation() != L"Jumping" && GetDrawPtr()->GetCurrentAnimationTime() >= .5f)))
 			SetAnim(L"Falling");
 
 	}
@@ -503,7 +512,7 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Fire_JumpStart", 0, 1, true, anim_fps);//330, 2, false, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_Jumping", 0, 1, true, anim_fps);//332, 28, false, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_Land", 0, 1, true, anim_fps);//360, 7, false, anim_fps);
-		ptrDraw->AddAnimation(L"Release", 242, 8, true, anim_fps);
+		ptrDraw->AddAnimation(L"Release", 242, 8, false, anim_fps);
 		//やられ・死亡
 		ptrDraw->AddAnimation(L"GetHit_Air", 280, 10, false, anim_fps);
 		ptrDraw->AddAnimation(L"GetHit_Stand", 280, 10, false, anim_fps);
@@ -563,10 +572,9 @@ namespace basecross {
 		firepos = firepos * scale;
 		pos += firepos;
 		GetStage()->AddGameObject<FireProjectile>(pos, fwd, m_chargePerc);
-
 		m_chargePerc = 0.0f;
 		m_isOverCharge = false;
-
+		m_stateType = release;
 	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え
