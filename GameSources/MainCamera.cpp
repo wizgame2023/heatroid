@@ -26,19 +26,14 @@ namespace basecross {
 	void CameraCollision::OnCreate() {
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		auto pos = ptrCamera->GetEye();
-		auto rot = ptrCamera->GetAt();
 		auto ptrtrans = GetComponent<Transform>();
-		ptrtrans->SetScale(Vec3(0.1, 0.1, 0.1));
+		ptrtrans->SetScale(Vec3(1.0, 1.0, 1.0));
 		ptrtrans->SetPosition(pos);
 		TargetPos = Vec3(0.0f, 0.0f, 0.0f);
 		GetPos = Vec3(0.0f, 1.0f, 0.0f);
 		//当たり判定
 		auto m_camera = AddComponent<CollisionSphere>();
 		ptrCamera->SetCameraObject(GetThis<GameObject>());
-		m_camera->SetDrawActive(true);
-		auto PtrDraw = AddComponent<BcPNTStaticDraw>();
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-
 	}
 
 	void CameraCollision::OnUpdate() {
@@ -52,16 +47,7 @@ namespace basecross {
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		auto pos = ptrCamera->GetEye();
 		auto rot = ptrCamera->GetAt();
-
-		//Vec3 Near, Far;
-		//GetTypeStage<GameStage>()->GetRay(Near, Far);
 		auto ptrTarget = ptrCamera->GetTargetObject();
-		//auto PsPos = ptrTarget->GetComponent<Transform>()->GetPosition();
-		//float t;
-		//Vec3 RayPos;
-		////現在位置と一番近いレイ上の点を得る
-		//HitTest::ClosetPtPointSegment(PsPos, Near, Far, t, RayPos);
-		//GetComponent<Transform>()->SetPosition(RayPos);
 
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto keyData = App::GetApp()->GetInputDevice().GetKeyState();
@@ -136,33 +122,36 @@ namespace basecross {
 			toAt += m_TargetToAt;
 			TargetPos = Lerp::CalculateLerp(rot, toAt, 0, 1.0f, 1.0, Lerp::Linear);
 		}
-
 		////目指したい場所にアームの値と腕ベクトルでEyeを調整
 		Vec3 toEye = newAt + armVec * m_ArmLen;
 		GetPos = Lerp::CalculateLerp(pos, toEye, 0, 1.0f, m_ToTargetLerp, Lerp::Linear);
 
 		//追尾システム
 		GetComponent<Transform>()->SetPosition(GetPos);
-		//ptrCamera->SetEye(GetPos);
-		//GetComponent<Transform>()->SetRotation(TargetPos);
 		UpdateArmLengh();
 	}
 
 	void CameraCollision::UpdateArmLengh() {
 		auto Ptr = GetComponent<Transform>();
-		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		auto Pos = Ptr->GetPosition();
+
+		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		auto ptrTarget = ptrCamera->GetTargetObject();
 		auto Rot = ptrTarget->GetComponent<Transform>()->GetPosition();
+
 		Vec3 vec = Pos - Rot;
+
 		m_ArmLen = bsm::length(vec);
 		if (m_ArmLen >= ptrCamera->m_MaxArm) {
 			//m_MaxArm以上離れないようにする
 			m_ArmLen = ptrCamera->m_MaxArm;
 		}
 		if (m_ArmLen <= ptrCamera->m_MinArm) {
-			//m_MaxArm以上離れないようにする
+			//m_MinArm以上離れないようにする
 			m_ArmLen = ptrCamera->m_MinArm;
+		}
+		if (m_Hit)
+		{
 		}
 	}
 

@@ -25,3 +25,4 @@
 #include "Gimmick.h"
 #include "MainCamera.h"
 #include "Sprite.h"
+#include "GameStageSprite.h"

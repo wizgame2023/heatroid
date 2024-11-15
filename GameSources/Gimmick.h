@@ -49,6 +49,7 @@ namespace basecross {
 		int m_number;
 	public:
 		float m_OpenSwitch;
+		wstring m_Texname;
 		//\’z‚Æ”jŠü
 		GimmickDoor(const shared_ptr<Stage>& stage,
 			const Vec3& position,
@@ -57,7 +58,8 @@ namespace basecross {
 			float UPic,
 			float VPic,
 			float m_OpenSwitch,
-			int number
+			int number,
+			const wstring& m_Texname
 		);
 		virtual ~GimmickDoor();
 		//‰Šú‰»
@@ -72,20 +74,18 @@ namespace basecross {
 		Vec3 m_Rotation;
 		Vec3 m_Scale;
 		bool m_open;
-		float m_UPic;
-		float m_VPic;
 		shared_ptr<GameObject> GDoor;
 		int m_number;
+		wstring m_Texname;
 	public:
 		int m_switch;
 		GimmickButton(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
 			const Vec3& scale,
-			float UPic,
-			float VPic,
 			int m_switch,
-			int number
+			int number,
+			const wstring& m_Texname
 		);
 		virtual ~GimmickButton();
 		//‰Šú‰»
