@@ -14,11 +14,9 @@ namespace basecross {
 
 	//ビューとライトの作成
 	void GameStageTsuboi::CreateViewLight() {
-		// カメラの設定
 		auto camera = ObjectFactory::Create<MainCamera>();
-		camera->SetEye(Vec3(0.0f, 80.00f, -5.0f));
+		camera->SetEye(Vec3(-50.0f, 3.00f, 0.0f));
 		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
-		//auto cameraObject = AddGameObject<CameraCollsion>(Vec3(1, 1, 1));
 		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -26,10 +24,13 @@ namespace basecross {
 
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
-		light->SetDefaultLighting2(); //デフォルトのライティングを指定
+		light->SetDefaultLighting(); //デフォルトのライティングを指定
+		auto cameraObject = AddGameObject<CameraCollision>();
+
 	}
 
-	void GameStageTsuboi::CreateGameBox() {
+	//ボックスの作成
+	void GameStageTsuboi::CreateFixedBox() {
 		//CSVの行単位の配列
 		vector<wstring> LineVec;
 		//0番目のカラムがL"FixedBox"である行を抜き出す
@@ -52,13 +53,14 @@ namespace basecross {
 			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
 
 			Vec3 Pos(
-				-(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[1].c_str()),
 				(float)_wtof(Tokens[2].c_str()),
 				(float)_wtof(Tokens[3].c_str())
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto ptrFloor = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			ptrFloor->AddTag(L"Floor");
 		}
 		m_GameStage1.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -79,20 +81,84 @@ namespace basecross {
 			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
 
 			Vec3 Pos(
-				-(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[1].c_str()),
 				(float)_wtof(Tokens[2].c_str()),
 				(float)_wtof(Tokens[3].c_str())
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto PtrWaal = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			PtrWaal->AddTag(L"Wall");
 		}
 	}
 
+	void GameStageTsuboi::CreateGimmick()
+	{
+		CreateSharedObjectGroup(L"Door");
+		CreateSharedObjectGroup(L"Switch");
+		vector<wstring> LineVec;
+		m_GameStage1.GetSelect(LineVec, 0, L"Door");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			float Switch = (float)_wtof(Tokens[10].c_str());
+			int number = (float)_wtof(Tokens[11].c_str());
+
+			//各値がそろったのでオブジェクト作成
+			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number, Tokens[12]);
+		}
+
+		m_GameStage1.GetSelect(LineVec, 0, L"Switch");
+		for (auto& v : LineVec) {
+			vector<wstring> Tokens;
+			Util::WStrToTokenVector(Tokens, v, L',');
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			float Button = (float)_wtof(Tokens[10].c_str());
+			int number = (float)_wtof(Tokens[11].c_str());
+
+			AddGameObject<GimmickButton>(Pos, Rot, Scale, Button, number, Tokens[12]);
+		}
+	}
+  
 	//プレイヤーを生成
 	void GameStageTsuboi::CreatePlayer() {
 		vector<Vec3> plVec = {
-			Vec3(2.0f, 5.0f, 0.0f),
+			Vec3(5.0f, 5.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(3.0f, 3.0f, 3.0f)
 		};
@@ -110,7 +176,7 @@ namespace basecross {
 		auto rad = XMConvertToRadians(30.0f);
 		vector<vector<Vec3>> vec = {
 			{
-				Vec3(0.6f,10.0f,3.0f),
+				Vec3(8.0f,10.0f,6.0f),
 				Vec3(0.0f,0.0f,0.0f),
 				Vec3(3.0f,3.0f,3.0f),
 			},
@@ -136,7 +202,7 @@ namespace basecross {
 
 			wstring Datadir;
 			App::GetApp()->GetDataDirectory(Datadir);
-			m_GameStage1.SetFileName(Datadir + L"GameStage.csv");
+			m_GameStage1.SetFileName(Datadir + L"CSV/GameStage.csv");
 			m_GameStage1.ReadCsv();
 			
 			CreatePlayer();
@@ -145,7 +211,8 @@ namespace basecross {
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
 
-			CreateGameBox();
+			CreateFixedBox();
+			CreateGimmick();
 			CreateEnemy();
 
 

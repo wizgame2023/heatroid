@@ -24,7 +24,7 @@ namespace basecross{
 		auto mdlPath = path + L"Models/";
 
 		// プレイヤー
-		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HeatRoid.bmf");
+		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HR.bmf");
 		app->RegisterResource(L"PLAYER", modelMesh);
 
 		//敵のモデル
@@ -59,8 +59,9 @@ namespace basecross{
 		app->RegisterTexture(L"TITLEROGO", texPath + L"TitleRogo.png");
 		app->RegisterTexture(L"TITLEEFFECT", texPath + L"TitleEffect.png");
 		app->RegisterTexture(L"TITLEBACKGROUND", texPath + L"TitleBackGround.png");
-
-
+		//ゲームクリア
+		app->RegisterTexture(L"GameClearTEXT", texPath + L"CLEAR.Text.png");
+		app->RegisterTexture(L"CLEARBackGround", texPath + L"CLEARBackGround.png");
 	}
 
 	void Scene::OnCreate(){
@@ -73,7 +74,7 @@ namespace basecross{
 
 			//自分自身にイベントを送る
 			//これにより各ステージやオブジェクトがCreate時にシーンにアクセスできる
-			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToTitleStage");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToGameStage");
 		}
 		catch (...) {
 			throw;

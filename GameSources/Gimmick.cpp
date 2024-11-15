@@ -260,4 +260,40 @@ namespace basecross {
 		}
 	}
 
+	Door::Door(const shared_ptr<Stage>& StagePtr,
+		const Vec3& position,
+		const Vec3& rotation,
+		const Vec3& scale,
+		const wstring& Texname
+	):
+		GameObject(StagePtr),
+		m_Position(position),
+		m_Rotation(rotation),
+		m_Scale(scale),
+		m_Texname(Texname)
+
+	{}
+	Door::~Door() {}
+
+	void Door::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Position);
+		Trans->SetRotation(m_Rotation);
+		Trans->SetScale(m_Scale);
+
+		auto ptrDraw = AddComponent<PNTBoneModelDraw>();
+		Mat4x4 meshMat;
+		meshMat.affineTransformation(
+			Vec3(.4f, .4f, .4f), //(.1f, .1f, .1f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f)
+		);
+
+		ptrDraw->SetMeshResource(m_Texname);
+		ptrDraw->SetMeshToTransformMatrix(meshMat);
+
+	};
+
 }
