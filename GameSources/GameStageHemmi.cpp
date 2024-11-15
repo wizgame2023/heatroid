@@ -1,7 +1,7 @@
 /*!
 @file GameStageHemmi.cpp
-@brief ƒeƒXƒgƒQ[ƒ€ƒXƒe[ƒWÀ‘Ì
-’S“–FˆíŒ©
+@brief ãƒ†ã‚¹ãƒˆã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸å®Ÿä½“
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -10,28 +10,30 @@
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
-	//	ƒQ[ƒ€ƒXƒe[ƒWƒNƒ‰ƒXÀ‘Ì
+	//	ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒ©ã‚¹å®Ÿä½“
 	//--------------------------------------------------------------------------------------
 
-	//ƒrƒ…[‚Æƒ‰ƒCƒg‚Ìì¬
+	//ãƒ“ãƒ¥ãƒ¼ã¨ãƒ©ã‚¤ãƒˆã®ä½œæˆ
 	void GameStageHemmi::CreateViewLight() {
-		// ƒJƒƒ‰‚Ìİ’è
+		// ã‚«ãƒ¡ãƒ©ã®è¨­å®š
 		auto camera = ObjectFactory::Create<MainCamera>();
 		camera->SetEye(Vec3(0.0f, 50.00f, -5.0f));
 		camera->SetAt(Vec3(0.0f, 2.5f, 0.0f));
-		auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
+
+		//auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
 		//camera->SetCameraObject(cameraObject);
-		// ƒrƒ…[‚ÉƒJƒƒ‰‚ğİ’è
+
+		// ãƒ“ãƒ¥ãƒ¼ã«ã‚«ãƒ¡ãƒ©ã‚’è¨­å®š
 		auto view = CreateView<SingleView>();
 		view->SetCamera(camera);
 
-		//ƒ}ƒ‹ƒ`ƒ‰ƒCƒg‚Ìì¬
+		//ãƒãƒ«ãƒãƒ©ã‚¤ãƒˆã®ä½œæˆ
 		auto light = CreateLight<MultiLight>();
-		light->SetDefaultLighting(); //ƒfƒtƒHƒ‹ƒg‚Ìƒ‰ƒCƒeƒBƒ“ƒO‚ğw’è
+		light->SetDefaultLighting(); //ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°ã‚’æŒ‡å®š
 	}
 
 	void GameStageHemmi::CreateGameBox() {
-		//”z—ñ‚Ì‰Šú‰»
+		//é…åˆ—ã®åˆæœŸåŒ–
 		vector< vector<Vec3> > vec = {
 			{
 				Vec3(0.0f, 0.01f, 0.0f),
@@ -39,44 +41,46 @@ namespace basecross {
 				Vec3(50.0f, 0.5f, 50.0f)
 			},
 		};
-		//ƒIƒuƒWƒFƒNƒg‚Ìì¬
+		//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆ
 		for (auto v : vec) {
 			AddGameObject<FixedBox>(v[0], v[1], v[2]);
 		}
 	}
 
-	//ƒvƒŒƒCƒ„[‚Ìì¬
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½œæˆ
 	void GameStageHemmi::CreatePlayer() {
-		//ƒvƒŒ[ƒ„[‚Ìì¬
+		//ãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼ã®ä½œæˆ
 		auto ptrPlayer = AddGameObject<Player>();
-		//ƒVƒFƒA”z—ñ‚ÉƒvƒŒƒCƒ„[‚ğ’Ç‰Á
+		//ã‚·ã‚§ã‚¢é…åˆ—ã«ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’è¿½åŠ 
 		SetSharedGameObject(L"Player", ptrPlayer);
 		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(25, 5.0125f, 0));
 		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
-		TilingFixedBox::m_moveObject.push_back(playerPos);
+
+		//m_playerObject.push_back(playerPos);
+
 
 	}
 
-	//ƒ{ƒbƒNƒX‚Ìì¬
+	//ãƒœãƒƒã‚¯ã‚¹ã®ä½œæˆ
 	void GameStageHemmi::CreateFixedBox() {
-		//CSV‚Ìs’PˆÊ‚Ì”z—ñ
+		//CSVã®è¡Œå˜ä½ã®é…åˆ—
 		vector<wstring> LineVec;
-		//0”Ô–Ú‚ÌƒJƒ‰ƒ€‚ªL"FixedBox"‚Å‚ ‚és‚ğ”²‚«o‚·
+		//0ç•ªç›®ã®ã‚«ãƒ©ãƒ ãŒL"FixedBox"ã§ã‚ã‚‹è¡Œã‚’æŠœãå‡ºã™
 		m_GameStage1.GetSelect(LineVec, 0, L"Floor");
 		for (auto& v : LineVec) {
-			//ƒg[ƒNƒ“iƒJƒ‰ƒ€j‚Ì”z—ñ
+			//ãƒˆãƒ¼ã‚¯ãƒ³ï¼ˆã‚«ãƒ©ãƒ ï¼‰ã®é…åˆ—
 			vector<wstring> Tokens;
-			//ƒg[ƒNƒ“iƒJƒ‰ƒ€j’PˆÊ‚Å•¶š—ñ‚ğ’Šo(L','‚ğƒfƒŠƒ~ƒ^‚Æ‚µ‚Ä‹æ•ª‚¯)
+			//ãƒˆãƒ¼ã‚¯ãƒ³ï¼ˆã‚«ãƒ©ãƒ ï¼‰å˜ä½ã§æ–‡å­—åˆ—ã‚’æŠ½å‡º(L','ã‚’ãƒ‡ãƒªãƒŸã‚¿ã¨ã—ã¦åŒºåˆ†ã‘)
 			Util::WStrToTokenVector(Tokens, v, L',');
-			//Šeƒg[ƒNƒ“iƒJƒ‰ƒ€j‚ğƒXƒP[ƒ‹A‰ñ“]AˆÊ’u‚É“Ç‚İ‚Ş
+			//å„ãƒˆãƒ¼ã‚¯ãƒ³ï¼ˆã‚«ãƒ©ãƒ ï¼‰ã‚’ã‚¹ã‚±ãƒ¼ãƒ«ã€å›è»¢ã€ä½ç½®ã«èª­ã¿è¾¼ã‚€
 			Vec3 Scale(
 				(float)_wtof(Tokens[7].c_str()),
 				(float)_wtof(Tokens[8].c_str()),
 				(float)_wtof(Tokens[9].c_str())
 			);
 			Vec3 Rot;
-			//‰ñ“]‚ÍuXM_PIDIV2v‚Ì•¶š—ñ‚É‚È‚Á‚Ä‚¢‚éê‡‚ª‚ ‚é
+			//å›è»¢ã¯ã€ŒXM_PIDIV2ã€ã®æ–‡å­—åˆ—ã«ãªã£ã¦ã„ã‚‹å ´åˆãŒã‚ã‚‹
 			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
 			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
 			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
@@ -87,23 +91,23 @@ namespace basecross {
 				(float)_wtof(Tokens[3].c_str())
 			);
 
-			//Še’l‚ª‚»‚ë‚Á‚½‚Ì‚ÅƒIƒuƒWƒFƒNƒgì¬
+			//å„å€¤ãŒãã‚ã£ãŸã®ã§ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä½œæˆ
 			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
 		}
 		m_GameStage1.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
-			//ƒg[ƒNƒ“iƒJƒ‰ƒ€j‚Ì”z—ñ
+			//ãƒˆãƒ¼ã‚¯ãƒ³ï¼ˆã‚«ãƒ©ãƒ ï¼‰ã®é…åˆ—
 			vector<wstring> Tokens;
-			//ƒg[ƒNƒ“iƒJƒ‰ƒ€j’PˆÊ‚Å•¶š—ñ‚ğ’Šo(L','‚ğƒfƒŠƒ~ƒ^‚Æ‚µ‚Ä‹æ•ª‚¯)
+			//ãƒˆãƒ¼ã‚¯ãƒ³ï¼ˆã‚«ãƒ©ãƒ ï¼‰å˜ä½ã§æ–‡å­—åˆ—ã‚’æŠ½å‡º(L','ã‚’ãƒ‡ãƒªãƒŸã‚¿ã¨ã—ã¦åŒºåˆ†ã‘)
 			Util::WStrToTokenVector(Tokens, v, L',');
-			//Šeƒg[ƒNƒ“iƒJƒ‰ƒ€j‚ğƒXƒP[ƒ‹A‰ñ“]AˆÊ’u‚É“Ç‚İ‚Ş
+			//å„ãƒˆãƒ¼ã‚¯ãƒ³ï¼ˆã‚«ãƒ©ãƒ ï¼‰ã‚’ã‚¹ã‚±ãƒ¼ãƒ«ã€å›è»¢ã€ä½ç½®ã«èª­ã¿è¾¼ã‚€
 			Vec3 Scale(
 				(float)_wtof(Tokens[7].c_str()),
 				(float)_wtof(Tokens[8].c_str()),
 				(float)_wtof(Tokens[9].c_str())
 			);
 			Vec3 Rot;
-			//‰ñ“]‚ÍuXM_PIDIV2v‚Ì•¶š—ñ‚É‚È‚Á‚Ä‚¢‚éê‡‚ª‚ ‚é
+			//å›è»¢ã¯ã€ŒXM_PIDIV2ã€ã®æ–‡å­—åˆ—ã«ãªã£ã¦ã„ã‚‹å ´åˆãŒã‚ã‚‹
 			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
 			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
 			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
@@ -114,8 +118,9 @@ namespace basecross {
 				(float)_wtof(Tokens[3].c_str())
 			);
 
-			//Še’l‚ª‚»‚ë‚Á‚½‚Ì‚ÅƒIƒuƒWƒFƒNƒgì¬
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			//å„å€¤ãŒãã‚ã£ãŸã®ã§ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä½œæˆ
+			auto PtrWaal = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			PtrWaal->AddTag(L"Wall");
 		}
 	}
 
@@ -126,18 +131,18 @@ namespace basecross {
 		vector<wstring> LineVec;
 		m_GameStage1.GetSelect(LineVec, 0, L"Door");
 		for (auto& v : LineVec) {
-			//ƒg[ƒNƒ“iƒJƒ‰ƒ€j‚Ì”z—ñ
+			//ãƒˆãƒ¼ã‚¯ãƒ³ï¼ˆã‚«ãƒ©ãƒ ï¼‰ã®é…åˆ—
 			vector<wstring> Tokens;
-			//ƒg[ƒNƒ“iƒJƒ‰ƒ€j’PˆÊ‚Å•¶š—ñ‚ğ’Šo(L','‚ğƒfƒŠƒ~ƒ^‚Æ‚µ‚Ä‹æ•ª‚¯)
+			//ãƒˆãƒ¼ã‚¯ãƒ³ï¼ˆã‚«ãƒ©ãƒ ï¼‰å˜ä½ã§æ–‡å­—åˆ—ã‚’æŠ½å‡º(L','ã‚’ãƒ‡ãƒªãƒŸã‚¿ã¨ã—ã¦åŒºåˆ†ã‘)
 			Util::WStrToTokenVector(Tokens, v, L',');
-			//Šeƒg[ƒNƒ“iƒJƒ‰ƒ€j‚ğƒXƒP[ƒ‹A‰ñ“]AˆÊ’u‚É“Ç‚İ‚Ş
+			//å„ãƒˆãƒ¼ã‚¯ãƒ³ï¼ˆã‚«ãƒ©ãƒ ï¼‰ã‚’ã‚¹ã‚±ãƒ¼ãƒ«ã€å›è»¢ã€ä½ç½®ã«èª­ã¿è¾¼ã‚€
 			Vec3 Scale(
 				(float)_wtof(Tokens[7].c_str()),
 				(float)_wtof(Tokens[8].c_str()),
 				(float)_wtof(Tokens[9].c_str())
 			);
 			Vec3 Rot;
-			//‰ñ“]‚ÍuXM_PIDIV2v‚Ì•¶š—ñ‚É‚È‚Á‚Ä‚¢‚éê‡‚ª‚ ‚é
+			//å›è»¢ã¯ã€ŒXM_PIDIV2ã€ã®æ–‡å­—åˆ—ã«ãªã£ã¦ã„ã‚‹å ´åˆãŒã‚ã‚‹
 			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
 			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
 			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
@@ -151,8 +156,8 @@ namespace basecross {
 			float Switch = (float)_wtof(Tokens[10].c_str());
 			int number = (float)_wtof(Tokens[11].c_str());
 
-			//Še’l‚ª‚»‚ë‚Á‚½‚Ì‚ÅƒIƒuƒWƒFƒNƒgì¬
-			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number);
+			//ï¿½eï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ÅƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ì¬
+			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number, Tokens[12]);   
 		}
 
 		m_GameStage1.GetSelect(LineVec, 0, L"Switch");
@@ -178,7 +183,7 @@ namespace basecross {
 			float Button = (float)_wtof(Tokens[10].c_str());
 			int number = (float)_wtof(Tokens[11].c_str());
 
-			AddGameObject<GimmickButton>(Pos, Rot, Scale, 1.0f, 1.0f, Button, number);
+			AddGameObject<GimmickButton>(Pos, Rot, Scale, Button, number, Tokens[12]);
 		}
 
 	}
@@ -186,28 +191,41 @@ namespace basecross {
 	void GameStageHemmi::CreateEnemy()
 	{
 
-		vector<wstring> LineVec;
-		m_GameStage1.GetSelect(LineVec, 0, L"Enemy");
-		for (auto& v : LineVec) {
-			vector<wstring> Tokens;
-			Util::WStrToTokenVector(Tokens, v, L',');
-			Vec3 Scale(
-				(float)_wtof(Tokens[7].c_str()),
-				(float)_wtof(Tokens[8].c_str()),
-				(float)_wtof(Tokens[9].c_str())
-			);
-			Vec3 Rot;
-			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
-			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
-			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+		//vector<wstring> LineVec;
+		//m_GameStage1.GetSelect(LineVec, 0, L"Enemy");
+		//for (auto& v : LineVec) {
+		//	vector<wstring> Tokens;
+		//	Util::WStrToTokenVector(Tokens, v, L',');
+		//	Vec3 Scale(
+		//		(float)_wtof(Tokens[7].c_str()),
+		//		(float)_wtof(Tokens[8].c_str()),
+		//		(float)_wtof(Tokens[9].c_str())
+		//	);
+		//	Vec3 Rot;
+		//	Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+		//	Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+		//	Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
 
-			Vec3 Pos(
-				(float)_wtof(Tokens[1].c_str()),
-				(float)_wtof(Tokens[2].c_str()),
-				(float)_wtof(Tokens[3].c_str())
-			);
+		//	Vec3 Pos(
+		//		(float)_wtof(Tokens[1].c_str()),
+		//		(float)_wtof(Tokens[2].c_str()),
+		//		(float)_wtof(Tokens[3].c_str())
+		//	);
+		//	auto player = GetSharedGameObject<Player>(L"Player");
+		//	auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
+		//	AddGameObject<GaugeSquare>(enemy);
+		//}
+
+		vector<vector<Vec3>> vec = {
+			{
+				Vec3(15, 5.0125f, 0),
+				Vec3(0.0f,0.0f,0.0f),
+				Vec3(3.0f,3.0f,3.0f)
+			}
+		};
+		for (auto v : vec) {
 			auto player = GetSharedGameObject<Player>(L"Player");
-			auto enemy = AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
+			auto enemy = AddGameObject<EnemyChase>(v[0],v[1],v[2], Enemy::rightMove, Enemy::stay, player);
 			AddGameObject<GaugeSquare>(enemy);
 		}
 	}
@@ -216,13 +234,13 @@ namespace basecross {
 		try {
 			wstring Datadir;
 			App::GetApp()->GetDataDirectory(Datadir);
-			//CSVƒpƒX‚ğæ“¾
+			//CSVãƒ‘ã‚¹ã‚’å–å¾—
 			m_GameStage1.SetFileName(Datadir + L"CSV/" + L"GameStage.csv");
 			m_GameStage1.ReadCsv();
-			//ƒrƒ…[‚Æƒ‰ƒCƒg‚Ìì¬
+			//ãƒ“ãƒ¥ãƒ¼ã¨ãƒ©ã‚¤ãƒˆã®ä½œæˆ
 			CreateViewLight();
 			//CreateGameBox();
-			CreateGimmick();
+			//CreateGimmick();
 
 			CreatePlayer();
 			CreateFixedBox();

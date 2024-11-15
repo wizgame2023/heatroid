@@ -19,8 +19,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)EnemyImage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Enemyobj.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FixedBox.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)GameOver.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStageHemmi.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)GameStageSprite.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStageTuboi.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Gimmick.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MainCamera.h" />
@@ -29,6 +31,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)ProjectBehavior.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ProjectShader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Scene.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)GameClear.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Sprite.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)TitleStage.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)Character.cpp" />
@@ -36,8 +41,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Enemy.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Enemyobj.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FixedBox.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)GameOver.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStageHemmi.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)GameStageSprite.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStageTuboi.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Gimmick.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MainCamera.cpp" />
@@ -45,6 +52,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)ProjectBehavior.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ProjectShader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Scene.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)GameClear.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Sprite.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)TitleStage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)WinMain.cpp" />
   </ItemGroup>
 </Project>

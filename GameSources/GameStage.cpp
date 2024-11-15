@@ -17,7 +17,7 @@ namespace basecross {
 	void GameStage::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<MainCamera>();
-		camera->SetEye(Vec3(0.0f, 8.00f, -5.0f));
+		camera->SetEye(Vec3(-50.0f, 3.00f, 0.0f));
 		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
 		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
@@ -27,7 +27,7 @@ namespace basecross {
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
 		light->SetDefaultLighting(); //デフォルトのライティングを指定
-		//auto cameraObject = AddGameObject<CameraCollision>();
+		auto cameraObject = AddGameObject<CameraCollision>();
 
 	}
 
@@ -52,10 +52,10 @@ namespace basecross {
 		auto ptrPlayer = AddGameObject<Player>();
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
-		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(25, 5.0125f, 0));
+		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(85, 5.0f, 0));
+		ptrPlayer->GetComponent<Transform>()->SetRotation(Vec3(0, 180, 0));
 		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
-		m_PlayerObject.push_back(playerPos);
 	
 	}
 
@@ -117,8 +117,8 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto PtrWaal = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
-			PtrWaal->AddTag(L"Floor");
+			auto PtrWall = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			PtrWall->AddTag(L"Wall");
 		}
 	}
 
@@ -155,7 +155,7 @@ namespace basecross {
 			int number = (float)_wtof(Tokens[11].c_str());
 
 			//各値がそろったのでオブジェクト作成
-			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number);
+			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number, Tokens[12]);
 		}
 
 		m_GameStage1.GetSelect(LineVec, 0, L"Switch");
@@ -181,14 +181,14 @@ namespace basecross {
 			float Button = (float)_wtof(Tokens[10].c_str());
 			int number = (float)_wtof(Tokens[11].c_str());
 
-			AddGameObject<GimmickButton>(Pos, Rot, Scale, 1.0f, 1.0f, Button, number);
+			AddGameObject<GimmickButton>(Pos, Rot, Scale,  Button, number, Tokens[12]);
 		}
 
 	}
 
 	void GameStage::CreateEnemy()
 	{			
-
+		CreateSharedObjectGroup(L"Enemy");
 		vector<wstring> LineVec;
 		m_GameStage1.GetSelect(LineVec, 0, L"Enemy");
 		for (auto& v : LineVec) {
@@ -210,48 +210,10 @@ namespace basecross {
 				(float)_wtof(Tokens[3].c_str())
 			);
 			auto player = GetSharedGameObject<Player>(L"Player");
-			AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
+			auto enemy = AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+			auto group = GetSharedObjectGroup(L"Enemy");
+			group->IntoGroup(enemy);
 		}
-	}
-
-	void GameStage::GetRay(Vec3& Near, Vec3& Far) {
-		Mat4x4 world, view, proj;
-		world.affineTransformation(
-			Vec3(1.0f, 1.0f, 1.0f),
-			Vec3(0.0f, 0.0f, 0.0f),
-			Vec3(0.0f, 0.0f, 0.0f),
-			Vec3(0.0f, 0.0f, 0.0f)
-		);
-		auto PtrCamera = GetView()->GetTargetCamera();
-		view = PtrCamera->GetViewMatrix();
-		proj = PtrCamera->GetProjMatrix();
-		auto viewport = GetView()->GetTargetViewport();
-		auto playerSh = GetSharedGameObject<Player>(L"Player");
-		auto PlayerPos = playerSh->GetComponent<Transform>()->GetWorldPosition();
-		Vec3 CaeraPos = PtrCamera->GetEye();
-		Near = XMVector3Unproject(
-			Vec3((float)PlayerPos.x, (float)PlayerPos.y, 0),
-			viewport.TopLeftX,
-			viewport.TopLeftY,
-			1280,
-			800,
-			viewport.MinDepth,
-			viewport.MaxDepth,
-			proj,
-			view,
-			world);
-
-		Far = XMVector3Unproject(
-			Vec3((float)CaeraPos.x, (float)CaeraPos.y, 1.0),
-			viewport.TopLeftX,
-			viewport.TopLeftY,
-			1280,
-			800,
-			viewport.MinDepth,
-			viewport.MaxDepth,
-			proj,
-			view,
-			world);
 	}
 	void GameStage::OnCreate() {
 		try {
@@ -262,12 +224,12 @@ namespace basecross {
 			m_GameStage1.ReadCsv();
 			//ビューとライトの作成
 			CreateViewLight();
-			//CreateGameBox();
+			CreateGameBox();
 			CreateGimmick();
 
 			CreatePlayer();
 			CreateFixedBox();
-			CreateEnemy();
+			//CreateEnemy();
 		}
 		catch (...) {
 			throw;
@@ -276,24 +238,20 @@ namespace basecross {
 
 	void GameStage::OnUpdate()
 	{
-
-		//for (auto& object : GetGameObjectVec())
+		//auto group = GetSharedObjectGroup(L"Enemy");
+		//auto& vec = group->GetGroupVector();
+		//for (auto& object : vec)
 		//{
-		//	if (object->FindTag(L"FixedBox"))
+		//	auto Enemybj = object.lock();
+		//	auto playerSh = GetSharedGameObject<Player>(L"Player");
+		//	auto PlayerPos = playerSh->GetComponent<Transform>()->GetWorldPosition();
+		//	if (Enemybj != nullptr)
 		//	{
-		//		for (auto& weaktrans : TilingFixedBox::m_moveObject)
-		//		{
-		//			auto trans = weaktrans.lock();
-		//			if (trans != nullptr)
-		//			{
-		//				if (length(trans->GetPosition() - object->GetComponent<Transform>()->GetPosition()) < 1.0f) {
-		//					object->SetUpdateActive(true);
-		//				}
-		//				{
-		//				else
-		//					object->SetUpdateActive(false);
-		//				}
-		//			}
+		//		if (length(PlayerPos - Enemybj->GetComponent<Transform>()->GetPosition()) < 50.0f) {
+		//			Enemybj->SetUpdateActive(true);
+		//		}
+		//		else{
+		//			Enemybj->SetUpdateActive(false);
 		//		}
 		//	}
 		//}
