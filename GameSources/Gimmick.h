@@ -125,6 +125,14 @@ namespace basecross {
 		virtual ~Door();
 		//初期化
 		virtual void OnCreate() override;
+		void AddAnim();
+
+		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
+		const void SetAnim(wstring animname, float time = 0.0f) {
+			auto draw = GetComponent<PNTBoneModelDraw>();
+			if (draw->GetCurrentAnimation() != animname)
+				draw->ChangeCurrentAnimation(animname, time);
+		}
 	};
 
 }
