@@ -30,7 +30,7 @@ namespace basecross {
 		};
 
 		
-	private:
+	protected:
 		float m_heat;          //オーバーヒート値
 		float m_maxHeat;       //最大オーバーヒート
 		float m_speed;       //移動速度
@@ -47,6 +47,8 @@ namespace basecross {
 		float m_maxDropTime;
 		float m_hitDropTime;
 		float m_maxHitDropTime;
+		float m_plungeTime;
+		int m_plungeColFlag;
 		Vec3 m_moveRot;
 
 		Vec3 m_direc;
@@ -65,11 +67,10 @@ namespace basecross {
 		bool m_floorFlag;
 		bool m_hitDropFlag;
 		bool m_plungeFlag;
-		bool m_plungeColFlag;
 
 		State m_stateType;
 		State m_beforState;
-		State m_deathState;
+		State m_overHeatState;
 
 		Vec3 m_pos;
 		Vec3 m_rot;
@@ -97,7 +98,7 @@ namespace basecross {
 			const Vec3& rotatoin, 
 			const Vec3& scale,
 			const State& state,
-			const State& deathState,
+			const State& overHeatState,
 			const shared_ptr<Player>& player);
 		virtual ~Enemy(){}
 		virtual void OnCreate() override; // 初期化
@@ -115,6 +116,8 @@ namespace basecross {
 		void HitDrop();
 		void FindFixed();
 		void Bullet();
+		void EnemyAnime(wstring anime);
+		void OverHeat();
 		void Debug();
 		//get,set
 		void SetEnemyFlayFlag(bool flag);
@@ -127,8 +130,10 @@ namespace basecross {
 		Vec3 GetChangePos();
 		bool GetFloorFlag();
 		void EnemyAngle();
+		float GetHeatRatio();
+		bool GetOverHeat();
 
-
+	private:
 		//重力に関する関数
 		void Grav();
 		void SetGrav(Vec3 grav);
@@ -136,7 +141,6 @@ namespace basecross {
 		void GravZero();
 		void GravVelZero();
 		void SetGravVel(Vec3 grav);
-		float GetHeatRatio();
 
 	};
 
