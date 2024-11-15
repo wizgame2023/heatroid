@@ -8,16 +8,16 @@
 #include "stdafx.h"
 
 namespace basecross {
-	class EnemyObj : public Enemy {
+	class EnemyChase : public Enemy {
 	public:
-		EnemyObj(const shared_ptr<Stage>& stage,
+		EnemyChase(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
 			const Vec3& scale,
 			const State& state,
 			const State& deathState,
 			const shared_ptr<Player>& player);
-		virtual ~EnemyObj() {};
+		virtual ~EnemyChase() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	private :

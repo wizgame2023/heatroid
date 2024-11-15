@@ -212,7 +212,7 @@ namespace basecross {
 		//		(float)_wtof(Tokens[3].c_str())
 		//	);
 		//	auto player = GetSharedGameObject<Player>(L"Player");
-		//	auto enemy = AddGameObject<EnemyObj>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
+		//	auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
 		//	AddGameObject<GaugeSquare>(enemy);
 		//}
 
@@ -225,7 +225,7 @@ namespace basecross {
 		};
 		for (auto v : vec) {
 			auto player = GetSharedGameObject<Player>(L"Player");
-			auto enemy = AddGameObject<EnemyObj>(v[0],v[1],v[2], Enemy::rightMove, Enemy::stay, player);
+			auto enemy = AddGameObject<EnemyChase>(v[0],v[1],v[2], Enemy::rightMove, Enemy::stay, player);
 			AddGameObject<GaugeSquare>(enemy);
 		}
 	}
