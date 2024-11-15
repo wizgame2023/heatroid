@@ -37,7 +37,7 @@ namespace basecross {
 			{
 				Vec3(0.0f, 0.01f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(50.0f, 0.5f, 50.0f)
+				Vec3(-50.0f, 0.5f, 70.0f)
 			},
 		};
 		//オブジェクトの作成
@@ -49,7 +49,7 @@ namespace basecross {
 	//プレイヤーの作成
 	void GameStage::CreatePlayer() {
 		vector<Vec3> plVec = {
-			Vec3(80.0f, 5.0f, 0.0f),
+			Vec3(-50.0f, 5.0f, -70.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(3.0f, 3.0f, 3.0f)
 		};
@@ -290,6 +290,7 @@ namespace basecross {
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
 			CreateFixedBox();
+			CreateSprite();
 			//CreateEnemy();
 		}
 		catch (...) {
@@ -304,7 +305,6 @@ namespace basecross {
 		//for (auto& object : vec)
 		//{
 		//	auto Enemybj = object.lock();
-		//	auto playerSh = GetSharedGameObject<Player>(L"Player");
 		//	auto PlayerPos = playerSh->GetComponent<Transform>()->GetWorldPosition();
 		//	if (Enemybj != nullptr)
 		//	{
@@ -316,14 +316,21 @@ namespace basecross {
 		//		}
 		//	}
 		//}
+		auto playerSh = GetSharedGameObject<Player>(L"Player");
+		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
 		{
+			m_TextDraw->SetDrawActive(true);
+			m_SpriteDraw->SetDrawActive(true);
 		}
 	}
 
 	void GameStage::CreateSprite()
 	{
-		AddGameObject<ClearSprite>(L"CLEARBackGround", true, Vec2(700.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_TextDraw = AddGameObject<ClearSprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_SpriteDraw = AddGameObject<ClearSprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_TextDraw->SetDrawActive(false);
+		m_SpriteDraw->SetDrawActive(false);
 	}
 
 }
