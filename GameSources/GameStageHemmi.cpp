@@ -156,8 +156,8 @@ namespace basecross {
 			float Switch = (float)_wtof(Tokens[10].c_str());
 			int number = (float)_wtof(Tokens[11].c_str());
 
-			//各値がそろったのでオブジェクト作成
-			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number);
+			//�e�l����������̂ŃI�u�W�F�N�g�쐬
+			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number, Tokens[12]);   
 		}
 
 		m_GameStage1.GetSelect(LineVec, 0, L"Switch");
@@ -183,7 +183,7 @@ namespace basecross {
 			float Button = (float)_wtof(Tokens[10].c_str());
 			int number = (float)_wtof(Tokens[11].c_str());
 
-			AddGameObject<GimmickButton>(Pos, Rot, Scale, 1.0f, 1.0f, Button, number);
+			AddGameObject<GimmickButton>(Pos, Rot, Scale, Button, number, Tokens[12]);
 		}
 
 	}
@@ -240,7 +240,7 @@ namespace basecross {
 			//ビューとライトの作成
 			CreateViewLight();
 			//CreateGameBox();
-			CreateGimmick();
+			//CreateGimmick();
 
 			CreatePlayer();
 			CreateFixedBox();
