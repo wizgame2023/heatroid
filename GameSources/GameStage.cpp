@@ -335,15 +335,17 @@ namespace basecross {
 	{
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		auto playerSh = GetSharedGameObject<Player>(L"Player");
+
 		//auto group = GetSharedObjectGroup(L"Enemy");
 		//auto& vec = group->GetGroupVector();
 		//for (auto& object : vec)
 		//{
 		//	auto Enemybj = object.lock();
-		//	auto PlayerPos = playerSh->GetComponent<Transform>()->GetWorldPosition();
+		//	auto PlayerPos = playerSh->GetComponent<Transform>()->GetPosition();
 		//	if (Enemybj != nullptr)
 		//	{
-		//		if (length(PlayerPos - Enemybj->GetComponent<Transform>()->GetPosition()) < 50.0f) {
+		//		if (length(Enemybj->GetComponent<Transform>()->GetPosition() - PlayerPos) < 50.0f) {
 		//			Enemybj->SetUpdateActive(true);
 		//		}
 		//		else{
@@ -351,11 +353,11 @@ namespace basecross {
 		//		}
 		//	}
 		//}
-		auto playerSh = GetSharedGameObject<Player>(L"Player");
+
+
 		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
 		{
-			playerSh->SetUpdateActive(false);
 			m_TextDraw->SetDrawActive(true);
 			m_SpriteDraw->SetDrawActive(true);
 			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
