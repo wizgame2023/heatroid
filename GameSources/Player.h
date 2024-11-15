@@ -61,7 +61,8 @@ namespace basecross {
 			shot_stand,	//チャージ地上
 			shot_air,	//チャージ空中
 			release,	//発射
-			died		//死亡
+			died,		//死亡
+			goal		//ステージクリア
 		};
 		//プレイヤーの状態
 		Stats m_stateType;
@@ -140,6 +141,11 @@ namespace basecross {
 		//死んだらtrueを返す
 		const bool GetDied() {
 			return (m_stateType == died);
+		}
+
+		//ゴールに到達したらtrueを返す
+		const bool GetArrivedGoal() {
+			return (m_stateType == goal);
 		}
 
 		//描画コンポーネントのゲッタ

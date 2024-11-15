@@ -26,7 +26,7 @@ namespace basecross {
 		m_frictionThreshold(.05f),
 		m_jumpHeight(12.0f),
 		m_gravity(-20.0f),
-		m_fallTerminal(-20.0f),
+		m_fallTerminal(-50.0f),
 		m_firePos(Vec3(1.0f, .8f, -.75f)),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_moveAngle(0.0f),
@@ -57,7 +57,7 @@ namespace basecross {
 		m_frictionThreshold(.05f),
 		m_jumpHeight(12.0f),
 		m_gravity(-20.0f),
-		m_fallTerminal(-20.0f),
+		m_fallTerminal(-50.0f),
 		m_firePos(Vec3(1.0f, .8f, -.75f)),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_moveAngle(0.0f),
@@ -244,6 +244,12 @@ namespace basecross {
 
 		if(GetDrawPtr()->GetCurrentAnimation()==L"Died") m_invincibleTime = m_invincibleTimeMax;
 
+		//チャージが消える状況
+		if (m_stateType == air || m_stateType == hit_stand || m_stateType == hit_air) {
+			m_isCharging = false;
+			m_chargePerc = 0.0f;
+		}
+
 		m_collideCount--;
 
 		switch (m_stateType) {
@@ -274,13 +280,6 @@ namespace basecross {
 			MovePlayer();
 			Gravity();
 
-			//Bボタンで射出
-			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_B || key.m_bUpKeyTbl[VK_LCONTROL] == true)
-				Projectile();
-
-			//Bボタンでチャージ
-			Charging(pad[0].wButtons & XINPUT_GAMEPAD_B || key.m_bPushKeyTbl[VK_LCONTROL] == true);
-
 			break;
 			//---------------------------------------地上のけぞり
 		case hit_stand:
@@ -308,6 +307,11 @@ namespace basecross {
 			Died();
 			Friction();
 			break;
+			//---------------------------------------ゴール
+		case goal:
+			SetAnim(L"Stand");
+			Friction();
+			break;
 		}
 
 		SwitchFireAnim(GetDrawPtr()->GetCurrentAnimationTime());
@@ -318,7 +322,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		//ShowDebug();
+		ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -340,9 +344,9 @@ namespace basecross {
 	}
 
 	void Player::OnPushA() {
-		//if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
-		//m_moveVel.y = m_jumpHeight;
-		//m_stateType = air;
+		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
+		m_moveVel.y = m_jumpHeight;
+		m_stateType = air;
 	}
 
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
@@ -381,6 +385,10 @@ namespace basecross {
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)
 	{
+		if (Other->FindTag(L"Goal") && m_stateType == stand) {
+			m_stateType = goal;
+		}
+
 		if ((Other->FindTag(L"GimmickButton")))
 		{
 
@@ -441,8 +449,10 @@ namespace basecross {
 					SetAnim(AddFire() + L"Idle");
 				}
 		}
-		if (m_stateType == air)
-			SetAnim(AddFire() + L"Jumping");
+		if (m_stateType == air && m_moveVel.y > 0)
+			SetAnim(L"Jumping");
+		if ((m_stateType == air && m_moveVel.y <= 0) || (GetDrawPtr()->GetCurrentAnimation() != L"Jumping" && GetDrawPtr()->GetCurrentAnimationTime() >= .5f))
+			SetAnim(L"Falling");
 
 	}
 
@@ -484,10 +494,10 @@ namespace basecross {
 		//移動関連
 		ptrDraw->AddAnimation(L"Idle", 10, 60, true, anim_fps);
 		ptrDraw->AddAnimation(L"Run", 80, 15, true, anim_fps);
-		ptrDraw->AddAnimation(L"Jump_Start", 0, 1, true, anim_fps);//240, 2, false, anim_fps);
-		ptrDraw->AddAnimation(L"Jumping", 0, 1, true, anim_fps);//242, 28, false, anim_fps);
-		ptrDraw->AddAnimation(L"Land", 0, 1, true, anim_fps);//270, 7, false, anim_fps);
-		ptrDraw->AddAnimation(L"PushObject", 0, 1, true, anim_fps);//280, 10, false, anim_fps);
+		ptrDraw->AddAnimation(L"Jump_Start", 300, 5, true, anim_fps);
+		ptrDraw->AddAnimation(L"Jumping", 320, 15, false, anim_fps);
+		ptrDraw->AddAnimation(L"Falling", 350, 20, true, anim_fps);
+		ptrDraw->AddAnimation(L"Land", 336, 4, false, anim_fps);
 		//火炎放射+行動
 		ptrDraw->AddAnimation(L"Fire_Idle", 170, 60, true, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_Run", 140, 19, true, 38.0f);//アニメーションを合わせるため
@@ -496,9 +506,9 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Fire_Land", 0, 1, true, anim_fps);//360, 7, false, anim_fps);
 		ptrDraw->AddAnimation(L"Release", 242, 8, true, anim_fps);
 		//やられ・死亡
-		ptrDraw->AddAnimation(L"GetHit_Air", 0, 1, true, anim_fps);//510, 24, false, anim_fps);
+		ptrDraw->AddAnimation(L"GetHit_Air", 280, 10, false, anim_fps);
 		ptrDraw->AddAnimation(L"GetHit_Stand", 280, 10, false, anim_fps);
-		ptrDraw->AddAnimation(L"Died", 300, 10, false, anim_fps);
+		ptrDraw->AddAnimation(L"Died", 300, 10, false, anim_fps * .6);
 		ptrDraw->ChangeCurrentAnimation(L"Idle");
 	}
 
