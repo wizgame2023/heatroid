@@ -397,7 +397,9 @@ namespace basecross {
 		if (Other->FindTag(L"Goal") && m_stateType == stand) {
 			m_stateType = goal;
 		}
+		if (Other->FindTag(L"GoalBeforeFloor")) {
 
+		}
 		if ((Other->FindTag(L"GimmickButton")))
 		{
 			auto group = GetStage()->GetSharedObjectGroup(L"Switch");

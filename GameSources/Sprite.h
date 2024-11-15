@@ -36,22 +36,4 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
-
-	class ClearSprite : public GameObject
-	{
-		float m_TotalTime;
-		bool m_Trace;
-		Vec2 m_StartScale;
-		Vec3 m_StartPos;
-		wstring m_TextureKey;
-		int m_Goal;
-		bool m_Goaltrue;
-		vector<VertexPositionColorTexture> m_vertices;
-	public:
-		ClearSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
-			const Vec2& StartScale, const Vec3& StartPos);
-		virtual ~ClearSprite() {}
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-	};
 }

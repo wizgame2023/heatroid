@@ -296,4 +296,15 @@ namespace basecross {
 
 	};
 
+	void Door::AddAnim() {
+		auto ptrDraw = GetComponent<PNTBoneModelDraw>();
+		auto anim_fps = 30.0f;
+
+		//ˆÚ“®ŠÖ˜A
+		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
+		ptrDraw->AddAnimation(L"Close", 30, 60, false, anim_fps);
+		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
+	}
+
+
 }
