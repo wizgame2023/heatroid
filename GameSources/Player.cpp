@@ -367,7 +367,9 @@ namespace basecross {
 		//被弾判定
 		if (Other->FindTag(L"Enemy"))
 		{
-			if (m_invincibleTime <= 0) 
+			shared_ptr<Enemy> enemy = dynamic_pointer_cast<Enemy>(Other);
+
+			if (m_invincibleTime <= 0 && enemy->GetOverHeat() == false) 
 				GetHit();
 		}
 
@@ -685,10 +687,24 @@ namespace basecross {
 	// チャージ中のパーティクル
 	//====================================================================
 
-	//void ChargePtcl::OnCreate() {
-	//	SetAddType(true);
-	//}
+	void ChargePtcl::OnCreate() {
+		SetAddType(true);
+	}
 
+	//パーティクルの挙動
+	void ChargePtcl::OnUpdate() {
+		for (auto ptrParticle : GetParticleVec()) {
+			for (auto& ptrParticleSprite : ptrParticle->GetParticleSpriteVec()) {
+				if (ptrParticleSprite.m_Active) {
+					if (ptrParticleSprite.m_LocalScale.x > 0) {
+						ptrParticleSprite.m_LocalScale.x -= .05f;
+						ptrParticleSprite.m_LocalScale.y -= .05f;
+					}
+				}
+			}
+		}
+		MultiParticle::OnUpdate();
+	}
 
 	//====================================================================
 	// class SpriteHealth
