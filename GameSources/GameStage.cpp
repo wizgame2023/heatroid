@@ -17,7 +17,7 @@ namespace basecross {
 	void GameStage::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<MainCamera>();
-		camera->SetEye(Vec3(0.0f, 3.00f, -5.0f));
+		camera->SetEye(Vec3(-50.0f, 3.00f, 0.0f));
 		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
 		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
@@ -52,7 +52,8 @@ namespace basecross {
 		auto ptrPlayer = AddGameObject<Player>();
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
-		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(25, 5.0125f, 0));
+		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(85, 5.0f, 0));
+		ptrPlayer->GetComponent<Transform>()->SetRotation(Vec3(0, 180, 0));
 		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
 	
@@ -154,7 +155,7 @@ namespace basecross {
 			int number = (float)_wtof(Tokens[11].c_str());
 
 			//各値がそろったのでオブジェクト作成
-			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number);
+			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number, Tokens[12]);
 		}
 
 		m_GameStage1.GetSelect(LineVec, 0, L"Switch");
@@ -180,7 +181,7 @@ namespace basecross {
 			float Button = (float)_wtof(Tokens[10].c_str());
 			int number = (float)_wtof(Tokens[11].c_str());
 
-			AddGameObject<GimmickButton>(Pos, Rot, Scale, 1.0f, 1.0f, Button, number);
+			AddGameObject<GimmickButton>(Pos, Rot, Scale,  Button, number, Tokens[12]);
 		}
 
 	}
@@ -228,7 +229,7 @@ namespace basecross {
 
 			CreatePlayer();
 			CreateFixedBox();
-			CreateEnemy();
+			//CreateEnemy();
 		}
 		catch (...) {
 			throw;

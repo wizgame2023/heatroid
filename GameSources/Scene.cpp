@@ -31,15 +31,29 @@ namespace basecross{
 		auto enemyAruki = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_ARUKU.bmf");
 		app->RegisterResource(L"ENEMYARUKU", enemyAruki);
 
+
+		//ステージオブジェクトのモデル
+		auto door = MeshResource::CreateBoneModelMesh(mdlPath, L"Door.bmf");
+		app->RegisterResource(L"DOOR", door);
+
+		auto blackSwitch = MeshResource::CreateStaticModelMesh(mdlPath, L"BLUCK_TILE.bmf");
+		app->RegisterResource(L"BLUCKSWITCH", blackSwitch);
+		auto blueSwitch = MeshResource::CreateStaticModelMesh(mdlPath, L"BLUE_TILE.bmf");
+		app->RegisterResource(L"BLUESWITCH", blueSwitch);
+		auto RedSwitch = MeshResource::CreateStaticModelMesh(mdlPath, L"RED_TILE.bmf");
+		app->RegisterResource(L"REDSWITCH", RedSwitch);
+
 		// 仮テクスチャ
 		app->RegisterTexture(L"White", texPath + L"White.png");
 		app->RegisterTexture(L"FIRE", texPath + L"fire_kari.png");
 		app->RegisterTexture(L"HEALTH", texPath + L"health.png");
 		app->RegisterTexture(L"CHARGE", texPath + L"charge.png");
 		//ステージオブジェクトテクスチャ
-		app->RegisterTexture(L"Wall", texPath + L"TX_WALL.png");
-		app->RegisterTexture(L"Floor", texPath + L"TX_FLOOR.png");
-		app->RegisterTexture(L"AreaDoor", texPath + L"TX_AREADOOR.png");
+		app->RegisterTexture(L"Wall", texPath + L"UV_WALL.png");
+		app->RegisterTexture(L"Floor", texPath + L"UV_FLOOR.png");
+		app->RegisterTexture(L"AreaDoorBLUCK", texPath + L"UV_AD_BLUCK.png");
+		app->RegisterTexture(L"AreaDoorBLUE", texPath + L"UV_AD_BLUE.png");
+		app->RegisterTexture(L"AreaDoorRED", texPath + L"UV_AD_RED.png");
 		//タイトルスプライト
 		app->RegisterTexture(L"TITLETEXT", texPath + L"TitleText.png");
 		app->RegisterTexture(L"TITLEROGO", texPath + L"TitleRogo.png");
