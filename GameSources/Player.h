@@ -145,7 +145,7 @@ namespace basecross {
 
 		//ゴールに到達したらtrueを返す
 		const bool GetArrivedGoal() {
-			return (m_stateType == goal);
+			if (m_stateType == goal) return true;
 		}
 
 		//描画コンポーネントのゲッタ

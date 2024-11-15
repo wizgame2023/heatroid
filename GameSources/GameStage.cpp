@@ -49,7 +49,7 @@ namespace basecross {
 	//ÉvÉåÉCÉÑÅ[ÇÃçÏê¨
 	void GameStage::CreatePlayer() {
 		vector<Vec3> plVec = {
-			Vec3(-50.0f, 5.0f, -70.0f),
+			Vec3(-70.0f, 5.0f, -50.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(3.0f, 3.0f, 3.0f)
 		};
@@ -300,6 +300,8 @@ namespace basecross {
 
 	void GameStage::OnUpdate()
 	{
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		//auto group = GetSharedObjectGroup(L"Enemy");
 		//auto& vec = group->GetGroupVector();
 		//for (auto& object : vec)
@@ -320,15 +322,20 @@ namespace basecross {
 		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
 		{
+			playerSh->SetUpdateActive(false);
 			m_TextDraw->SetDrawActive(true);
 			m_SpriteDraw->SetDrawActive(true);
+			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+			}
 		}
 	}
 
 	void GameStage::CreateSprite()
 	{
-		m_TextDraw = AddGameObject<ClearSprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
-		m_SpriteDraw = AddGameObject<ClearSprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_TextDraw = AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_SpriteDraw = AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
 	}

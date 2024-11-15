@@ -118,16 +118,5 @@ namespace basecross {
 
 	void ClearSprite::OnUpdate()
 	{
-		auto playerSh = GetStage()->GetSharedGameObject<Player>(L"Player");
-		m_Goaltrue = playerSh->GetArrivedGoal();
-		if (m_Goaltrue)
-		{
-			float ElapsedTime = App::GetApp()->GetElapsedTime();
-			m_TotalTime += ElapsedTime;
-			auto PtrDraw = GetComponent<PCTSpriteDraw>();
-			Col4 col(1.0, 1.0, 1.0, 0.0);
-			col.w = sin(m_TotalTime) * 0.05f;
-			PtrDraw->SetDiffuse(col);
-		}
 	}
 }
