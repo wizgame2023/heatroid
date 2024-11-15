@@ -49,7 +49,7 @@ namespace basecross {
 	//ƒvƒŒƒCƒ„[‚Ìì¬
 	void GameStage::CreatePlayer() {
 		vector<Vec3> plVec = {
-			Vec3(80.0f, 5.0f, 0.0f),
+			Vec3(-70.0f, 5.0f, -50.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(3.0f, 3.0f, 3.0f)
 		};
@@ -325,7 +325,7 @@ namespace basecross {
 			playerSh->SetUpdateActive(false);
 			m_TextDraw->SetDrawActive(true);
 			m_SpriteDraw->SetDrawActive(true);
-			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
 			}
