@@ -343,9 +343,9 @@ namespace basecross {
 	}
 
 	void Player::OnPushA() {
-		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
-		m_moveVel.y = m_jumpHeight;
-		m_stateType = air;
+		//if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
+		//m_moveVel.y = m_jumpHeight;
+		//m_stateType = air;
 	}
 
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
@@ -499,7 +499,7 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"PushObject", 0, 1, true, anim_fps);//280, 10, false, anim_fps);
 		//火炎放射+行動
 		ptrDraw->AddAnimation(L"Fire_Idle", 170, 60, true, anim_fps);
-		ptrDraw->AddAnimation(L"Fire_Run", 140, 19, true, anim_fps);
+		ptrDraw->AddAnimation(L"Fire_Run", 140, 19, true, 38.0f);//アニメーションを合わせるため
 		ptrDraw->AddAnimation(L"Fire_JumpStart", 0, 1, true, anim_fps);//330, 2, false, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_Jumping", 0, 1, true, anim_fps);//332, 28, false, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_Land", 0, 1, true, anim_fps);//360, 7, false, anim_fps);
@@ -609,7 +609,8 @@ namespace basecross {
 		m_power(power),
 		m_speed(18.0f),
 		m_speedBase(4.5f),
-		m_rangeMax(.8f)
+		m_rangeMax(.8f),
+		m_stopped(false)
 	{}
 
 	void FireProjectile::OnCreate() {
@@ -652,7 +653,9 @@ namespace basecross {
 
 		auto trans = GetComponent<Transform>();
 
-		trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
+		if (!m_stopped) {
+			trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
+		}
 
 		m_range -= delta;
 		GetComponent<PNTStaticDraw>()->SetDiffuse(Col4(1, 1, 1, m_range * 2 / m_rangeMax));
@@ -662,10 +665,10 @@ namespace basecross {
 		}
 	}
 
-	//壁に当たったら消える
+	//壁に当たったら止まる
 	void FireProjectile::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		if (Other->FindTag(L"FixedBox")) {
-			GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
+			m_stopped = true;
 		}
 	}
 

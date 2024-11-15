@@ -198,6 +198,7 @@ namespace basecross {
 		Vec3 m_angle;
 		//射程
 		float m_range = 0, m_rangeMax;
+		bool m_stopped;
 
 	public:
 		//構築と破棄
