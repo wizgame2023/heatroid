@@ -100,11 +100,31 @@ namespace basecross {
 		{
 			m_open = open;
 		}
-		
+
 		int GetSwitch()
 		{
 			return m_switch;
 		}
+	};
+
+	class Door : public GameObject
+	{
+		Vec3 m_Position;
+		Vec3 m_Rotation;
+		Vec3 m_Scale;
+		bool m_open;
+		wstring m_Texname;
+	public:
+		int m_switch;
+		Door(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale,
+			const wstring& m_Texname
+		);
+		virtual ~Door();
+		//èâä˙âª
+		virtual void OnCreate() override;
 	};
 
 }

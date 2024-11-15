@@ -21,7 +21,6 @@ namespace basecross {
 		void CreateFixedBox();
 		void CreateGimmick();
 		void CreateEnemy();
-		void InstanceStage();
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage(){}
