@@ -15,6 +15,10 @@ namespace basecross {
 //====================================================================
 
 	class Player : public GameObject {
+		//Transformの初期化
+		Vec3 m_initPos;
+		Vec3 m_initRot;
+		Vec3 m_initSca;
 		//プレイヤーが使用するコントローラとキーボードの入力
 		Vec2 GetInputState() const;
 		// コントローラから方向ベクトルを得る
@@ -78,6 +82,9 @@ namespace basecross {
 
 	public:
 		//構築と破棄
+
+		Player(const shared_ptr<Stage>& StagePtr,
+			const Vec3& pos, const Vec3& rot, const Vec3& sca);
 
 		Player(const shared_ptr<Stage>& StagePtr);
 
@@ -178,7 +185,7 @@ namespace basecross {
 		//どれくらいの位置からスタートするか
 		Vec3 m_dist;
 		//速度と方向
-		float m_speed, m_power;
+		float m_speed, m_speedBase, m_power;
 		Vec3 m_angle;
 		//射程
 		float m_range = 0, m_rangeMax;
@@ -197,6 +204,8 @@ namespace basecross {
 		virtual void OnUpdate() override;
 
 		//何かに接触している判定
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+
 	};
 
 	//------------------------------------------------------------------

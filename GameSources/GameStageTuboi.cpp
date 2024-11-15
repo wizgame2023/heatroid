@@ -16,7 +16,7 @@ namespace basecross {
 	void GameStageTsuboi::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<MainCamera>();
-		camera->SetEye(Vec3(0.0f, 50.00f, -5.0f));
+		camera->SetEye(Vec3(0.0f, 80.00f, -5.0f));
 		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
 		//auto cameraObject = AddGameObject<CameraCollsion>(Vec3(1, 1, 1));
 		//camera->SetCameraObject(cameraObject);
@@ -58,7 +58,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f);
+			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
 		}
 		m_GameStage1.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -85,8 +85,24 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f);
+			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
 		}
+	}
+
+	//プレイヤーを生成
+	void GameStageTsuboi::CreatePlayer() {
+		vector<Vec3> plVec = {
+			Vec3(2.0f, 5.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(3.0f, 3.0f, 3.0f)
+		};
+
+		shared_ptr<GameObject> ptrPlayer = AddGameObject<Player>(plVec[0], plVec[1], plVec[2]);
+		SetSharedGameObject(L"Player", ptrPlayer);
+		////プレイヤーの攻撃判定
+		//auto ptrColl = AddGameObject<AttackCollision>(ptrPlayer);
+		//ptrPlayer = AddGameObject<AttackCollision>(ptrPlayer);
+
 	}
 
 	void GameStageTsuboi::CreateEnemy() {
@@ -122,13 +138,8 @@ namespace basecross {
 			App::GetApp()->GetDataDirectory(Datadir);
 			m_GameStage1.SetFileName(Datadir + L"GameStage.csv");
 			m_GameStage1.ReadCsv();
-
-			//プレイヤーを生成
-			shared_ptr<GameObject> ptrPlayer = AddGameObject<Player>();
-			SetSharedGameObject(L"Player", ptrPlayer);
-			////プレイヤーの攻撃判定
-			//auto ptrColl = AddGameObject<AttackCollision>(ptrPlayer);
-			//ptrPlayer = AddGameObject<AttackCollision>(ptrPlayer);
+			
+			CreatePlayer();
 
 			auto player = GetSharedGameObject<Player>(L"Player");
 			AddGameObject<SpriteHealth>(player);
