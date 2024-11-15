@@ -8,7 +8,7 @@
 #include "Project.h"
 
 namespace basecross {
-	EnemyObj::EnemyObj(const shared_ptr<Stage>& stage,
+	EnemyChase::EnemyChase(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotation,
 		const Vec3& scale,
@@ -23,11 +23,11 @@ namespace basecross {
 		m_maxPlungeRargeTime(m_plungeRargeTime)
 	{}
 
-	void EnemyObj::OnCreate() {
+	void EnemyChase::OnCreate() {
 		Enemy::OnCreate();
 		//SetState(plunge);
 	}
-	void EnemyObj::OnUpdate() {
+	void EnemyChase::OnUpdate() {
 		Enemy::OnUpdate();
 		float elapsed = App::GetApp()->GetApp()->GetElapsedTime();
 		m_plungeTime -= elapsed;
