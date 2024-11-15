@@ -117,9 +117,39 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto PtrWall = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto PtrWall = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x, Scale.y, Tokens[10]);
 			PtrWall->AddTag(L"Wall");
 		}
+		m_GameStage1.GetSelect(LineVec, 0, L"GoalFloor");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			//各値がそろったのでオブジェクト作成
+			auto ptrFloor = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			ptrFloor->AddTag(L"Floor");
+			ptrFloor->AddTag(L"Goal");
+		}
+
 	}
 
 	void GameStage::CreateGimmick()
@@ -155,7 +185,7 @@ namespace basecross {
 			int number = (float)_wtof(Tokens[11].c_str());
 
 			//各値がそろったのでオブジェクト作成
-			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number, Tokens[12]);
+			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, Scale.x, Scale.y, Switch, number, Tokens[12]);
 		}
 
 		m_GameStage1.GetSelect(LineVec, 0, L"Switch");
@@ -229,7 +259,7 @@ namespace basecross {
 
 			CreatePlayer();
 			CreateFixedBox();
-			//CreateEnemy();
+			CreateEnemy();
 		}
 		catch (...) {
 			throw;

@@ -260,4 +260,25 @@ namespace basecross {
 		}
 	}
 
+	Door::Door(const shared_ptr<Stage>& StagePtr,
+		const Vec3& position,
+		const Vec3& rotation,
+		const Vec3& scale,
+		const wstring& Texname
+	):
+		GameObject(StagePtr),
+		m_Position(position),
+		m_Rotation(rotation),
+		m_Scale(scale),
+		m_Texname(Texname)
+
+	{}
+	Door::~Door() {}
+
+	void Door::OnCreate()
+	{
+
+	}
+	;
+
 }
