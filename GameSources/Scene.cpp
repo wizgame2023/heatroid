@@ -59,8 +59,9 @@ namespace basecross{
 		app->RegisterTexture(L"TITLEROGO", texPath + L"TitleRogo.png");
 		app->RegisterTexture(L"TITLEEFFECT", texPath + L"TitleEffect.png");
 		app->RegisterTexture(L"TITLEBACKGROUND", texPath + L"TitleBackGround.png");
-
-
+		//ゲームクリア
+		app->RegisterTexture(L"GameClear", texPath + L"CLEAR.Text.png");
+		app->RegisterTexture(L"ClearBACKGROUND", texPath + L"CLEAR.Text.png");
 	}
 
 	void Scene::OnCreate(){

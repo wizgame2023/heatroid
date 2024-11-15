@@ -8,7 +8,7 @@
 
 namespace basecross {
 
-	TitleSprite::TitleSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
+	Sprite::Sprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
 		const Vec2& StartScale, const Vec3& StartPos) :
 		GameObject(StagePtr),
 		m_TextureKey(TextureKey),
@@ -17,7 +17,7 @@ namespace basecross {
 		m_StartPos(StartPos)
 	{}
 
-	void TitleSprite::OnCreate() {
+	void Sprite::OnCreate() {
 		float helfSize = 1.0f;
 		//頂点配列(縦横5個ずつ表示)
 		vector<VertexPositionColorTexture> vertices = {
@@ -39,7 +39,7 @@ namespace basecross {
 		ptrDraw->SetTextureResource(m_TextureKey);
 	}
 
-	StartA::StartA(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
+	BlinkingSprite::BlinkingSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
 		const Vec2& StartScale, const Vec3& StartPos) :
 		GameObject(StagePtr),
 		m_TextureKey(TextureKey),
@@ -48,7 +48,7 @@ namespace basecross {
 		m_StartPos(StartPos)
 	{}
 
-	void StartA::OnCreate() {
+	void BlinkingSprite::OnCreate() {
 		float helfSize = 1.0f;
 		//頂点配列(縦横5個ずつ表示)
 		vector<VertexPositionColorTexture> vertices = {
@@ -70,7 +70,7 @@ namespace basecross {
 		ptrDraw->SetTextureResource(m_TextureKey);
 	}
 
-	void StartA::OnUpdate()
+	void BlinkingSprite::OnUpdate()
 	{
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
 		m_TotalTime += ElapsedTime * 3.5f;
@@ -82,5 +82,37 @@ namespace basecross {
 		col.w = sin(m_TotalTime) * 0.5f + 0.5f;
 		PtrDraw->SetDiffuse(col);
 
+	}
+
+	void ClearSprite::OnCreate() {
+		float helfSize = 1.0f;
+		//頂点配列(縦横5個ずつ表示)
+		m_vertices = {
+			{Vec3(-helfSize, helfSize, 0),Col4(1.0f,1.0f,1.0f,1.0f), Vec2(0.0f, 0.0f) },
+			{Vec3(helfSize, helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, 0.0f) },
+			{Vec3(-helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(0.0f, 1.0f) },
+			{Vec3(helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, 1.0f) },
+		};
+		//インデックス配列
+		vector<uint16_t> indices = { 0, 1, 2, 1, 3, 2 };
+		SetAlphaActive(m_Trace);
+		auto ptrTrans = GetComponent<Transform>();
+		ptrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0.2f);
+		ptrTrans->SetRotation(0, 0, 0);
+		ptrTrans->SetPosition(m_StartPos);
+		//頂点とインデックスを指定してスプライト作成
+		auto ptrDraw = AddComponent<PCTSpriteDraw>(m_vertices, indices);
+		ptrDraw->SetSamplerState(SamplerState::LinearWrap);
+		ptrDraw->SetTextureResource(m_TextureKey);
+	}
+
+	void ClearSprite::OnUpdate()
+	{
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		m_TotalTime += ElapsedTime;
+		auto PtrDraw = GetComponent<PCTSpriteDraw>();
+		Col4 col(1.0, 1.0, 1.0, 0.0);
+		col.w = sin(m_TotalTime) * 0.05f;
+		PtrDraw->SetDiffuse(col);
 	}
 }
