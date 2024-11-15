@@ -277,6 +277,8 @@ namespace basecross {
 
 	void Door::OnCreate()
 	{
+		m_open = false;
+		m_Goaltrue = false;
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_Position);
 		Trans->SetRotation(m_Rotation);
@@ -293,8 +295,23 @@ namespace basecross {
 
 		ptrDraw->SetMeshResource(m_Texname);
 		ptrDraw->SetMeshToTransformMatrix(meshMat);
+		AddAnim();
+	}
+	void Door::OnUpdate()
+	{
+		auto playerSh = GetStage()->GetSharedGameObject<Player>(L"Player");
+		m_Goaltrue = playerSh->GetArrivedGoal();
 
-	};
+		if (m_open && !m_Goaltrue)
+		{
+			SetAnim(L"Open");
+		}
+		if (m_Goaltrue)
+		{
+			SetAnim(L"Close");
+		}
+		GetComponent<PNTBoneModelDraw>()->UpdateAnimation(_delta);
+	}
 
 	void Door::AddAnim() {
 		auto ptrDraw = GetComponent<PNTBoneModelDraw>();
@@ -302,7 +319,6 @@ namespace basecross {
 
 		//ˆÚ“®ŠÖ˜A
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
-		ptrDraw->AddAnimation(L"Close", 30, 60, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
 	}
 
