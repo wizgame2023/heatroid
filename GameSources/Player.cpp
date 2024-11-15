@@ -287,7 +287,7 @@ namespace basecross {
 			SetAnim(L"GetHit_Stand");
 			Friction();
 			Gravity();
-			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Stand" && GetDrawPtr()->GetCurrentAnimationTime() >= .5f) {
+			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Stand" && GetDrawPtr()->GetCurrentAnimationTime() >= .33f) {
 				m_stateType = stand;
 			}
 			if (m_HP <= 0) {
@@ -298,7 +298,7 @@ namespace basecross {
 		case hit_air:
 			SetAnim(L"GetHit_Air");
 			Gravity();
-			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Air" && GetDrawPtr()->GetCurrentAnimationTime() >= .5f) {
+			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Air" && GetDrawPtr()->GetCurrentAnimationTime() >= .33f) {
 				m_stateType = air;
 			}
 
@@ -351,13 +351,8 @@ namespace basecross {
 		//被弾判定
 		if (Other->FindTag(L"Enemy"))
 		{
-			shared_ptr<Enemy> enemy = dynamic_pointer_cast<Enemy>(Other);
-			// 敵がヒート状態か取得したい
-			// enemy->
-
-
-
-			if (m_invincibleTime > 0) GetHit();
+			if (m_invincibleTime <= 0) 
+				GetHit();
 		}
 
 		if (m_stateType == hit_air && Other->FindTag(L"Floor")) {
@@ -520,7 +515,6 @@ namespace basecross {
 		m_moveVel.x = fwd.x * 30.0f;
 		m_moveVel.z = fwd.z * 30.0f;
 
-		//m_moveType = hit;
 		m_HP -= 1;
 		m_invincibleTime = m_invincibleTimeMax;
 
