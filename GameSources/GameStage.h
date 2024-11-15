@@ -15,6 +15,8 @@ namespace basecross {
 	class GameStage : public Stage {
 		CsvFile m_GameStage1;
 		shared_ptr<Transform> m_PlayerObject;
+		shared_ptr<GameObject> m_SpriteDraw;
+		shared_ptr<GameObject> m_TextDraw;
 		bool m_Goaltrue;
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 		void CreateGameBox();//GameStage‚Ì¶¬

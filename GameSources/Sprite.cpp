@@ -84,6 +84,16 @@ namespace basecross {
 
 	}
 
+	ClearSprite::ClearSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
+		const Vec2& StartScale, const Vec3& StartPos) :
+		GameObject(StagePtr),
+		m_TextureKey(TextureKey),
+		m_Trace(Trace),
+		m_StartScale(StartScale),
+		m_StartPos(StartPos)
+	{}
+
+
 	void ClearSprite::OnCreate() {
 		float helfSize = 1.0f;
 		//’¸“_”z—ñ(c‰¡5ŒÂ‚¸‚Â•\Ž¦)
@@ -108,11 +118,16 @@ namespace basecross {
 
 	void ClearSprite::OnUpdate()
 	{
-		float ElapsedTime = App::GetApp()->GetElapsedTime();
-		m_TotalTime += ElapsedTime;
-		auto PtrDraw = GetComponent<PCTSpriteDraw>();
-		Col4 col(1.0, 1.0, 1.0, 0.0);
-		col.w = sin(m_TotalTime) * 0.05f;
-		PtrDraw->SetDiffuse(col);
+		auto playerSh = GetStage()->GetSharedGameObject<Player>(L"Player");
+		m_Goaltrue = playerSh->GetArrivedGoal();
+		if (m_Goaltrue)
+		{
+			float ElapsedTime = App::GetApp()->GetElapsedTime();
+			m_TotalTime += ElapsedTime;
+			auto PtrDraw = GetComponent<PCTSpriteDraw>();
+			Col4 col(1.0, 1.0, 1.0, 0.0);
+			col.w = sin(m_TotalTime) * 0.05f;
+			PtrDraw->SetDiffuse(col);
+		}
 	}
 }

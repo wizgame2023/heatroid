@@ -45,6 +45,7 @@ namespace basecross {
 		Vec3 m_StartPos;
 		wstring m_TextureKey;
 		int m_Goal;
+		bool m_Goaltrue;
 		vector<VertexPositionColorTexture> m_vertices;
 	public:
 		ClearSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
