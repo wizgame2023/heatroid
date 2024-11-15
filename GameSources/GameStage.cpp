@@ -48,13 +48,15 @@ namespace basecross {
 
 	//プレイヤーの作成
 	void GameStage::CreatePlayer() {
+		vector<Vec3> plVec = {
+			Vec3(2.0f, 5.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(3.0f, 3.0f, 3.0f)
+		};
 		//プレーヤーの作成
-		auto ptrPlayer = AddGameObject<Player>();
+		shared_ptr<GameObject> ptrPlayer = AddGameObject<Player>(plVec[0], plVec[1], plVec[2]);
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
-		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(85, 5.0f, 0));
-		ptrPlayer->GetComponent<Transform>()->SetRotation(Vec3(0, 180, 0));
-		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
 	
 	}
@@ -258,6 +260,9 @@ namespace basecross {
 			CreateGimmick();
 
 			CreatePlayer();
+			auto player = GetSharedGameObject<Player>(L"Player");
+			AddGameObject<SpriteHealth>(player);
+			AddGameObject<SpriteCharge>(player);
 			CreateFixedBox();
 			CreateEnemy();
 		}
