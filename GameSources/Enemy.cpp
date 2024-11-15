@@ -239,7 +239,7 @@ namespace basecross {
 
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ
@@ -296,7 +296,7 @@ namespace basecross {
 			m_stateType = m_overHeatState;
 		}
 		if (m_heat > 0.0f) {
-			m_heat -= elapsed * 50;
+			m_heat -= elapsed * 10;
 		}
 		else if (GetOverHeat()&&m_heat <= 0.0f) {
 			m_heat = 0.0f;
