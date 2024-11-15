@@ -14,11 +14,9 @@ namespace basecross {
 
 	//ビューとライトの作成
 	void GameStageTsuboi::CreateViewLight() {
-		// カメラの設定
 		auto camera = ObjectFactory::Create<MainCamera>();
-		camera->SetEye(Vec3(0.0f, 80.00f, -5.0f));
+		camera->SetEye(Vec3(-50.0f, 3.00f, 0.0f));
 		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
-		//auto cameraObject = AddGameObject<CameraCollsion>(Vec3(1, 1, 1));
 		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
@@ -26,7 +24,9 @@ namespace basecross {
 
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
-		light->SetDefaultLighting2(); //デフォルトのライティングを指定
+		light->SetDefaultLighting(); //デフォルトのライティングを指定
+		auto cameraObject = AddGameObject<CameraCollision>();
+
 	}
 
 	//ボックスの作成
@@ -125,7 +125,7 @@ namespace basecross {
 			int number = (float)_wtof(Tokens[11].c_str());
 
 			//各値がそろったのでオブジェクト作成
-			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number);
+			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number, Tokens[12]);
 		}
 
 		m_GameStage1.GetSelect(LineVec, 0, L"Switch");
@@ -151,7 +151,7 @@ namespace basecross {
 			float Button = (float)_wtof(Tokens[10].c_str());
 			int number = (float)_wtof(Tokens[11].c_str());
 
-			AddGameObject<GimmickButton>(Pos, Rot, Scale, 1.0f, 1.0f, Button, number);
+			AddGameObject<GimmickButton>(Pos, Rot, Scale, Button, number, Tokens[12]);
 		}
 
 	}
