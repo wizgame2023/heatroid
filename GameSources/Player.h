@@ -58,8 +58,9 @@ namespace basecross {
 			air,		//空中
 			hit_stand,	//やられ地上
 			hit_air,	//やられ空中
-			shot_stand,	//攻撃地上
-			shot_air,	//攻撃空中
+			shot_stand,	//チャージ地上
+			shot_air,	//チャージ空中
+			release,	//発射
 			died		//死亡
 		};
 		//プレイヤーの状態
@@ -130,9 +131,15 @@ namespace basecross {
 			return GetComponent<Transform>()->GetScale();
 		}
 
+		//HPを1を最大値とした割合で返す
 		const float GetHPRate() {
 			if (m_HP < 0) return 0;
 			return static_cast<float>(m_HP) / static_cast<float>(m_HP_max);
+		}
+
+		//死んだらtrueを返す
+		const bool GetDied() {
+			return (m_stateType == died);
 		}
 
 		//描画コンポーネントのゲッタ
@@ -215,14 +222,14 @@ namespace basecross {
 	// チャージ中のパーティクル
 	//====================================================================
 
-	class ChargePtcl : public MultiParticle {
-	public:
-		ChargePtcl(const shared_ptr<Stage>& StagePtr) {}
-		virtual ~ChargePtcl() {}
+	//class ChargePtcl : public MultiParticle {
+	//public:
+	//	ChargePtcl(const shared_ptr<Stage>& StagePtr) {}
+	//	virtual ~ChargePtcl() {}
 
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-	};
+	//	virtual void OnCreate() override;
+	//	virtual void OnUpdate() override;
+	//};
 
 	//====================================================================
 	// class SpriteHealth

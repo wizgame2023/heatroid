@@ -24,7 +24,7 @@ namespace basecross{
 		auto mdlPath = path + L"Models/";
 
 		// プレイヤー
-		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HeatRoid.bmf");
+		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HR.bmf");
 		app->RegisterResource(L"PLAYER", modelMesh);
 
 		//敵のモデル
