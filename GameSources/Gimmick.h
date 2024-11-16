@@ -113,9 +113,10 @@ namespace basecross {
 		Vec3 m_Rotation;
 		Vec3 m_Scale;
 		bool m_open;
+		bool m_Goaltrue;
 		wstring m_Texname;
+		float _delta = App::GetApp()->GetElapsedTime();
 	public:
-		int m_switch;
 		Door(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
@@ -125,6 +126,21 @@ namespace basecross {
 		virtual ~Door();
 		//初期化
 		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		void AddAnim();
+
+		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
+		const void SetAnim(wstring animname, float time = 0.0f) {
+			auto draw = GetComponent<PNTBoneModelDraw>();
+			if (draw->GetCurrentAnimation() != animname)
+				draw->ChangeCurrentAnimation(animname, time);
+		}
+
+		void SetButton(const bool& open)
+		{
+			m_open = open;
+		}
+
 	};
 
 }
