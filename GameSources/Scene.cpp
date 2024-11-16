@@ -62,6 +62,8 @@ namespace basecross{
 		//ゲームクリア
 		app->RegisterTexture(L"GameClearTEXT", texPath + L"CLEAR.Text.png");
 		app->RegisterTexture(L"CLEARBackGround", texPath + L"CLEARBackGround.png");
+		//ゲームオーバー
+		app->RegisterTexture(L"GameOverText", texPath + L"GAMEOVER_Text.png");
 	}
 
 	void Scene::OnCreate(){
