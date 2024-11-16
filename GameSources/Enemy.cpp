@@ -42,7 +42,7 @@ namespace basecross {
 		m_hitDropTime(2.0f),
 		m_maxHitDropTime(m_hitDropTime),
 		m_bulletTime(0.0f),
-		m_trackingRange(30.0f),
+		m_trackingRange(100.0f),
 		m_plungeColFlag(0),
 		m_plungeTime(3.0f),
 		m_firstDirec(Vec3(0.0f)),
@@ -150,11 +150,13 @@ namespace basecross {
 		{
 		//移動なし
 		case stay:
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			EnemyAnime(L"wait");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			break;
 		//追従の左右移動
 		case rightMove:
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			EnemyAnime(L"walk");
 			m_speed = m_maxSpeed;
 			PlayerDic();
@@ -212,16 +214,15 @@ namespace basecross {
 			//突っ込み
 		case plunge:
 			EnemyAnime(L"attack");
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			//PlayerDic();
-			if (m_floorFlag) {
-				if (!m_plungeFlag) {
-					m_firstDirec = m_playerPos - GetChangePos();
-					m_plungeFlag = true;
-				}
-				Vec3 dic = Vec3(m_firstDirec.x, 0.0f, m_firstDirec.z);
-				m_pos += dic * m_speed * 0.2f * elapsed;
-
+			if (!m_plungeFlag) {
+				m_firstDirec = m_playerPos - GetChangePos();
+				m_plungeFlag = true;
 			}
+			m_pos += Vec3(m_firstDirec.x, 0.0f, m_firstDirec.z) * m_speed * 0.2f * elapsed;
+			//if (m_floorFlag) {
+			//}
 			break;
 		default:
 			break;
@@ -236,10 +237,14 @@ namespace basecross {
 		}
 		m_trans->SetPosition(m_pos);
 
+		if (m_stateType != plunge) {
+			m_plungeFlag = false;
+		}
 
+		OverHeat();
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		//Debug();
+		Debug();
 	}
 
 	//ジャンプ
@@ -423,11 +428,11 @@ namespace basecross {
 		if (other->FindTag(L"Wall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
 		}
-		if (other->FindTag(L"FixedBox")) {
-			m_fixedBox = dynamic_pointer_cast<TilingFixedBox>(other);
-			m_trans->SetParent(m_fixedBox.lock());
-			m_floorPos = m_pos;
-		}
+		//if (other->FindTag(L"Floor")) {
+		//	m_fixedBox = dynamic_pointer_cast<TilingFixedBox>(other);
+		//	m_trans->SetParent(m_fixedBox.lock());
+		//	m_floorPos = m_pos;
+		//}
 		if ((other->FindTag(L"GimmickButton")))
 		{
 			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
@@ -461,15 +466,22 @@ namespace basecross {
 		}
 	}
 
-	void Enemy::OnCollisionExcute(shared_ptr<GameObject>& Other)
+	void Enemy::OnCollisionExcute(shared_ptr<GameObject>& other)
 	{
-		if ((Other->FindTag(L"GimmickButton")))
+		if (other->FindTag(L"Floor")) {
+			m_fixedBox = dynamic_pointer_cast<TilingFixedBox>(other);
+			m_trans->SetParent(m_fixedBox.lock());
+			m_floorPos = m_pos;
+		}
+
+
+		if ((other->FindTag(L"GimmickButton")))
 		{
 			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 			auto& vec = group->GetGroupVector();
 			for (auto& v : vec) {
 				auto shObj = v.lock();
-				if (Other == shObj) {
+				if (other == shObj) {
 					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
 					Switchs->SetButton(true);
 				}
@@ -516,7 +528,7 @@ namespace basecross {
 			<<L"\nOverHeat : "
 			<< GetOverHeat()
 			<<L"\n"
-			<< m_plungeTime
+			<< m_speed
 			<< endl;
 		scene->SetDebugString(wss.str());
 
@@ -602,6 +614,9 @@ namespace basecross {
 			return false;
 		}
 	}
+	void Enemy::SetPlungeFlag(bool flag) {
+		m_plungeFlag = flag;
+	}
 
 	//--------------------------------------------------------------------------------------
 	//	class EnemyBullet : public GameObject;  
@@ -622,14 +637,15 @@ namespace basecross {
 	{}
 	void EnemyBullet::OnCreate() {
 		m_trans = GetComponent<Transform>();
-		m_enemyPos = m_enemy->GetChangePos();
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
+		m_enemyPos = enemy->GetChangePos();
 		m_trans->SetPosition(m_enemyPos);
 		m_trans->SetRotation(m_rot);
 		m_trans->SetScale(m_scal);
-		auto direc = m_enemy->GetDirec();
+		auto direc = enemy->GetDirec();
 		m_direc = direc.normalize();
-		m_beforFlag = m_enemy->GetFloorFlag();
-		m_enemyPos = m_enemy->GetChangePos();
+		m_beforFlag = enemy->GetFloorFlag();
 
 		//描画
 		auto ptrDraw = AddComponent<PNTStaticDraw>();
@@ -659,6 +675,7 @@ namespace basecross {
 		m_pos.y = m_enemyPos.y;
 		m_pos += m_direc * m_speed * elapsed;
 		m_trans->SetPosition(m_pos);
+		Debug();
 	}
 
 	void EnemyBullet::OnCollisionEnter(shared_ptr<GameObject>& other) {
@@ -673,6 +690,7 @@ namespace basecross {
 	void EnemyBullet::Debug() {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		auto scene = App::GetApp()->GetScene<Scene>();
+		auto enemy = m_enemy.lock();
 		wstringstream wss(L"");
 		wss << L"pos : ( "
 			<< m_pos.x
@@ -684,11 +702,13 @@ namespace basecross {
 			<<L"\nbefor : "
 			<< m_beforFlag
 			<<L"\nfloor : "
-			<< m_enemy->GetFloorFlag()
+			<< enemy->GetFloorFlag()
 			<<L"\ndic : "
 			<<m_beforFlag
 			<<"\n"
 			<<m_test
+			<<L"\nlangth: "
+			<< m_enemyPos.length()
 			<< endl;
 		scene->SetDebugString(wss.str());
 
