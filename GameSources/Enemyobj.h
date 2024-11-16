@@ -20,6 +20,7 @@ namespace basecross {
 		virtual ~EnemyChase() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		void Debug();
 	private :
 		float m_plungeTime;
 		float m_maxPlungeTime;

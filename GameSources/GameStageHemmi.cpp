@@ -49,7 +49,7 @@ namespace basecross {
 	//プレイヤーの作成
 	void GameStageHemmi::CreatePlayer() {
 		vector<Vec3> plVec = {
-			Vec3(-50.0f, 5.0f, -70.0f),
+			Vec3(-50.0f, 5.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(3.0f, 3.0f, 3.0f)
 		};
@@ -247,32 +247,36 @@ namespace basecross {
 	void GameStageHemmi::CreateEnemy()
 	{
 		CreateSharedObjectGroup(L"Enemy");
-		vector<wstring> LineVec;
-		m_GameStage1.GetSelect(LineVec, 0, L"Enemy");
-		for (auto& v : LineVec) {
-			vector<wstring> Tokens;
-			Util::WStrToTokenVector(Tokens, v, L',');
-			Vec3 Scale(
-				(float)_wtof(Tokens[7].c_str()),
-				(float)_wtof(Tokens[8].c_str()),
-				(float)_wtof(Tokens[9].c_str())
-			);
-			Vec3 Rot;
-			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
-			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
-			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+		//vector<wstring> LineVec;
+		//m_GameStage1.GetSelect(LineVec, 0, L"Enemy");
+		//for (auto& v : LineVec) {
+		//	vector<wstring> Tokens;
+		//	Util::WStrToTokenVector(Tokens, v, L',');
+		//	Vec3 Scale(
+		//		(float)_wtof(Tokens[7].c_str()),
+		//		(float)_wtof(Tokens[8].c_str()),
+		//		(float)_wtof(Tokens[9].c_str())
+		//	);
+		//	Vec3 Rot;
+		//	Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+		//	Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+		//	Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
 
-			Vec3 Pos(
-				(float)_wtof(Tokens[1].c_str()),
-				(float)_wtof(Tokens[2].c_str()),
-				(float)_wtof(Tokens[3].c_str())
-			);
-			auto player = GetSharedGameObject<Player>(L"Player");
-			auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
-			auto group = GetSharedObjectGroup(L"Enemy");
-			AddGameObject<GaugeSquare>(enemy);
-			group->IntoGroup(enemy);
-		}
+		//	Vec3 Pos(
+		//		(float)_wtof(Tokens[1].c_str()),
+		//		(float)_wtof(Tokens[2].c_str()),
+		//		(float)_wtof(Tokens[3].c_str())
+		//	);
+
+		auto Pos = Vec3(-50.0f, 5.0f, -70.0f);
+		auto Rot = Vec3(0.0f, 0.0f, 0.0f);
+		auto Scale = Vec3(3.0f, 3.0f, 3.0f);
+		auto player = GetSharedGameObject<Player>(L"Player");
+		auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+		auto group = GetSharedObjectGroup(L"Enemy");
+		AddGameObject<GaugeSquare>(enemy);
+		group->IntoGroup(enemy);
+		
 	}
 	void GameStageHemmi::OnCreate() {
 		try {
@@ -293,6 +297,7 @@ namespace basecross {
 			CreateFixedBox();
 			//CreateSprite();
 			CreateEnemy();
+			AddGameObject<GameOverSprite>();
 		}
 		catch (...) {
 			throw;
