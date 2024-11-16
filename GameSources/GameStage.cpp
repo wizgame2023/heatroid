@@ -300,7 +300,7 @@ namespace basecross {
 				(float)_wtof(Tokens[3].c_str())
 			);
 			auto player = GetSharedGameObject<Player>(L"Player");
-			auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+			auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
 			AddGameObject<GaugeSquare>(enemy);
 			auto group = GetSharedObjectGroup(L"Enemy");
 			group->IntoGroup(enemy);
@@ -336,24 +336,6 @@ namespace basecross {
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto playerSh = GetSharedGameObject<Player>(L"Player");
-
-		//auto group = GetSharedObjectGroup(L"Enemy");
-		//auto& vec = group->GetGroupVector();
-		//for (auto& object : vec)
-		//{
-		//	auto Enemybj = object.lock();
-		//	auto PlayerPos = playerSh->GetComponent<Transform>()->GetPosition();
-		//	if (Enemybj != nullptr)
-		//	{
-		//		if (length(Enemybj->GetComponent<Transform>()->GetPosition() - PlayerPos) < 50.0f) {
-		//			Enemybj->SetUpdateActive(true);
-		//		}
-		//		else{
-		//			Enemybj->SetUpdateActive(false);
-		//		}
-		//	}
-		//}
-
 
 		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
