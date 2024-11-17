@@ -97,7 +97,7 @@ namespace basecross {
 		//衝突判定
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(true);
+		m_collision->SetDrawActive(false);
 		//影
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
@@ -249,7 +249,7 @@ namespace basecross {
 		OverHeat();
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ
@@ -682,7 +682,7 @@ namespace basecross {
 		if (pos.length() >= 70.0f) {
 			ThisDestroy();
 		}
-		Debug();
+		//Debug();
 	}
 
 	void EnemyBullet::OnCollisionEnter(shared_ptr<GameObject>& other) {
