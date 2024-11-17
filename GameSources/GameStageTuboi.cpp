@@ -173,25 +173,36 @@ namespace basecross {
 
 	void GameStageTsuboi::CreateEnemy() {
 
-		auto rad = XMConvertToRadians(30.0f);
-		vector<vector<Vec3>> vec = {
-			{
-				Vec3(8.0f,10.0f,6.0f),
-				Vec3(0.0f,0.0f,0.0f),
-				Vec3(3.0f,3.0f,3.0f),
-			},
-			//{
-			//	Vec3(-0.6f,0.2f,0.0f),
-			//	Vec3(0.0f,0.0f,0.0f),
-			//	Vec3(0.1f,0.1f,0.1f),
-			//}
+		CreateSharedObjectGroup(L"Enemy");
+		CreateSharedObjectGroup(L"EnemyGauge");
+		vector<wstring> LineVec;
+		m_GameStage1.GetSelect(LineVec, 0, L"Enemy");
+		for (auto& v : LineVec) {
+			vector<wstring> Tokens;
+			Util::WStrToTokenVector(Tokens, v, L',');
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
 
-		};
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+			auto player = GetSharedGameObject<Player>(L"Player");
+			auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+			auto group = GetSharedObjectGroup(L"Enemy");
+			group->IntoGroup(enemy);
+			auto enemygauge = AddGameObject<GaugeSquare>(enemy);
+			group = GetSharedObjectGroup(L"EnemyGauge");
+			group->IntoGroup(enemygauge);
 
-		auto player = GetSharedGameObject<Player>(L"Player");
-		for (auto v : vec) {
-			auto enemy = AddGameObject<Enemy>(v[0], v[1], v[2], Enemy::rightMove, Enemy::runaway, player);
-			AddGameObject<GaugeSquare>(enemy);
 		}
 	}
 
