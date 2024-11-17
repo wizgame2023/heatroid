@@ -247,11 +247,11 @@ namespace basecross {
 									{
 										if (m_Scale.x < m_Scale.z)
 										{
-											ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z -= 0.05f));
+											ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
 										}
 										else
 										{
-											ptrTransform->SetPosition(Vec3(pos.x -= 0.05f, pos.y, pos.z));
+											ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
 										}
 									}
 								}

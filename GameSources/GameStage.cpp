@@ -50,7 +50,7 @@ namespace basecross {
 	void GameStage::CreatePlayer() {
 		vector<Vec3> plVec = {
 			Vec3(80.0f, 5.0f, 0.0f),
-			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, -90.0f, 0.0f),
 			Vec3(3.0f, 3.0f, 3.0f)
 		};
 		//ƒvƒŒ[ƒ„[‚Ìì¬
@@ -374,7 +374,11 @@ namespace basecross {
 		m_Diedtrue =  playerSh->GetDied();
 		if (m_Diedtrue)
 		{
-			AddGameObject<GameOverSprite>();
+			if (m_Flag)
+			{
+				AddGameObject<GameOverSprite>();
+				m_Flag = false;
+			}
 			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
