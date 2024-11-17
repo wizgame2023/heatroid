@@ -37,7 +37,7 @@ namespace basecross {
 			{
 				Vec3(0.0f, 0.01f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(-50.0f, 0.5f, 70.0f)
+				Vec3(80.0f, 0.5f, 0.0f)
 			},
 		};
 		//オブジェクトの作成
@@ -300,7 +300,7 @@ namespace basecross {
 				(float)_wtof(Tokens[3].c_str())
 			);
 			auto player = GetSharedGameObject<Player>(L"Player");
-			auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
+			auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
 			AddGameObject<GaugeSquare>(enemy);
 			auto group = GetSharedObjectGroup(L"Enemy");
 			group->IntoGroup(enemy);
@@ -308,6 +308,7 @@ namespace basecross {
 	}
 	void GameStage::OnCreate() {
 		try {
+			
 			wstring Datadir;
 			App::GetApp()->GetDataDirectory(Datadir);
 			//CSVパスを取得
@@ -317,16 +318,15 @@ namespace basecross {
 			CreateViewLight();
 			CreateGameBox();
 			CreateGimmick();
+			CreatePlayer();
 			auto player = GetSharedGameObject<Player>(L"Player");
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
-
-
-			CreatePlayer();
 			CreateFixedBox();
 			CreateSprite();
 			CreateEnemy();
 			AddGameObject<FadeIn>();
+
 		}
 		catch (...) {
 			throw;
@@ -336,12 +336,14 @@ namespace basecross {
 	void GameStage::OnUpdate()
 	{
 		GoalJudge();
+		GameOverJudge();
 	}
 
 	void GameStage::CreateSprite()
 	{
 		m_TextDraw = AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 		m_SpriteDraw = AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		// AddGameObject<Sprite>(L"GameOverText", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
 	}
@@ -357,6 +359,22 @@ namespace basecross {
 		{
 			m_TextDraw->SetDrawActive(true);
 			m_SpriteDraw->SetDrawActive(true);
+			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+			}
+		}
+	}
+
+	void GameStage::GameOverJudge()
+	{
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		auto playerSh = GetSharedGameObject<Player>(L"Player");
+		m_Diedtrue =  playerSh->GetDied();
+		if (m_Diedtrue)
+		{
+			AddGameObject<GameOverSprite>();
 			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
