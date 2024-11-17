@@ -268,7 +268,7 @@ namespace basecross {
 		//		(float)_wtof(Tokens[3].c_str())
 		//	);
 
-		auto Pos = Vec3(-50.0f, 5.0f, -70.0f);
+		auto Pos = Vec3(-50.0f, 5.0f, -30.0f);
 		auto Rot = Vec3(0.0f, 0.0f, 0.0f);
 		auto Scale = Vec3(3.0f, 3.0f, 3.0f);
 		auto player = GetSharedGameObject<Player>(L"Player");
@@ -297,7 +297,7 @@ namespace basecross {
 			CreateFixedBox();
 			//CreateSprite();
 			CreateEnemy();
-			AddGameObject<GameOverSprite>();
+			//AddGameObject<GameOverSprite>();
 		}
 		catch (...) {
 			throw;

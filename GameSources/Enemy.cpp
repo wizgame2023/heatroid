@@ -37,12 +37,13 @@ namespace basecross {
 		m_jumpPower(5.0f),
 		m_jumpTime(1.0f),
 		m_dicUp(0),
+		m_direcNorm(Vec3(0.0f)),
 		m_dropTime(4.0f),
 		m_maxDropTime(m_dropTime),
 		m_hitDropTime(2.0f),
 		m_maxHitDropTime(m_hitDropTime),
 		m_bulletTime(0.0f),
-		m_trackingRange(100.0f),
+		m_trackingRange(20.0f),
 		m_plungeColFlag(0),
 		m_plungeTime(3.0f),
 		m_firstDirec(Vec3(0.0f)),
@@ -161,7 +162,8 @@ namespace basecross {
 			m_speed = m_maxSpeed;
 			PlayerDic();
 			EnemyAngle();
-			if (m_direc.length() <= m_trackingRange) {
+			if (m_direc.length() <= m_trackingRange*2) {
+				m_pos += m_speed * m_direcNorm * elapsed;
 				Bullet();
 			}
 			break;
@@ -220,7 +222,10 @@ namespace basecross {
 				m_firstDirec = m_playerPos - GetChangePos();
 				m_plungeFlag = true;
 			}
-			m_pos += Vec3(m_firstDirec.x, 0.0f, m_firstDirec.z) * m_speed * 0.2f * elapsed;
+			if (m_direc.length() <= m_trackingRange) {
+				m_pos += Vec3(m_firstDirec.x, 0.0f, m_firstDirec.z) * m_speed * 0.2f * elapsed;
+			}
+
 			//if (m_floorFlag) {
 			//}
 			break;
@@ -276,11 +281,11 @@ namespace basecross {
 			auto playerPos = playerTrans->GetPosition();
 			m_direc = playerPos - GetChangePos();
 			Vec3 dic = Vec3(m_direc.x, 0.0f, m_direc.z);
-			auto direc = dic.normalize();
-			if (m_direc.length() <= m_trackingRange && m_stateType != plunge) {
-				m_pos += m_speed * direc * elapsed;
+			m_direcNorm = dic.normalize();
+			//if (m_direc.length() <= m_trackingRange && m_stateType != plunge) {
+			//	m_pos += m_speed * m_direcNorm * elapsed;
 
-			}
+			//}
 		}
 	}
 	//プレイヤーの方向を向かせる
@@ -301,7 +306,7 @@ namespace basecross {
 			m_stateType = m_overHeatState;
 		}
 		if (m_heat > 0.0f) {
-			m_heat -= elapsed * 10;
+			m_heat -= elapsed * 5;
 		}
 		else if (GetOverHeat()&&m_heat <= 0.0f) {
 			m_heat = 0.0f;
@@ -422,8 +427,6 @@ namespace basecross {
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
 			m_deathPos = m_pos;
-
-			ReceiveDamage(50.0f);
 		}
 		if (other->FindTag(L"Wall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
@@ -675,11 +678,18 @@ namespace basecross {
 		m_pos.y = m_enemyPos.y;
 		m_pos += m_direc * m_speed * elapsed;
 		m_trans->SetPosition(m_pos);
+		Vec3 pos = m_enemyPos - m_pos;
+		if (pos.length() >= 70.0f) {
+			ThisDestroy();
+		}
 		Debug();
 	}
 
 	void EnemyBullet::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
+			ThisDestroy();
+		}
+		if (other->FindTag(L"Wall")) {
 			ThisDestroy();
 		}
 	}

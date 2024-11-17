@@ -64,6 +64,8 @@ namespace basecross{
 		app->RegisterTexture(L"CLEARBackGround", texPath + L"CLEARBackGround.png");
 		//ゲームオーバー
 		app->RegisterTexture(L"GameOverText", texPath + L"GAMEOVER_Text.png");
+		app->RegisterTexture(L"GameOverBackEffect", texPath + L"GAMEOVER_BackEffect.png");
+
 	}
 
 	void Scene::OnCreate(){

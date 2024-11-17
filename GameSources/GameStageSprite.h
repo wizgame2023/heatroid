@@ -14,6 +14,7 @@ namespace basecross {
 		float m_width;
 		float m_height;
 		float m_time;
+		int m_layer;
 		Vec3 m_pos;
 		wstring m_meshName;
 		Col4 m_color;
@@ -33,7 +34,6 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void SetColor(Col4 color);
-		void DrawActive(bool active);
 	};
 	class FadeOut : public GameObject {
 	private: 
@@ -46,6 +46,7 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		bool GetFadeOutEnd();
+		void SetColor(Col4 color);
 	};
 	class FadeIn : public GameObject {
 	private :
@@ -62,6 +63,7 @@ namespace basecross {
 	private:
 		shared_ptr<FadeOut> m_fadeOut;
 		shared_ptr<GameSprite> m_textSprite;
+		shared_ptr<GameSprite> m_backEffSprite;
 	public:
 		GameOverSprite(const shared_ptr<Stage>& stage);
 		virtual ~GameOverSprite() {};
