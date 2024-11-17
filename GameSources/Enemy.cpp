@@ -249,7 +249,7 @@ namespace basecross {
 		OverHeat();
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ

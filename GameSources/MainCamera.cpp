@@ -37,11 +37,11 @@ namespace basecross {
 	}
 
 	void CameraCollision::OnUpdate() {
-		auto scene = App::GetApp()->GetScene<Scene>();
+		//auto scene = App::GetApp()->GetScene<Scene>();
 
-		wstringstream wss;
-		wss << GetPos.x << " : " << GetPos.y << " : " << GetPos.z << " : " << endl;
-		scene->SetDebugString(L"Camera\n" + wss.str());
+		//wstringstream wss;
+		//wss << GetPos.x << " : " << GetPos.y << " : " << GetPos.z << " : " << endl;
+		//scene->SetDebugString(L"Camera\n" + wss.str());
 
 		auto Ptr = GetComponent<Transform>();
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
