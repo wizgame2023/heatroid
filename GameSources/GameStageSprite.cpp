@@ -19,7 +19,8 @@ namespace basecross {
 		m_meshName(meshName),
 		m_pos(pos),
 		m_color(color),
-		m_time(1.0f)
+		m_time(1.0f),
+		m_layer(1)
 	{}
 	void GameSprite::OnCreate() {
 		m_vertices = {
@@ -42,20 +43,14 @@ namespace basecross {
 		m_trans = GetComponent<Transform>();
 		m_trans->SetPosition(m_pos);
 
-		SetDrawLayer(1);
+		SetDrawLayer(m_layer);
 	}
 	void GameSprite::OnUpdate() {
-		auto elapsed = App::GetApp()->GetElapsedTime();
-		//m_time -= elapsed;
-		//m_draw->SetDiffuse(Col4(1.0f, 1.0f, 1.0f,m_time));
+
 	}
 	void GameSprite::SetColor(Col4 color) {
 		m_draw->SetDiffuse(color);
 	}
-	void GameSprite::DrawActive(bool active) {
-		m_draw->SetDrawActive(active);
-	}
-
 	FadeOut::FadeOut(const shared_ptr<Stage>& stage
 	):
 		GameObject(stage),
@@ -83,6 +78,9 @@ namespace basecross {
 		else {
 			return false;
 		}
+	}
+	void FadeOut::SetColor(Col4 color) {
+		m_sprite->SetColor(color);
 	}
 
 	FadeIn::FadeIn(const shared_ptr<Stage>& stage
@@ -112,13 +110,21 @@ namespace basecross {
 	void GameOverSprite::OnCreate() {
 		auto stage = GetStage();
 		m_fadeOut = stage->AddGameObject<FadeOut>();
+		m_fadeOut->SetDrawLayer(1);
 		m_textSprite = stage->AddGameObject<GameSprite>(1280,800,L"GameOverText",Vec3(0.0f));
-		m_textSprite->DrawActive(false);
+		m_textSprite->SetDrawActive(false);
+		m_backEffSprite = stage->AddGameObject<GameSprite>(1280, 800, L"GameOverBackEffect", Vec3(0.0f));
+		m_backEffSprite->SetDrawActive(false);
+		m_backEffSprite->SetColor(Col4(1.0f, 1.0f, 1.0f, 0.5f));
+		m_backEffSprite->SetDrawLayer(1);
 		
 	}
 	void GameOverSprite::OnUpdate() {
 		if (m_fadeOut->GetFadeOutEnd()) {
-			m_textSprite->DrawActive(true);
+			m_textSprite->SetDrawActive(true);
+			m_backEffSprite->SetDrawActive(true);
+			m_textSprite->SetDrawLayer(2);
+			m_fadeOut->SetColor(Col4(0.0f, 0.0f, 0.0f, 0.6f));
 		}
 	}
 }
