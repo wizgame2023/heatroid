@@ -17,7 +17,8 @@ namespace basecross {
 		shared_ptr<Transform> m_PlayerObject;
 		shared_ptr<GameObject> m_SpriteDraw;
 		shared_ptr<GameObject> m_TextDraw;
-		bool m_Goaltrue;
+		bool m_Goaltrue = false;
+		bool m_Diedtrue = false;
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 		void CreateGameBox();//GameStage‚Ì¶¬
 		void CreatePlayer(); //Player‚Ì¶¬
@@ -26,6 +27,7 @@ namespace basecross {
 		void CreateEnemy();
 		void CreateSprite();
 		void GoalJudge();
+		void GameOverJudge();
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage(){}
