@@ -36,7 +36,7 @@ namespace basecross {
 		Trans->SetScale(m_Scale);
 		auto Coll = AddComponent<CollisionObb>();
 		Coll->SetFixed(true);
-		Coll->SetDrawActive(true);
+		//Coll->SetDrawActive(true);
 
 		vector<VertexPositionNormalTexture> vertices;
 		vector<uint16_t> indices;
@@ -167,7 +167,7 @@ namespace basecross {
 		Trans->SetScale(m_Scale);
 		auto Coll = AddComponent<CollisionObb>();
 		Coll->SetFixed(true);
-		Coll->SetDrawActive(true);
+		//Coll->SetDrawActive(true);
 		vector<VertexPositionNormalTexture> vertices;
 		vector<uint16_t> indices;
 		MeshUtill::CreateCube(1.0f, vertices, indices);

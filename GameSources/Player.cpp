@@ -182,7 +182,7 @@ namespace basecross {
 
 		//CollisionSphere衝突判定を付ける
 		auto ptrColl = AddComponent<CollisionCapsule>();
-		ptrColl->SetDrawActive(true);//debug
+		//ptrColl->SetDrawActive(true);//debug
 		ptrColl->SetMakedRadius(.8f);
 		ptrColl->SetMakedHeight(1.25f);
 
@@ -334,7 +334,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		ShowDebug();
+		//ShowDebug();
 	}
 
 	void Player::ShowDebug() {
