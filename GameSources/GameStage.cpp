@@ -58,8 +58,6 @@ namespace basecross {
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
-		AddGameObject<SpriteHealth>(ptrPlayer);
-		AddGameObject<SpriteCharge>(ptrPlayer);
 	}
 
 	//ボックスの作成
@@ -319,6 +317,10 @@ namespace basecross {
 			CreateViewLight();
 			CreateGameBox();
 			CreateGimmick();
+			auto player = GetSharedGameObject<Player>(L"Player");
+			AddGameObject<SpriteHealth>(player);
+			AddGameObject<SpriteCharge>(player);
+
 
 			CreatePlayer();
 			CreateFixedBox();
