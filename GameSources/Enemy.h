@@ -52,6 +52,7 @@ namespace basecross {
 		Vec3 m_moveRot;
 
 		Vec3 m_direc;
+		Vec3 m_direcNorm;
 		int m_dicUp;
 		Vec3 m_firstDirec;
 
