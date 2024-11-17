@@ -317,14 +317,16 @@ namespace basecross {
 			CreateViewLight();
 			CreateGameBox();
 			CreateGimmick();
-
-			CreatePlayer();
 			auto player = GetSharedGameObject<Player>(L"Player");
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
+
+
+			CreatePlayer();
 			CreateFixedBox();
 			CreateSprite();
 			CreateEnemy();
+			AddGameObject<FadeIn>();
 		}
 		catch (...) {
 			throw;
@@ -333,10 +335,23 @@ namespace basecross {
 
 	void GameStage::OnUpdate()
 	{
+		GoalJudge();
+	}
+
+	void GameStage::CreateSprite()
+	{
+		m_TextDraw = AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_SpriteDraw = AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_TextDraw->SetDrawActive(false);
+		m_SpriteDraw->SetDrawActive(false);
+	}
+
+	void GameStage::GoalJudge()
+	{
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-		auto playerSh = GetSharedGameObject<Player>(L"Player");
 
+		auto playerSh = GetSharedGameObject<Player>(L"Player");
 		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
 		{
@@ -347,14 +362,6 @@ namespace basecross {
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
 			}
 		}
-	}
-
-	void GameStage::CreateSprite()
-	{
-		m_TextDraw = AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
-		m_SpriteDraw = AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
-		m_TextDraw->SetDrawActive(false);
-		m_SpriteDraw->SetDrawActive(false);
 	}
 
 }
