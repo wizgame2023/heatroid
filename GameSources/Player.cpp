@@ -648,7 +648,7 @@ namespace basecross {
 		//描画コンポーネントの設定
 		auto ptrDraw = AddComponent<PNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		ptrDraw->SetBlendState(BlendState::AlphaBlend);
+		ptrDraw->SetBlendState(BlendState::Additive);
 
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(

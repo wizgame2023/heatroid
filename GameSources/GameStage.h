@@ -19,6 +19,7 @@ namespace basecross {
 		shared_ptr<GameObject> m_TextDraw;
 		bool m_Goaltrue = false;
 		bool m_Diedtrue = false;
+		bool m_Flag = true;
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 		void CreateGameBox();//GameStage‚Ì¶¬
 		void CreatePlayer(); //Player‚Ì¶¬
