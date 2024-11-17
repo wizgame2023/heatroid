@@ -25,6 +25,7 @@ namespace basecross {
 		void CreateGimmick();
 		void CreateEnemy();
 		void CreateSprite();
+		void GoalJudge();
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage(){}
