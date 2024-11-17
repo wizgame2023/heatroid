@@ -297,7 +297,7 @@ namespace basecross {
 			CreateFixedBox();
 			//CreateSprite();
 			CreateEnemy();
-			//AddGameObject<GameOverSprite>();
+			AddGameObject<GameOverSprite>();
 		}
 		catch (...) {
 			throw;
