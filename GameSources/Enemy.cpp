@@ -164,7 +164,7 @@ namespace basecross {
 			EnemyAngle();
 			if (m_direc.length() <= m_trackingRange*2) {
 				m_pos += m_speed * m_direcNorm * elapsed;
-				Bullet();
+				//Bullet();
 			}
 			break;
 		//上下に移動
