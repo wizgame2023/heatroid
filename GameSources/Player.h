@@ -145,7 +145,7 @@ namespace basecross {
 
 		//ゴールに到達したらtrueを返す
 		const bool GetArrivedGoal() {
-			return (m_stateType == goal);
+			if (m_stateType == goal) return true;
 		}
 
 		//描画コンポーネントのゲッタ
@@ -229,14 +229,16 @@ namespace basecross {
 	// チャージ中のパーティクル
 	//====================================================================
 
-	//class ChargePtcl : public MultiParticle {
-	//public:
-	//	ChargePtcl(const shared_ptr<Stage>& StagePtr) {}
-	//	virtual ~ChargePtcl() {}
+	class ChargePtcl : public MultiParticle {
+	public:
+		ChargePtcl(const shared_ptr<Stage>& StagePtr) :
+			MultiParticle(StagePtr)
+		{}
+		virtual ~ChargePtcl() {}
 
-	//	virtual void OnCreate() override;
-	//	virtual void OnUpdate() override;
-	//};
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+	};
 
 	//====================================================================
 	// class SpriteHealth
