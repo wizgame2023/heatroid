@@ -324,6 +324,7 @@ namespace basecross {
 			CreateFixedBox();
 			CreateSprite();
 			CreateEnemy();
+			AddGameObject<FadeIn>();
 		}
 		catch (...) {
 			throw;
