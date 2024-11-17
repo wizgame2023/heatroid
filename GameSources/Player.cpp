@@ -367,9 +367,9 @@ namespace basecross {
 		//被弾判定
 		if (Other->FindTag(L"Enemy"))
 		{
-			shared_ptr<Enemy> enemy = dynamic_pointer_cast<Enemy>(Other);
+			shared_ptr<Enemy> enemy = dynamic_pointer_cast<Enemy>(Other);//Enemyクラスに変換
 
-			if (m_invincibleTime <= 0 && enemy->GetOverHeat() == false) 
+			if (m_invincibleTime <= 0 && enemy->GetOverHeat() == false) //オーバーヒート時は被弾しない
 				GetHit();
 		}
 
