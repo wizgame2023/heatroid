@@ -8,7 +8,7 @@
 
 namespace basecross {
 
-	TitleSprite::TitleSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
+	Sprite::Sprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
 		const Vec2& StartScale, const Vec3& StartPos) :
 		GameObject(StagePtr),
 		m_TextureKey(TextureKey),
@@ -17,7 +17,7 @@ namespace basecross {
 		m_StartPos(StartPos)
 	{}
 
-	void TitleSprite::OnCreate() {
+	void Sprite::OnCreate() {
 		float helfSize = 1.0f;
 		//頂点配列(縦横5個ずつ表示)
 		vector<VertexPositionColorTexture> vertices = {
@@ -39,7 +39,7 @@ namespace basecross {
 		ptrDraw->SetTextureResource(m_TextureKey);
 	}
 
-	StartA::StartA(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
+	BlinkingSprite::BlinkingSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
 		const Vec2& StartScale, const Vec3& StartPos) :
 		GameObject(StagePtr),
 		m_TextureKey(TextureKey),
@@ -48,7 +48,7 @@ namespace basecross {
 		m_StartPos(StartPos)
 	{}
 
-	void StartA::OnCreate() {
+	void BlinkingSprite::OnCreate() {
 		float helfSize = 1.0f;
 		//頂点配列(縦横5個ずつ表示)
 		vector<VertexPositionColorTexture> vertices = {
@@ -70,7 +70,7 @@ namespace basecross {
 		ptrDraw->SetTextureResource(m_TextureKey);
 	}
 
-	void StartA::OnUpdate()
+	void BlinkingSprite::OnUpdate()
 	{
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
 		m_TotalTime += ElapsedTime * 3.5f;
@@ -83,4 +83,5 @@ namespace basecross {
 		PtrDraw->SetDiffuse(col);
 
 	}
+
 }

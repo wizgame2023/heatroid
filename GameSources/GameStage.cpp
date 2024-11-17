@@ -37,7 +37,7 @@ namespace basecross {
 			{
 				Vec3(0.0f, 0.01f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(50.0f, 0.5f, 50.0f)
+				Vec3(80.0f, 0.5f, 0.0f)
 			},
 		};
 		//オブジェクトの作成
@@ -49,7 +49,7 @@ namespace basecross {
 	//プレイヤーの作成
 	void GameStage::CreatePlayer() {
 		vector<Vec3> plVec = {
-			Vec3(85.0f, 5.0f, 0.0f),
+			Vec3(80.0f, 5.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(3.0f, 3.0f, 3.0f)
 		};
@@ -150,7 +150,7 @@ namespace basecross {
 			ptrFloor->AddTag(L"Floor");
 			ptrFloor->AddTag(L"Goal");
 		}
-		m_GameStage1.GetSelect(LineVec, 0, L"StageDoor");
+		m_GameStage1.GetSelect(LineVec, 0, L"GoalBeforeFloor");
 		for (auto& v : LineVec) {
 			//トークン（カラム）の配列
 			vector<wstring> Tokens;
@@ -175,16 +175,17 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto ptrFloor = AddGameObject<Door>(Pos, Rot, Scale, Tokens[10]);
-			ptrFloor->AddTag(L"StageDoor");
+			auto ptrFloor = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			ptrFloor->AddTag(L"Floor");
+			ptrFloor->AddTag(L"GoalBefore");
 		}
-
 	}
 
 	void GameStage::CreateGimmick()
 	{
 		CreateSharedObjectGroup(L"Door");
 		CreateSharedObjectGroup(L"Switch");
+		CreateSharedObjectGroup(L"StageDoor");
 		vector<wstring> LineVec;
 		m_GameStage1.GetSelect(LineVec, 0, L"Door");
 		for (auto& v : LineVec) {
@@ -242,6 +243,37 @@ namespace basecross {
 
 			AddGameObject<GimmickButton>(Pos, Rot, Scale,  Button, number, Tokens[12]);
 		}
+		m_GameStage1.GetSelect(LineVec, 0, L"StageDoor");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			//各値がそろったのでオブジェクト作成
+			auto ptrStageDoor = AddGameObject<Door>(Pos, Rot, Scale, Tokens[10]);
+			ptrStageDoor->AddTag(L"StageDoor");
+			auto group = GetSharedObjectGroup(L"StageDoor");
+			group->IntoGroup(ptrStageDoor);
+		}
+
 	}
 
 	void GameStage::CreateEnemy()
@@ -268,13 +300,15 @@ namespace basecross {
 				(float)_wtof(Tokens[3].c_str())
 			);
 			auto player = GetSharedGameObject<Player>(L"Player");
-			auto enemy = AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+			auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+			AddGameObject<GaugeSquare>(enemy);
 			auto group = GetSharedObjectGroup(L"Enemy");
 			group->IntoGroup(enemy);
 		}
 	}
 	void GameStage::OnCreate() {
 		try {
+			
 			wstring Datadir;
 			App::GetApp()->GetDataDirectory(Datadir);
 			//CSVパスを取得
@@ -284,13 +318,15 @@ namespace basecross {
 			CreateViewLight();
 			CreateGameBox();
 			CreateGimmick();
-
 			CreatePlayer();
 			auto player = GetSharedGameObject<Player>(L"Player");
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
 			CreateFixedBox();
+			CreateSprite();
 			CreateEnemy();
+			AddGameObject<FadeIn>();
+
 		}
 		catch (...) {
 			throw;
@@ -299,23 +335,51 @@ namespace basecross {
 
 	void GameStage::OnUpdate()
 	{
-		//auto group = GetSharedObjectGroup(L"Enemy");
-		//auto& vec = group->GetGroupVector();
-		//for (auto& object : vec)
-		//{
-		//	auto Enemybj = object.lock();
-		//	auto playerSh = GetSharedGameObject<Player>(L"Player");
-		//	auto PlayerPos = playerSh->GetComponent<Transform>()->GetWorldPosition();
-		//	if (Enemybj != nullptr)
-		//	{
-		//		if (length(PlayerPos - Enemybj->GetComponent<Transform>()->GetPosition()) < 50.0f) {
-		//			Enemybj->SetUpdateActive(true);
-		//		}
-		//		else{
-		//			Enemybj->SetUpdateActive(false);
-		//		}
-		//	}
-		//}
+		GoalJudge();
+		GameOverJudge();
+	}
+
+	void GameStage::CreateSprite()
+	{
+		m_TextDraw = AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_SpriteDraw = AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		// AddGameObject<Sprite>(L"GameOverText", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_TextDraw->SetDrawActive(false);
+		m_SpriteDraw->SetDrawActive(false);
+	}
+
+	void GameStage::GoalJudge()
+	{
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+
+		auto playerSh = GetSharedGameObject<Player>(L"Player");
+		m_Goaltrue = playerSh->GetArrivedGoal();
+		if (m_Goaltrue)
+		{
+			m_TextDraw->SetDrawActive(true);
+			m_SpriteDraw->SetDrawActive(true);
+			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+			}
+		}
+	}
+
+	void GameStage::GameOverJudge()
+	{
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		auto playerSh = GetSharedGameObject<Player>(L"Player");
+		m_Diedtrue =  playerSh->GetDied();
+		if (m_Diedtrue)
+		{
+			AddGameObject<GameOverSprite>();
+			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+			}
+		}
 	}
 
 }

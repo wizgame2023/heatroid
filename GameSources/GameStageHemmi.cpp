@@ -17,12 +17,9 @@ namespace basecross {
 	void GameStageHemmi::CreateViewLight() {
 		// カメラの設定
 		auto camera = ObjectFactory::Create<MainCamera>();
-		camera->SetEye(Vec3(0.0f, 50.00f, -5.0f));
-		camera->SetAt(Vec3(0.0f, 2.5f, 0.0f));
-
-		//auto cameraObject = AddGameObject<CameraObject>(Vec3(1, 1, 1));
+		camera->SetEye(Vec3(-50.0f, 3.00f, 0.0f));
+		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
 		//camera->SetCameraObject(cameraObject);
-
 		// ビューにカメラを設定
 		auto view = CreateView<SingleView>();
 		view->SetCamera(camera);
@@ -30,6 +27,8 @@ namespace basecross {
 		//マルチライトの作成
 		auto light = CreateLight<MultiLight>();
 		light->SetDefaultLighting(); //デフォルトのライティングを指定
+		auto cameraObject = AddGameObject<CameraCollision>();
+
 	}
 
 	void GameStageHemmi::CreateGameBox() {
@@ -38,7 +37,7 @@ namespace basecross {
 			{
 				Vec3(0.0f, 0.01f, 0.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(50.0f, 0.5f, 50.0f)
+				Vec3(-50.0f, 0.5f, 70.0f)
 			},
 		};
 		//オブジェクトの作成
@@ -49,17 +48,16 @@ namespace basecross {
 
 	//プレイヤーの作成
 	void GameStageHemmi::CreatePlayer() {
+		vector<Vec3> plVec = {
+			Vec3(-50.0f, 5.0f, 0.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(3.0f, 3.0f, 3.0f)
+		};
 		//プレーヤーの作成
-		auto ptrPlayer = AddGameObject<Player>();
+		shared_ptr<GameObject> ptrPlayer = AddGameObject<Player>(plVec[0], plVec[1], plVec[2]);
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player", ptrPlayer);
-		ptrPlayer->GetComponent<Transform>()->SetPosition(Vec3(25, 5.0125f, 0));
-		ptrPlayer->GetComponent<Transform>()->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
-
-		//m_playerObject.push_back(playerPos);
-
-
 	}
 
 	//ボックスの作成
@@ -92,7 +90,8 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto ptrFloor = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			ptrFloor->AddTag(L"Floor");
 		}
 		m_GameStage1.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -119,9 +118,67 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto PtrWaal = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
-			PtrWaal->AddTag(L"Wall");
+			auto PtrWall = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x, Scale.y, Tokens[10]);
+			PtrWall->AddTag(L"Wall");
 		}
+		m_GameStage1.GetSelect(LineVec, 0, L"GoalFloor");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			//各値がそろったのでオブジェクト作成
+			auto ptrFloor = AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			ptrFloor->AddTag(L"Floor");
+			ptrFloor->AddTag(L"Goal");
+		}
+		m_GameStage1.GetSelect(LineVec, 0, L"StageDoor");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			//各値がそろったのでオブジェクト作成
+			auto ptrFloor = AddGameObject<Door>(Pos, Rot, Scale, Tokens[10]);
+			ptrFloor->AddTag(L"StageDoor");
+		}
+
 	}
 
 	void GameStageHemmi::CreateGimmick()
@@ -156,8 +213,8 @@ namespace basecross {
 			float Switch = (float)_wtof(Tokens[10].c_str());
 			int number = (float)_wtof(Tokens[11].c_str());
 
-			//�e�l����������̂ŃI�u�W�F�N�g�쐬
-			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, 1.0f, 1.0f, Switch, number, Tokens[12]);   
+			//各値がそろったのでオブジェクト作成
+			auto door = AddGameObject<GimmickDoor>(Pos, Rot, Scale, Scale.x, Scale.y, Switch, number, Tokens[12]);
 		}
 
 		m_GameStage1.GetSelect(LineVec, 0, L"Switch");
@@ -185,12 +242,11 @@ namespace basecross {
 
 			AddGameObject<GimmickButton>(Pos, Rot, Scale, Button, number, Tokens[12]);
 		}
-
 	}
 
 	void GameStageHemmi::CreateEnemy()
 	{
-
+		CreateSharedObjectGroup(L"Enemy");
 		//vector<wstring> LineVec;
 		//m_GameStage1.GetSelect(LineVec, 0, L"Enemy");
 		//for (auto& v : LineVec) {
@@ -211,25 +267,17 @@ namespace basecross {
 		//		(float)_wtof(Tokens[2].c_str()),
 		//		(float)_wtof(Tokens[3].c_str())
 		//	);
-		//	auto player = GetSharedGameObject<Player>(L"Player");
-		//	auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::stay, Enemy::stay, player);
-		//	AddGameObject<GaugeSquare>(enemy);
-		//}
 
-		vector<vector<Vec3>> vec = {
-			{
-				Vec3(15, 5.0125f, 0),
-				Vec3(0.0f,0.0f,0.0f),
-				Vec3(3.0f,3.0f,3.0f)
-			}
-		};
-		for (auto v : vec) {
-			auto player = GetSharedGameObject<Player>(L"Player");
-			auto enemy = AddGameObject<EnemyChase>(v[0],v[1],v[2], Enemy::rightMove, Enemy::stay, player);
-			AddGameObject<GaugeSquare>(enemy);
-		}
+		auto Pos = Vec3(-50.0f, 5.0f, -30.0f);
+		auto Rot = Vec3(0.0f, 0.0f, 0.0f);
+		auto Scale = Vec3(3.0f, 3.0f, 3.0f);
+		auto player = GetSharedGameObject<Player>(L"Player");
+		auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+		auto group = GetSharedObjectGroup(L"Enemy");
+		AddGameObject<GaugeSquare>(enemy);
+		group->IntoGroup(enemy);
+		
 	}
-
 	void GameStageHemmi::OnCreate() {
 		try {
 			wstring Datadir;
@@ -239,17 +287,23 @@ namespace basecross {
 			m_GameStage1.ReadCsv();
 			//ビューとライトの作成
 			CreateViewLight();
-			//CreateGameBox();
+			CreateGameBox();
 			//CreateGimmick();
 
 			CreatePlayer();
+			auto player = GetSharedGameObject<Player>(L"Player");
+			AddGameObject<SpriteHealth>(player);
+			AddGameObject<SpriteCharge>(player);
 			CreateFixedBox();
+			//CreateSprite();
 			CreateEnemy();
+			//AddGameObject<GameOverSprite>();
 		}
 		catch (...) {
 			throw;
 		}
 	}
+
 
 }
 //end basecross

@@ -399,10 +399,19 @@ namespace basecross {
 		if (Other->FindTag(L"Goal") && m_stateType == stand) {
 			m_stateType = goal;
 		}
-
+		if (Other->FindTag(L"GoalBefore")) {
+			auto group = GetStage()->GetSharedObjectGroup(L"StageDoor");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if ( shObj) {
+					auto Switchs = dynamic_pointer_cast<Door>(shObj);
+					Switchs->SetButton(true);
+				}
+			}
+		}
 		if ((Other->FindTag(L"GimmickButton")))
 		{
-
 			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 			auto& vec = group->GetGroupVector();
 			for (auto& v : vec) {
