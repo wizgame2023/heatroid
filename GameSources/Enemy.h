@@ -132,8 +132,9 @@ namespace basecross {
 		void EnemyAngle();
 		float GetHeatRatio();
 		bool GetOverHeat();
+		void SetPlungeFlag(bool flag);
 
-	private:
+	protected:
 		//d—Í‚ÉŠÖ‚·‚éŠÖ”
 		void Grav();
 		void SetGrav(Vec3 grav);
@@ -164,7 +165,7 @@ namespace basecross {
 		float m_test;
 
 		shared_ptr<Transform> m_trans;
-		shared_ptr<Enemy> m_enemy;
+		weak_ptr<Enemy> m_enemy;
 		
 
 	public :
