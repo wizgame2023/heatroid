@@ -26,6 +26,8 @@ namespace basecross {
 
 		void PlayBGM(const wstring& StageBGM);
 
+		void OnDestroy();
+
 	};
 
 }

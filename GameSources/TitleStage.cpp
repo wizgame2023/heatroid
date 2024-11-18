@@ -28,7 +28,7 @@ namespace basecross {
 			CreateViewLight();
 			//OnDraw();
 			OnTitleSprite();
-			//PlayBGM();
+			PlayBGM(L"TitleBGM");
 		}
 		catch (...) {
 			throw;
@@ -56,9 +56,20 @@ namespace basecross {
 
 	}
 
+	void TitleStage::OnDestroy() {
+		//BGMのストップ
+		m_ptrXA->Stop(m_BGM);
+	}
+
 
 	void TitleStage::OnPushA() {
+		OnDestroy();
 		PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+	}
+
+	void TitleStage::PlayBGM(const wstring& StageBGM)
+	{
+		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
 	}
 
 	Draw::Draw(const shared_ptr<Stage>& stage,

@@ -6,6 +6,7 @@
 
 #include "stdafx.h"
 #include "Project.h"
+#include "GameStage.h"
 
 namespace basecross {
 
@@ -27,7 +28,7 @@ namespace basecross {
 			a->CreateFixedBox();
 			a->CreateGimmick();
 			a->CreateSprite();
-			
+			PlayBGM(L"StageBGM");
 		}
 		catch (...) {
 			throw;
@@ -35,11 +36,17 @@ namespace basecross {
 	}
 	void GameStage::OnUpdate()
 	{
+		
 	}
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{
 		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
+	}
+
+	void GameStage::OnDestroy() {
+		//BGMのストップ
+		m_ptrXA->Stop(m_BGM);
 	}
 }
 //end basecross
