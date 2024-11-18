@@ -187,14 +187,11 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class EnemyFloorCol : public GameObject {
 	private:
-		Vec3 m_pos;
-		Vec3 m_rot;
-		Vec3 m_scal;
 		shared_ptr<Transform> m_trans;
 		weak_ptr<Enemy> m_enemy;
 
 	public:
-		EnemyFloorCol(const shared_ptr<Stage>& stage, const Vec3& pos, shared_ptr<Enemy>& enemy);
+		EnemyFloorCol(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
 		virtual ~EnemyFloorCol(){}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;

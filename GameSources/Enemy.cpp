@@ -102,6 +102,8 @@ namespace basecross {
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 
+		GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
+
 		AddTag(L"Enemy");
 	}
 
@@ -724,27 +726,28 @@ namespace basecross {
 		scene->SetDebugString(wss.str());
 	}
 	EnemyFloorCol::EnemyFloorCol(const shared_ptr<Stage>& stage,
-		const Vec3& pos,
-		shared_ptr<Enemy>& enemy
+		const shared_ptr<Enemy>& enemy
 	):
 		GameObject(stage),
-		m_pos(pos),
 		m_enemy(enemy)
 	{}
 	void EnemyFloorCol::OnCreate() {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
-		m_trans->SetParent(enemy);
+		auto enemyTrans = enemy->GetComponent<Transform>();
+		auto enemyPos = enemyTrans->GetPosition();
+		auto enemyScal = enemyTrans->GetScale();
 		m_trans = GetComponent<Transform>();
-		m_trans->SetPosition(m_pos);
-		m_trans->SetScale(Vec3(3.0f, 3.0f, 3.0f));
+		m_trans->SetPosition(Vec3(enemyPos.x, enemyPos.y + enemyScal.y / 2, enemyPos.z));
+		m_trans->SetScale(Vec3(enemyScal.x,enemyScal.y/5,enemyScal.z));
+		m_trans->SetParent(enemy);
 
-		auto ptrColl = AddComponent<CollisionSphere>();
+		auto ptrColl = AddComponent<CollisionObb>();
 		ptrColl->SetAfterCollision(AfterCollision::Auto);
-		ptrColl->SetFixed(false); //空間に固定するか
+		ptrColl->SetFixed(true); //空間に固定するか
 		ptrColl->SetDrawActive(true);
 
-
+		AddTag(L"Floor");
 	}
 	void EnemyFloorCol::OnUpdate() {
 
