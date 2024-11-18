@@ -583,7 +583,7 @@ namespace basecross {
 		m_isOverCharge = false;
 		m_stateType = release;
 
-		PlaySnd(L"PlayerProj", 100.0f, 0);
+		PlaySnd(L"PlayerProj", 60.0f, 0);
 	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え
