@@ -111,7 +111,6 @@ namespace basecross {
 		void EnemyJump();
 		void HipDropJump();
 		void ThisDestroy();
-		void ReceiveDamage(float damage);
 		void PlayerDic();
 		void OneJump(float jumpHight);
 		void HitDrop();
@@ -119,6 +118,7 @@ namespace basecross {
 		void Bullet();
 		void EnemyAnime(wstring anime);
 		void OverHeat();
+		void PlayerSE(wstring path, float volume = 1.0f, float loopcnt = 0);
 		void Debug();
 		//get,set
 		void SetEnemyFlayFlag(bool flag);
@@ -182,6 +182,21 @@ namespace basecross {
 
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class EnemyFloorCol : public GameObject;
+	//--------------------------------------------------------------------------------------
+	class EnemyFloorCol : public GameObject {
+	private:
+		Vec3 m_pos;
+		Vec3 m_rot;
+		Vec3 m_scal;
+		shared_ptr<Transform> m_trans;
 
+	public:
+		EnemyFloorCol(const shared_ptr<Stage>& stage,const Vec3& pos);
+		virtual ~EnemyFloorCol(){}
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+	};
 
 }
