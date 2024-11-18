@@ -81,6 +81,12 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"PlayerLand", soundWav);
 
 
+		wstring TitleWav = sdPath + L"TitleTheme.wav";
+		App::GetApp()->RegisterWav(L"TitleBGM", TitleWav);
+
+		wstring StageWav = sdPath + L"StageBGM.wav";
+		App::GetApp()->RegisterWav(L"StageBGM", StageWav);
+
 	}
 
 	void Scene::OnCreate(){
