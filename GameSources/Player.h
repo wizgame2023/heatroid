@@ -52,6 +52,8 @@ namespace basecross {
 		//CollisionExitの空中判定用カウント
 		int m_collideCount, m_collideCountInit;
 
+		float m_landSEcooltime = 0.0f;
+
 		//プレイヤーの状態を表す列挙型
 		enum Stats {
 			stand,		//地上
@@ -151,6 +153,13 @@ namespace basecross {
 		//描画コンポーネントのゲッタ
 		const shared_ptr<PNTBoneModelDraw> GetDrawPtr() {
 			return GetComponent<PNTBoneModelDraw>();
+		}
+
+		//SEの再生
+		void Player::PlaySnd(wstring sndname, float volume, float loopcount) {
+			auto audio = App::GetApp()->GetXAudio2Manager();
+			audio->Start(sndname, loopcount, volume);
+
 		}
 
 		//isChargingフラグの取得

@@ -72,6 +72,13 @@ namespace basecross{
 		//SE
 		wstring soundWav = sdPath + L"OverHeatSE.wav";
 		App::GetApp()->RegisterWav(L"OverHeatSE", soundWav);
+		soundWav = sdPath + L"PlayerJump.wav";
+		App::GetApp()->RegisterWav(L"PlayerJump", soundWav);
+		soundWav = sdPath + L"PlayerProj.wav";
+		App::GetApp()->RegisterWav(L"PlayerProj", soundWav);
+		soundWav = sdPath + L"PlayerLand.wav";
+		App::GetApp()->RegisterWav(L"PlayerLand", soundWav);
+
 
 	}
 
