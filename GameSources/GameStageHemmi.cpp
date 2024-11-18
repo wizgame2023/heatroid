@@ -272,9 +272,12 @@ namespace basecross {
 		auto Rot = Vec3(0.0f, 0.0f, 0.0f);
 		auto Scale = Vec3(3.0f, 3.0f, 3.0f);
 		auto player = GetSharedGameObject<Player>(L"Player");
-		auto enemy = AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+		auto enemy = AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
 		auto group = GetSharedObjectGroup(L"Enemy");
 		AddGameObject<GaugeSquare>(enemy);
+		//AddGameObject<EnemyFloorCol>(Vec3(0.0f, 1.0f, 0.0f), enemy);
+
+
 		group->IntoGroup(enemy);
 		
 	}
@@ -288,7 +291,7 @@ namespace basecross {
 			//ビューとライトの作成
 			CreateViewLight();
 			CreateGameBox();
-			//CreateGimmick();
+			CreateGimmick();
 
 			CreatePlayer();
 			auto player = GetSharedGameObject<Player>(L"Player");
@@ -298,7 +301,6 @@ namespace basecross {
 			//CreateSprite();
 			CreateEnemy();
 			//AddGameObject<GameOverSprite>();
-			AddGameObject<EnemyFloorCol>(Vec3(-50.0f, 5.0f, -20.0f));
 		}
 		catch (...) {
 			throw;

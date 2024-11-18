@@ -73,15 +73,6 @@ namespace basecross{
 		//SE
 		wstring soundWav = sdPath + L"OverHeatSE.wav";
 		App::GetApp()->RegisterWav(L"OverHeatSE", soundWav);
-<<<<<<< Updated upstream
-
-		wstring TitleWav = sdPath + L"TitleTheme.wav";
-		App::GetApp()->RegisterWav(L"TitleBGM", TitleWav);
-
-		wstring StageWav = sdPath + L"StageBGM.wav";
-		App::GetApp()->RegisterWav(L"StageBGM", StageWav);
-
-=======
 		soundWav = sdPath + L"PlayerJump.wav";
 		App::GetApp()->RegisterWav(L"PlayerJump", soundWav);
 		soundWav = sdPath + L"PlayerProj.wav";
@@ -93,7 +84,6 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"TitleBGM", soundWav);
 		soundWav = sdPath + L"StageBGM.wav";
 		App::GetApp()->RegisterWav(L"StageBGM", soundWav);
->>>>>>> Stashed changes
 	}
 
 	void Scene::OnCreate(){
