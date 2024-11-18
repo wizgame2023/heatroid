@@ -5,7 +5,7 @@
 
 #pragma once
 
-
+#include "StageManager.h"
 #include "ProjectShader.h"
 #include "ProjectBehavior.h"
 #include "Scene.h"
