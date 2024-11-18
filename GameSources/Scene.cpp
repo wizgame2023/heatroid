@@ -22,6 +22,8 @@ namespace basecross{
 		auto texPath = path + L"Textures/";
 		// Modelsパス
 		auto mdlPath = path + L"Models/";
+		// Soundsパス
+		auto sdPath = path + L"Sounds/";
 
 		// プレイヤー
 		auto modelMesh = MeshResource::CreateBoneModelMesh(mdlPath, L"HR.bmf");
@@ -65,6 +67,11 @@ namespace basecross{
 		//ゲームオーバー
 		app->RegisterTexture(L"GameOverText", texPath + L"GAMEOVER_Text.png");
 		app->RegisterTexture(L"GameOverBackEffect", texPath + L"GAMEOVER_BackEffect.png");
+
+		//サウンド
+		//SE
+		wstring soundWav = sdPath + L"OverHeatSE.wav";
+		App::GetApp()->RegisterWav(L"OverHeatSE", soundWav);
 
 	}
 

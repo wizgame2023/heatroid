@@ -264,14 +264,6 @@ namespace basecross {
 		GravZero();
 		EnemyJump();
 	}
-	//削除
-	void Enemy::ThisDestroy() {
-		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
-	}
-	//ダメージを受ける
-	void Enemy::ReceiveDamage(float damage) {
-		m_heat -= damage;
-	}
 	//プレイヤーの向いている方向に進む
 	void Enemy::PlayerDic() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
@@ -422,6 +414,16 @@ namespace basecross {
 		}
 
 	}
+	//削除
+	void Enemy::ThisDestroy() {
+		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
+	}
+	//SEの再生
+	void Enemy::PlayerSE(wstring path, float volume, float loopcnt) {
+		auto playerSE = App::GetApp()->GetXAudio2Manager();
+		playerSE->Start(path, loopcnt, volume);
+
+	}
 
 	//衝突判定
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
@@ -451,6 +453,7 @@ namespace basecross {
 		if (other->FindTag(L"Attack")) {
 			m_deathPos = m_pos;
 			m_heat = m_maxHeat;
+			PlayerSE(L"OverHeatSE");
 		}
 	}
 	void Enemy::OnCollisionExit(shared_ptr<GameObject>& Other)
@@ -721,7 +724,26 @@ namespace basecross {
 			<< m_enemyPos.length()
 			<< endl;
 		scene->SetDebugString(wss.str());
+	}
+	EnemyFloorCol::EnemyFloorCol(const shared_ptr<Stage>& stage,
+		const Vec3& pos
+	):
+		GameObject(stage),
+		m_pos(pos)
+	{}
+	void EnemyFloorCol::OnCreate() {
+		m_trans = GetComponent<Transform>();
+		m_trans->SetPosition(m_pos);
+		m_trans->SetScale(Vec3(3.0f, 3.0f, 3.0f));
 
+		auto ptrColl = AddComponent<CollisionSphere>();
+		ptrColl->SetAfterCollision(AfterCollision::Auto);
+		ptrColl->SetFixed(false); //空間に固定するか
+		ptrColl->SetDrawActive(true);
+
+
+	}
+	void EnemyFloorCol::OnUpdate() {
 
 	}
 }
