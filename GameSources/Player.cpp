@@ -231,6 +231,8 @@ namespace basecross {
 		auto key = App::GetApp()->GetInputDevice().GetKeyState();
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 
+		if (m_landSEcooltime > 0.0f) m_landSEcooltime -= _delta;
+
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 
@@ -376,6 +378,10 @@ namespace basecross {
 
 		if ((m_stateType == air || m_stateType == hit_air) && Other->FindTag(L"Floor")) {
 			SetAnim(AddFire() + L"Land");
+			if (m_landSEcooltime <= 0.0f) {
+				PlaySnd(L"PlayerLand", 100.0f, 0);
+				m_landSEcooltime = .5f;
+			}
 			m_stateType = stand;
 		}
 
@@ -565,17 +571,6 @@ namespace basecross {
 		auto face = atan2f(fwd.z,fwd.x);
 		auto scale = trans->GetScale();
 
-		////発射位置の調整
-		//Quat qt;
-		//qt.rotation(face, Vec3(0, 1.0f, 0));
-		//qt.normalize();
-		//Mat4x4 Mat;
-		//Mat.strTransformation(
-		//	scale,
-		//	m_firePos,
-		//	qt);
-		//Vec3 firepos = Mat.transInMatrix();
-
 		Vec3 firepos;
 		firepos.x = (cosf(face) * m_firePos.x) - (sinf(face) * m_firePos.z);
 		firepos.y = m_firePos.y;
@@ -587,6 +582,8 @@ namespace basecross {
 		m_chargePerc = 0.0f;
 		m_isOverCharge = false;
 		m_stateType = release;
+
+		PlaySnd(L"PlayerProj", 60.0f, 0);
 	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え
