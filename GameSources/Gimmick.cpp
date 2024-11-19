@@ -161,6 +161,8 @@ namespace basecross {
 	//èâä˙âª
 	void GimmickDoor::OnCreate() {
 		m_open = false;
+		m_Flag = false;
+		m_Flag2 = false;
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_Position);
 		Trans->SetRotation(m_Rotation);
@@ -224,11 +226,11 @@ namespace basecross {
 						{
 							if (m_Scale.x < m_Scale.z)
 							{
-								ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z -= 0.05f));
+								ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
 							}
 							else
 							{
-								ptrTransform->SetPosition(Vec3(pos.x -= 0.05f, pos.y, pos.z));
+								ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
 							}
 						}
 					}
@@ -261,7 +263,6 @@ namespace basecross {
 								}									
 							}
 						}
-
 					}
 
 				}

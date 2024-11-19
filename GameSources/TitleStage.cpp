@@ -64,7 +64,7 @@ namespace basecross {
 
 	void TitleStage::OnPushA() {
 		OnDestroy();
-		PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+		PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
 	}
 
 	void TitleStage::PlayBGM(const wstring& StageBGM)

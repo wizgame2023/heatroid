@@ -26,3 +26,4 @@
 #include "MainCamera.h"
 #include "Sprite.h"
 #include "GameStageSprite.h"
+#include "SelectStage.h"
