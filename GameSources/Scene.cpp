@@ -67,8 +67,6 @@ namespace basecross{
 		//ゲームオーバー
 		app->RegisterTexture(L"GameOverText", texPath + L"GAMEOVER_Text.png");
 		app->RegisterTexture(L"GameOverBackEffect", texPath + L"GAMEOVER_BackEffect.png");
-		//wstring strTitleBGM = DataDir + L"\\SFX\\TITLE.wav";
-		//app->RegisterWav(L"title", strTitleBGM);
 		//サウンド
 		//SE
 		wstring soundWav = sdPath + L"OverHeatSE.wav";
@@ -96,7 +94,7 @@ namespace basecross{
 
 			//自分自身にイベントを送る
 			//これにより各ステージやオブジェクトがCreate時にシーンにアクセスできる
-			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToTitleStage");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), GetThis<Scene>(), L"ToGameStage");
 		}
 		catch (...) {
 			throw;

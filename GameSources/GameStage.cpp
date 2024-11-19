@@ -13,7 +13,7 @@ namespace basecross {
 	void GameStage::OnCreate() {
 		try {
 			vector<Vec3> plVec = {
-				Vec3(80.0f, 5.0f, 0.0f),
+				Vec3(-30.0f, 5.0f, 71.0f),
 				Vec3(0.0f, -90.0f, 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
@@ -28,6 +28,7 @@ namespace basecross {
 			a->CreateFixedBox();
 			a->CreateGimmick();
 			a->CreateSprite();
+			AddGameObject<FadeIn>();
 			PlayBGM(L"StageBGM");
 		}
 		catch (...) {

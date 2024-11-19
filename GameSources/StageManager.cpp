@@ -227,11 +227,7 @@ namespace basecross {
 			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
 			Util::WStrToTokenVector(Tokens, v, L',');
 			//各トークン（カラム）をスケール、回転、位置に読み込む
-			Vec3 Scale(
-				(float)_wtof(Tokens[7].c_str()),
-				(float)_wtof(Tokens[8].c_str()),
-				(float)_wtof(Tokens[9].c_str())
-			);
+			Vec3 Scale(5,5,5);
 			Vec3 Rot;
 			//回転は「XM_PIDIV2」の文字列になっている場合がある
 			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
@@ -259,11 +255,7 @@ namespace basecross {
 		for (auto& v : LineVec) {
 			vector<wstring> Tokens;
 			Util::WStrToTokenVector(Tokens, v, L',');
-			Vec3 Scale(
-				(float)_wtof(Tokens[7].c_str()),
-				(float)_wtof(Tokens[8].c_str()),
-				(float)_wtof(Tokens[9].c_str())
-			);
+			Vec3 Scale(3,3,3);
 			Vec3 Rot;
 			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
 			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
@@ -285,10 +277,14 @@ namespace basecross {
 	void StageManager::OnCreate() {
 		try {
 
-			wstring Datadir;
-			App::GetApp()->GetDataDirectory(Datadir);
+			auto& app = App::GetApp();
+
+			// mediaパスを取得
+			auto path = app->GetDataDirWString();
+			// texturesパスを取得
+			auto csvPath = path + L"CSV/";
 			//CSVパスを取得
-			m_GameStage.SetFileName(Datadir + L"CSV/" + L"GameStage.csv");
+			m_GameStage.SetFileName(csvPath + L"Stagedata1.csv");
 			m_GameStage.ReadCsv();
 			//ビューとライトの作成
 		}
@@ -307,7 +303,6 @@ namespace basecross {
 	{
 		m_TextDraw = GetStage()->AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 		m_SpriteDraw = GetStage()->AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
-		// AddGameObject<Sprite>(L"GameOverText", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
 	}
@@ -346,6 +341,7 @@ namespace basecross {
 			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+				GetTypeStage<GameStage>()->OnDestroy();
 			}
 		}
 	}
