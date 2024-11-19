@@ -102,7 +102,11 @@ namespace basecross {
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 
+		//足場コリジョンの追加
 		GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
+		//オーバーヒートゲージの追加
+		GetStage()->AddGameObject<GaugeSquare>(GetThis<Enemy>());
+
 
 		AddTag(L"Enemy");
 	}
@@ -744,7 +748,7 @@ namespace basecross {
 
 		auto ptrColl = AddComponent<CollisionObb>();
 		ptrColl->SetAfterCollision(AfterCollision::Auto);
-		ptrColl->SetFixed(true); //空間に固定するか
+		ptrColl->SetFixed(false); //空間に固定するか
 		ptrColl->SetDrawActive(true);
 
 		AddTag(L"Floor");
