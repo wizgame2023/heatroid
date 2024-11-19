@@ -31,6 +31,7 @@ namespace basecross {
 		InputHandler<Player> m_InputHandler;
 		//スピード(最高速)
 		float m_speed;
+		float m_airSpeedPerc;
 		//加速度
 		float m_accel;
 		//摩擦係数(静/動/完全停止)
@@ -247,6 +248,7 @@ namespace basecross {
 
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		void Emit(const Vec3& emitPos, const Vec3& randomEmitRange);
 	};
 
 	//====================================================================
