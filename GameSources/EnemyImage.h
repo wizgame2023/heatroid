@@ -8,10 +8,9 @@
 #include "stdafx.h"
 
 namespace basecross {
-	class GaugeSquare : public GameObject{
+	class Square : public GameObject{
 
-		float m_sizeX;
-		float m_sizeY;
+	protected:
 		float m_width;
 		float m_height;
 		float m_moveX;
@@ -30,17 +29,30 @@ namespace basecross {
 
 		Col4 m_color;
 
-		weak_ptr<Enemy> m_enemy;
-
 		
 	public :
-		GaugeSquare(const shared_ptr<Stage>& stage,const shared_ptr<Enemy>& enemy);
-		virtual ~GaugeSquare() {};
+		Square(const shared_ptr<Stage>& stage);
+		virtual ~Square() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void ThisDestroy();
-		void UpdateValue(float ratio);
 		void Debug();
 		Quat RotCorrection(const Vec3& Line);
+	};
+
+	class GaugeSquare : public Square {
+	private:
+		Vec3 m_enemyPos;
+		Vec3 m_enemyScal;
+
+		weak_ptr<Enemy> m_enemy;
+
+	public:
+		GaugeSquare(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
+		virtual ~GaugeSquare() {};
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		void UpdateValue(float ratio);
+
 	};
 }
