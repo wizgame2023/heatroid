@@ -191,9 +191,10 @@ namespace basecross {
 		Vec3 m_rot;
 		Vec3 m_scal;
 		shared_ptr<Transform> m_trans;
+		weak_ptr<Enemy> m_enemy;
 
 	public:
-		EnemyFloorCol(const shared_ptr<Stage>& stage,const Vec3& pos);
+		EnemyFloorCol(const shared_ptr<Stage>& stage, const Vec3& pos, shared_ptr<Enemy>& enemy);
 		virtual ~EnemyFloorCol(){}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;

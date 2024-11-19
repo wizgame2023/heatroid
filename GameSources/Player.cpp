@@ -392,18 +392,18 @@ namespace basecross {
 		}
 
 
-		if ((Other->FindTag(L"GimmickButton")))
-		{
-			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-			auto& vec = group->GetGroupVector();
-			for (auto& v : vec) {
-				auto shObj = v.lock();
-				if (Other == shObj) {
-					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					Switchs->SetButton(true);
-				}
-			}
-		}
+		//if ((Other->FindTag(L"GimmickButton")))
+		//{
+		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+		//	auto& vec = group->GetGroupVector();
+		//	for (auto& v : vec) {
+		//		auto shObj = v.lock();
+		//		if (Other == shObj) {
+		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+		//			Switchs->SetButton(true);
+		//		}
+		//	}
+		//}
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)
@@ -422,33 +422,33 @@ namespace basecross {
 				}
 			}
 		}
-		if ((Other->FindTag(L"GimmickButton")))
-		{
-			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-			auto& vec = group->GetGroupVector();
-			for (auto& v : vec) {
-				auto shObj = v.lock();
-				if (Other == shObj) {
-					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					Switchs->SetButton(true);
-				}
-			}
-		}
+		//if ((Other->FindTag(L"GimmickButton")))
+		//{
+		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+		//	auto& vec = group->GetGroupVector();
+		//	for (auto& v : vec) {
+		//		auto shObj = v.lock();
+		//		if (Other == shObj) {
+		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+		//			Switchs->SetButton(true);
+		//		}
+		//	}
+		//}
 	}
 	void Player::OnCollisionExit(shared_ptr<GameObject>& Other)
 	{
-		if ((Other->FindTag(L"GimmickButton")))
-		{
-			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-			auto& vec = group->GetGroupVector();
-			for (auto& v : vec) {
-				auto shObj = v.lock();
-				if (shObj) {
-					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					Switchs->SetButton(false);
-				}
-			}
-		}
+		//if ((Other->FindTag(L"GimmickButton")))
+		//{
+		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+		//	auto& vec = group->GetGroupVector();
+		//	for (auto& v : vec) {
+		//		auto shObj = v.lock();
+		//		if (shObj) {
+		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+		//			Switchs->SetButton(false);
+		//		}
+		//	}
+		//}
 	}
 
 	void Player::MoveCamera()

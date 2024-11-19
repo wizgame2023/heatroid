@@ -66,7 +66,6 @@ namespace basecross {
 		m_trans->SetScale(m_scal);
 		m_beforState = m_stateType;
 		m_beforePos = m_pos;
-
 		auto player = m_player.lock();
 		if (!player) return;
 		m_playerScale = m_player.lock()->GetScale();
@@ -96,8 +95,9 @@ namespace basecross {
 
 		//衝突判定
 		m_collision = AddComponent<CollisionObb>();
+		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(false);
+		m_collision->SetDrawActive(true);
 		//影
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
@@ -144,7 +144,6 @@ namespace basecross {
 
 
 		FindFixed();
-
 
 		//行動パターン
 		switch (m_stateType)
@@ -422,7 +421,6 @@ namespace basecross {
 	void Enemy::PlayerSE(wstring path, float volume, float loopcnt) {
 		auto playerSE = App::GetApp()->GetXAudio2Manager();
 		playerSE->Start(path, loopcnt, volume);
-
 	}
 
 	//衝突判定
@@ -726,12 +724,17 @@ namespace basecross {
 		scene->SetDebugString(wss.str());
 	}
 	EnemyFloorCol::EnemyFloorCol(const shared_ptr<Stage>& stage,
-		const Vec3& pos
+		const Vec3& pos,
+		shared_ptr<Enemy>& enemy
 	):
 		GameObject(stage),
-		m_pos(pos)
+		m_pos(pos),
+		m_enemy(enemy)
 	{}
 	void EnemyFloorCol::OnCreate() {
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
+		m_trans->SetParent(enemy);
 		m_trans = GetComponent<Transform>();
 		m_trans->SetPosition(m_pos);
 		m_trans->SetScale(Vec3(3.0f, 3.0f, 3.0f));

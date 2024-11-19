@@ -28,7 +28,7 @@ namespace basecross {
 			CreateViewLight();
 			//OnDraw();
 			OnTitleSprite();
-			//PlayBGM();
+			PlayBGM(L"TitleBGM");
 		}
 		catch (...) {
 			throw;
@@ -42,10 +42,10 @@ namespace basecross {
 
 	void TitleStage::OnTitleSprite()
 	{
-		AddGameObject<Sprite>(L"TITLEBACKGROUND", true, Vec2(640.0f, 360.0f), Vec3(0.0f, 10.0f, 0.3f));
-		AddGameObject<BlinkingSprite>(L"TITLETEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, -200.0f, 0.1f));
-		AddGameObject<Sprite>(L"TITLEEFFECT", true, Vec2(640.0f, 200.0f), Vec3(0.0f, 0.0f, 0.2f));
-		AddGameObject<Sprite>(L"TITLEROGO", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.1f));
+		AddGameObject<Sprite>(L"TITLEBACKGROUND", true, Vec2(640.0f, 410.0f), Vec3(0.0f, -5.0f, 0.3f));
+		AddGameObject<BlinkingSprite>(L"TITLETEXT", true, Vec2(640.0f, 410.0f), Vec3(0.0f, -250.0f, 0.1f));
+		AddGameObject<Sprite>(L"TITLEEFFECT", true, Vec2(640.0f, 205.0f), Vec3(0.0f, 0.0f, 0.2f));
+		AddGameObject<Sprite>(L"TITLEROGO", true, Vec2(640.0f, 410.0f), Vec3(0.0f, 0.0f, 0.1f));
 	}
 
 	void TitleStage::OnUpdate() {
@@ -56,9 +56,20 @@ namespace basecross {
 
 	}
 
+	void TitleStage::OnDestroy() {
+		//BGMのストップ
+		m_ptrXA->Stop(m_BGM);
+	}
+
 
 	void TitleStage::OnPushA() {
-		PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+		OnDestroy();
+		PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+	}
+
+	void TitleStage::PlayBGM(const wstring& StageBGM)
+	{
+		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
 	}
 
 	Draw::Draw(const shared_ptr<Stage>& stage,

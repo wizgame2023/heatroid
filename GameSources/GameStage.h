@@ -14,21 +14,8 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class GameStage : public Stage {
 		CsvFile m_GameStage1;
-		shared_ptr<Transform> m_PlayerObject;
-		shared_ptr<GameObject> m_SpriteDraw;
-		shared_ptr<GameObject> m_TextDraw;
-		bool m_Goaltrue = false;
-		bool m_Diedtrue = false;
-		bool m_Flag = true;
-		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
-		void CreateGameBox();//GameStage‚Ì¶¬
-		void CreatePlayer(); //Player‚Ì¶¬
-		void CreateFixedBox();
-		void CreateGimmick();
-		void CreateEnemy();
-		void CreateSprite();
-		void GoalJudge();
-		void GameOverJudge();
+		shared_ptr<SoundItem> m_BGM;
+		std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager();
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage(){}
@@ -36,6 +23,10 @@ namespace basecross {
 		
 		virtual void OnCreate()override; //‰Šú‰»
 		virtual void OnUpdate()override; //‰Šú‰»
+
+		void PlayBGM(const wstring& StageBGM);
+
+		void OnDestroy();
 
 	};
 

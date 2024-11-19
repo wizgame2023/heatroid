@@ -47,6 +47,8 @@ namespace basecross {
 		shared_ptr<GimmickButton> GDoor;
 		int kazu = 1;
 		int m_number;
+		bool m_Flag;
+		bool m_Flag2;
 	public:
 		float m_OpenSwitch;
 		wstring m_Texname;

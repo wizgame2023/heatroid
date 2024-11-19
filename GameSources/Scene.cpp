@@ -67,7 +67,8 @@ namespace basecross{
 		//ゲームオーバー
 		app->RegisterTexture(L"GameOverText", texPath + L"GAMEOVER_Text.png");
 		app->RegisterTexture(L"GameOverBackEffect", texPath + L"GAMEOVER_BackEffect.png");
-
+		//wstring strTitleBGM = DataDir + L"\\SFX\\TITLE.wav";
+		//app->RegisterWav(L"title", strTitleBGM);
 		//サウンド
 		//SE
 		wstring soundWav = sdPath + L"OverHeatSE.wav";
@@ -78,8 +79,11 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"PlayerProj", soundWav);
 		soundWav = sdPath + L"PlayerLand.wav";
 		App::GetApp()->RegisterWav(L"PlayerLand", soundWav);
-
-
+		//BGM
+		soundWav = sdPath + L"TitleTheme.wav";
+		App::GetApp()->RegisterWav(L"TitleBGM", soundWav);
+		soundWav = sdPath + L"StageBGM.wav";
+		App::GetApp()->RegisterWav(L"StageBGM", soundWav);
 	}
 
 	void Scene::OnCreate(){
@@ -107,9 +111,13 @@ namespace basecross{
 			//ゲームステージの設定
 			ResetActiveStage<GameStage>();
 		}
-		if (event->m_MsgStr == L"ToTitleStage") {
+		else if (event->m_MsgStr == L"ToTitleStage") {
 			//ゲームステージの設定
 			ResetActiveStage<TitleStage>();
+		}
+		else if (event->m_MsgStr == L"ToSlelctStage") {
+			//ゲームステージの設定
+			ResetActiveStage<SelectStage>();
 		}
 		else if (event->m_MsgStr == L"ToGameStageHemmi") {
 			//ゲームステージの設定
