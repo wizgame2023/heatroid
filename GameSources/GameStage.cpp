@@ -12,22 +12,10 @@ namespace basecross {
 
 	void GameStage::OnCreate() {
 		try {
-			vector<Vec3> plVec = {
-				Vec3(-30.0f, 5.0f, 71.0f),
-				Vec3(0.0f, -90.0f, 0.0f),
-				Vec3(3.0f, 3.0f, 3.0f)
-			};
-
-			auto a = AddGameObject<StageManager>();
-			a->CreateViewLight();
-			a->CreatePlayer(plVec[0], plVec[1], plVec[2]);
+			CreateStageManager();
 			auto player = GetSharedGameObject<Player>(L"Player");
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
-			a->CreateEnemy();
-			a->CreateFixedBox();
-			a->CreateGimmick();
-			a->CreateSprite();
 			AddGameObject<FadeIn>();
 			PlayBGM(L"StageBGM");
 		}
@@ -49,5 +37,28 @@ namespace basecross {
 		//BGMのストップ
 		m_ptrXA->Stop(m_BGM);
 	}
+	void GameStage::CreateStageManager() {
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
+		auto ptrStageManager = AddGameObject<StageManager>();
+		SetSharedGameObject(L"StageManager", ptrStageManager);
+		auto Status = ptrStageManager->GameStatus::GAME_PLAYING;
+		ptrStageManager->SetNowGameStatus(Status);
+		ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
+		vector<Vec3> plVec = {
+			Vec3(0.0f, 5.0f,0.0f),
+			Vec3(0.0f, -90.0f, 0.0f),
+			Vec3(3.0f, 3.0f, 3.0f)
+		};
+		ptrStageManager->CreateViewLight();
+		ptrStageManager->CreatePlayer(plVec[0], plVec[1], plVec[2]);
+		ptrStageManager->CreateEnemy();
+		ptrStageManager->CreateFixedBox();
+		ptrStageManager->CreateGimmick();
+		ptrStageManager->CreateSprite();
+
+	}
+
+
 }
 //end basecross
