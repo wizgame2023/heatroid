@@ -276,17 +276,20 @@ namespace basecross {
 
 	void StageManager::OnCreate() {
 		try {
-
 			auto& app = App::GetApp();
-
+			auto scene = app->GetScene<Scene>();
 			// mediaパスを取得
 			auto path = app->GetDataDirWString();
 			// texturesパスを取得
 			auto csvPath = path + L"CSV/";
+			m_StageName = scene->GetSelectedMap();
 			//CSVパスを取得
-			m_GameStage.SetFileName(csvPath + L"Stagedata1.csv");
-			m_GameStage.ReadCsv();
-			//ビューとライトの作成
+			if (m_StageName != L"")
+			{
+				m_GameStage.SetFileName(csvPath + m_StageName);
+				m_GameStage.ReadCsv();
+			}
+
 		}
 		catch (...) {
 			throw;
@@ -295,8 +298,39 @@ namespace basecross {
 
 	void StageManager::OnUpdate()
 	{
-		GoalJudge();
-		GameOverJudge();
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
+		// mediaパスを取得
+		auto path = app->GetDataDirWString();
+		// texturesパスを取得
+		auto csvPath = path + L"CSV/";
+
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+
+		switch (m_nowGameStatus) {
+		case GameStatus::TITLE:
+			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+			}
+			break;
+		case GameStatus::SELECT:
+
+			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+			}
+			break;
+		case GameStatus::GAME_PLAYING:
+
+			GoalJudge();
+			GameOverJudge();
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	void StageManager::CreateSprite()
@@ -346,5 +380,23 @@ namespace basecross {
 		}
 	}
 
+	void StageManager::SetGameStageSelect(const wstring& m_csvFail)
+	{
+		m_StageName = m_csvFail;
+	}
+	wstring StageManager::GetGameStageSelect()
+	{
+		return m_StageName;
+	}
+
+	// 現在のゲームステータスを取得
+	int StageManager::GetNowGameStatus() {
+		return m_nowGameStatus;
+	}
+
+	// 現在のゲームステータスを設定
+	void StageManager::SetNowGameStatus(int afterGameStatus) {
+		m_nowGameStatus = afterGameStatus;
+	}
 }
 //end basecross

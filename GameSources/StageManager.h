@@ -10,6 +10,18 @@ namespace basecross {
 	class StageManager : public  GameObject
 	{
 	public:
+
+		enum GameStatus {
+			// タイトルシーン表示時
+			TITLE,
+			// ステージセレクトシーン表示時
+			SELECT,
+			// ゲームが開始してから終了するまで
+			GAME_PLAYING,
+		};
+
+		int m_nowGameStatus;
+		wstring m_StageName;
 		CsvFile m_GameStage;
 		shared_ptr<Transform> m_PlayerObject;
 		shared_ptr<GameObject> m_SpriteDraw;
@@ -25,6 +37,11 @@ namespace basecross {
 		void CreateSprite();
 		void GoalJudge();
 		void GameOverJudge();
+		void SetGameStageSelect(const wstring& m_csvFail);
+		wstring GetGameStageSelect();
+		int GetNowGameStatus();
+		void SetNowGameStatus(int afterGameStatus);
+
 		//構築と破棄
 		StageManager(const shared_ptr<Stage>& stage) :
 			GameObject(stage)

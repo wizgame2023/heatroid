@@ -24,6 +24,7 @@ namespace basecross {
 		void OnDraw();
 		void OnTitleSprite();
 		void PlayBGM(const wstring& StageBGM);
+		void CreateStageManager();
 	};
 
 	class Draw : public GameObject
