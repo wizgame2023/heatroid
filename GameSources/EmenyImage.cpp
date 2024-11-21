@@ -7,21 +7,39 @@
 #include "Project.h"
 
 namespace basecross {
-	Square::Square(const shared_ptr<Stage>& stage	
+	Square::Square(const shared_ptr<Stage>& stage,
+		const float width, 
+		const float height,
+		const wstring meshName,
+		const Col4 color,
+		const shared_ptr<Enemy>& enemy,
+		const Vec3 pos
 	):
 		GameObject(stage),
-		m_width(3.0f),
-		m_height(0.3f),
-		m_moveX(0.0f),
-		m_moveY(0.0f),
-		m_color(1.0f,0.0f,0.0f,1.0f)
-
+		m_width(width),
+		m_height(height),
+		m_meshName(meshName),
+		m_color(color),
+		m_enemy(enemy),
+		m_pos(pos)
 	{}
+	
 	void Square::OnCreate() {
 		m_trans = GetComponent<Transform>();
-		m_trans->SetPosition(Vec3(-50.0f, 5.0f, -30.0f));
-		m_trans->SetScale(Vec3(1.0f, 1.0f, 1.0f));
-		m_trans->SetRotation(Vec3(0.0f, 0.0f, 0.0f));
+		auto enemy = m_enemy.lock();
+		if (enemy) {
+			auto enemyTrans = enemy->GetComponent<Transform>();
+			auto enemyPos = enemy->GetChangePos();
+			auto enemyScal = enemyTrans->GetScale();
+			m_trans->SetPosition(Vec3(enemyPos.x, enemyPos.y + enemyScal.y / 2, enemyPos.z));
+			m_trans->SetScale(Vec3(1.0f, 1.0f, 1.0f));
+			m_trans->SetRotation(Vec3(0.0f, 0.0f, 0.0f));
+		}
+		else {
+			m_trans->SetPosition(m_pos);
+			m_trans->SetScale(Vec3(1.0f, 1.0f, 1.0f));
+			m_trans->SetRotation(Vec3(0.0f, 0.0f, 0.0f));
+		}
 		//頂点データ
 		m_normalVertices = {
 			{Vec3(-m_width * 0.5f, m_height * 0.5f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(0.0f,0.0f)},
@@ -45,17 +63,36 @@ namespace basecross {
 
 		m_draw = AddComponent<PCTStaticDraw>();
 		m_draw->SetMeshResource(m_squareMesh);
-		m_draw->SetTextureResource(L"White");
+		m_draw->SetTextureResource(m_meshName);
 		m_draw->SetOriginalMeshResource(m_squareMesh);
 		SetAlphaActive(true);//透過処理有効
 		SetDrawLayer(1);
-	
+		if (enemy) {
+			m_draw->SetDrawActive(false);
 
+		}
+	
 	}
 	void Square::OnUpdate() {
+		auto enemy = m_enemy.lock();
+		if (enemy) {
+			Vec3 enemyScal = enemy->GetComponent<Transform>()->GetScale();
+			m_pos = enemy->GetChangePos();
+			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + enemyScal.y * 1.5, m_pos.z));
+			
+			//オーバーヒートの時のみ表示
+			if (enemy->GetOverHeat()) {
+				m_draw->SetDrawActive(true);
+			}
+			else {
+				m_draw->SetDrawActive(false);
+			}
+		}
 		auto ptrCamera = GetStage()->GetView()->GetTargetCamera();
 		Quat Qt = RotCorrection(ptrCamera->GetAt() - ptrCamera->GetEye());
 		m_trans->SetQuaternion(Qt);
+
+		
 		//Debug();
 	}
 	//回転の補正
@@ -109,26 +146,20 @@ namespace basecross {
 	}
 
 	//オーバーヒートゲージ
-	GaugeSquare::GaugeSquare(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy):
-		Square(stage),
+	GaugeSquare::GaugeSquare(const shared_ptr<Stage>& stage,
+		const float width, const float height,
+		const wstring meshName,
+		const Col4 color,
+		const shared_ptr<Enemy>& enemy,
+		const Vec3 pos
+		) :
+		Square(stage, width, height, meshName, color, enemy, pos),
 		m_enemy(enemy)
 	{}
-	void GaugeSquare::OnCreate() {
-		Square::OnCreate();
-		auto enemy = m_enemy.lock();
-		if (!enemy) return;
-		m_trans = GetComponent<Transform>();
-		auto enemyTrans = enemy->GetComponent<Transform>();
-		m_enemyPos = enemy->GetChangePos();
-		m_enemyScal = enemyTrans->GetScale();
-		m_trans->SetPosition(Vec3(m_enemyPos.x, m_enemyPos.y + m_enemyScal.y / 2, m_enemyPos.z));
-	}
 	void GaugeSquare::OnUpdate() {
 		Square::OnUpdate();
 		auto enemy = m_enemy.lock();
 		if (enemy) {
-			m_pos = enemy->GetChangePos();
-			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + m_enemyScal.y * 1.5, m_pos.z));
 			UpdateValue(enemy->GetHeatRatio());
 		}
 		else {
