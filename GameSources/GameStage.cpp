@@ -45,13 +45,8 @@ namespace basecross {
 		auto Status = ptrStageManager->GameStatus::GAME_PLAYING;
 		ptrStageManager->SetNowGameStatus(Status);
 		ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
-		vector<Vec3> plVec = {
-			Vec3(0.0f, 5.0f,0.0f),
-			Vec3(0.0f, -90.0f, 0.0f),
-			Vec3(3.0f, 3.0f, 3.0f)
-		};
 		ptrStageManager->CreateViewLight();
-		ptrStageManager->CreatePlayer(plVec[0], plVec[1], plVec[2]);
+		ptrStageManager->CreatePlayer();
 		ptrStageManager->CreateEnemy();
 		ptrStageManager->CreateFixedBox();
 		ptrStageManager->CreateGimmick();
