@@ -42,10 +42,10 @@ namespace basecross {
 		m_maxDropTime(m_dropTime),
 		m_hitDropTime(2.0f),
 		m_maxHitDropTime(m_hitDropTime),
+		m_plungeTime(1.0f),
+		m_maxPlungeTime(m_plungeTime),
 		m_bulletTime(0.0f),
 		m_trackingRange(20.0f),
-		m_plungeColFlag(0),
-		m_plungeTime(3.0f),
 		m_firstDirec(Vec3(0.0f)),
 		m_gravity(-9.8f),
 		m_grav(Vec3(0.0f, m_gravity, 0.0f)),
@@ -88,9 +88,10 @@ namespace basecross {
 		ptrDraw->SetMeshToTransformMatrix(meshMat);
 		ptrDraw->SetOwnShadowActive(true);
 
-		ptrDraw->AddAnimation(L"walk", 10, 30, true, 30);
-		ptrDraw->AddAnimation(L"attack", 50, 40, false, 30);
-		ptrDraw->AddAnimation(L"wait", 90, 25, false, 30);
+		ptrDraw->AddAnimation(L"walk", 10, 30, true, 30);    //歩き
+		ptrDraw->AddAnimation(L"attack", 50, 40, false, 30); //攻撃
+		ptrDraw->AddAnimation(L"spare", 50, 10, false, 15);  //突っ込み前の予備動作
+		ptrDraw->AddAnimation(L"wait", 90, 25, false, 30);   //オーバーヒート状態
 		ptrDraw->ChangeCurrentAnimation(L"walk");
 
 		//衝突判定
@@ -161,13 +162,13 @@ namespace basecross {
 		case stay:
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			EnemyAnime(L"wait");
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			break;
 		//追従の左右移動
 		case rightMove:
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			EnemyAnime(L"walk");
 			m_speed = m_maxSpeed;
+
 			PlayerDic();
 			EnemyAngle();
 			if (m_direc.length() <= m_trackingRange * 2) {
@@ -205,14 +206,14 @@ namespace basecross {
 			Grav();
 			m_pos = m_deathPos;
 			m_collision->SetFixed(true);
-			AddTag(L"FixedBox");
+			//AddTag(L"FixedBox");
 			break;
 			//プレイヤーと逆方向に移動
 		case runaway:
 
 			PlayerDic();
 			break;
-			//ヒップドロップ
+		//ヒップドロップ
 		case hitDrop:
 			m_dropTime -= elapsed;
 			if (m_dropTime <= 0.0f) {
@@ -223,19 +224,9 @@ namespace basecross {
 			break;
 			//突っ込み
 		case plunge:
-			EnemyAnime(L"attack");
+			EnemyAnime(L"spare");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			//PlayerDic();
-			if (!m_plungeFlag) {
-				m_firstDirec = m_playerPos - GetChangePos();
-				m_plungeFlag = true;
-			}
-			if (m_direc.length() <= m_trackingRange) {
-				m_pos += Vec3(m_firstDirec.x, 0.0f, m_firstDirec.z) * m_speed * 0.2f * elapsed;
-			}
-
-			//if (m_floorFlag) {
-			//}
+			Plunge();
 			break;
 		default:
 			break;
@@ -252,6 +243,7 @@ namespace basecross {
 
 		if (m_stateType != plunge) {
 			m_plungeFlag = false;
+			m_plungeTime = m_maxPlungeTime;
 		}
 
 		OverHeat();
@@ -350,7 +342,20 @@ namespace basecross {
 				}
 			}
 		}
-
+	}
+	void Enemy::Plunge() {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		m_plungeTime -= elapsed;
+		if (m_plungeTime <= 0.0f) {
+			if (!m_plungeFlag) {
+				m_firstDirec = m_playerPos - GetChangePos();
+				m_plungeFlag = true;
+			}
+			if (m_direc.length() <= m_trackingRange) {
+				m_pos += Vec3(m_firstDirec.x, 0.0f, m_firstDirec.z) * m_speed * 0.2f * elapsed;
+			}
+			m_plungeTime = 0.0f;
+		}
 	}
 	//床に触れたら取得
 	void Enemy::FindFixed() {
@@ -609,15 +614,16 @@ namespace basecross {
 		}
 	}
 	Vec3 Enemy::GetChangePos() {
-		auto fixed = m_fixedBox.lock();
-		if (fixed) {
-			//Vec3 pos = m_pos + fixed->GetComponent<Transform>()->GetPosition();
-			Vec3 pos = m_trans->GetWorldPosition();
-			return pos;
-		}
-		else {
-			return m_pos;
-		}
+		Vec3 pos = m_trans->GetWorldPosition();
+		return pos;
+		//auto fixed = m_fixedBox.lock();
+		//if (fixed) {
+		//	//Vec3 pos = m_pos + fixed->GetComponent<Transform>()->GetPosition();
+		//	return pos;
+		//}
+		//else {
+		//	return m_pos;
+		//}
 	}
 	bool Enemy::GetOverHeat() {
 		if (m_stateType == m_overHeatState) {

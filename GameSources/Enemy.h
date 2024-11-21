@@ -33,34 +33,28 @@ namespace basecross {
 	protected:
 		float m_heat;          //オーバーヒート値
 		float m_maxHeat;       //最大オーバーヒート
-		float m_speed;       //移動速度
+		float m_speed;         //移動速度
 		float m_maxSpeed;
-		float m_upSpeed;     //上下の速度
-		float m_upHeight;    //上下の高さ
-		float m_jumpPower;   //ジャンプ力
-		float m_jumpTime;    //ジャンプ速度
-		float m_jumpHight;   //ジャンプする高さ
-		float m_time;
-		float m_bulletTime;  //弾の発射間隔
+		float m_upSpeed;       //上下の速度
+		float m_upHeight;      //上下の高さ
+		float m_jumpPower;     //ジャンプ力
+		float m_jumpTime;      //ジャンプ速度
+		float m_jumpHight;     //ジャンプする高さ
+		float m_bulletTime;    //弾の発射間隔
 		float m_trackingRange; //弾を発射する距離
-		float m_dropTime;
-		float m_maxDropTime;
-		float m_hitDropTime;
-		float m_maxHitDropTime;
-		float m_plungeTime;
-		int m_plungeColFlag;
-		Vec3 m_moveRot;
-
+		float m_dropTime;      //ヒットドロップまでの時間
+		float m_maxDropTime;   //↑の最大値
+		float m_hitDropTime;   //ヒットドロップ中の浮いてる時間
+		float m_maxHitDropTime;//↑の最大値
+		float m_plungeTime;    //突っ込みの予備時間
+		float m_maxPlungeTime; //↑の最大値
+		int m_dicUp;
 		Vec3 m_direc;
 		Vec3 m_direcNorm;
-		int m_dicUp;
 		Vec3 m_firstDirec;
-
+		Vec3 m_moveRot;
+		//テスト用
 		float m_test;
-		//重力
-		float m_gravity;
-		Vec3 m_grav;
-		Vec3 m_gravVel;
 
 		bool m_bulletFlag;   
 		bool m_jumpFlag;
@@ -68,6 +62,11 @@ namespace basecross {
 		bool m_floorFlag;
 		bool m_hitDropFlag;
 		bool m_plungeFlag;
+
+		//重力
+		float m_gravity;
+		Vec3 m_grav;
+		Vec3 m_gravVel;
 
 		State m_stateType;
 		State m_beforState;
@@ -114,6 +113,7 @@ namespace basecross {
 		void PlayerDic();
 		void OneJump(float jumpHight);
 		void HitDrop();
+		void Plunge();
 		void FindFixed();
 		void Bullet();
 		void EnemyAnime(wstring anime);
