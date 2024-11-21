@@ -22,8 +22,9 @@ namespace basecross {
 		//\’z‚Æ”jŠü
 		GameStageTsuboi() :Stage(){}
 		virtual ~GameStageTsuboi() {}
-		
+
 		virtual void OnCreate() override; //‰Šú‰»
+		virtual void OnDestroy() override; //‰Šú‰»
 	};
 
 }
