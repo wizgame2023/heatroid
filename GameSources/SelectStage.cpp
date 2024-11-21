@@ -96,7 +96,13 @@ namespace basecross {
 			scene->SetSelectedMap(L"GameStage.csv");
 			break;
 		case 1:
-			scene->SetSelectedMap(L"GameStage1.csv");
+			scene->SetSelectedMap(L"Stagedata2.csv");
+			break;
+		case 2:
+			scene->SetSelectedMap(L"Stagedata2.csv");
+			break;
+		case 3:
+			scene->SetSelectedMap(L"Stagedata3.csv");
 			break;
 		default:
 			break;

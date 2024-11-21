@@ -30,7 +30,7 @@ namespace basecross {
 		bool m_Diedtrue = false;
 		bool m_Flag = true;
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
-		void CreatePlayer(Vec3& pos , Vec3& rot, Vec3& scale); //Player‚Ì¶¬
+		void CreatePlayer(); //Player‚Ì¶¬
 		void CreateFixedBox();
 		void CreateGimmick();
 		void CreateEnemy();

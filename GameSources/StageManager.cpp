@@ -27,10 +27,47 @@ namespace basecross {
 		auto cameraObject = GetStage()->AddGameObject<CameraCollision>();
 	}
 
-	void StageManager::CreatePlayer(Vec3& pos, Vec3& rot, Vec3& scale)
+	void StageManager::CreatePlayer()
 	{
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
+		m_StageName = scene->GetSelectedMap();
+		vector<Vec3> plVec;
+
+		if (m_StageName == L"GameStage.csv")
+		{
+			plVec = {
+				Vec3(80.0f, 5.0f,0.0f),
+				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
+		else if (m_StageName == L"Stagedata1.csv")
+		{
+			plVec = {
+				Vec3(80.0f, 5.0f,0.0f),
+				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
+		else if (m_StageName == L"Stagedata2.csv")
+		{
+			plVec = {
+				Vec3(80.0f, 5.0f,0.0f),
+				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
+		else if (m_StageName == L"Stagedata3.csv")
+		{
+			plVec = {
+				Vec3(65.0f, 5.0f,0.0f),
+				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
 		//プレーヤーの作成
-		shared_ptr<GameObject> ptrPlayer = GetStage()->AddGameObject<Player>(pos, rot, scale);
+		shared_ptr<GameObject> ptrPlayer = GetStage()->AddGameObject<Player>(plVec[0], plVec[1], plVec[2]);
 		//シェア配列にプレイヤーを追加
 		GetStage()->SetSharedGameObject(L"Player", ptrPlayer);
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
@@ -300,11 +337,6 @@ namespace basecross {
 	{
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
-		// mediaパスを取得
-		auto path = app->GetDataDirWString();
-		// texturesパスを取得
-		auto csvPath = path + L"CSV/";
-
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 
