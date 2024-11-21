@@ -304,7 +304,7 @@ namespace basecross {
 				(float)_wtof(Tokens[3].c_str())
 			);
 			auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
-			auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+			auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale,Tokens[10], Tokens[11], player);
 			GetStage()->AddGameObject<GaugeSquare>(enemy);
 			auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 			group->IntoGroup(enemy);
