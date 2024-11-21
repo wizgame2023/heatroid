@@ -377,6 +377,8 @@ namespace basecross {
 		{
 			shared_ptr<Enemy> enemy = dynamic_pointer_cast<Enemy>(Other);//Enemyクラスに変換
 
+			PushEnemy(enemy);
+
 			if (m_invincibleTime <= 0 && enemy->GetOverHeat() == false) //オーバーヒート時は被弾しない
 				GetHit();
 		}
@@ -404,6 +406,13 @@ namespace basecross {
 		//		}
 		//	}
 		//}
+	}
+
+	//オーバーヒート中の敵を押す(OnCollisionExecuteから)
+	void Player::PushEnemy(const weak_ptr<GameObject> enemyptr) {
+		auto enemy = enemyptr.lock();
+		auto plRot = GetComponent<Transform>()->GetQuaternion();
+		enemy->GetComponent<Transform>()->SetQuaternion(plRot);
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)

@@ -124,6 +124,8 @@ namespace basecross {
 		Vec3 RoundOff(Vec3 number, int point);
 		//アニメーションの登録
 		void RegisterAnim();
+		//オーバーヒート中の敵を押す
+		void PushEnemy(const weak_ptr<GameObject> enemyptr);
 		//飛び道具発射
 		void Projectile();
 		//攻撃をくらう/死ぬ

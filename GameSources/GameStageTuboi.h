@@ -13,18 +13,18 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class GameStageTsuboi : public Stage {
 		CsvFile m_GameStage1;
-		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
-		void CreateFixedBox();
-		void CreateGimmick();
-		void CreatePlayer();
-		void CreateEnemy();
+		shared_ptr<SoundItem> m_BGM;
+		std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager();
+
+		void PlayBGM(const wstring& StageBGM);
 
 	public:
 		//\’z‚Æ”jŠü
 		GameStageTsuboi() :Stage(){}
 		virtual ~GameStageTsuboi() {}
-		
+
 		virtual void OnCreate() override; //‰Šú‰»
+		virtual void OnDestroy() override; //‰Šú‰»
 	};
 
 }
