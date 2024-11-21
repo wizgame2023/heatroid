@@ -67,6 +67,9 @@ namespace basecross{
 		//ゲームオーバー
 		app->RegisterTexture(L"GameOverText", texPath + L"GAMEOVER_Text.png");
 		app->RegisterTexture(L"GameOverBackEffect", texPath + L"GAMEOVER_BackEffect.png");
+		//オーバーヒート
+		app->RegisterTexture(L"OverHeatText", texPath + L"OverHeatText.png");
+
 		//サウンド
 		//SE
 		wstring soundWav = sdPath + L"OverHeatSE.wav";

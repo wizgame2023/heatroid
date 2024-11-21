@@ -98,10 +98,19 @@ namespace basecross {
 		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
 		m_collision->SetDrawActive(true);
+		//敵の別コリジョンとの判定をなくす
+		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
 		//影
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 
+		//足場コリジョンの追加
+		GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
+		//オーバーヒートゲージの追加
+		GetStage()->AddGameObject<GaugeSquare>(3.0f, 0.3f, L"White",
+			Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
+		GetStage()->AddGameObject<Square>(3.0f, 0.3f, L"OverHeatText",
+			Col4(1.0f, 1.0f, 1.0f, 1.0f), GetThis<Enemy>());
 		AddTag(L"Enemy");
 	}
 
@@ -161,7 +170,7 @@ namespace basecross {
 			m_speed = m_maxSpeed;
 			PlayerDic();
 			EnemyAngle();
-			if (m_direc.length() <= m_trackingRange*2) {
+			if (m_direc.length() <= m_trackingRange * 2) {
 				m_pos += m_speed * m_direcNorm * elapsed;
 				//Bullet();
 			}
@@ -248,7 +257,7 @@ namespace basecross {
 		OverHeat();
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		//Debug();
+		Debug();
 	}
 
 	//ジャンプ
@@ -724,29 +733,43 @@ namespace basecross {
 		scene->SetDebugString(wss.str());
 	}
 	EnemyFloorCol::EnemyFloorCol(const shared_ptr<Stage>& stage,
-		const Vec3& pos,
-		shared_ptr<Enemy>& enemy
+		const shared_ptr<Enemy>& enemy
 	):
 		GameObject(stage),
-		m_pos(pos),
 		m_enemy(enemy)
 	{}
 	void EnemyFloorCol::OnCreate() {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
-		m_trans->SetParent(enemy);
+		auto enemyTrans = enemy->GetComponent<Transform>();
+		m_enemyPos = enemyTrans->GetPosition();
+		m_enemyScal = enemyTrans->GetScale();
 		m_trans = GetComponent<Transform>();
-		m_trans->SetPosition(m_pos);
-		m_trans->SetScale(Vec3(3.0f, 3.0f, 3.0f));
+		m_trans->SetPosition(Vec3(m_enemyPos.x, m_enemyPos.y + m_enemyScal.y / 2, m_enemyPos.z));
+		m_trans->SetScale(Vec3(m_enemyScal.x,m_enemyScal.y/5,m_enemyScal.z));
+		m_trans->SetParent(enemy);
 
-		auto ptrColl = AddComponent<CollisionSphere>();
+		auto ptrColl = AddComponent<CollisionObb>();
 		ptrColl->SetAfterCollision(AfterCollision::Auto);
 		ptrColl->SetFixed(false); //空間に固定するか
 		ptrColl->SetDrawActive(true);
 
-
+		AddTag(L"Floor");
+		AddTag(L"EnemyFloor");
 	}
 	void EnemyFloorCol::OnUpdate() {
+		auto enemy = m_enemy.lock();
+		if (enemy) {
+			auto enemyTrans = enemy->GetComponent<Transform>();
+			m_enemyPos = enemyTrans->GetPosition();
+			m_trans->SetPosition(Vec3(0.0f, m_enemyScal.y / 2.0f, 0.0f));
+		}
+		else {
+			ThisDestroy();
+		}
 
+	}
+	void EnemyFloorCol::ThisDestroy() {
+		GetStage()->RemoveGameObject<EnemyFloorCol>(GetThis<EnemyFloorCol>());
 	}
 }
