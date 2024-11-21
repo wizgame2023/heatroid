@@ -187,6 +187,9 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class EnemyFloorCol : public GameObject {
 	private:
+		Vec3 m_pos;
+		Vec3 m_enemyPos;
+		Vec3 m_enemyScal;
 		shared_ptr<Transform> m_trans;
 		weak_ptr<Enemy> m_enemy;
 
@@ -195,6 +198,7 @@ namespace basecross {
 		virtual ~EnemyFloorCol(){}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		void ThisDestroy();
 	};
 
 }
