@@ -325,8 +325,8 @@ namespace basecross {
 			{
 				m_GameStage.SetFileName(csvPath + m_StageName);
 				m_GameStage.ReadCsv();
-			}
 
+			}
 		}
 		catch (...) {
 			throw;
