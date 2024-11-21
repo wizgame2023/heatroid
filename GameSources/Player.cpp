@@ -19,10 +19,12 @@ namespace basecross {
 		m_initPos(Vec3(0.0f, 3.0f, 0.0f)),
 		m_initRot(Vec3(0.0f, 0.0f, 0.0f)),
 		m_initSca(Vec3(3.0f, 3.0f, 3.0f)),
-		m_speed(24.0f),
-		m_accel(48.0f),
+
+		m_speed(36.0f),
+		m_airSpeedPerc(.5f),
+		m_accel(96.0f),
 		m_friction(.5f),
-		m_frictionDynamic(.15f),
+		m_frictionDynamic(.25f),
 		m_frictionThreshold(.05f),
 		m_jumpHeight(12.0f),
 		m_gravity(-20.0f),
@@ -50,10 +52,11 @@ namespace basecross {
 		m_initRot(rot),
 		m_initSca(sca),
 
-		m_speed(24.0f),
-		m_accel(48.0f),
+		m_speed(36.0f),
+		m_airSpeedPerc(.5f),
+		m_accel(96.0f),
 		m_friction(.5f),
-		m_frictionDynamic(.15f),
+		m_frictionDynamic(.25f),
 		m_frictionThreshold(.05f),
 		m_jumpHeight(12.0f),
 		m_gravity(-20.0f),
@@ -149,17 +152,20 @@ namespace basecross {
 		auto angle = Vec3(m_moveVel.x, 0, m_moveVel.z);
 		if (angle.length() > 0) {
 			angle.normalize();
+			float limit = m_speed;
+			if (m_stateType == air) limit *= m_airSpeedPerc;
+
 			if (angle.x > 0) {
-				if (m_moveVel.x > angle.x * m_speed) m_moveVel.x = angle.x * m_speed;
+				if (m_moveVel.x > angle.x * limit) m_moveVel.x = angle.x * limit;
 			}
 			else {
-				if (m_moveVel.x < angle.x * m_speed) m_moveVel.x = angle.x * m_speed;
+				if (m_moveVel.x < angle.x * limit) m_moveVel.x = angle.x * limit;
 			}
 			if (angle.z > 0) {
-				if (m_moveVel.z > angle.z * m_speed) m_moveVel.z = angle.z * m_speed;
+				if (m_moveVel.z > angle.z * limit) m_moveVel.z = angle.z * limit;
 			}
 			else {
-				if (m_moveVel.z < angle.z * m_speed) m_moveVel.z = angle.z * m_speed;
+				if (m_moveVel.z < angle.z * limit) m_moveVel.z = angle.z * limit;
 			}
 		}
 
@@ -230,6 +236,8 @@ namespace basecross {
 		_delta = App::GetApp()->GetElapsedTime();
 		auto key = App::GetApp()->GetInputDevice().GetKeyState();
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
+
+		if (m_landSEcooltime > 0.0f) m_landSEcooltime -= _delta;
 
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
@@ -334,7 +342,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		//ShowDebug();
+		ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -369,6 +377,8 @@ namespace basecross {
 		{
 			shared_ptr<Enemy> enemy = dynamic_pointer_cast<Enemy>(Other);//Enemyクラスに変換
 
+			PushEnemy(enemy);
+
 			if (m_invincibleTime <= 0 && enemy->GetOverHeat() == false) //オーバーヒート時は被弾しない
 				GetHit();
 		}
@@ -376,22 +386,33 @@ namespace basecross {
 
 		if ((m_stateType == air || m_stateType == hit_air) && Other->FindTag(L"Floor")) {
 			SetAnim(AddFire() + L"Land");
+			if (m_landSEcooltime <= 0.0f) {
+				PlaySnd(L"PlayerLand", 100.0f, 0);
+				m_landSEcooltime = .5f;
+			}
 			m_stateType = stand;
 		}
 
 
-		if ((Other->FindTag(L"GimmickButton")))
-		{
-			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-			auto& vec = group->GetGroupVector();
-			for (auto& v : vec) {
-				auto shObj = v.lock();
-				if (Other == shObj) {
-					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					Switchs->SetButton(true);
-				}
-			}
-		}
+		//if ((Other->FindTag(L"GimmickButton")))
+		//{
+		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+		//	auto& vec = group->GetGroupVector();
+		//	for (auto& v : vec) {
+		//		auto shObj = v.lock();
+		//		if (Other == shObj) {
+		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+		//			Switchs->SetButton(true);
+		//		}
+		//	}
+		//}
+	}
+
+	//オーバーヒート中の敵を押す(OnCollisionExecuteから)
+	void Player::PushEnemy(const weak_ptr<GameObject> enemyptr) {
+		auto enemy = enemyptr.lock();
+		auto plRot = GetComponent<Transform>()->GetQuaternion();
+		enemy->GetComponent<Transform>()->SetQuaternion(plRot);
 	}
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)
@@ -410,33 +431,33 @@ namespace basecross {
 				}
 			}
 		}
-		if ((Other->FindTag(L"GimmickButton")))
-		{
-			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-			auto& vec = group->GetGroupVector();
-			for (auto& v : vec) {
-				auto shObj = v.lock();
-				if (Other == shObj) {
-					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					Switchs->SetButton(true);
-				}
-			}
-		}
+		//if ((Other->FindTag(L"GimmickButton")))
+		//{
+		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+		//	auto& vec = group->GetGroupVector();
+		//	for (auto& v : vec) {
+		//		auto shObj = v.lock();
+		//		if (Other == shObj) {
+		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+		//			Switchs->SetButton(true);
+		//		}
+		//	}
+		//}
 	}
 	void Player::OnCollisionExit(shared_ptr<GameObject>& Other)
 	{
-		if ((Other->FindTag(L"GimmickButton")))
-		{
-			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-			auto& vec = group->GetGroupVector();
-			for (auto& v : vec) {
-				auto shObj = v.lock();
-				if (shObj) {
-					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					Switchs->SetButton(false);
-				}
-			}
-		}
+		//if ((Other->FindTag(L"GimmickButton")))
+		//{
+		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+		//	auto& vec = group->GetGroupVector();
+		//	for (auto& v : vec) {
+		//		auto shObj = v.lock();
+		//		if (shObj) {
+		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+		//			Switchs->SetButton(false);
+		//		}
+		//	}
+		//}
 	}
 
 	void Player::MoveCamera()
@@ -565,17 +586,6 @@ namespace basecross {
 		auto face = atan2f(fwd.z,fwd.x);
 		auto scale = trans->GetScale();
 
-		////発射位置の調整
-		//Quat qt;
-		//qt.rotation(face, Vec3(0, 1.0f, 0));
-		//qt.normalize();
-		//Mat4x4 Mat;
-		//Mat.strTransformation(
-		//	scale,
-		//	m_firePos,
-		//	qt);
-		//Vec3 firepos = Mat.transInMatrix();
-
 		Vec3 firepos;
 		firepos.x = (cosf(face) * m_firePos.x) - (sinf(face) * m_firePos.z);
 		firepos.y = m_firePos.y;
@@ -587,6 +597,8 @@ namespace basecross {
 		m_chargePerc = 0.0f;
 		m_isOverCharge = false;
 		m_stateType = release;
+
+		PlaySnd(L"PlayerProj", 60.0f, 0);
 	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え
@@ -713,6 +725,21 @@ namespace basecross {
 			}
 		}
 		MultiParticle::OnUpdate();
+	}
+
+	void ChargePtcl::Emit(const Vec3& emitPos, const Vec3& randomEmitRange) {
+		auto ptrParticle = InsertParticle(1);
+		ptrParticle->SetEmitterPos(emitPos);
+		ptrParticle->SetTextureResource(L"AURA_TEX");
+		ptrParticle->SetMaxTime(1.0f);
+		for (auto& ptrParticleSprite : ptrParticle->GetParticleSpriteVec()) {
+			ptrParticleSprite.m_LocalPos.x = Util::RandZeroToOne() * randomEmitRange.x - randomEmitRange.x * 0.5f;
+			ptrParticleSprite.m_LocalPos.y = Util::RandZeroToOne() * randomEmitRange.y - randomEmitRange.y * 0.5f;
+			ptrParticleSprite.m_LocalPos.z = Util::RandZeroToOne() * randomEmitRange.z - randomEmitRange.z * 0.5f;
+
+			ptrParticleSprite.m_Velocity.y = .5f;
+			ptrParticleSprite.m_Color = Col4(1.0f, 1.0f, 1.0f, 1.0f);
+		}
 	}
 
 	//====================================================================

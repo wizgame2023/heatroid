@@ -74,7 +74,17 @@ namespace basecross{
 		//SE
 		wstring soundWav = sdPath + L"OverHeatSE.wav";
 		App::GetApp()->RegisterWav(L"OverHeatSE", soundWav);
-
+		soundWav = sdPath + L"PlayerJump.wav";
+		App::GetApp()->RegisterWav(L"PlayerJump", soundWav);
+		soundWav = sdPath + L"PlayerProj.wav";
+		App::GetApp()->RegisterWav(L"PlayerProj", soundWav);
+		soundWav = sdPath + L"PlayerLand.wav";
+		App::GetApp()->RegisterWav(L"PlayerLand", soundWav);
+		//BGM
+		soundWav = sdPath + L"TitleTheme.wav";
+		App::GetApp()->RegisterWav(L"TitleBGM", soundWav);
+		soundWav = sdPath + L"StageBGM.wav";
+		App::GetApp()->RegisterWav(L"StageBGM", soundWav);
 	}
 
 	void Scene::OnCreate(){
@@ -102,9 +112,13 @@ namespace basecross{
 			//ゲームステージの設定
 			ResetActiveStage<GameStage>();
 		}
-		if (event->m_MsgStr == L"ToTitleStage") {
+		else if (event->m_MsgStr == L"ToTitleStage") {
 			//ゲームステージの設定
 			ResetActiveStage<TitleStage>();
+		}
+		else if (event->m_MsgStr == L"ToSlelctStage") {
+			//ゲームステージの設定
+			ResetActiveStage<SelectStage>();
 		}
 		else if (event->m_MsgStr == L"ToGameStageHemmi") {
 			//ゲームステージの設定
@@ -116,7 +130,12 @@ namespace basecross{
 		}
 	}
 
-
+	void Scene::SetSelectedMap(const wstring& mapNumber) {
+		m_SelectedMap = mapNumber;
+	}
+	wstring Scene::GetSelectedMap() {
+		return m_SelectedMap;
+	}
 
 }
 //end basecross

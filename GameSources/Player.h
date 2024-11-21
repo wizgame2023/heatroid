@@ -31,6 +31,7 @@ namespace basecross {
 		InputHandler<Player> m_InputHandler;
 		//スピード(最高速)
 		float m_speed;
+		float m_airSpeedPerc;
 		//加速度
 		float m_accel;
 		//摩擦係数(静/動/完全停止)
@@ -51,6 +52,8 @@ namespace basecross {
 		Vec3 m_moveVel;
 		//CollisionExitの空中判定用カウント
 		int m_collideCount, m_collideCountInit;
+
+		float m_landSEcooltime = 0.0f;
 
 		//プレイヤーの状態を表す列挙型
 		enum Stats {
@@ -121,6 +124,8 @@ namespace basecross {
 		Vec3 RoundOff(Vec3 number, int point);
 		//アニメーションの登録
 		void RegisterAnim();
+		//オーバーヒート中の敵を押す
+		void PushEnemy(const weak_ptr<GameObject> enemyptr);
 		//飛び道具発射
 		void Projectile();
 		//攻撃をくらう/死ぬ
@@ -151,6 +156,13 @@ namespace basecross {
 		//描画コンポーネントのゲッタ
 		const shared_ptr<PNTBoneModelDraw> GetDrawPtr() {
 			return GetComponent<PNTBoneModelDraw>();
+		}
+
+		//SEの再生
+		void Player::PlaySnd(wstring sndname, float volume, float loopcount) {
+			auto audio = App::GetApp()->GetXAudio2Manager();
+			audio->Start(sndname, loopcount, volume);
+
 		}
 
 		//isChargingフラグの取得
@@ -238,6 +250,7 @@ namespace basecross {
 
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		void Emit(const Vec3& emitPos, const Vec3& randomEmitRange);
 	};
 
 	//====================================================================

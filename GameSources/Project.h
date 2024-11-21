@@ -5,7 +5,7 @@
 
 #pragma once
 
-
+#include "StageManager.h"
 #include "ProjectShader.h"
 #include "ProjectBehavior.h"
 #include "Scene.h"
@@ -26,3 +26,4 @@
 #include "MainCamera.h"
 #include "Sprite.h"
 #include "GameStageSprite.h"
+#include "SelectStage.h"

@@ -46,9 +46,10 @@ namespace basecross{
 		*/
 		//--------------------------------------------------------------------------------------
 		virtual void OnEvent(const shared_ptr<Event>& event) override;
-
-	};
-
+		void SetSelectedMap(const wstring& mapNumber);
+		wstring m_SelectedMap;
+		wstring GetSelectedMap();
+	}; 
 }
 
 //end basecross

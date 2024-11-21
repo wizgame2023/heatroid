@@ -9,6 +9,8 @@
 namespace basecross {
 	class TitleStage : public Stage
 	{
+		shared_ptr<SoundItem> m_BGM;
+		std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager();
 		void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 
 	public:
@@ -17,9 +19,12 @@ namespace basecross {
 
 		virtual void OnCreate()override; //‰Šú‰»
 		virtual void OnUpdate()override; //‰Šú‰»
+		void OnDestroy();
 		void OnPushA();
 		void OnDraw();
 		void OnTitleSprite();
+		void PlayBGM(const wstring& StageBGM);
+		void CreateStageManager();
 	};
 
 	class Draw : public GameObject
