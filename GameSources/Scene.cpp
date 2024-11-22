@@ -73,8 +73,9 @@ namespace basecross{
 		//ゲームオーバー
 		app->RegisterTexture(L"GameOverText", texPath + L"GAMEOVER_Text.png");
 		app->RegisterTexture(L"GameOverBackEffect", texPath + L"GAMEOVER_BackEffect.png");
-		//wstring strTitleBGM = DataDir + L"\\SFX\\TITLE.wav";
-		//app->RegisterWav(L"title", strTitleBGM);
+		//オーバーヒート
+		app->RegisterTexture(L"OverHeatText", texPath + L"OverHeatText.png");
+
 		//サウンド
 		//SE
 		wstring soundWav = sdPath + L"OverHeatSE.wav";
@@ -138,6 +139,13 @@ namespace basecross{
 		load = end;
 		Sleep(800);
 		DrawLoadScreen();
+	}
+
+	void Scene::SetSelectedMap(const wstring& mapNumber) {
+		m_SelectedMap = mapNumber;
+	}
+	wstring Scene::GetSelectedMap() {
+		return m_SelectedMap;
 	}
 
 	void Scene::DrawLoadScreen() {

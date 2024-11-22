@@ -22,8 +22,24 @@ namespace basecross {
 		SetView(cameraView);
 	}
 
+	void SelectStage::ShowDebug()
+	{
+		float delta = App::GetApp()->GetElapsedTime();
+		wstringstream wss;
+
+		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
+		wss << "fps : " << App::GetApp()->GetStepTimer().GetFramesPerSecond() << " delta : " << delta << endl;
+		wss << "select : " << m_select <<  endl;
+
+		auto scene = App::GetApp()->GetScene<Scene>();
+		scene->SetDebugString(L"SelectStage\n" + wss.str());
+
+	}
+
 	void SelectStage::OnCreate() {
 		try {
+			m_Flag = true;
+			CreateStageManager();
 			//ビューとライトの作成
 			CreateViewLight();
 			OnSelectSprite();
@@ -44,7 +60,10 @@ namespace basecross {
 		InputHandler<SelectStage> m_InputHandler;
 		m_InputHandler.PushHandle(GetThis<SelectStage>());
 		auto time = App::GetApp()->GetElapsedTime();
-
+		ShowDebug();
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		StageSelect();
 	}
 
 	void SelectStage::OnDestroy() {
@@ -52,10 +71,58 @@ namespace basecross {
 		m_ptrXA->Stop(m_BGM);
 	}
 
+	void SelectStage::CreateStageManager() {
+		auto ptrStageManager = AddGameObject<StageManager>();
+		SetSharedGameObject(L"StageManager", ptrStageManager);
+		auto Status = ptrStageManager->GameStatus::SELECT;
+		ptrStageManager->SetNowGameStatus(Status);
+	}
+
+	void SelectStage::StageSelect()
+	{
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
+		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || KeyState.m_bPressedKeyTbl[VK_UP])
+		{
+			m_select++;
+			if (m_select > 3)
+			{
+				m_select = 0;
+			}
+		}
+		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || KeyState.m_bPressedKeyTbl[VK_DOWN])
+		{
+			m_select--;
+			if (m_select < 0)
+			{
+				m_select = 3;
+			}
+		}
+
+		switch (m_select)
+		{
+		case 0:
+			scene->SetSelectedMap(L"GameStage.csv");
+			break;
+		case 1:
+			scene->SetSelectedMap(L"Stagedata1.csv");
+			break;
+		case 2:
+			scene->SetSelectedMap(L"Stagedata2.csv");
+			break;
+		case 3:
+			scene->SetSelectedMap(L"Stagedata3.csv");
+			break;
+		}
+	}
+
+
+
 
 	void SelectStage::OnPushA() {
 		OnDestroy();
-		PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 	}
 
 	void SelectStage::PlayBGM(const wstring& StageBGM)

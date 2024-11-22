@@ -28,6 +28,7 @@ namespace basecross {
 
 		void OnDestroy();
 
+		void CreateStageManager();
 	};
 
 }

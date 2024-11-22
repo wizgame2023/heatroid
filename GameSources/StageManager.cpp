@@ -27,10 +27,47 @@ namespace basecross {
 		auto cameraObject = GetStage()->AddGameObject<CameraCollision>();
 	}
 
-	void StageManager::CreatePlayer(Vec3& pos, Vec3& rot, Vec3& scale)
+	void StageManager::CreatePlayer()
 	{
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
+		m_StageName = scene->GetSelectedMap();
+		vector<Vec3> plVec;
+
+		if (m_StageName == L"GameStage.csv")
+		{
+			plVec = {
+				Vec3(80.0f, 5.0f,0.0f),
+				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
+		else if (m_StageName == L"Stagedata1.csv")
+		{
+			plVec = {
+				Vec3(80.0f, 5.0f,0.0f),
+				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
+		else if (m_StageName == L"Stagedata2.csv")
+		{
+			plVec = {
+				Vec3(80.0f, 5.0f,0.0f),
+				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
+		else if (m_StageName == L"Stagedata3.csv")
+		{
+			plVec = {
+				Vec3(65.0f, 5.0f,0.0f),
+				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
 		//プレーヤーの作成
-		shared_ptr<GameObject> ptrPlayer = GetStage()->AddGameObject<Player>(pos, rot, scale);
+		shared_ptr<GameObject> ptrPlayer = GetStage()->AddGameObject<Player>(plVec[0], plVec[1], plVec[2]);
 		//シェア配列にプレイヤーを追加
 		GetStage()->SetSharedGameObject(L"Player", ptrPlayer);
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
@@ -227,11 +264,7 @@ namespace basecross {
 			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
 			Util::WStrToTokenVector(Tokens, v, L',');
 			//各トークン（カラム）をスケール、回転、位置に読み込む
-			Vec3 Scale(
-				(float)_wtof(Tokens[7].c_str()),
-				(float)_wtof(Tokens[8].c_str()),
-				(float)_wtof(Tokens[9].c_str())
-			);
+			Vec3 Scale(5,5,5);
 			Vec3 Rot;
 			//回転は「XM_PIDIV2」の文字列になっている場合がある
 			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
@@ -259,11 +292,7 @@ namespace basecross {
 		for (auto& v : LineVec) {
 			vector<wstring> Tokens;
 			Util::WStrToTokenVector(Tokens, v, L',');
-			Vec3 Scale(
-				(float)_wtof(Tokens[7].c_str()),
-				(float)_wtof(Tokens[8].c_str()),
-				(float)_wtof(Tokens[9].c_str())
-			);
+			Vec3 Scale(3,3,3);
 			Vec3 Rot;
 			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
 			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
@@ -275,7 +304,7 @@ namespace basecross {
 				(float)_wtof(Tokens[3].c_str())
 			);
 			auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
-			auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+			auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale,Tokens[10], Tokens[11], player);
 			GetStage()->AddGameObject<GaugeSquare>(enemy);
 			auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 			group->IntoGroup(enemy);
@@ -284,13 +313,20 @@ namespace basecross {
 
 	void StageManager::OnCreate() {
 		try {
-
-			wstring Datadir;
-			App::GetApp()->GetDataDirectory(Datadir);
+			auto& app = App::GetApp();
+			auto scene = app->GetScene<Scene>();
+			// mediaパスを取得
+			auto path = app->GetDataDirWString();
+			// texturesパスを取得
+			auto csvPath = path + L"CSV/";
+			m_StageName = scene->GetSelectedMap();
 			//CSVパスを取得
-			m_GameStage.SetFileName(Datadir + L"CSV/" + L"GameStage.csv");
-			m_GameStage.ReadCsv();
-			//ビューとライトの作成
+			if (m_StageName != L"")
+			{
+				m_GameStage.SetFileName(csvPath + m_StageName);
+				m_GameStage.ReadCsv();
+
+			}
 		}
 		catch (...) {
 			throw;
@@ -299,15 +335,40 @@ namespace basecross {
 
 	void StageManager::OnUpdate()
 	{
-		GoalJudge();
-		GameOverJudge();
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+
+		switch (m_nowGameStatus) {
+		case GameStatus::TITLE:
+			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+			}
+			break;
+		case GameStatus::SELECT:
+
+			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+			}
+			break;
+		case GameStatus::GAME_PLAYING:
+
+			GoalJudge();
+			GameOverJudge();
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	void StageManager::CreateSprite()
 	{
 		m_TextDraw = GetStage()->AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 		m_SpriteDraw = GetStage()->AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
-		// AddGameObject<Sprite>(L"GameOverText", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
 	}
@@ -346,9 +407,28 @@ namespace basecross {
 			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+				GetTypeStage<GameStage>()->OnDestroy();
 			}
 		}
 	}
 
+	void StageManager::SetGameStageSelect(const wstring& m_csvFail)
+	{
+		m_StageName = m_csvFail;
+	}
+	wstring StageManager::GetGameStageSelect()
+	{
+		return m_StageName;
+	}
+
+	// 現在のゲームステータスを取得
+	int StageManager::GetNowGameStatus() {
+		return m_nowGameStatus;
+	}
+
+	// 現在のゲームステータスを設定
+	void StageManager::SetNowGameStatus(int afterGameStatus) {
+		m_nowGameStatus = afterGameStatus;
+	}
 }
 //end basecross

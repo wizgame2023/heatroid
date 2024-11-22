@@ -24,6 +24,8 @@ namespace basecross {
 
 	void TitleStage::OnCreate() {
 		try {
+
+			CreateStageManager();
 			//ビューとライトの作成
 			CreateViewLight();
 			//OnDraw();
@@ -61,10 +63,15 @@ namespace basecross {
 		m_ptrXA->Stop(m_BGM);
 	}
 
+	void TitleStage::CreateStageManager() {
+		auto ptrStageManager = AddGameObject<StageManager>();
+		SetSharedGameObject(L"StageManager", ptrStageManager);
+		auto Status =  ptrStageManager->GameStatus::TITLE;
+		ptrStageManager->SetNowGameStatus(Status);
+	}
 
 	void TitleStage::OnPushA() {
 		OnDestroy();
-		PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
 	}
 
 	void TitleStage::PlayBGM(const wstring& StageBGM)
