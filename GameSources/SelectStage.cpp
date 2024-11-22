@@ -87,7 +87,7 @@ namespace basecross {
 		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || KeyState.m_bPressedKeyTbl[VK_UP])
 		{
 			m_select++;
-			if (m_select > 3)
+			if (m_select > 4)
 			{
 				m_select = 0;
 			}
@@ -97,7 +97,7 @@ namespace basecross {
 			m_select--;
 			if (m_select < 0)
 			{
-				m_select = 3;
+				m_select = 4;
 			}
 		}
 
@@ -114,6 +114,9 @@ namespace basecross {
 			break;
 		case 3:
 			scene->SetSelectedMap(L"Stagedata3.csv");
+			break;
+		case 4:
+			scene->SetSelectedMap(L"Stagedata4.csv");
 			break;
 		}
 	}

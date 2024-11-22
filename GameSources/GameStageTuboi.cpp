@@ -22,7 +22,7 @@ namespace basecross {
 
 			auto a = AddGameObject<StageManager>();
 			a->CreateViewLight();
-			a->CreatePlayer(plVec[0], plVec[1], plVec[2]);
+			a->CreatePlayer();
 			auto player = GetSharedGameObject<Player>(L"Player");
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
