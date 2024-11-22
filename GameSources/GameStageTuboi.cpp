@@ -14,15 +14,10 @@ namespace basecross {
 
 	void GameStageTsuboi::OnCreate() {
 		try {
-			vector<Vec3> plVec = {
-				Vec3(80.0f, 5.0f, 0.0f),
-				Vec3(0.0f, -90.0f, 0.0f),
-				Vec3(3.0f, 3.0f, 3.0f)
-			};
 
 			auto a = AddGameObject<StageManager>();
 			a->CreateViewLight();
-			a->CreatePlayer(plVec[0], plVec[1], plVec[2]);
+			a->CreatePlayer();
 			auto player = GetSharedGameObject<Player>(L"Player");
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
