@@ -66,6 +66,14 @@ namespace basecross {
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
 		}
+		else if (m_StageName == L"Stagedata4.csv")
+		{
+			plVec = {
+				Vec3(80.0f, 5.0f,0.0f),
+				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
 		//プレーヤーの作成
 		shared_ptr<GameObject> ptrPlayer = GetStage()->AddGameObject<Player>(plVec[0], plVec[1], plVec[2]);
 		//シェア配列にプレイヤーを追加
@@ -290,6 +298,8 @@ namespace basecross {
 		vector<wstring> LineVec;
 		m_GameStage.GetSelect(LineVec, 0, L"Enemy");
 		for (auto& v : LineVec) {
+			Enemy::State stateBefore;
+			Enemy::State stateAfter;
 			vector<wstring> Tokens;
 			Util::WStrToTokenVector(Tokens, v, L',');
 			Vec3 Scale(3,3,3);
@@ -304,8 +314,11 @@ namespace basecross {
 				(float)_wtof(Tokens[3].c_str())
 			);
 			auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
-			auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale,Tokens[10], Tokens[11], player);
-			GetStage()->AddGameObject<GaugeSquare>(enemy);
+			if (Tokens[10] == L"Enemy::rightMove")			stateBefore = Enemy::rightMove;
+			else if (Tokens[10] == L"Enemy::rightMove")		stateBefore = Enemy::fly;
+			if (Tokens[11] == L"Enemy::stay")				stateAfter = Enemy::stay;
+			else if (Tokens[11] == L"Enemy::stay")			stateAfter = Enemy::fixedStay;
+			auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale, stateBefore, stateAfter, player);
 			auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 			group->IntoGroup(enemy);
 		}
@@ -375,6 +388,8 @@ namespace basecross {
 
 	void StageManager::GoalJudge()
 	{
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 
@@ -384,10 +399,17 @@ namespace basecross {
 		{
 			m_TextDraw->SetDrawActive(true);
 			m_SpriteDraw->SetDrawActive(true);
-			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_B|| KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+				GetTypeStage<GameStage>()->OnDestroy();
 			}
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+				GetTypeStage<GameStage>()->OnDestroy();
+			}
+
 		}
 	}
 
@@ -404,9 +426,14 @@ namespace basecross {
 				GetStage()->AddGameObject<GameOverSprite>();
 				m_Flag = false;
 			}
-			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+				GetTypeStage<GameStage>()->OnDestroy();
+			}
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 				GetTypeStage<GameStage>()->OnDestroy();
 			}
 		}
