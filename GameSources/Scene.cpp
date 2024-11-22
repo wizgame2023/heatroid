@@ -141,15 +141,38 @@ namespace basecross{
 		DrawLoadScreen();
 	}
 
-	void Scene::SetSelectedMap(const wstring& mapNumber) {
-		m_SelectedMap = mapNumber;
+	void Scene::SetSelectedMap(const int& select) {
+
+		switch (select)
+		{
+		case 0:
+			m_SelectedMap =  L"GameStage.csv";
+			m_select = select;
+			break;
+		case 1:
+			m_SelectedMap = L"Stagedata1.csv";
+			m_select = select;
+			break;
+		case 2:
+			m_SelectedMap = L"Stagedata2.csv";
+			m_select = select;
+			break;
+		case 3:
+			m_SelectedMap = L"Stagedata3.csv";
+			m_select = select;
+			break;
+		case 4:
+			m_SelectedMap = L"Stagedata4.csv";
+			m_select = select;
+			break;
+		}
 	}
 	wstring Scene::GetSelectedMap() {
 		return m_SelectedMap;
 	}
 
 	void Scene::DrawLoadScreen() {
-		GetActiveStage()->AddChileStage<LoadScreen>();
+		//GetActiveStage()->AddChileStage<LoadScreen>();
 	}
 }
 //end basecross
