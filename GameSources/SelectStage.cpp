@@ -38,6 +38,8 @@ namespace basecross {
 
 	void SelectStage::OnCreate() {
 		try {
+			m_Flag = true;
+			m_maxSelect = 4;
 			CreateStageManager();
 			//ビューとライトの作成
 			CreateViewLight();
@@ -62,15 +64,6 @@ namespace basecross {
 		ShowDebug();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-
-		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || KeyState.m_bPushKeyTbl[VK_UP]) {
-			if (m_select == 0) m_select = 1;
-			else m_select = 0;
-		}
-		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || KeyState.m_bPushKeyTbl[VK_DOWN]) {
-			if (m_select == 1) m_select = 0;
-			else m_select = 1;
-		}
 		StageSelect();
 	}
 
@@ -88,23 +81,43 @@ namespace basecross {
 
 	void SelectStage::StageSelect()
 	{
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
+		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || KeyState.m_bPressedKeyTbl[VK_UP])
+		{
+			m_select++;
+			if (m_select > m_maxSelect)
+			{
+				m_select = 0;
+			}
+		}
+		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || KeyState.m_bPressedKeyTbl[VK_DOWN])
+		{
+			m_select--;
+			if (m_select < 0)
+			{
+				m_select = m_maxSelect;
+			}
+		}
+
 		switch (m_select)
 		{
 		case 0:
-			scene->SetSelectedMap(L"GameStage.csv");
+			scene->SetSelectedMap(0);
 			break;
 		case 1:
-			scene->SetSelectedMap(L"Stagedata2.csv");
+			scene->SetSelectedMap(1);
 			break;
 		case 2:
-			scene->SetSelectedMap(L"Stagedata2.csv");
+			scene->SetSelectedMap(2);
 			break;
 		case 3:
-			scene->SetSelectedMap(L"Stagedata3.csv");
+			scene->SetSelectedMap(3);
 			break;
-		default:
+		case 4:
+			scene->SetSelectedMap(4);
 			break;
 		}
 	}

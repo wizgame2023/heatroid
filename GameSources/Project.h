@@ -9,6 +9,7 @@
 #include "ProjectShader.h"
 #include "ProjectBehavior.h"
 #include "Scene.h"
+#include "LoadScreen.h"
 #include "TitleStage.h"
 #include "GameOver.h"
 #include "GameClear.h"

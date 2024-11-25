@@ -12,6 +12,9 @@ namespace basecross{
 	//--------------------------------------------------------------------------------------
 	///	ゲームシーン
 	//--------------------------------------------------------------------------------------
+	Scene::~Scene() {
+	}
+	
 	void Scene::CreateResources() {
 
 		auto& app = App::GetApp();
@@ -50,6 +53,9 @@ namespace basecross{
 		app->RegisterTexture(L"FIRE", texPath + L"fire_kari.png");
 		app->RegisterTexture(L"HEALTH", texPath + L"health.png");
 		app->RegisterTexture(L"CHARGE", texPath + L"charge.png");
+		//ロード画面テクスチャ
+		app->RegisterTexture(L"LoadBG", texPath + L"loadblack.png");
+		app->RegisterTexture(L"LoadText", texPath + L"loadtext.png");
 		//ステージオブジェクトテクスチャ
 		app->RegisterTexture(L"Wall", texPath + L"UV_WALL.png");
 		app->RegisterTexture(L"Floor", texPath + L"UV_FLOOR.png");
@@ -103,39 +109,70 @@ namespace basecross{
 			throw;
 		}
 	}
-
-	Scene::~Scene() {
-	}
-
+	
 	void Scene::OnEvent(const shared_ptr<Event>& event) {
+		if (m_isInitialLoad == true) {
+			m_isInitialLoad = false;
+		}
+		else {
+			load = start;
+			DrawLoadScreen();
+			Sleep(800);
+		}
+
+		//ゲームステージの設定
 		if (event->m_MsgStr == L"ToGameStage") {
-			//ゲームステージの設定
 			ResetActiveStage<GameStage>();
 		}
 		else if (event->m_MsgStr == L"ToTitleStage") {
-			//ゲームステージの設定
 			ResetActiveStage<TitleStage>();
 		}
 		else if (event->m_MsgStr == L"ToSlelctStage") {
-			//ゲームステージの設定
 			ResetActiveStage<SelectStage>();
 		}
 		else if (event->m_MsgStr == L"ToGameStageHemmi") {
-			//ゲームステージの設定
 			ResetActiveStage<GameStageHemmi>();
 		}
 		else if (event->m_MsgStr == L"ToGameStageTsuboi") {
-			//ゲームステージの設定
 			ResetActiveStage<GameStageTsuboi>();
 		}
+		load = end;
+		Sleep(800);
+		DrawLoadScreen();
 	}
 
-	void Scene::SetSelectedMap(const wstring& mapNumber) {
-		m_SelectedMap = mapNumber;
+	void Scene::SetSelectedMap(const int& select) {
+
+		switch (select)
+		{
+		case 0:
+			m_SelectedMap =  L"GameStage.csv";
+			m_select = select;
+			break;
+		case 1:
+			m_SelectedMap = L"Stagedata1.csv";
+			m_select = select;
+			break;
+		case 2:
+			m_SelectedMap = L"Stagedata2.csv";
+			m_select = select;
+			break;
+		case 3:
+			m_SelectedMap = L"Stagedata3.csv";
+			m_select = select;
+			break;
+		case 4:
+			m_SelectedMap = L"Stagedata4.csv";
+			m_select = select;
+			break;
+		}
 	}
 	wstring Scene::GetSelectedMap() {
 		return m_SelectedMap;
 	}
 
+	void Scene::DrawLoadScreen() {
+		//GetActiveStage()->AddChileStage<LoadScreen>();
+	}
 }
 //end basecross
