@@ -23,24 +23,25 @@ namespace basecross {
 			flyMove,   //追従浮遊移動
 			fly,       //浮遊
 			fixedStay, //プレイヤーに触れた位置で固定
-			runaway,   //プレイヤーと逆方向に移動
 			hitDrop,   //ヒップドロップ
 			plunge,    //突っ込み
-			attack
+			bullet
 		};
 
 		
 	protected:
 		float m_heat;          //オーバーヒート値
 		float m_maxHeat;       //最大オーバーヒート
+		float m_angle;          //プレイヤーに向く角度
 		float m_speed;         //移動速度
-		float m_maxSpeed;
+		float m_maxSpeed;      //↑の最大値
 		float m_upSpeed;       //上下の速度
 		float m_upHeight;      //上下の高さ
 		float m_jumpPower;     //ジャンプ力
 		float m_jumpTime;      //ジャンプ速度
 		float m_jumpHight;     //ジャンプする高さ
 		float m_bulletTime;    //弾の発射間隔
+		float m_maxBulletTime;
 		float m_trackingRange; //弾を発射する距離
 		float m_dropTime;      //ヒットドロップまでの時間
 		float m_maxDropTime;   //↑の最大値
@@ -121,6 +122,7 @@ namespace basecross {
 		void PlayerSE(wstring path, float volume = 1.0f, float loopcnt = 0);
 		void Debug();
 		//get,set
+		float GetAngle();
 		void SetEnemyFlayFlag(bool flag);
 		void SetSpeed(float speed);
 		void SetUpMove(float speed,float height);
@@ -155,30 +157,36 @@ namespace basecross {
 		
 		float m_speed;   //弾の速さ
 		float m_Range;   //射程
+		float m_power;
+		float m_maxPower;
 		Vec3 m_direc;
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
-		Vec3 m_fixedPos;
+		Vec3 m_velocity;
 		bool m_floorCheck;
 		bool m_beforFlag;
 		float m_test;
 
 		shared_ptr<Transform> m_trans;
 		weak_ptr<Enemy> m_enemy;
+
+		Vec3 m_grav;
+		Vec3 m_gravVel;
 		
 
 	public :
-		EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy,
-			const Vec3& fixedPos = Vec3(0.0f));
+		EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
 		virtual ~EnemyBullet(){}
 		virtual void OnCreate();
 		virtual void OnUpdate();
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
 
+		void StartVel();
 		void ThisDestroy();
 		void Debug();
+		void Grav();
 
 	};
 
@@ -192,6 +200,8 @@ namespace basecross {
 		Vec3 m_enemyScal;
 		shared_ptr<Transform> m_trans;
 		weak_ptr<Enemy> m_enemy;
+
+
 
 	public:
 		EnemyFloorCol(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
