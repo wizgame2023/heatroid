@@ -10,6 +10,10 @@ namespace basecross {
 	class StageManager : public  GameObject
 	{
 	public:
+		enum CameraSelect {
+			openingCamera,
+			myCamera,
+		};
 
 		enum GameStatus {
 			// タイトルシーン表示時
@@ -19,7 +23,9 @@ namespace basecross {
 			// ゲームが開始してから終了するまで
 			GAME_PLAYING,
 		};
-
+		CameraSelect m_CameraSelect;
+		shared_ptr<SingleView> m_OpeningCameraView;
+		shared_ptr<SingleView> m_MyCameraView;
 		int m_nowGameStatus;
 		wstring m_StageName;
 		CsvFile m_GameStage;
@@ -41,7 +47,9 @@ namespace basecross {
 		wstring GetGameStageSelect();
 		int GetNowGameStatus();
 		void SetNowGameStatus(int afterGameStatus);
-
+		void ToMainCamera();
+		void ToOpeningCamera();
+		
 		//構築と破棄
 		StageManager(const shared_ptr<Stage>& stage) :
 			GameObject(stage)

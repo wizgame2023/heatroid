@@ -323,67 +323,6 @@ namespace basecross {
 		float elapsedTime = App::GetApp()->GetElapsedTime();
 		Vec3 newEye = GetEye();
 		Vec3 newAt = GetAt();
-		//計算に使うための腕角度（ベクトル）
-		//bsm::Vec3 armVec = newEye - newAt;
-		////正規化しておく
-		//armVec.normalize();
-		//float fThumbRX = 0.0f;
-		//if (cntlVec[0].bConnected) {
-		//	fThumbRX = cntlVec[0].fThumbRX;
-		//}
-		//armVec.y = sin(m_RadY);
-		////ここでY軸回転を作成
-		//if (fThumbRX != 0 || keyData.m_bPushKeyTbl[VK_LEFT] || keyData.m_bPushKeyTbl[VK_RIGHT]) {
-		//	//回転スピードを反映
-		//	if (fThumbRX != 0) {
-		//		if (IsLRBaseMode()) {
-		//			m_RadXZ += -fThumbRX * elapsedTime * m_RotSpeed;
-		//		}
-		//		else {
-		//			m_RadXZ += fThumbRX * elapsedTime * m_RotSpeed;
-		//		}
-		//	}
-		//	else if (keyData.m_bPushKeyTbl[VK_LEFT]) {
-		//		if (IsLRBaseMode()) {
-		//			m_RadXZ += elapsedTime * m_RotSpeed;
-		//		}
-		//		else {
-		//			m_RadXZ -= elapsedTime * m_RotSpeed;
-		//		}
-		//	}
-		//	else if (keyData.m_bPushKeyTbl[VK_RIGHT]) {
-		//		if (IsLRBaseMode()) {
-		//			m_RadXZ -= elapsedTime * m_RotSpeed;
-		//		}
-		//		else {
-		//			m_RadXZ += elapsedTime * m_RotSpeed;
-		//		}
-
-		//	}
-		//	if (abs(m_RadXZ) >= XM_2PI) {
-		//		//1週回ったら0回転にする
-		//		m_RadXZ = 0;
-		//	}
-		//}
-		////クオータニオンでY回転（つまりXZベクトルの値）を計算
-		//Quat qtXZ;
-		//qtXZ.rotation(m_RadXZ, bsm::Vec3(0, 1.0f, 0));
-		//qtXZ.normalize();
-		////移動先行の行列計算することで、XZの値を算出
-		//Mat4x4 Mat;
-		//Mat.strTransformation(
-		//	bsm::Vec3(1.0f, 1.0f, 1.0f),
-		//	bsm::Vec3(0.0f, 0.0f, -1.0f),
-		//	qtXZ
-		//);
-
-		//Vec3 posXZ = Mat.transInMatrix();
-		////XZの値がわかったので腕角度に代入
-		//armVec.x = posXZ.x;
-		//armVec.z = posXZ.z;
-		////腕角度を正規化
-		//armVec.normalize();
-
 		auto ptrTarget = GetTargetObject();
 		if (ptrTarget) {
 			//目指したい場所
@@ -391,14 +330,159 @@ namespace basecross {
 			toAt += m_TargetToAt;
 			newAt = Lerp::CalculateLerp(GetAt(), toAt, 0, 1.0f, 1.0, Lerp::Linear);
 		}
-		//////目指したい場所にアームの値と腕ベクトルでEyeを調整
-		//Vec3 toEye = newAt + armVec * m_ArmLen;
-		//newEye = Lerp::CalculateLerp(GetEye(), toEye, 0, 1.0f, m_ToTargetLerp, Lerp::Linear);
-
 		SetAt(newAt);
-		//SetEye(newEye);
-		////CameraObject::SetPos(newEye);
-		//UpdateArmLengh();
-		//Camera::OnUpdate();
+	}
+
+	OpeningCameraman::OpeningCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
+		const Vec3& AtStartPos, const Vec3& AtEndPos, const Vec3& AtPos, float& TotalTime,
+		const Vec3& secondEndPos, const Vec3& secondAtEndPos) :
+		GameObject(StagePtr),
+		m_startPos(StartPos),
+		m_endPos(EndPos),
+		m_atStartPos(AtStartPos),
+		m_atEndPos(AtEndPos),
+		m_atPos(AtStartPos),
+		m_totalTime(TotalTime),
+		m_secondEndPos(secondEndPos),
+		m_secondAtEndPos(secondAtEndPos)
+	{}
+	OpeningCameraman::~OpeningCameraman() {}
+
+	//初期化
+	void OpeningCameraman::OnCreate() {
+		//初期位置などの設定
+		auto ptr = GetComponent<Transform>();
+		ptr->SetScale(0.25f, 0.25f, 0.25f);	//直径25センチの球体
+		ptr->SetRotation(0.0f, 0.0f, 0.0f);
+		ptr->SetPosition(m_startPos);
+		//ステートマシンの構築
+		m_StateMachine.reset(new StateMachine<OpeningCameraman>(GetThis<OpeningCameraman>()));
+		//最初のステートをOpeningCameramanToGoalStateに設定
+		m_StateMachine->ChangeState(OpeningCameramanToFirstState::Instance());
+
+		//後半用の一時的な格納場所
+		m_tempStartPos = m_startPos;
+		m_tempEndPos = m_endPos;
+		m_tempAtStartPos = m_atStartPos;
+		m_tempAtEndPos = m_atEndPos;
+		m_tempAtPos = m_atPos;
+		m_tempTotalTime = m_totalTime;
+	}
+
+	//操作
+	void OpeningCameraman::OnUpdate() {
+		//ステートマシンのUpdateを行う
+		//この中でステートの切り替えが行われる
+		m_StateMachine->Update();
+	}
+
+	void OpeningCameraman::ToGoalEnterBehavior() { //前半部
+		m_startPos; //カメラの最初の位置
+		m_endPos; //カメラの最後の位置
+		m_atStartPos; //最初に見てる方角
+		m_atEndPos; //最後に見てる方角
+		m_atPos;//カメラ最後の位置
+		m_totalTime;
+	}
+
+	void OpeningCameraman::ToStartEnterBehavior() { //後半部
+		m_startPos = m_tempEndPos; //カメラの最初の位置
+		m_endPos = m_secondEndPos; //カメラの最後の位置
+		m_atStartPos = m_tempAtEndPos; //最初に見てる方角
+		m_atEndPos = m_secondAtEndPos; //最後に見てる方角
+		m_atPos;//カメラ最後の位置
+		m_totalTime = m_tempTotalTime;
+	}
+
+	bool OpeningCameraman::ExcuteBehavior(float totaltime) {
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		m_totalTime += ElapsedTime;
+		if (m_totalTime > totaltime) {
+			return true;
+		}
+		Easing<Vec3> easing;
+		m_eyePos = easing.EaseInOut(EasingType::Cubic, m_startPos, m_endPos, m_totalTime, totaltime);
+		m_atPos = easing.EaseInOut(EasingType::Cubic, m_atStartPos, m_atEndPos, m_totalTime, totaltime);
+		auto ptrTrans = GetComponent<Transform>();
+		ptrTrans->SetPosition(m_eyePos);
+		return false;
+	}
+	void OpeningCameraman::EndStateEnterBehavior() {
+		auto ptrGameStageManegeer = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		ptrGameStageManegeer->ToMainCamera();
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class OpeningCameramanToGoalState : public ObjState<OpeningCameraman>;
+	//--------------------------------------------------------------------------------------
+	shared_ptr<OpeningCameramanToFirstState> OpeningCameramanToFirstState::Instance() {
+		static shared_ptr<OpeningCameramanToFirstState> instance(new OpeningCameramanToFirstState);
+		return instance;
+	}
+	void OpeningCameramanToFirstState::Enter(const shared_ptr<OpeningCameraman>& Obj) {
+		Obj->ToGoalEnterBehavior();
+	}
+	void OpeningCameramanToFirstState::Execute(const shared_ptr<OpeningCameraman>& Obj) {
+		if (Obj->ExcuteBehavior(1.0f)) {
+			Obj->GetStateMachine()->ChangeState(OpeningCameramanToSecondState::Instance());
+		}
+	}
+	void OpeningCameramanToFirstState::Exit(const shared_ptr<OpeningCameraman>& Obj) {
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class OpeningCameramanToStartState : public ObjState<OpeningCameraman>;
+	//--------------------------------------------------------------------------------------
+	shared_ptr<OpeningCameramanToSecondState> OpeningCameramanToSecondState::Instance() {
+		static shared_ptr<OpeningCameramanToSecondState> instance(new OpeningCameramanToSecondState);
+		return instance;
+	}
+	void OpeningCameramanToSecondState::Enter(const shared_ptr<OpeningCameraman>& Obj) {
+		Obj->ToStartEnterBehavior();
+	}
+	void OpeningCameramanToSecondState::Execute(const shared_ptr<OpeningCameraman>& Obj) {
+		if (Obj->ExcuteBehavior(3.0f)) {
+			Obj->GetStateMachine()->ChangeState(OpeningCameramanEndState::Instance());
+		}
+	}
+	void OpeningCameramanToSecondState::Exit(const shared_ptr<OpeningCameraman>& Obj) {
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class OpeningCameramanEndState : public ObjState<OpeningCameraman>;
+	//--------------------------------------------------------------------------------------
+	shared_ptr<OpeningCameramanEndState> OpeningCameramanEndState::Instance() {
+		static shared_ptr<OpeningCameramanEndState> instance(new OpeningCameramanEndState);
+		return instance;
+	}
+	void OpeningCameramanEndState::Enter(const shared_ptr<OpeningCameraman>& Obj) {
+		Obj->EndStateEnterBehavior();
+	}
+	void OpeningCameramanEndState::Execute(const shared_ptr<OpeningCameraman>& Obj) {
+	}
+	void OpeningCameramanEndState::Exit(const shared_ptr<OpeningCameraman>& Obj) {
+	}
+
+
+
+	OpeningCamera::OpeningCamera() :
+		Camera()
+	{}
+	OpeningCamera::~OpeningCamera() {}
+
+	void OpeningCamera::OnCreate()
+	{
+	}
+
+	void OpeningCamera::OnUpdate() {
+		Camera::OnUpdate();
+
+		auto ptrOpeningCameraman = dynamic_pointer_cast<OpeningCameraman>(GetCameraObject());
+		if (ptrOpeningCameraman) {
+			auto pos = ptrOpeningCameraman->GetAtPos();
+			auto eye = ptrOpeningCameraman->GetEyePos();
+			SetEye(eye);
+			SetAt(pos);
+		}
 	}
 }
