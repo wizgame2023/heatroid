@@ -111,14 +111,6 @@ namespace basecross{
 	}
 	
 	void Scene::OnEvent(const shared_ptr<Event>& event) {
-		if (m_isInitialLoad == true) {
-			m_isInitialLoad = false;
-		}
-		else {
-			load = start;
-			DrawLoadScreen();
-			Sleep(800);
-		}
 
 		//ゲームステージの設定
 		if (event->m_MsgStr == L"ToGameStage") {
@@ -136,9 +128,6 @@ namespace basecross{
 		else if (event->m_MsgStr == L"ToGameStageTsuboi") {
 			ResetActiveStage<GameStageTsuboi>();
 		}
-		load = end;
-		Sleep(800);
-		DrawLoadScreen();
 	}
 
 	void Scene::SetSelectedMap(const wstring& mapNumber) {
@@ -148,8 +137,5 @@ namespace basecross{
 		return m_SelectedMap;
 	}
 
-	void Scene::DrawLoadScreen() {
-		GetActiveStage()->AddChileStage<LoadScreen>();
-	}
 }
 //end basecross

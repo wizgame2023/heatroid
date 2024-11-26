@@ -13,7 +13,7 @@ namespace basecross {
 // class Player
 // プレイヤークラス
 //====================================================================
-
+	class PlayerGrab;
 	class Player : public GameObject {
 		//Transformの初期化
 		Vec3 m_initPos;
@@ -70,6 +70,9 @@ namespace basecross {
 		//プレイヤーの状態
 		Stats m_stateType;
 
+		//掴み判定用ポインタ
+		weak_ptr<PlayerGrab> m_pGrab;
+
 		//移動時の物理学的な計算を行うか否か
 		bool m_doPhysicalProcess;
 		//チャージ中orオーバーチャージ中
@@ -78,8 +81,8 @@ namespace basecross {
 		float m_chargePerc, m_chargeSpeed, m_chargeReduceSpeed;
 		//無敵時間
 		float m_invincibleTime, m_invincibleTimeMax;
-		//何かを押してるか否か
-		bool m_isPushingObject;
+		//何かを持っているか否か
+		bool m_isCarrying;
 
 		//HP
 		int m_HP, m_HP_max;
@@ -124,8 +127,8 @@ namespace basecross {
 		Vec3 RoundOff(Vec3 number, int point);
 		//アニメーションの登録
 		void RegisterAnim();
-		//オーバーヒート中の敵を押す
-		void PushEnemy(const weak_ptr<GameObject> enemyptr);
+		//敵を持つ
+		void GrabEnemy();
 		//飛び道具発射
 		void Projectile();
 		//攻撃をくらう/死ぬ
@@ -201,6 +204,49 @@ namespace basecross {
 			if (m_isCharging) return L"Fire_";
 			else return L"";
 		}
+	};
+
+	//====================================================================
+	// class PlayerGrab
+	// プレイヤーの掴み判定
+	//====================================================================
+	class Enemy;
+	class PlayerGrab : public GameObject {
+		//プレイヤーとの相対位置・判定の大きさ
+		Vec3 m_dist, m_scale;
+		//プレイヤーに追従させるためのポインタ
+		weak_ptr<Player> m_player;
+		//触れた敵のポインタを保管しておく
+		shared_ptr<GameObject> m_target;
+		//敵に当たっているかどうか
+		bool m_isHit;
+	public:
+		PlayerGrab(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player) :
+			GameObject(StagePtr),
+			m_player(player),
+			m_dist(Vec3(-1.5f, 1, 0)),
+			m_scale(Vec3(8.0f)),
+			m_isHit(false)
+		{};
+
+		~PlayerGrab() {};
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+
+		void SetCollActive(bool update) {
+			GetComponent<CollisionSphere>()->SetUpdateActive(update);
+		}
+
+		bool IsHit() {
+			return m_isHit;
+		}
+
+		//何かに接触している判定
+		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
+
+
 	};
 
 	//====================================================================
