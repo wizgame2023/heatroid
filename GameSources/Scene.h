@@ -18,6 +18,7 @@ namespace basecross{
 		};
 		Load load;
 		bool m_isInitialLoad = true;
+
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief リソースの作成
@@ -53,9 +54,10 @@ namespace basecross{
 		//--------------------------------------------------------------------------------------
 		virtual void OnEvent(const shared_ptr<Event>& event) override;
     
-		void SetSelectedMap(const wstring& mapNumber);
+		void SetSelectedMap(const int& m_select);
 		wstring m_SelectedMap;
 		wstring GetSelectedMap();
+		int m_select = 0;
 
     //--------------------------------------------------------------------------------------
 		/*!

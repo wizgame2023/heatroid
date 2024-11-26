@@ -12,19 +12,22 @@ namespace basecross {
 
 	void StageManager::CreateViewLight()
 	{
+		m_OpeningCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
+		auto ptrOpeningCamera = ObjectFactory::Create<OpeningCamera>();
+		m_OpeningCameraView->SetCamera(ptrOpeningCamera);
 		// カメラの設定
+		m_MyCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
 		auto camera = ObjectFactory::Create<MainCamera>();
-		camera->SetEye(Vec3(-50.0f, 3.00f, 0.0f));
-		camera->SetAt(Vec3(0.0f, 0.25, 0.0f));
+		m_MyCameraView->SetCamera(camera);
+
 		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
-		auto view = GetStage()->CreateView<SingleView>();
-		view->SetCamera(camera);
+
+		GetStage()->SetView(m_OpeningCameraView);
 
 		//マルチライトの作成
 		auto light = GetStage()->CreateLight<MultiLight>();
 		light->SetDefaultLighting(); //デフォルトのライティングを指定
-		auto cameraObject = GetStage()->AddGameObject<CameraCollision>();
 	}
 
 	void StageManager::CreatePlayer()
@@ -113,6 +116,7 @@ namespace basecross {
 			//各値がそろったのでオブジェクト作成
 			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
 			ptrFloor->AddTag(L"Floor");
+			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
 		}
 		m_GameStage.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -338,7 +342,6 @@ namespace basecross {
 			{
 				m_GameStage.SetFileName(csvPath + m_StageName);
 				m_GameStage.ReadCsv();
-
 			}
 		}
 		catch (...) {
@@ -368,9 +371,35 @@ namespace basecross {
 			}
 			break;
 		case GameStatus::GAME_PLAYING:
+			if (m_CameraSelect == CameraSelect::openingCamera)
+			{
 
-			GoalJudge();
-			GameOverJudge();
+				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+				auto& vec = group->GetGroupVector();
+				for (auto v : vec)
+				{
+					auto shObj = v.lock();
+					if (shObj)
+					{
+						shObj->SetUpdateActive(false);
+					}
+				}
+			}
+			if (m_CameraSelect == CameraSelect::myCamera)
+			{
+				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+				auto& vec = group->GetGroupVector();
+				for (auto v : vec)
+				{
+					auto shObj = v.lock();
+					if (shObj->GetUpdateActive() == false)
+					{
+						shObj->SetUpdateActive(true);
+					}
+				}
+				GoalJudge();
+				GameOverJudge();
+			}
 			break;
 		default:
 			break;
@@ -384,6 +413,8 @@ namespace basecross {
 		m_SpriteDraw = GetStage()->AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
+		//ToMainCamera();
+		ToOpeningCamera();
 	}
 
 	void StageManager::GoalJudge()
@@ -404,9 +435,10 @@ namespace basecross {
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
 				GetTypeStage<GameStage>()->OnDestroy();
 			}
-			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 			{
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+				scene->SetSelectedMap(scene->m_select + 1);
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 				GetTypeStage<GameStage>()->OnDestroy();
 			}
 
@@ -431,7 +463,7 @@ namespace basecross {
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
 				GetTypeStage<GameStage>()->OnDestroy();
 			}
-			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 				GetTypeStage<GameStage>()->OnDestroy();
@@ -456,6 +488,45 @@ namespace basecross {
 	// 現在のゲームステータスを設定
 	void StageManager::SetNowGameStatus(int afterGameStatus) {
 		m_nowGameStatus = afterGameStatus;
+	}
+
+	void StageManager::ToMainCamera()
+	{
+		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
+		auto ptrCamera = dynamic_pointer_cast<MainCamera>(m_MyCameraView->GetCamera());
+		if (ptrCamera) {
+			//MyCameraである
+			//MyCameraに注目するオブジェクト（プレイヤー）の設定
+			GetStage()->SetView(m_MyCameraView);
+			auto cameraObject = GetStage()->AddGameObject<CameraCollision>();
+			ptrCamera->SetTargetObject(PtrPlayer);
+			ptrCamera->SetTargetToAt(Vec3(0, 3.0f, 0));
+			m_CameraSelect = CameraSelect::myCamera;
+		}
+
+	}
+	void StageManager::ToOpeningCamera()
+	{
+		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
+		auto PlayPos =  PtrPlayer->AddComponent<Transform>()->GetPosition();
+		Vec3 CameraPos = Vec3(PlayPos.x + 5.0f, PlayPos.y, PlayPos.z);
+		Vec3 CameraEndPos = Vec3(PlayPos.x - 5.0f, PlayPos.y + 5.0f, PlayPos.z);
+		auto view = GetStage()->CreateView<SingleView>();
+		//カメラのオープニングの移動(最初のカメラの位置、最後のカメラの位置、
+// 　　　　　　　　　　　　　最初に見てる所、最後に見てる所、後半最初に見る位置、
+// 　　　　　　　　　　　　　かかる時間(多分)、後半最後にいる位置、後半最後に見てる所)
+		auto ptrOpeningCameraman = GetStage()->AddGameObject<OpeningCameraman>(CameraPos, CameraPos,
+			PlayPos, PlayPos, PlayPos,
+			0.0f, CameraEndPos, PlayPos);
+		//シェア配列にOpeningCameramanを追加
+		GetStage()->SetSharedGameObject(L"OpeningCameraman", ptrOpeningCameraman);
+
+		auto ptrOpeningCamera = dynamic_pointer_cast<OpeningCamera>(m_OpeningCameraView->GetCamera());
+		if (ptrOpeningCamera) {
+			ptrOpeningCamera->SetCameraObject(ptrOpeningCameraman);
+			GetStage()->SetView(m_OpeningCameraView);
+			m_CameraSelect = CameraSelect::openingCamera;
+		}
 	}
 }
 //end basecross

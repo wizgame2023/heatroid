@@ -246,4 +246,115 @@ namespace basecross {
 		virtual void OnUpdate()override;
 	};
 
+	class OpeningCameraman : public GameObject {
+		Vec3 m_startPos;
+		Vec3 m_endPos;
+		Vec3 m_atStartPos;
+		Vec3 m_atEndPos;
+		Vec3 m_atPos;
+		Vec3 m_eyePos;
+		float m_totalTime;
+		Vec3 m_secondEndPos;
+		Vec3 m_secondAtEndPos;
+
+		Vec3 m_tempStartPos;
+		Vec3 m_tempEndPos;
+		Vec3 m_tempAtStartPos;
+		Vec3 m_tempAtEndPos;
+		Vec3 m_tempAtPos;
+		float m_tempTotalTime;
+
+		//ステートマシーン
+		unique_ptr< StateMachine<OpeningCameraman> >  m_StateMachine;
+	public:
+		//構築と破棄
+		OpeningCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
+			const Vec3& AtStartPos, const Vec3& AtEndPos, const Vec3& AtPos, float& TotalTime,
+			const Vec3& secondEndPos, const Vec3& secondAtEndPos);
+		virtual ~OpeningCameraman();
+		//初期化
+		virtual void OnCreate() override;
+		//操作
+		virtual void OnUpdate() override;
+
+		//アクセサ
+		const unique_ptr<StateMachine<OpeningCameraman>>& GetStateMachine() {
+			return m_StateMachine;
+		}
+
+		Vec3 GetAtPos() const {
+			return m_atPos;
+		}
+
+		Vec3 GetEyePos() const {
+			return m_eyePos;
+		}
+		void ToGoalEnterBehavior();
+		void ToStartEnterBehavior();
+		bool ExcuteBehavior(float totaltime);
+		void EndStateEnterBehavior();
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class OpeningCameramanToGoalState : public ObjState<OpeningCameraman>;
+	//--------------------------------------------------------------------------------------
+	class OpeningCameramanToFirstState : public ObjState<OpeningCameraman>
+	{
+		OpeningCameramanToFirstState() {}
+	public:
+		static shared_ptr<OpeningCameramanToFirstState> Instance();
+		virtual void Enter(const shared_ptr<OpeningCameraman>& Obj)override;
+		virtual void Execute(const shared_ptr<OpeningCameraman>& Obj)override;
+		virtual void Exit(const shared_ptr<OpeningCameraman>& Obj)override;
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class OpeningCameramanToStartState : public ObjState<OpeningCameraman>;
+	//--------------------------------------------------------------------------------------
+	class OpeningCameramanToSecondState : public ObjState<OpeningCameraman>
+	{
+		OpeningCameramanToSecondState() {}
+	public:
+		static shared_ptr<OpeningCameramanToSecondState> Instance();
+		virtual void Enter(const shared_ptr<OpeningCameraman>& Obj)override;
+		virtual void Execute(const shared_ptr<OpeningCameraman>& Obj)override;
+		virtual void Exit(const shared_ptr<OpeningCameraman>& Obj)override;
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class OpeningCameramanEndState : public ObjState<OpeningCameraman>;
+	//--------------------------------------------------------------------------------------
+	class OpeningCameramanEndState : public ObjState<OpeningCameraman>
+	{
+		OpeningCameramanEndState() {}
+	public:
+		static shared_ptr<OpeningCameramanEndState> Instance();
+		virtual void Enter(const shared_ptr<OpeningCameraman>& Obj)override;
+		virtual void Execute(const shared_ptr<OpeningCameraman>& Obj)override;
+		virtual void Exit(const shared_ptr<OpeningCameraman>& Obj)override;
+	};
+
+	class OpeningCamera : public Camera {
+	public:
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		*/
+		//--------------------------------------------------------------------------------------
+		OpeningCamera();
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	デストラクタ
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual ~OpeningCamera();
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief 更新処理
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void OnCreate()override;
+		virtual void OnUpdate()override;
+	};
 }

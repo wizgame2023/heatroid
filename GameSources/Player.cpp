@@ -225,17 +225,16 @@ namespace basecross {
 
 		m_HP = m_HP_max;
 
-		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
-		if (ptrCamera) {
-			//MyCameraである
-			//MyCameraに注目するオブジェクト（プレイヤー）の設定
-			ptrCamera->SetTargetObject(GetThis<GameObject>());
-			ptrCamera->SetTargetToAt(Vec3(0, 3.0f, 0));
-		}
-
 		//敵を掴む判定用オブジェクト
 		m_pGrab = GetStage()->AddGameObject<PlayerGrab>(GetThis<Player>());
 
+		//auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
+		//if (ptrCamera) {
+		//	//MyCameraである
+		//	//MyCameraに注目するオブジェクト（プレイヤー）の設定
+		//	ptrCamera->SetTargetObject(GetThis<GameObject>());
+		//	ptrCamera->SetTargetToAt(Vec3(0, 3.0f, 0));
+		//}
 	}
 
 	void Player::OnUpdate() {
