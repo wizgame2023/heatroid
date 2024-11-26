@@ -23,9 +23,9 @@ namespace basecross {
 			flyMove,   //追従浮遊移動
 			fly,       //浮遊
 			fixedStay, //プレイヤーに触れた位置で固定
-			hitDrop,   //ヒップドロップ
+			jump,      //ジャンプ
 			plunge,    //突っ込み
-			bullet
+			bullet     //弾を撃ってくる
 		};
 
 		
@@ -47,8 +47,8 @@ namespace basecross {
 		float m_maxDropTime;   //↑の最大値
 		float m_hitDropTime;   //ヒットドロップ中の浮いてる時間
 		float m_maxHitDropTime;//↑の最大値
-		float m_plungeTime;    //突っ込みの予備時間
-		float m_maxPlungeTime; //↑の最大値
+		float m_spareTime;    //突っ込みの予備時間
+		float m_maxSpareTime; //↑の最大値
 		int m_dicUp;
 		Vec3 m_direc;
 		Vec3 m_direcNorm;
@@ -59,6 +59,7 @@ namespace basecross {
 
 		bool m_bulletFlag;   
 		bool m_jumpFlag;
+		bool m_jumpMoveFlag;
 		bool m_flyFlag;
 		bool m_floorFlag;
 		bool m_hitDropFlag;
@@ -70,7 +71,8 @@ namespace basecross {
 		Vec3 m_gravVel;
 
 		State m_stateType;
-		State m_beforState;
+		State m_fastState;
+		State m_beforeState;
 		State m_overHeatState;
 
 		Vec3 m_pos;
@@ -115,6 +117,7 @@ namespace basecross {
 		void OneJump(float jumpHight);
 		void HitDrop();
 		void Plunge();
+		void JumpMove();
 		void FindFixed();
 		void Bullet();
 		void EnemyAnime(wstring anime);

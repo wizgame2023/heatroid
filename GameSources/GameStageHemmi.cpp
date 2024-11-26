@@ -274,8 +274,6 @@ namespace basecross {
 		auto player = GetSharedGameObject<Player>(L"Player");
 		auto enemy = AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
 		auto group = GetSharedObjectGroup(L"Enemy");
-		//AddGameObject<GaugeSquare>(enemy);
-
 
 		group->IntoGroup(enemy);
 		
