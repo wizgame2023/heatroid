@@ -17,6 +17,7 @@ namespace basecross {
 	{
 		//0 = ロード開始、1 = ロード終了
 		int m_loadState;
+		float m_time;
 	public:
 		LoadScreen();
 		virtual ~LoadScreen() {}
