@@ -14,11 +14,19 @@ namespace basecross {
 // ロード時に表示するトランジション画面
 //====================================================================
 	LoadScreen::LoadScreen(): 
-		Stage()
+		Stage(),
+		m_time(0.0f)
 	{
 	}
 
 	void LoadScreen::OnCreate() {
+		/*
+		auto dev = App::GetApp()->GetDeviceResources();
+		auto view = dev->GetDefaultRenderTarget();
+		*/
+
+		
+
 		auto a = AddGameObject<StageManager>();
 		a->CreateViewLight();
 		m_loadState = App::GetApp()->GetScene<Scene>()->GetLoadState();
@@ -28,7 +36,9 @@ namespace basecross {
 	}
 	
 	void LoadScreen::OnUpdate() {
+		auto delta = App::GetApp()->GetElapsedTime();
 
+		m_time += delta;
 	}
 
 //====================================================================
