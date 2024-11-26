@@ -16,7 +16,7 @@ namespace basecross {
 			auto player = GetSharedGameObject<Player>(L"Player");
 			AddGameObject<SpriteHealth>(player);
 			AddGameObject<SpriteCharge>(player);
-			AddGameObject<FadeIn>();
+			//AddGameObject<FadeIn>();
 			PlayBGM(L"StageBGM");
 		}
 		catch (...) {
@@ -45,13 +45,12 @@ namespace basecross {
 		auto Status = ptrStageManager->GameStatus::GAME_PLAYING;
 		ptrStageManager->SetNowGameStatus(Status);
 		ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
-		ptrStageManager->CreateViewLight();
 		ptrStageManager->CreatePlayer();
+		ptrStageManager->CreateViewLight();
 		ptrStageManager->CreateEnemy();
 		ptrStageManager->CreateFixedBox();
 		ptrStageManager->CreateGimmick();
 		ptrStageManager->CreateSprite();
-
 	}
 
 
