@@ -12,11 +12,31 @@ namespace basecross {
 		const Vec3& position,
 		const Vec3& rotation,
 		const Vec3& scale,
-		const State& state,
+		const State& defaultState,
+		const State& deathState,
+		const shared_ptr<Player>& player
+	) :
+		Enemy(stage, position, rotation, scale, defaultState, deathState, player),
+		m_defaultState(defaultState),
+		m_attackState(plunge),
+		m_plungeTime(0.0f),
+		m_maxPlungeTime(3.0f),
+		m_plungeRargeTime(7.0f),
+		m_maxPlungeRargeTime(m_plungeRargeTime)
+	{}
+
+	EnemyChase::EnemyChase(const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotation,
+		const Vec3& scale,
+		const State& defaultState,
+		const State& attackState,
 		const State& deathState,
 		const shared_ptr<Player>& player
 	):
-		Enemy(stage,position,rotation,scale,state,deathState,player),
+		Enemy(stage,position,rotation,scale,defaultState,deathState,player),
+		m_defaultState(defaultState),
+		m_attackState(attackState),
 		m_plungeTime(0.0f),
 		m_maxPlungeTime(3.0f),
 		m_plungeRargeTime(7.0f),
@@ -34,12 +54,11 @@ namespace basecross {
 
 		if (!GetOverHeat()) {
 			if (m_plungeTime >= 0.0f) {
-				SetState(plunge);
+				SetState(m_attackState);
 			}
 			else if (m_plungeTime < 0.0f) {
-				SetState(rightMove);
+				SetState(m_defaultState);
 				m_plungeRargeTime -= elapsed;
-				//SetPlungeFlag(false);
 			}
 			if (m_plungeRargeTime <= 0.0f) {
 				m_plungeTime = m_maxPlungeTime;
@@ -62,7 +81,5 @@ namespace basecross {
 			<<m_plungeFlag
 			<< endl;
 		scene->SetDebugString(wss.str());
-
-
 	}
 }
