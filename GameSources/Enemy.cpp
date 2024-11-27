@@ -485,20 +485,6 @@ namespace basecross {
 			m_trans->SetParent(m_fixedBox.lock());
 			m_floorPos = m_pos;
 		}
-
-
-		if ((other->FindTag(L"GimmickButton")))
-		{
-			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-			auto& vec = group->GetGroupVector();
-			for (auto& v : vec) {
-				auto shObj = v.lock();
-				if (other == shObj) {
-					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					Switchs->SetButton(true);
-				}
-			}
-		}
 	}
 
 	void Enemy::EnemyAnime(wstring anime) {

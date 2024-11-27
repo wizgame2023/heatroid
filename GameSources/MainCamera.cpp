@@ -34,6 +34,7 @@ namespace basecross {
 		//当たり判定
 		auto m_camera = AddComponent<CollisionSphere>();
 		ptrCamera->SetCameraObject(GetThis<GameObject>());
+		m_camera->SetAfterCollision(AfterCollision::Auto);
 	}
 
 	void CameraCollision::OnUpdate() {
@@ -123,25 +124,23 @@ namespace basecross {
 			TargetPos = Lerp::CalculateLerp(rot, toAt, 0, 1.0f, 1.0, Lerp::Linear);
 		}
 		////目指したい場所にアームの値と腕ベクトルでEyeを調整
+		UpdateArmLengh();
 		Vec3 toEye = newAt + armVec * m_ArmLen;
 		GetPos = Lerp::CalculateLerp(pos, toEye, 0, 1.0f, m_ToTargetLerp, Lerp::Linear);
 
 		//追尾システム
 		GetComponent<Transform>()->SetPosition(GetPos);
-		UpdateArmLengh();
 	}
 
 	void CameraCollision::UpdateArmLengh() {
 		auto Ptr = GetComponent<Transform>();
 		auto Pos = Ptr->GetPosition();
-
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		auto ptrTarget = ptrCamera->GetTargetObject();
-		auto Rot = ptrTarget->GetComponent<Transform>()->GetPosition();
+		Vec3 toAt = ptrTarget->GetComponent<Transform>()->GetWorldMatrix().transInMatrix();
 
-		Vec3 vec = Pos - Rot;
-
-		m_ArmLen = bsm::length(vec);
+		Vec3 vec = Pos - toAt;
+		m_ArmLen = length(vec);
 		if (m_ArmLen >= ptrCamera->m_MaxArm) {
 			//m_MaxArm以上離れないようにする
 			m_ArmLen = ptrCamera->m_MaxArm;
@@ -149,9 +148,6 @@ namespace basecross {
 		if (m_ArmLen <= ptrCamera->m_MinArm) {
 			//m_MinArm以上離れないようにする
 			m_ArmLen = ptrCamera->m_MinArm;
-		}
-		if (m_Hit)
-		{
 		}
 	}
 
@@ -162,9 +158,6 @@ namespace basecross {
 	bool CameraCollision::IsLRBaseMode() const {
 		return m_LRBaseMode;
 
-	}
-	void CameraCollision::OnCollisionExcute(shared_ptr<GameObject>& Other) {
-		m_Hit = true;
 	}
 	void CameraCollision::OnCollisionEnter(shared_ptr<GameObject>& Other)
 	{
