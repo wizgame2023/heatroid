@@ -49,7 +49,7 @@ namespace basecross {
 	//プレイヤーの作成
 	void GameStageHemmi::CreatePlayer() {
 		vector<Vec3> plVec = {
-			Vec3(-50.0f, 5.0f, 0.0f),
+			Vec3(-20.0f, 5.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(3.0f, 3.0f, 3.0f)
 		};
@@ -268,14 +268,12 @@ namespace basecross {
 		//		(float)_wtof(Tokens[3].c_str())
 		//	);
 
-		auto Pos = Vec3(-50.0f, 5.0f, -30.0f);
+		auto Pos = Vec3(-10.0f, 5.0f, 0.0f);
 		auto Rot = Vec3(0.0f, 0.0f, 0.0f);
 		auto Scale = Vec3(3.0f, 3.0f, 3.0f);
 		auto player = GetSharedGameObject<Player>(L"Player");
 		auto enemy = AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
 		auto group = GetSharedObjectGroup(L"Enemy");
-		//AddGameObject<GaugeSquare>(enemy);
-
 
 		group->IntoGroup(enemy);
 		
