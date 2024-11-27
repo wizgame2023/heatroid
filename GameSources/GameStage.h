@@ -16,6 +16,10 @@ namespace basecross {
 		CsvFile m_GameStage1;
 		shared_ptr<SoundItem> m_BGM;
 		std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager();
+		bool m_pause = false;
+		shared_ptr<GameObject> m_fadeIn;
+		shared_ptr<GameObject> m_fadeOut;
+
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage(){}
@@ -29,6 +33,8 @@ namespace basecross {
 		void OnDestroy();
 
 		void CreateStageManager();
+
+		void GamePause();
 	};
 
 }

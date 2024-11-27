@@ -471,7 +471,6 @@ namespace basecross {
 			}
 		}
 	}
-
 	void StageManager::SetGameStageSelect(const wstring& m_csvFail)
 	{
 		m_StageName = m_csvFail;
