@@ -41,7 +41,7 @@ namespace basecross {
 		{
 			plVec = {
 				Vec3(80.0f, 5.0f,0.0f),
-				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
 		}
@@ -49,7 +49,7 @@ namespace basecross {
 		{
 			plVec = {
 				Vec3(80.0f, 5.0f,0.0f),
-				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
 		}
@@ -57,7 +57,7 @@ namespace basecross {
 		{
 			plVec = {
 				Vec3(80.0f, 5.0f,0.0f),
-				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
 		}
@@ -65,7 +65,7 @@ namespace basecross {
 		{
 			plVec = {
 				Vec3(65.0f, 5.0f,0.0f),
-				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
 		}
@@ -73,7 +73,7 @@ namespace basecross {
 		{
 			plVec = {
 				Vec3(80.0f, 5.0f,0.0f),
-				Vec3(0.0f, -90.0f, 0.0f),
+				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
 		}
