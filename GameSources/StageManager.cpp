@@ -1,6 +1,7 @@
 /*!
 @file Character.cpp
 @brief キャラクターなど実体
+鎌田大輝
 */
 
 #include "stdafx.h"
@@ -40,7 +41,7 @@ namespace basecross {
 		if (m_StageName == L"GameStage.csv")
 		{
 			plVec = {
-				Vec3(80.0f, 5.0f,0.0f),
+				Vec3(75.0f, 5.0f,0.0f),
 				Vec3(0.0f, -90.0f, 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
