@@ -12,8 +12,8 @@ Wall,-50,15,23.75,0,0,0,5,30,37.5,Wall,,
 Wall,-50,15,-23.75,0,0,0,5,30,37.5,Wall,,
 Wall,-95,15,0,0,0,0,1,30,10,Wall,,
 Wall,92.5,15,0,0,0,0,1,30,10,Wall,,
-Door,20,15,0,0,0,0,2.5,30,10,0,1,AreaDoorBLUCK
-Door,-50,15,0,0,0,0,2.5,30,10,1,2,AreaDoorBLUCK
+Door,20,15,0,0,0,0,5,30,10,0,1,AreaDoorBLUCK
+Door,-50,15,0,0,0,0,5,30,10,1,2,AreaDoorBLUCK
 Switch,55,0.4,0,0,0,0,10,0.5,10,0,1,BLUCKSWITCH
 Switch,-35,0.4,-35,0,0,0,10,0.5,10,1,2,BLUCKSWITCH
 Switch,-35,0.4,35,0,0,0,10,0.5,10,1,2,BLUCKSWITCH
