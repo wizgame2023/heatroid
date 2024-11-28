@@ -20,8 +20,6 @@ namespace basecross {
 		m_MyCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
 		auto camera = ObjectFactory::Create<MainCamera>();
 		m_MyCameraView->SetCamera(camera);
-
-		//camera->SetCameraObject(cameraObject);
 		// ビューにカメラを設定
 
 		GetStage()->SetView(m_OpeningCameraView);
@@ -41,7 +39,7 @@ namespace basecross {
 		if (m_StageName == L"GameStage.csv")
 		{
 			plVec = {
-				Vec3(75.0f, 5.0f,0.0f),
+				Vec3(80.0f, 5.0f,0.0f),
 				Vec3(0.0f, -90.0f, 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
@@ -374,7 +372,6 @@ namespace basecross {
 		case GameStatus::GAME_PLAYING:
 			if (m_CameraSelect == CameraSelect::openingCamera)
 			{
-
 				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 				auto& vec = group->GetGroupVector();
 				for (auto v : vec)
@@ -414,7 +411,6 @@ namespace basecross {
 		m_SpriteDraw = GetStage()->AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
-		//ToMainCamera();
 		ToOpeningCamera();
 	}
 
@@ -489,14 +485,21 @@ namespace basecross {
 	void StageManager::SetNowGameStatus(int afterGameStatus) {
 		m_nowGameStatus = afterGameStatus;
 	}
+	//現在のカメラステータスの
+	int StageManager::GetNowCameraStatus() {
+		return m_nowGameStatus;
+	}
 
 	void StageManager::ToMainCamera()
 	{
 		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(m_MyCameraView->GetCamera());
+		auto PlayPos = PtrPlayer->AddComponent<Transform>()->GetPosition();
+		Vec3 CameraEndPos = Vec3(90.0f, 15.0f, 0);
 		if (ptrCamera) {
 			//MyCameraである
 			//MyCameraに注目するオブジェクト（プレイヤー）の設定
+			ptrCamera->SetEye(CameraEndPos);
 			GetStage()->SetView(m_MyCameraView);
 			auto cameraObject = GetStage()->AddGameObject<CameraCollision>();
 			ptrCamera->SetTargetObject(PtrPlayer);
@@ -509,9 +512,9 @@ namespace basecross {
 	{
 		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
 		auto PlayPos =  PtrPlayer->AddComponent<Transform>()->GetPosition();
-		Vec3 CameraPos = Vec3(PlayPos.x + 10.0f, PlayPos.y, PlayPos.z);
-		Vec3 CameraEndPos = Vec3(PlayPos.x + 5.0f, PlayPos.y + 5.0f, PlayPos.z);
-		Vec3 PlayEndpos = Vec3(PlayPos.x + 5.0f, PlayPos.y, PlayPos.z);
+		Vec3 CameraPos = Vec3(PlayPos.x + 5.0f, PlayPos.y, PlayPos.z);
+		Vec3 CameraEndPos = Vec3(PlayPos.x + 5.0f, PlayPos.y + 15.0f, PlayPos.z);
+		Vec3 PlayEndpos = Vec3(PlayPos.x - 5.0f, PlayPos.y, PlayPos.z);
 		auto view = GetStage()->CreateView<SingleView>();
 		//カメラのオープニングの移動(最初のカメラの位置、最後のカメラの位置、
 // 　　　　　　　　　　　　　最初に見てる所、最後に見てる所、後半最初に見る位置、
