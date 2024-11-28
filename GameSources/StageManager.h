@@ -47,6 +47,8 @@ namespace basecross {
 		wstring GetGameStageSelect();
 		int GetNowGameStatus();
 		void SetNowGameStatus(int afterGameStatus);
+		int GetNowCameraStatus();
+		void SetNowCameraStatus(int afterGameStatus);
 		void ToMainCamera();
 		void ToOpeningCamera();
 		

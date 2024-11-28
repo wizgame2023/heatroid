@@ -14,9 +14,9 @@ namespace basecross {
 		GetPos(Vec3(0.0f, 1.0f, 0.0f)), 
 		m_TargetToAt(0, 0, 0),
 		TargetPos(Vec3(0.0f, 0.0f, 0.0f)),
-		m_ArmLen(20.5f),
+		m_ArmLen(15.5f),
 		m_RadY(.5f),
-		m_RadXZ(0),
+		m_RadXZ(1.5f),
 		m_RotSpeed(-2.0f),
 		m_ToTargetLerp(1.0f),
 		m_Hit(false),
@@ -38,16 +38,14 @@ namespace basecross {
 	}
 
 	void CameraCollision::OnUpdate() {
-		//auto scene = App::GetApp()->GetScene<Scene>();
+		auto scene = App::GetApp()->GetScene<Scene>();
 
-		//wstringstream wss;
-		//wss << GetPos.x << " : " << GetPos.y << " : " << GetPos.z << " : " << endl;
-		//scene->SetDebugString(L"Camera\n" + wss.str());
+		wstringstream wss;
+		wss << GetPos.x << " : " << GetPos.y << " : " << GetPos.z << " : " << endl;
+		scene->SetDebugString(L"Camera\n" + wss.str());
 
 		auto Ptr = GetComponent<Transform>();
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
-		auto pos = ptrCamera->GetEye();
-		auto rot = ptrCamera->GetAt();
 		auto ptrTarget = ptrCamera->GetTargetObject();
 
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
@@ -106,7 +104,7 @@ namespace basecross {
 		Mat4x4 Mat;
 		Mat.strTransformation(
 			bsm::Vec3(1.0f, 1.0f, 1.0f),
-			bsm::Vec3(0.0f, 0.0f, -1.0f),
+			bsm::Vec3(0.0f, 0.0f, 1.0f),
 			qtXZ
 		);
 
@@ -121,16 +119,17 @@ namespace basecross {
 			//目指したい場所
 			Vec3 toAt = ptrTarget->GetComponent<Transform>()->GetWorldMatrix().transInMatrix();
 			toAt += m_TargetToAt;
-			TargetPos = Lerp::CalculateLerp(rot, toAt, 0, 1.0f, 1.0, Lerp::Linear);
+			TargetPos = Lerp::CalculateLerp(newAt, toAt, 0, 1.0f, 1.0, Lerp::Linear);
 		}
 		////目指したい場所にアームの値と腕ベクトルでEyeを調整
 
 		UpdateArmLengh();
 		Vec3 toEye = newAt + armVec * m_ArmLen;
-		GetPos = Lerp::CalculateLerp(pos, toEye, 0, 1.0f, m_ToTargetLerp, Lerp::Linear);
+		GetPos = Lerp::CalculateLerp(newEye, toEye, 0, 1.0f, m_ToTargetLerp, Lerp::Linear);
 
 		//追尾システム
 		GetComponent<Transform>()->SetPosition(GetPos);
+		GetComponent<Transform>()->SetRotation(TargetPos);
 	}
 
 	void CameraCollision::OnCollisionExcute(const CollisionPair& Pair)
@@ -147,6 +146,8 @@ namespace basecross {
 
 		Vec3 vec =toAt - Pos;
 		m_ArmLen = length(vec);
+
+		auto StageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
 		if (m_ArmLen >= ptrCamera->m_MaxArm) {
 			//m_MaxArm以上離れないようにする
 			m_ArmLen = ptrCamera->m_MaxArm;
@@ -316,11 +317,7 @@ namespace basecross {
 
 	}
 	void MainCamera::OnUpdate() {
-		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto keyData = App::GetApp()->GetInputDevice().GetKeyState();
 		//前回のターンからの時間
-		float elapsedTime = App::GetApp()->GetElapsedTime();
-		Vec3 newEye = GetEye();
 		Vec3 newAt = GetAt();
 		auto ptrTarget = GetTargetObject();
 		if (ptrTarget) {
