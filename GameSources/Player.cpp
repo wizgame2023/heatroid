@@ -63,7 +63,7 @@ namespace basecross {
 		m_fallTerminal(-50.0f),
 		m_firePos(Vec3(1.0f, .8f, -.75f)),
 		m_moveVel(Vec3(0, 0, 0)),
-		m_moveAngle(0.0f),
+		m_moveAngle(rot.y),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
 
@@ -596,7 +596,7 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Jumping", 320, 15, false, anim_fps);
 		ptrDraw->AddAnimation(L"Falling", 350, 20, true, anim_fps);
 		ptrDraw->AddAnimation(L"Land", 336, 4, false, anim_fps);
-		ptrDraw->AddAnimation(L"Walk", 100, 29, false, anim_fps);
+		ptrDraw->AddAnimation(L"Walk", 100, 29, true, anim_fps);
 		//火炎放射+行動
 		ptrDraw->AddAnimation(L"Fire_Idle", 170, 60, true, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_Run", 140, 19, true, 38.0f);//アニメーションを合わせるため
@@ -781,7 +781,7 @@ namespace basecross {
 
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(
-			Vec3(1.0f / trans->GetScale().x, 1.0f / trans->GetScale().y, 1.0f / trans->GetScale().z), //(.1f, .1f, .1f),
+			Vec3(2.0f / trans->GetScale().x, 2.0f / trans->GetScale().y, 2.0f / trans->GetScale().z), //(.1f, .1f, .1f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f)
