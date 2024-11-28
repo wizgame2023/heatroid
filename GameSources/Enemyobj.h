@@ -9,12 +9,22 @@
 
 namespace basecross {
 	class EnemyChase : public Enemy {
+		State m_defaultState;
+		State m_attackState;
 	public:
 		EnemyChase(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
 			const Vec3& scale,
-			const State& state,
+			const State& defaultState,
+			const State& deathState,
+			const shared_ptr<Player>& player);
+		EnemyChase(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale,
+			const State& defaultState,
+			const State& attackState,
 			const State& deathState,
 			const shared_ptr<Player>& player);
 		virtual ~EnemyChase() {};

@@ -25,8 +25,38 @@ namespace basecross {
 	}
 	void GameStage::OnUpdate()
 	{
-		
+		GamePause();
 	}
+
+	void GameStage::GamePause()
+	{
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		if (m_pause)
+		{
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+			{
+				auto obj = GetGameObjectVec();
+				for (auto object : obj)
+				{
+					object->SetUpdateActive(true);
+				}
+				m_pause = false;
+			}
+		}
+		else {
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+			{
+				auto obj = GetGameObjectVec();
+				for (auto object : obj)
+				{
+					object->SetUpdateActive(false);
+				}
+				m_pause = true;
+			}
+		}
+	}
+
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{

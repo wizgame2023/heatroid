@@ -27,13 +27,14 @@ namespace basecross {
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		auto pos = ptrCamera->GetEye();
 		auto ptrtrans = GetComponent<Transform>();
-		ptrtrans->SetScale(Vec3(1.0, 1.0, 1.0));
+		ptrtrans->SetScale(Vec3(0.1f, 0.1f, 0.1f));
 		ptrtrans->SetPosition(pos);
 		TargetPos = Vec3(0.0f, 0.0f, 0.0f);
 		GetPos = Vec3(0.0f, 1.0f, 0.0f);
 		//当たり判定
 		auto m_camera = AddComponent<CollisionSphere>();
 		ptrCamera->SetCameraObject(GetThis<GameObject>());
+		m_camera->SetAfterCollision(AfterCollision::Auto);
 	}
 
 	void CameraCollision::OnUpdate() {
@@ -123,25 +124,29 @@ namespace basecross {
 			TargetPos = Lerp::CalculateLerp(rot, toAt, 0, 1.0f, 1.0, Lerp::Linear);
 		}
 		////目指したい場所にアームの値と腕ベクトルでEyeを調整
+
+		UpdateArmLengh();
 		Vec3 toEye = newAt + armVec * m_ArmLen;
 		GetPos = Lerp::CalculateLerp(pos, toEye, 0, 1.0f, m_ToTargetLerp, Lerp::Linear);
 
 		//追尾システム
 		GetComponent<Transform>()->SetPosition(GetPos);
-		UpdateArmLengh();
+	}
+
+	void CameraCollision::OnCollisionExcute(const CollisionPair& Pair)
+	{
+		m_Hit == true;
 	}
 
 	void CameraCollision::UpdateArmLengh() {
 		auto Ptr = GetComponent<Transform>();
 		auto Pos = Ptr->GetPosition();
-
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		auto ptrTarget = ptrCamera->GetTargetObject();
-		auto Rot = ptrTarget->GetComponent<Transform>()->GetPosition();
+		Vec3 toAt = ptrTarget->GetComponent<Transform>()->GetWorldMatrix().transInMatrix();
 
-		Vec3 vec = Pos - Rot;
-
-		m_ArmLen = bsm::length(vec);
+		Vec3 vec =toAt - Pos;
+		m_ArmLen = length(vec);
 		if (m_ArmLen >= ptrCamera->m_MaxArm) {
 			//m_MaxArm以上離れないようにする
 			m_ArmLen = ptrCamera->m_MaxArm;
@@ -149,9 +154,6 @@ namespace basecross {
 		if (m_ArmLen <= ptrCamera->m_MinArm) {
 			//m_MinArm以上離れないようにする
 			m_ArmLen = ptrCamera->m_MinArm;
-		}
-		if (m_Hit)
-		{
 		}
 	}
 
@@ -163,12 +165,9 @@ namespace basecross {
 		return m_LRBaseMode;
 
 	}
-	void CameraCollision::OnCollisionExcute(shared_ptr<GameObject>& Other) {
-		m_Hit = true;
-	}
+
 	void CameraCollision::OnCollisionEnter(shared_ptr<GameObject>& Other)
 	{
-		m_Hit = true;
 		
 	}
 
@@ -186,7 +185,7 @@ namespace basecross {
 		m_CameraUnderRot(0.1f),
 		m_ArmLen(3.0f),
 		m_MaxArm(20.0f),
-		m_MinArm(0.5f),
+		m_MinArm(0.1f),
 		m_RotSpeed(-2.0f),
 		m_ZoomSpeed(0.1f),
 		m_LRBaseMode(true)
@@ -201,7 +200,7 @@ namespace basecross {
 		m_CameraUnderRot(0.1f),
 		m_ArmLen(3.0f),
 		m_MaxArm(20.0f),
-		m_MinArm(0.5f),
+		m_MinArm(0.1f),
 		m_RotSpeed(-2.0f),
 		m_ZoomSpeed(0.1f),
 		m_LRBaseMode(true)
