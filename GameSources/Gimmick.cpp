@@ -119,6 +119,15 @@ namespace basecross {
 
 	}
 
+	void GimmickButton::OnUpdate()
+	{
+	}
+
+	void GimmickButton::PlaySE(wstring path, float volume, float loopcnt) {
+		auto playSE = App::GetApp()->GetXAudio2Manager();
+		playSE->Start(path, loopcnt, volume);
+	}
+
 	void GimmickButton::OnCollisionEnter(shared_ptr<GameObject>& Other)
 	{
 		if ((Other->FindTag(L"Player")))

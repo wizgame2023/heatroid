@@ -419,7 +419,7 @@ namespace basecross {
 		Obj->ToGoalEnterBehavior();
 	}
 	void OpeningCameramanToFirstState::Execute(const shared_ptr<OpeningCameraman>& Obj) {
-		if (Obj->ExcuteBehavior(1.0f)) {
+		if (Obj->ExcuteBehavior(4.0f)) {
 			Obj->GetStateMachine()->ChangeState(OpeningCameramanToSecondState::Instance());
 		}
 	}
@@ -437,7 +437,7 @@ namespace basecross {
 		Obj->ToStartEnterBehavior();
 	}
 	void OpeningCameramanToSecondState::Execute(const shared_ptr<OpeningCameraman>& Obj) {
-		if (Obj->ExcuteBehavior(3.0f)) {
+		if (Obj->ExcuteBehavior(2.0f)) {
 			Obj->GetStateMachine()->ChangeState(OpeningCameramanEndState::Instance());
 		}
 	}
