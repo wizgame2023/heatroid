@@ -64,11 +64,17 @@ namespace basecross {
 			shot_stand,	//チャージ地上
 			shot_air,	//チャージ空中
 			release,	//発射
+			start,		//ゲーム開始演出
 			died,		//死亡
 			goal		//ステージクリア
 		};
 		//プレイヤーの状態
 		Stats m_stateType;
+		//演出アニメ制御用の時間計測変数
+		float m_animTime = 0.0f;
+
+		//ステージマネージャ
+		shared_ptr<StageManager> m_stageMgr;
 
 		//掴み判定用ポインタ
 		weak_ptr<PlayerGrab> m_pGrab;
@@ -114,6 +120,8 @@ namespace basecross {
 		////Aボタン
 		void OnPushA();
 
+		//最高速度
+		void SpeedLimit();
 		//カメラの移動
 		void MoveCamera();
 		//アニメーション制御
@@ -122,6 +130,8 @@ namespace basecross {
 		void Gravity();
 		//摩擦
 		void Friction();
+		//演出中の摩擦
+		void FrictionMovie();
 
 		//四捨五入
 		Vec3 RoundOff(Vec3 number, int point);
@@ -249,6 +259,21 @@ namespace basecross {
 
 	};
 
+	//====================================================================
+	// class ChargeAura
+	// プレイヤーがチャージ中に足元に出る筒
+	//====================================================================
+	class ChargeAura : public GameObject {
+	public:
+		ChargeAura(const shared_ptr<Stage>& StagePtr) :
+			GameObject(StagePtr)
+		{};
+		~ChargeAura() {};
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+
+	};
 	//====================================================================
 	// class FireProjectile
 	// プレイヤーの火炎放射
