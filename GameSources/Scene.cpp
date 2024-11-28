@@ -86,6 +86,8 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"PlayerProj", soundWav);
 		soundWav = sdPath + L"PlayerLand.wav";
 		App::GetApp()->RegisterWav(L"PlayerLand", soundWav);
+		soundWav = sdPath + L"PlayerDamage.wav";
+		App::GetApp()->RegisterWav(L"PlayerDamage", soundWav);
 		//BGM
 		soundWav = sdPath + L"TitleTheme.wav";
 		App::GetApp()->RegisterWav(L"TitleBGM", soundWav);

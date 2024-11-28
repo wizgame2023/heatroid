@@ -66,6 +66,7 @@ namespace basecross {
 			release,	//発射
 			start,		//ゲーム開始演出
 			died,		//死亡
+			died_air,		//死亡空中
 			goal		//ステージクリア
 		};
 		//プレイヤーの状態
@@ -158,7 +159,7 @@ namespace basecross {
 
 		//死んだらtrueを返す
 		const bool GetDied() {
-			return (m_stateType == died);
+			return (m_stateType == died || m_stateType == died_air);
 		}
 
 		//ゴールに到達したらtrueを返す
@@ -234,7 +235,7 @@ namespace basecross {
 		PlayerGrab(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player) :
 			GameObject(StagePtr),
 			m_player(player),
-			m_dist(Vec3(-1.5f, 1, 0)),
+			m_dist(Vec3(-2.5f, 1, 0)),
 			m_scale(Vec3(8.0f)),
 			m_isHit(false)
 		{};
@@ -335,6 +336,7 @@ namespace basecross {
 
 		const float m_width = 150.0f;
 		const float m_height = 15.0f;
+		const float m_bottomSlip = 10.0f;
 
 		const float windowWidth = App::GetApp()->GetGameWidth();
 		const float windowHeight = App::GetApp()->GetGameHeight();
