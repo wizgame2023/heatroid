@@ -453,6 +453,7 @@ namespace basecross {
 				if (other == shObj) {
 					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
 					Switchs->SetButton(true);
+					PlayerSE(L"SwitchSE", 0.3, 0);
 				}
 			}
 		}
@@ -769,7 +770,7 @@ namespace basecross {
 
 		AddTag(L"Floor");
 		AddTag(L"EnemyFloor");
-		AddTag(L"Enemy");
+		//AddTag(L"Enemy");
 	}
 	void EnemyFloorCol::OnUpdate() {
 		auto enemy = m_enemy.lock();

@@ -38,7 +38,7 @@ namespace basecross {
 		if (m_StageName == L"GameStage.csv")
 		{
 			plVec = {
-				Vec3(75.0f, 5.0f,0.0f),
+				Vec3(80.0f, 5.0f,0.0f),
 				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
@@ -508,15 +508,17 @@ namespace basecross {
 	{
 		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
 		auto PlayPos =  PtrPlayer->AddComponent<Transform>()->GetPosition();
-		Vec3 CameraPos = Vec3(PlayPos.x + 5.0f, PlayPos.y, PlayPos.z);
-		Vec3 CameraEndPos = Vec3(PlayPos.x + 5.0f, PlayPos.y + 15.0f, PlayPos.z);
+		Vec3 CameraPos = Vec3(PlayPos.x + 10.0f, PlayPos.y + 5.0f, PlayPos.z);
+		Vec3 CameraStartEndPos = Vec3(PlayPos.x -5.0f, PlayPos.y + 5.0f, PlayPos.z);
+		Vec3 CameraEndPos = Vec3(PlayPos.x + 10.0f, PlayPos.y + 15.0f, PlayPos.z);
 		Vec3 PlayEndpos = Vec3(PlayPos.x - 5.0f, PlayPos.y, PlayPos.z);
+		Vec3 PlayStartpos = Vec3(PlayPos.x, PlayPos.y + 3.0f, PlayPos.z);
 		auto view = GetStage()->CreateView<SingleView>();
 		//カメラのオープニングの移動(最初のカメラの位置、最後のカメラの位置、
 // 　　　　　　　　　　　　　最初に見てる所、最後に見てる所、後半最初に見る位置、
 // 　　　　　　　　　　　　　かかる時間(多分)、後半最後にいる位置、後半最後に見てる所)
-		auto ptrOpeningCameraman = GetStage()->AddGameObject<OpeningCameraman>(CameraPos, CameraPos,
-			PlayPos, PlayEndpos, PlayEndpos,
+		auto ptrOpeningCameraman = GetStage()->AddGameObject<OpeningCameraman>(CameraPos, CameraStartEndPos,
+			PlayStartpos, Vec3(0), PlayEndpos,
 			0.0f, CameraEndPos, PlayEndpos);
 		//シェア配列にOpeningCameramanを追加
 		GetStage()->SetSharedGameObject(L"OpeningCameraman", ptrOpeningCameraman);
