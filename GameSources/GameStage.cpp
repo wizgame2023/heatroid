@@ -50,7 +50,7 @@ namespace basecross {
 			}
 			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 			{
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSelectStage");
 				OnDestroy();
 			}
 		}
@@ -60,7 +60,6 @@ namespace basecross {
 				auto obj = GetGameObjectVec();
 				for (auto object : obj)
 				{
-
 					object->SetUpdateActive(false);
 				}
 				m_pause = true;
