@@ -224,7 +224,7 @@ namespace basecross {
 		PlayerGrab(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player) :
 			GameObject(StagePtr),
 			m_player(player),
-			m_dist(Vec3(-1.5f, 1, 0)),
+			m_dist(Vec3(-5.0f, 1, 0)),
 			m_scale(Vec3(8.0f)),
 			m_isHit(false)
 		{};
