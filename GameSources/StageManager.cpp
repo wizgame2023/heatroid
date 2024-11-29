@@ -406,10 +406,33 @@ namespace basecross {
 
 	void StageManager::CreateSprite()
 	{
-		m_TextDraw = GetStage()->AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
-		m_SpriteDraw = GetStage()->AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.3f));
+		m_TextDraw = GetStage()->AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
+		m_TextDraw->SetDrawLayer(5);
+
+		m_SpriteDraw = GetStage()->AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(.0f, 0.0f, 0.0f));
+		m_SpriteDraw->SetDrawLayer(0);
+
+		m_StageUI = GetStage()->AddGameObject<Sprite>(L"GameStageUI", true, Vec2(640.0f, 400.0f), Vec3(10, 0, 0.0f));
+		m_StageUI->SetDrawLayer(1);
+
+		m_nextStageUI = GetStage()->AddGameObject<Sprite>(L"NextStage", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
+		m_nextStageUI->SetDrawLayer(4);
+
+		m_clearSelectStage = GetStage()->AddGameObject<Sprite>(L"ClearSelectStage", true, Vec2(400.0f, 300.0f), Vec3(-1000.0f, -200.0f, 0.0f));
+		m_clearSelectStage->SetDrawLayer(4);
+
+		m_retryStageUI = GetStage()->AddGameObject<Sprite>(L"Retry", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
+		m_retryStageUI->SetDrawLayer(4);
+
+		m_overSelectStage = GetStage()->AddGameObject<Sprite>(L"OverSelectStage", true, Vec2(400.0f, 300.0f), Vec3(-1000.0f, -200.0f, 0.0f));
+		m_overSelectStage->SetDrawLayer(4);
+
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
+		m_nextStageUI->SetDrawActive(false);
+		m_clearSelectStage->SetDrawActive(false);
+		m_retryStageUI->SetDrawActive(false);
+		m_overSelectStage->SetDrawActive(false);
 		ToOpeningCamera();
 	}
 
@@ -419,25 +442,40 @@ namespace basecross {
 		auto scene = app->GetScene<Scene>();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		auto nextUI = m_nextStageUI->GetComponent<Transform>();
+		auto selectUI = m_clearSelectStage->GetComponent<Transform>();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		float totaltime = 1.0f;
+		Easing<Vec3> easing;
 
 		auto playerSh = GetStage()->GetSharedGameObject<Player>(L"Player");
 		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
 		{
-			m_TextDraw->SetDrawActive(true);
-			m_SpriteDraw->SetDrawActive(true);
-			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_B|| KeyState.m_bPressedKeyTbl[VK_SPACE])
+			if (m_select == 0)
 			{
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
 				GetTypeStage<GameStage>()->OnDestroy();
-			}
-			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
-			{
-				scene->SetSelectedMap(scene->m_select + 1);
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
-				GetTypeStage<GameStage>()->OnDestroy();
-			}
 
+				m_StageUI->SetDrawActive(false);
+				m_TextDraw->SetDrawActive(true);
+				m_SpriteDraw->SetDrawActive(true);
+				m_nextStageUI->SetDrawActive(true);
+				m_clearSelectStage->SetDrawActive(true);
+
+				MoveSprite(m_nextStageUI, m_clearSelectStage);
+
+				if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
+				{
+					m_select = 1;
+					m_totalTime = 0.0f;
+				}
+				else if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
+				{
+					m_select = 2;
+					m_totalTime = 0.0f;
+				}
+			}
+			SelectMoveSprite(m_nextStageUI, m_clearSelectStage);
 		}
 	}
 
@@ -451,25 +489,93 @@ namespace basecross {
 		{
 			if (m_Flag)
 			{
+				m_StageUI->SetDrawActive(false);
+				m_retryStageUI->SetDrawActive(true);
+				m_overSelectStage->SetDrawActive(true);
 				GetStage()->AddGameObject<GameOverSprite>();
 				m_Flag = false;
 			}
-			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			if (m_select == 0)
 			{
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
-				GetTypeStage<GameStage>()->OnDestroy();
+				MoveSprite(m_retryStageUI, m_overSelectStage);
+				if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
+				{
+					m_select = 1;
+					m_totalTime = 0.0f;
+				}
+				if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
+				{
+					m_select = 3;
+					m_totalTime = 0.0f;
+				}
 			}
-			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
-			{
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
-				GetTypeStage<GameStage>()->OnDestroy();
-			}
+			SelectMoveSprite(m_retryStageUI, m_overSelectStage);
 		}
 	}
 	void StageManager::SetGameStageSelect(const wstring& m_csvFail)
 	{
 		m_StageName = m_csvFail;
 	}
+
+	void StageManager::MoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStageUI)
+	{
+		auto nextStage = nextStageUI->GetComponent<Transform>();
+		auto SelectStage = SelectStageUI->GetComponent<Transform>();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		float totaltime = 1.0f;
+		m_totalTime += ElapsedTime;
+		Easing<Vec3> easing;
+		Vec3 nextPos = easing.EaseInOut(EasingType::Exponential, Vec3(1000.0f, -275.0f, 0.0f), Vec3(150.0f, -275.0f, 0.0f), m_totalTime, totaltime);
+		nextStage->SetPosition(nextPos);
+		Vec3 selecttPos = easing.EaseInOut(EasingType::Exponential, Vec3(-1000.0f, -200.0f, 0.0f), Vec3(-200.0f, -200.0f, 0.0f), m_totalTime, totaltime);
+		SelectStage->SetPosition(selecttPos);
+
+	}
+
+	void StageManager::SelectMoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStage)
+	{
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
+
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		float totaltime = 1.0f;
+		Easing<Vec3> easing;
+
+		auto selectUI = SelectStage->GetComponent<Transform>();
+		auto nextStage = nextStageUI->GetComponent<Transform>();
+
+		if (m_select == 1)
+		{
+			m_totalTime += ElapsedTime;
+			Vec3 select = easing.EaseInOut(EasingType::Exponential, Vec3(-200.0f, -200.0f, 0.0f), Vec3(-1000.0f, -200.0f, 0.0f), m_totalTime, totaltime);
+			selectUI->SetPosition(select);
+			if (m_totalTime > 1.0f)
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+			}
+		}
+		else if (m_select == 2)
+		{
+			m_totalTime += ElapsedTime;
+			Vec3 m_nxsttPos = easing.EaseInOut(EasingType::Exponential, Vec3(150.0f, -275.0f, 0.0f), Vec3(1000.0f, -275.0f, 0.0f), m_totalTime, totaltime);
+			nextStage->SetPosition(m_nxsttPos);
+			if (m_totalTime > 1.0f)
+			{
+				scene->SetSelectedMap(scene->m_select + 1);
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+			}
+		}
+		else if (m_select == 3) {
+			m_totalTime += ElapsedTime;
+			Vec3 m_nxsttPos = easing.EaseInOut(EasingType::Exponential, Vec3(150.0f, -275.0f, 0.0f), Vec3(1000.0f, -275.0f, 0.0f), m_totalTime, totaltime);
+			nextStage->SetPosition(m_nxsttPos);
+			if (m_totalTime > 1.0f)
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+			}
+		}
+	}
+
 	wstring StageManager::GetGameStageSelect()
 	{
 		return m_StageName;

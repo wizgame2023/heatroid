@@ -29,9 +29,19 @@ namespace basecross {
 		int m_nowGameStatus;
 		wstring m_StageName;
 		CsvFile m_GameStage;
+		//スプライト
 		shared_ptr<Transform> m_PlayerObject;
 		shared_ptr<GameObject> m_SpriteDraw;
 		shared_ptr<GameObject> m_TextDraw;
+		shared_ptr<GameObject> m_StageUI;
+		shared_ptr<GameObject> m_nextStageUI;
+		shared_ptr<GameObject> m_clearSelectStage;
+		shared_ptr<GameObject> m_retryStageUI;
+		shared_ptr<GameObject> m_overSelectStage;
+
+		float m_totalTime = 0.0f;
+		int m_select = 0;
+
 		bool m_Goaltrue = false;
 		bool m_Diedtrue = false;
 		bool m_Flag = true;
@@ -44,11 +54,12 @@ namespace basecross {
 		void GoalJudge();
 		void GameOverJudge();
 		void SetGameStageSelect(const wstring& m_csvFail);
+		void MoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStage);
+		void SelectMoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStage);
 		wstring GetGameStageSelect();
 		int GetNowGameStatus();
 		void SetNowGameStatus(int afterGameStatus);
 		int GetNowCameraStatus();
-		void SetNowCameraStatus(int afterGameStatus);
 		void ToMainCamera();
 		void ToOpeningCamera();
 		
