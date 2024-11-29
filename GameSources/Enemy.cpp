@@ -475,23 +475,25 @@ namespace basecross {
 			auto player = m_player.lock();
 			if (!player) return;
 			auto pGrab = m_playerGrab.lock();
+			if(!pGrab) return;
 			auto playerPos = player->GetComponent<Transform>()->GetPosition();
 			auto playerFor = player->GetComponent<Transform>()->GetForward();
 			auto grabScal = m_playerGrab.lock()->GetComponent<Transform>()->GetScale();
 			Vec3 scal = Vec3(grabScal.x / 2.5, 0.0f, grabScal.z / 2.5);
-			float rad = XMConvertToRadians(100);
+			auto grabPos = pGrab->GetComponent<Transform>();
+			float rad = XMConvertToRadians(-45);
 			if (pGrab) {
-				m_trans->SetParent(player);
-				m_pos = Vec3(0.0f, -1.0f, 0.0f) + scal;
+				m_trans->SetParent(pGrab);
+				m_pos = Vec3(0.0f, -2.0f, 0.0f);
 				m_trans->SetPosition(m_pos);
-				m_trans->SetRotation(Vec3(0.0f, rad, 0.0f));
+				m_trans->SetRotation(Vec3(0.0f, 0.0f, 0.0f));
 
 			}
 			else {
 				return;
 			}
 			float angle = atan2(playerFor.z, playerFor.x);
-			//m_trans->SetRotation(Vec3(0.0f, angle, 0.0f));
+			m_trans->SetRotation(Vec3(0.0f, -angle, 0.0f));
 
 		}
 		else {
