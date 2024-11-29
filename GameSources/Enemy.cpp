@@ -850,6 +850,7 @@ namespace basecross {
 
 		AddTag(L"Floor");
 		AddTag(L"EnemyFloor");
+
 	}
 	void EnemyFloorCol::OnUpdate() {
 		auto enemy = m_enemy.lock();

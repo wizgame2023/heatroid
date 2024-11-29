@@ -35,7 +35,7 @@ namespace basecross {
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
 
-		m_stateType(air),
+		m_stateType(start),
 		m_isCharging(false),
 		m_isOverCharge(false),
 		m_chargePerc(0.0f),
@@ -63,11 +63,11 @@ namespace basecross {
 		m_fallTerminal(-50.0f),
 		m_firePos(Vec3(1.0f, .8f, -.75f)),
 		m_moveVel(Vec3(0, 0, 0)),
-		m_moveAngle(0.0f),
+		m_moveAngle(rot.y),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
 
-		m_stateType(stand),
+		m_stateType(start),
 		m_isCharging(false),
 		m_isOverCharge(false),
 		m_chargePerc(0.0f),
@@ -141,14 +141,20 @@ namespace basecross {
 
 	void Player::MovePlayer() {
 		auto trans = GetComponent<Transform>();
-		
+
 		//加速
 		m_moveVel += GetMoveVector() * m_accel * _delta;
 
 		//アニメーション関係
 		Animate();
 
-		//最高速度
+		SpeedLimit();
+
+		GetComponent<Transform>()->SetRotation(0, m_moveAngle, 0);
+	}
+
+	//最高速度
+	void Player::SpeedLimit() {
 		auto angle = Vec3(m_moveVel.x, 0, m_moveVel.z);
 		if (angle.length() > 0) {
 			angle.normalize();
@@ -168,12 +174,8 @@ namespace basecross {
 				if (m_moveVel.z < angle.z * limit) m_moveVel.z = angle.z * limit;
 			}
 		}
-
-		GetComponent<Transform>()->SetRotation(0, m_moveAngle, 0);
-
 		//落下の終端速度
 		if (m_moveVel.y < m_fallTerminal) m_moveVel.y = m_fallTerminal;
-
 	}
 
 	void Player::OnCreate() {
@@ -225,16 +227,10 @@ namespace basecross {
 
 		m_HP = m_HP_max;
 
+		//ステージマネージャ
+		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
 		//敵を掴む判定用オブジェクト
 		m_pGrab = GetStage()->AddGameObject<PlayerGrab>(GetThis<Player>());
-
-		//auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
-		//if (ptrCamera) {
-		//	//MyCameraである
-		//	//MyCameraに注目するオブジェクト（プレイヤー）の設定
-		//	ptrCamera->SetTargetObject(GetThis<GameObject>());
-		//	ptrCamera->SetTargetToAt(Vec3(0, 3.0f, 0));
-		//}
 	}
 
 	void Player::OnUpdate() {
@@ -262,6 +258,11 @@ namespace basecross {
 			m_isCarrying = false;
 			m_isCharging = false;
 			m_chargePerc = 0.0f;
+		}
+
+		//演出アニメを利用しないステート
+		if (m_stateType != start) {
+			m_animTime = 0.0f;
 		}
 
 		m_collideCount--;
@@ -329,6 +330,28 @@ namespace basecross {
 				m_stateType = stand;
 			}
 			break;
+			//---------------------------------------開始演出
+		case start:
+			m_animTime += _delta;
+			if (m_animTime <= 1.0f) {
+				SetAnim(L"Idle");
+			}
+			else if(m_animTime > 1.0f && m_animTime <= 3.0f) {
+				SetAnim(L"Walk");
+				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .005f;
+			}
+			else if (m_animTime > 3.0f) {
+				SetAnim(L"Idle");
+			}
+			FrictionMovie();
+			SpeedLimit();
+
+			//ステージマネージャ取得、カメラ元に戻ったら操作可能に
+			if (m_stageMgr->m_CameraSelect != StageManager::CameraSelect::openingCamera) {
+				m_stateType = stand;
+			}
+
+			break;
 			//---------------------------------------死亡
 		case died:
 			Died();
@@ -357,7 +380,7 @@ namespace basecross {
 	void Player::ShowDebug() {
 		wstringstream wss;
 		auto pos = RoundOff(GetComponent<Transform>()->GetPosition(), 3);
-		auto rot = RoundOff(GetComponent<Transform>()->GetRotation(), 3);
+		auto rot = GetComponent<Transform>()->GetQuaternion();
 
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		wss << "stateType : " << m_stateType << endl;
@@ -401,20 +424,6 @@ namespace basecross {
 			}
 			m_stateType = stand;
 		}
-
-
-		//if ((Other->FindTag(L"GimmickButton")))
-		//{
-		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-		//	auto& vec = group->GetGroupVector();
-		//	for (auto& v : vec) {
-		//		auto shObj = v.lock();
-		//		if (Other == shObj) {
-		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-		//			Switchs->SetButton(true);
-		//		}
-		//	}
-		//}
 	}
 
 	void Player::GrabEnemy() {
@@ -447,52 +456,11 @@ namespace basecross {
 				}
 			}
 		}
-		//if ((Other->FindTag(L"GimmickButton")))
-		//{
-		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-		//	auto& vec = group->GetGroupVector();
-		//	for (auto& v : vec) {
-		//		auto shObj = v.lock();
-		//		if (Other == shObj) {
-		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-		//			Switchs->SetButton(true);
-		//		}
-		//	}
-		//}
 	}
 	void Player::OnCollisionExit(shared_ptr<GameObject>& Other)
 	{
-		//if ((Other->FindTag(L"GimmickButton")))
-		//{
-		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-		//	auto& vec = group->GetGroupVector();
-		//	for (auto& v : vec) {
-		//		auto shObj = v.lock();
-		//		if (shObj) {
-		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-		//			Switchs->SetButton(false);
-		//		}
-		//	}
-		//}
 	}
 
-	void Player::MoveCamera()
-	{
-		//auto ptrCamera = dynamic_pointer_cast<Camera>(OnGetDrawCamera());
-		//auto pos = GetComponent<Transform>()->GetPosition();
-		//Vec3 Camera = ptrCamera->GetEye();
-		//float differenceX = pos.x - Camera.x;
-		//if (differenceX >= 0.5f)
-		//{
-		//	ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), -0.3f, Camera.z);
-		//	ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
-		//}
-		//else if (differenceX <= -0.5f)
-		//{
-		//	ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), -0.3f, Camera.z);
-		//	ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
-		//}
-	}
 
 	void Player::Animate() {
 		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .23f) {
@@ -523,7 +491,7 @@ namespace basecross {
 	//摩擦(地上のみ)
 	void Player::Friction() {
 		if (m_doPhysicalProcess = false) return;
-		if (GetMoveVector() == Vec3(0) || m_stateType == died) {
+		if (GetMoveVector() == Vec3(0) || m_stateType == died || m_animTime > 0.0f) {
 			m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
 			m_moveVel.z -= m_moveVel.z * m_friction * (1000.0f / 60.0f) * _delta;
 			if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
@@ -534,6 +502,14 @@ namespace basecross {
 			m_moveVel.x -= m_moveVel.x * m_frictionDynamic * (1000.0f / 60.0f) * _delta;
 			m_moveVel.z -= m_moveVel.z * m_frictionDynamic * (1000.0f / 60.0f) * _delta;
 		}
+	}
+
+	//GetMoveVectorを使わない摩擦(演出用)
+	void Player::FrictionMovie() {
+		m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
+		m_moveVel.z -= m_moveVel.z * m_friction * (1000.0f / 60.0f) * _delta;
+		if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
+		if (abs(m_moveVel.z) <= m_frictionThreshold) m_moveVel.z = 0;
 	}
 
 	Vec3 Player::RoundOff(Vec3 number, int point) {
@@ -557,6 +533,7 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Jumping", 320, 15, false, anim_fps);
 		ptrDraw->AddAnimation(L"Falling", 350, 20, true, anim_fps);
 		ptrDraw->AddAnimation(L"Land", 336, 4, false, anim_fps);
+		ptrDraw->AddAnimation(L"Walk", 100, 29, true, anim_fps);
 		//火炎放射+行動
 		ptrDraw->AddAnimation(L"Fire_Idle", 170, 60, true, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_Run", 140, 19, true, 38.0f);//アニメーションを合わせるため
@@ -699,6 +676,12 @@ namespace basecross {
 	}
 
 	//====================================================================
+	// class ChargeAura
+	// プレイヤーがチャージ中に足元に出る筒
+	//====================================================================
+
+
+	//====================================================================
 	// class FireProjectile
 	// プレイヤーの飛び道具
 	//====================================================================
@@ -735,7 +718,7 @@ namespace basecross {
 
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(
-			Vec3(1.0f / trans->GetScale().x, 1.0f / trans->GetScale().y, 1.0f / trans->GetScale().z), //(.1f, .1f, .1f),
+			Vec3(2.0f / trans->GetScale().x, 2.0f / trans->GetScale().y, 2.0f / trans->GetScale().z), //(.1f, .1f, .1f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f)

@@ -70,13 +70,22 @@ namespace basecross{
 		//ゲームクリア
 		app->RegisterTexture(L"GameClearTEXT", texPath + L"CLEAR.Text.png");
 		app->RegisterTexture(L"CLEARBackGround", texPath + L"CLEARBackGround.png");
+		app->RegisterTexture(L"NextStage", texPath + L"NextStage.png");
+		app->RegisterTexture(L"ClearSelectStage", texPath + L"ClearSelectStage.png");
+
 		//ゲームオーバー
 		app->RegisterTexture(L"GameOverText", texPath + L"GAMEOVER_Text.png");
 		app->RegisterTexture(L"GameOverBackEffect", texPath + L"GAMEOVER_BackEffect.png");
+		app->RegisterTexture(L"OverSelectStage", texPath + L"OverSelectStage.png");
+		app->RegisterTexture(L"Retry", texPath + L"Retry.png");
+
 		//オーバーヒート
 		app->RegisterTexture(L"OverHeatText", texPath + L"OverHeatText.png");
+
 		//セレクトステージテクスチャ
 		app->RegisterTexture(L"SelectStageBack", texPath + L"SelectStageBack.png");
+		//GameStageUI
+		app->RegisterTexture(L"GameStageUI", texPath + L"UIGameStage.png");
 
 		//サウンド
 		//SE
@@ -88,6 +97,8 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"PlayerProj", soundWav);
 		soundWav = sdPath + L"PlayerLand.wav";
 		App::GetApp()->RegisterWav(L"PlayerLand", soundWav);
+		soundWav = sdPath + L"Switch.wav";
+		App::GetApp()->RegisterWav(L"SwitchSE", soundWav);
 		//BGM
 		soundWav = sdPath + L"TitleTheme.wav";
 		App::GetApp()->RegisterWav(L"TitleBGM", soundWav);

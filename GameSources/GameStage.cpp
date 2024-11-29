@@ -25,8 +25,48 @@ namespace basecross {
 	}
 	void GameStage::OnUpdate()
 	{
-		
+		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
+		int camerastatus = stageMane->GetNowCameraStatus();
+		if (stageMane->m_CameraSelect == StageManager::CameraSelect::myCamera)
+		{
+			GamePause();
+		}
 	}
+
+	void GameStage::GamePause()
+	{
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		if (m_pause)
+		{
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+			{
+				auto obj = GetGameObjectVec();
+				for (auto object : obj)
+				{
+					object->SetUpdateActive(true);
+				}
+				m_pause = false;
+			}
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSelectStage");
+				OnDestroy();
+			}
+		}
+		else {
+			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+			{
+				auto obj = GetGameObjectVec();
+				for (auto object : obj)
+				{
+					object->SetUpdateActive(false);
+				}
+				m_pause = true;
+			}
+		}
+	}
+
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{

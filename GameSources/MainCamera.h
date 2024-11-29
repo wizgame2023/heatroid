@@ -32,7 +32,7 @@ namespace basecross {
 		virtual void OnCreate();
 		//çXêV
 		virtual void OnUpdate();
-		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
+		virtual void OnCollisionExcute(const CollisionPair& Pair) override;
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 		void UpdateArmLengh();
