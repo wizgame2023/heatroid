@@ -85,22 +85,6 @@ namespace basecross {
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
-		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || KeyState.m_bPressedKeyTbl[VK_UP])
-		{
-			m_select++;
-			if (m_select > m_maxSelect)
-			{
-				m_select = 0;
-			}
-		}
-		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || KeyState.m_bPressedKeyTbl[VK_DOWN])
-		{
-			m_select--;
-			if (m_select < 0)
-			{
-				m_select = m_maxSelect;
-			}
-		}
 
 		switch (m_select)
 		{

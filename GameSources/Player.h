@@ -122,8 +122,6 @@ namespace basecross {
 
 		//最高速度
 		void SpeedLimit();
-		//カメラの移動
-		void MoveCamera();
 		//アニメーション制御
 		void Animate();
 		//重力
