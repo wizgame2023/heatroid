@@ -461,7 +461,7 @@ namespace basecross {
 				m_SpriteDraw->SetDrawActive(true);
 				m_nextStageUI->SetDrawActive(true);
 				m_clearSelectStage->SetDrawActive(true);
-
+				GetStage()->AddGameObject<FadeOut>();
 				MoveSprite(m_nextStageUI, m_clearSelectStage);
 
 				if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
