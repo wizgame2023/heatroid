@@ -115,8 +115,6 @@ namespace basecross {
 
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		group->IntoGroup(GetThis<GameObject>());
-
-
 	}
 
 	void GimmickButton::OnUpdate()

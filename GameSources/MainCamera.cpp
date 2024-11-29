@@ -32,9 +32,11 @@ namespace basecross {
 		TargetPos = Vec3(0.0f, 0.0f, 0.0f);
 		GetPos = Vec3(0.0f, 1.0f, 0.0f);
 		//“–‚½‚è”»’è
+		auto ptrTarget = ptrCamera->GetTargetObject();
 		auto m_camera = AddComponent<CollisionSphere>();
 		ptrCamera->SetCameraObject(GetThis<GameObject>());
 		m_camera->SetAfterCollision(AfterCollision::Auto);
+		m_camera->AddExcludeCollisionGameObject(ptrTarget);
 	}
 
 	void CameraCollision::OnUpdate() {
@@ -147,7 +149,6 @@ namespace basecross {
 		Vec3 vec =toAt - Pos;
 		m_ArmLen = length(vec);
 
-		auto StageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
 		if (m_ArmLen >= ptrCamera->m_MaxArm) {
 			//m_MaxArmˆÈã—£‚ê‚È‚¢‚æ‚¤‚É‚·‚é
 			m_ArmLen = ptrCamera->m_MaxArm;
