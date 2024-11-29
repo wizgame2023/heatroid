@@ -13,20 +13,28 @@ namespace basecross {
 	//	ゲームステージクラス
 	//--------------------------------------------------------------------------------------
 	class GameStageHemmi : public Stage {
-		CsvFile m_GameStage1;
-		void CreateViewLight(); //ビューの作成
-		void CreateGameBox();//GameStageの生成
-		void CreatePlayer(); //Playerの生成
-		void CreateFixedBox();
-		void CreateGimmick();
-		void CreateEnemy();
-		void InstanceStage();
+
+		shared_ptr<SoundItem> m_BGM;
+		std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager();
+		//CsvFile m_GameStage1;
+		//void CreateViewLight(); //ビューの作成
+		//void CreateGameBox();//GameStageの生成
+		//void CreatePlayer(); //Playerの生成
+		//void CreateFixedBox();
+		//void CreateGimmick();
+		//void CreateEnemy();
+		//void InstanceStage();
+		//void ToMainCamera();
 	public:
 		//構築と破棄
 		GameStageHemmi() :Stage(){}
 		virtual ~GameStageHemmi() {}
-		
 		virtual void OnCreate()override; //初期化
+		
+		void PlayBGM(const wstring& StageBGM);
+		void CreateStageManager();
+		void CreateEnemy();
+		void OnDestroy();
 	};
 
 }
