@@ -84,6 +84,7 @@ namespace basecross{
 
 		//セレクトステージテクスチャ
 		app->RegisterTexture(L"SelectStageBack", texPath + L"SelectStageBack.png");
+		app->RegisterTexture(L"SelectFram", texPath + L"SelectFram.png");
 		//GameStageUI
 		app->RegisterTexture(L"GameStageUI", texPath + L"UIGameStage.png");
 

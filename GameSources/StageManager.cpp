@@ -368,7 +368,7 @@ namespace basecross {
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 			}
 			break;
-		case GameStatus::GAME_PLAYING:
+		case GameStatus::GAME_PLAYING: 
 			if (m_CameraSelect == CameraSelect::openingCamera)
 			{
 				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
@@ -464,12 +464,12 @@ namespace basecross {
 				GetStage()->AddGameObject<FadeOut>();
 				MoveSprite(m_nextStageUI, m_clearSelectStage);
 
-				if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
 					m_select = 1;
 					m_totalTime = 0.0f;
 				}
-				else if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 				{
 					m_select = 2;
 					m_totalTime = 0.0f;
@@ -498,12 +498,12 @@ namespace basecross {
 			if (m_select == 0)
 			{
 				MoveSprite(m_retryStageUI, m_overSelectStage);
-				if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
 					m_select = 1;
 					m_totalTime = 0.0f;
 				}
-				if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 				{
 					m_select = 3;
 					m_totalTime = 0.0f;
