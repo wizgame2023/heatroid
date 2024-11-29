@@ -280,11 +280,11 @@ namespace basecross {
 			Gravity();
 
 			//Bボタンで射出
-			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_B || key.m_bUpKeyTbl[VK_LCONTROL] == true)
+			if ((pad[0].wReleasedButtons & XINPUT_GAMEPAD_B) || key.m_bUpKeyTbl[VK_LCONTROL] == true)
 				Projectile();
 
 			//Bボタンでチャージ
-			Charging(pad[0].wButtons & XINPUT_GAMEPAD_B || key.m_bPushKeyTbl[VK_LCONTROL] == true);
+			Charging((pad[0].wButtons & XINPUT_GAMEPAD_B) || key.m_bPushKeyTbl[VK_LCONTROL] == true);
 
 			//Rボタンで敵を持つ
 			GrabEnemy();
