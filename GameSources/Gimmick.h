@@ -76,6 +76,7 @@ namespace basecross {
 		Vec3 m_Rotation;
 		Vec3 m_Scale;
 		bool m_open;
+		bool m_flag = false;
 		shared_ptr<GameObject> GDoor;
 		int m_number;
 		wstring m_Texname;

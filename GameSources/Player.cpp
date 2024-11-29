@@ -231,14 +231,6 @@ namespace basecross {
 		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
 		//敵を掴む判定用オブジェクト
 		m_pGrab = GetStage()->AddGameObject<PlayerGrab>(GetThis<Player>());
-
-		//auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
-		//if (ptrCamera) {
-		//	//MyCameraである
-		//	//MyCameraに注目するオブジェクト（プレイヤー）の設定
-		//	ptrCamera->SetTargetObject(GetThis<GameObject>());
-		//	ptrCamera->SetTargetToAt(Vec3(0, 3.0f, 0));
-		//}
 	}
 
 	void Player::OnUpdate() {
@@ -432,20 +424,6 @@ namespace basecross {
 			}
 			m_stateType = stand;
 		}
-
-
-		//if ((Other->FindTag(L"GimmickButton")))
-		//{
-		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-		//	auto& vec = group->GetGroupVector();
-		//	for (auto& v : vec) {
-		//		auto shObj = v.lock();
-		//		if (Other == shObj) {
-		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-		//			Switchs->SetButton(true);
-		//		}
-		//	}
-		//}
 	}
 
 	void Player::GrabEnemy() {
@@ -478,52 +456,11 @@ namespace basecross {
 				}
 			}
 		}
-		//if ((Other->FindTag(L"GimmickButton")))
-		//{
-		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-		//	auto& vec = group->GetGroupVector();
-		//	for (auto& v : vec) {
-		//		auto shObj = v.lock();
-		//		if (Other == shObj) {
-		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-		//			Switchs->SetButton(true);
-		//		}
-		//	}
-		//}
 	}
 	void Player::OnCollisionExit(shared_ptr<GameObject>& Other)
 	{
-		//if ((Other->FindTag(L"GimmickButton")))
-		//{
-		//	auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-		//	auto& vec = group->GetGroupVector();
-		//	for (auto& v : vec) {
-		//		auto shObj = v.lock();
-		//		if (shObj) {
-		//			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-		//			Switchs->SetButton(false);
-		//		}
-		//	}
-		//}
 	}
 
-	void Player::MoveCamera()
-	{
-		//auto ptrCamera = dynamic_pointer_cast<Camera>(OnGetDrawCamera());
-		//auto pos = GetComponent<Transform>()->GetPosition();
-		//Vec3 Camera = ptrCamera->GetEye();
-		//float differenceX = pos.x - Camera.x;
-		//if (differenceX >= 0.5f)
-		//{
-		//	ptrCamera->SetEye(Camera.x + (differenceX - 0.5f), -0.3f, Camera.z);
-		//	ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
-		//}
-		//else if (differenceX <= -0.5f)
-		//{
-		//	ptrCamera->SetEye(Camera.x + (differenceX + 0.5f), -0.3f, Camera.z);
-		//	ptrCamera->SetAt(pos.x - differenceX, -0.3f, pos.z);
-		//}
-	}
 
 	void Player::Animate() {
 		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .23f) {

@@ -119,6 +119,13 @@ namespace basecross {
 
 	void GimmickButton::OnUpdate()
 	{
+		if (m_open == true)
+		{
+
+		}
+		else {
+
+		}
 	}
 
 	void GimmickButton::PlaySE(wstring path, float volume, float loopcnt) {
