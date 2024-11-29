@@ -484,7 +484,7 @@ namespace basecross {
 			float rad = XMConvertToRadians(-45);
 			if (pGrab) {
 				m_trans->SetParent(pGrab);
-				m_pos = Vec3(0.0f, -2.0f, 0.0f);
+				m_pos = Vec3(0.0f, 0.0f, 0.0f);
 				m_trans->SetPosition(m_pos);
 				m_trans->SetRotation(Vec3(0.0f, 0.0f, 0.0f));
 

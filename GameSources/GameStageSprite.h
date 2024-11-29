@@ -92,6 +92,7 @@ namespace basecross {
 		bool m_sCheck[4];
 		bool m_nextFlag;
 		bool m_coolTimeFlag;
+		bool m_select;
 		Vec3 m_pos;
 		Vec3 m_selectPos;
 		Vec2 m_maxPos;
@@ -108,7 +109,9 @@ namespace basecross {
 		void KeepStick();
 		void CoolTimeStick();
 		void PosSetting();
+		void Decision();
 		void Debug();
+		bool GetSelectNum();
 
 	};
 }

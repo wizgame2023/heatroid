@@ -133,10 +133,10 @@ namespace basecross {
 		GameObject(stage),
 		m_widthNum(2),
 		m_heightNum(6),
-		m_wSize(50),
-		m_hSize(50),
-		m_wSpace(20),
-		m_hSpace(20),
+		m_wSize(200),
+		m_hSize(70),
+		m_wSpace(700),
+		m_hSpace(30),
 		m_widthSpace(m_wSpace+m_wSize),
 		m_heightSpace(m_hSpace+m_hSize),
 		m_selectNum(1),
@@ -149,7 +149,8 @@ namespace basecross {
 		m_minPos(0.0f),
 		m_sCheck{false},
 		m_nextFlag(false),
-		m_coolTimeFlag(false)
+		m_coolTimeFlag(false),
+		m_select(false)
 	{}
 	void SelectSprite::OnCreate() {
 		auto stage = GetStage();
@@ -171,10 +172,11 @@ namespace basecross {
 	}
 	void SelectSprite::OnUpdate() {
 		auto selectTrans = m_selectSprite->GetComponent<Transform>();
-		
+		Decision();
 		StickSelect();
-		KeepStick();
+		//KeepStick();
 		selectTrans->SetPosition(m_selectPos);
+		//m_sprite[m_selectNum+1]->SetColor(Col4(0.0f, 1.0f, 1.0f, 1.0f));
 		Debug();
 	}
 	//À•W‚ð^‚ñ’†‚É‚·‚éŒvŽZ
@@ -199,7 +201,7 @@ namespace basecross {
 		auto cntVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
 		CoolTimeStick();
-		//if (m_coolTimeFlag&&m_nextFlag==false) return;
+		if (m_select) return;
 		//ã
 		if (cntVec[0].fThumbLY > 0.7f || keyState.m_bPressedKeyTbl[VK_UP]) {
 			if ((!m_sCheck[0] ||m_nextFlag) &&
@@ -224,10 +226,11 @@ namespace basecross {
 		else if (cntVec[0].fThumbLY > -0.7f || keyState.m_bLastKeyTbl[VK_DOWN]) {
 			m_sCheck[2] = false;
 		}
+
 		if (cntVec[0].fThumbLX > 0.7f || keyState.m_bPressedKeyTbl[VK_RIGHT]) {
 			if ((!m_sCheck[1] || m_nextFlag) &&
 				m_minPos.x > m_selectPos.x) {
-				m_selectPos.x += m_heightSpace;
+				m_selectPos.x += m_widthSpace;
 				m_sCheck[1] = true;
 				m_selectNum += m_heightNum;
 			}
@@ -287,6 +290,16 @@ namespace basecross {
 			m_coolTime = m_maxCoolTime;
 			m_coolTimeFlag = false;
 		}
+	}
+	void SelectSprite::Decision() {
+		//auto cntVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		//auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
+		//if (cntVec[0].wPressedButtons && XINPUT_GAMEPAD_A || keyState.m_bPressedKeyTbl[VK_SPACE]) {
+		//	m_select = true;
+		//}
+	}
+	bool SelectSprite::GetSelectNum() {
+		return m_selectNum;
 	}
 	void SelectSprite::Debug() {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
