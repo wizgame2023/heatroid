@@ -80,7 +80,7 @@ namespace basecross {
 		shared_ptr<GameObject> GDoor;
 		int m_number;
 		wstring m_Texname;
-		bool m_flag = false;
+		//bool m_flag = false;
 	public:
 		int m_switch;
 		GimmickButton(const shared_ptr<Stage>& stage,
