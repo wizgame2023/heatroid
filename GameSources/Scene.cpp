@@ -81,8 +81,12 @@ namespace basecross{
 
 		//オーバーヒート
 		app->RegisterTexture(L"OverHeatText", texPath + L"OverHeatText.png");
+
+		//セレクトステージテクスチャ
+		app->RegisterTexture(L"SelectStageBack", texPath + L"SelectStageBack.png");
 		//GameStageUI
 		app->RegisterTexture(L"GameStageUI", texPath + L"UIGameStage.png");
+
 		//サウンド
 		//SE
 		wstring soundWav = sdPath + L"OverHeatSE.wav";
