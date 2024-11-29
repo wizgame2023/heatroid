@@ -75,6 +75,8 @@ namespace basecross{
 		app->RegisterTexture(L"GameOverBackEffect", texPath + L"GAMEOVER_BackEffect.png");
 		//オーバーヒート
 		app->RegisterTexture(L"OverHeatText", texPath + L"OverHeatText.png");
+		//セレクトステージテクスチャ
+		app->RegisterTexture(L"SelectStageBack", texPath + L"SelectStageBack.png");
 
 		//サウンド
 		//SE
