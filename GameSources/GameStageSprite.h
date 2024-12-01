@@ -71,47 +71,26 @@ namespace basecross {
 		virtual void OnUpdate() override;
 	};
 
-	class SelectSprite : public GameObject {
+	class NumberSprite :public GameObject {
 	private:
-		int m_widthNum;
-		int m_heightNum;
-		float m_wSize;
-		float m_hSize;
-		float m_wSpace;
-		float m_hSpace;
-		float m_widthSpace;
-		float m_heightSpace;
-		float m_keepTime;
-		float m_maxKeepTime;
-		float m_coolTime;
-		float m_maxCoolTime;
-		float m_sum;
-		int m_selectNum;
-		int m_keepNum;
-
-		bool m_sCheck[4];
-		bool m_nextFlag;
-		bool m_coolTimeFlag;
-		bool m_select;
+		int m_number;
+		float m_width;
+		float m_height;
+		float m_moveW;
+		float m_moveH;
 		Vec3 m_pos;
-		Vec3 m_selectPos;
-		Vec2 m_maxPos;
-		Vec2 m_minPos;
-		shared_ptr<GameSprite> m_sprite[20];
-		shared_ptr<GameSprite> m_selectSprite;
+		Col4 m_color;
+		wstring m_meshName;
+
+		vector<VertexPositionColorTexture> m_vertices;
+		vector<uint16_t> m_indices;
+		shared_ptr<PCTSpriteDraw> m_draw;
 		shared_ptr<Transform> m_trans;
-	public :
-		SelectSprite(const shared_ptr<Stage>& stage);
-		virtual ~SelectSprite() {};
+
+	public:
+		NumberSprite(const shared_ptr<Stage>& stage,const int& number,const Vec3& pos);
+		virtual ~NumberSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
-		void StickSelect();
-		void KeepStick();
-		void CoolTimeStick();
-		void PosSetting();
-		void Decision();
-		void Debug();
-		bool GetSelectNum();
-
 	};
 }
