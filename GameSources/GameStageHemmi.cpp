@@ -292,8 +292,6 @@ namespace basecross {
 
 			CreatePlayer();
 			auto player = GetSharedGameObject<Player>(L"Player");
-			AddGameObject<SpriteHealth>(player);
-			AddGameObject<SpriteCharge>(player);
 			CreateFixedBox();
 			//CreateSprite();
 			CreateEnemy();

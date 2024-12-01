@@ -270,6 +270,7 @@ namespace basecross {
 		if (m_stateType == air || m_stateType == hit_stand || m_stateType == hit_air || m_stateType == died || m_stateType == goal) {
 			m_isCarrying = false;
 			m_isCharging = false;
+			m_isOverCharge = false;
 			m_chargePerc = 0.0f;
 		}
 
@@ -398,6 +399,16 @@ namespace basecross {
 
 		GetComponent<Transform>()->SetPosition((m_moveVel * _delta) + GetComponent<Transform>()->GetPosition());
 
+		if (m_isCarrying == true) {
+			m_pGrab.lock()->SetCollActive(true);
+			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(true);
+		}
+		else {
+			m_pGrab.lock()->SetCollActive(false);
+			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(false);
+		}
+
+
 		GetDrawPtr()->UpdateAnimation(_delta);
 	}
 
@@ -478,13 +489,11 @@ namespace basecross {
 		auto key = App::GetApp()->GetInputDevice().GetKeyState();
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 
-		if (pad[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bPushKeyTbl[VK_RETURN] == true) {
-			m_pGrab.lock()->SetCollActive(true);
-			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(true);
+		if (pad[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bPushKeyTbl['Q'] == true) {
+			m_isCarrying = true;
 		}
 		else {
-			m_pGrab.lock()->SetCollActive(false);
-			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(false);
+			m_isCarrying = false;
 		}
 	}
 
@@ -890,6 +899,44 @@ namespace basecross {
 	}
 
 	//====================================================================
+	// class SpritePlayerUI
+	// プレイヤーのゲージ類
+	//====================================================================
+
+	void SpritePlayerUI::OnCreate() {
+		Col4 color(1, 1, 1, 1);
+
+		m_Vertices = {
+			{Vec3(0, 0, 0.0f), color, Vec2(0, 0)},
+			{Vec3(m_width, 0, 0.0f), color, Vec2(1, 0)},
+			{Vec3(0, -m_height, 0.0f), color, Vec2(0, 1)},
+			{Vec3(m_width, -m_height, 0.0f), color, Vec2(1, 1)},
+		};
+		vector<uint16_t> indices = {
+			0, 1, 2,
+			2, 1, 3,
+		};
+		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
+		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
+		m_DrawComp->SetTextureResource(m_resKey);
+		m_DrawComp->SetDrawActive(true);
+		SetDrawLayer(m_layer);
+		SetAlphaActive(true);
+
+		GetComponent<Transform>()->SetPosition(windowWidth * -.52, windowHeight * .5, 0);
+
+		if (m_resKey == L"PLAYERUI") {
+			m_health = GetStage()->AddGameObject<SpriteHealth>(m_player.lock(), GetThis<SpritePlayerUI>());
+			m_charge = GetStage()->AddGameObject<SpriteCharge>(m_player.lock(), GetThis<SpritePlayerUI>());
+			m_frame = GetStage()->AddGameObject<SpritePlayerUI>(m_player.lock(), L"PLAYERUI2", 3);
+		}
+	}
+
+	void SpritePlayerUI::OnUpdate() {
+
+	}
+
+	//====================================================================
 	// class SpriteHealth
 	// プレイヤーのライフ
 	//====================================================================
@@ -900,8 +947,8 @@ namespace basecross {
 		m_Vertices = {
 			{Vec3(0 + m_bottomSlip, 0, 0.0f), color, Vec2(0, 0)},
 			{Vec3(m_width + m_bottomSlip, 0, 0.0f), color, Vec2(1, 0)},
-			{Vec3(0, m_height, 0.0f), color, Vec2(0, 1)},
-			{Vec3(m_width, m_height, 0.0f), color, Vec2(1, 1)},
+			{Vec3(0, -m_height, 0.0f), color, Vec2(0, 1)},
+			{Vec3(m_width, -m_height, 0.0f), color, Vec2(1, 1)},
 		};
 		vector<uint16_t> indices = {
 			0, 1, 2,
@@ -911,10 +958,11 @@ namespace basecross {
 		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
 		m_DrawComp->SetTextureResource(L"HEALTH");
 		m_DrawComp->SetDrawActive(true);
-		SetDrawLayer(1);
+		SetDrawLayer(2);
 		SetAlphaActive(true);
 
-		GetComponent<Transform>()->SetPosition(windowWidth * -.45, windowHeight * .45, 0);
+		Vec3 pos = m_meter->GetComponent<Transform>()->GetPosition();
+		GetComponent<Transform>()->SetPosition(pos + addPos);
 	}
 
 	void SpriteHealth::OnUpdate() {
@@ -938,10 +986,10 @@ namespace basecross {
 		Col4 color(1, 1, 1, 1);
 
 		m_Vertices = {
-			{Vec3(0, 0, 0.0f), color, Vec2(0, 0)},
-			{Vec3(m_width, 0, 0.0f), color, Vec2(1, 0)},
-			{Vec3(0, m_height, 0.0f), color, Vec2(0, 1)},
-			{Vec3(m_width, m_height, 0.0f), color, Vec2(1, 1)},
+			{Vec3(0 + m_bottomSlip, 0, 0.0f), color, Vec2(0, 0)},
+			{Vec3(m_width + m_bottomSlip, 0, 0.0f), color, Vec2(1, 0)},
+			{Vec3(0, -m_height, 0.0f), color, Vec2(0, 1)},
+			{Vec3(m_width, -m_height, 0.0f), color, Vec2(1, 1)},
 		};
 		vector<uint16_t> indices = {
 			0, 1, 2,
@@ -951,10 +999,11 @@ namespace basecross {
 		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
 		m_DrawComp->SetTextureResource(L"CHARGE");
 		m_DrawComp->SetDrawActive(false);
-		SetDrawLayer(1);
+		SetDrawLayer(2);
 		SetAlphaActive(true);
 
-		GetComponent<Transform>()->SetPosition(windowWidth * -.45, windowHeight * .42, 0);
+		Vec3 pos = m_meter->GetComponent<Transform>()->GetPosition();
+		GetComponent<Transform>()->SetPosition(pos + addPos);
 	}
 
 	void SpriteCharge::OnUpdate() {
@@ -964,8 +1013,8 @@ namespace basecross {
 		if (player->IsCharging()) {
 			draw->SetDrawActive(true);
 			float perc = player->GetChargePerc();
-			m_Vertices[1].position.x = m_width * perc;
-			m_Vertices[3].position.x = m_width * perc;
+			m_Vertices[1].position.x = (m_width * perc) + m_bottomSlip;
+			m_Vertices[3].position.x = (m_width * perc);
 			m_Vertices[1].textureCoordinate.x = perc;
 			m_Vertices[3].textureCoordinate.x = perc;
 
