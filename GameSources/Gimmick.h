@@ -48,7 +48,6 @@ namespace basecross {
 		int kazu = 1;
 		int m_number;
 		bool m_Flag;
-		bool m_Flag2;
 	public:
 		float m_OpenSwitch;
 		wstring m_Texname;
@@ -68,49 +67,50 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void OpenDoor();
+		void PlaySE(wstring path, float loopcnt, float volume);
 	};
 
 	class GimmickButton : public GameObject
 	{
-		Vec3 m_Position;
-		Vec3 m_Rotation;
-		Vec3 m_Scale;
-		bool m_open;
-		bool m_flag = false;
-		shared_ptr<GameObject> GDoor;
-		int m_number;
-		wstring m_Texname;
-		//bool m_flag = false;
-	public:
-		int m_switch;
-		GimmickButton(const shared_ptr<Stage>& stage,
-			const Vec3& position,
-			const Vec3& rotation,
-			const Vec3& scale,
-			int m_switch,
-			int number,
-			const wstring& m_Texname
-		);
-		virtual ~GimmickButton();
-		//èâä˙âª
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		void PlaySE(wstring path, float volume, float loopcnt);
-		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
-		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
+		public:
 
-		bool GetButton() {
-			return m_open;
-		}
-		void SetButton(const bool& open)
-		{
-			m_open = open;
-		}
+			Vec3 m_Position;
+			Vec3 m_Rotation;
+			Vec3 m_Scale;
+			int m_switch;
+			int m_number;
+			wstring m_Texname;
 
-		int GetSwitch()
-		{
-			return m_switch;
-		}
+			bool m_open;
+			bool m_flag = false;
+
+			GimmickButton(const shared_ptr<Stage>& stage,
+				const Vec3& position,
+				const Vec3& rotation,
+				const Vec3& scale,
+				int m_switch,
+				int number,
+				const wstring& m_Texname
+			);
+			virtual ~GimmickButton();
+			//èâä˙âª
+			virtual void OnCreate() override;
+			virtual void OnUpdate() override;
+			void PlaySE(wstring path, float volume, float loopcnt);
+			//âüÇ≥ÇÍÇƒÇ¢ÇÈÇÃÇ©ÇÃîªíË
+			bool GetButton() 
+			{
+				return m_open;
+			}
+			void SetButton(const bool& open)
+			{
+				m_open = open;
+			}
+			//swichîªï 
+			int GetSwitch()
+			{
+				return m_switch;
+			}
 	};
 
 	class Door : public GameObject

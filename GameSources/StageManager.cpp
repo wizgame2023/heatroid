@@ -461,6 +461,7 @@ namespace basecross {
 				m_SpriteDraw->SetDrawActive(true);
 				m_nextStageUI->SetDrawActive(true);
 				m_clearSelectStage->SetDrawActive(true);
+
 				GetStage()->AddGameObject<FadeOut>();
 				MoveSprite(m_nextStageUI, m_clearSelectStage);
 
