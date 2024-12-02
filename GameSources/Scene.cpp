@@ -35,6 +35,9 @@ namespace basecross{
 		//敵のモデル
 		auto enemyAruki = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_ARUKU.bmf");
 		app->RegisterResource(L"ENEMYARUKU", enemyAruki);
+		auto enemyTobi = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_TOBU.bmf");
+		app->RegisterResource(L"ENEMYTOBU", enemyTobi);
+
 
 
 		//ステージオブジェクトのモデル
@@ -56,8 +59,10 @@ namespace basecross{
 		app->RegisterTexture(L"HEALTH", texPath + L"PlayerMeterHP.png");
 		app->RegisterTexture(L"CHARGE", texPath + L"PlayerMeterCharge.png");
 		//ロード画面テクスチャ
-		app->RegisterTexture(L"LoadBG", texPath + L"loadblack.png");
-		app->RegisterTexture(L"LoadText", texPath + L"loadtext.png");
+		app->RegisterTexture(L"LoadBG", texPath + L"LoadBG.png");
+		app->RegisterTexture(L"LoadText", texPath + L"loadtext_wip.png");
+		app->RegisterTexture(L"LoadCircle", texPath + L"LoadCircle.png");
+		app->RegisterTexture(L"LoadBar", texPath + L"LoadBar.png");
 		//ステージオブジェクトテクスチャ
 		app->RegisterTexture(L"Wall", texPath + L"UV_WALL.png");
 		app->RegisterTexture(L"Floor", texPath + L"UV_FLOOR.png");
