@@ -92,9 +92,11 @@ namespace basecross {
 			auto Status = ptrStageManager->GameStatus::TEST_PLAY;
 			ptrStageManager->SetNowGameStatus(Status);
 			ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
+			ptrStageManager->CreateViewLight();
 			ptrStageManager->CreatePlayer();
 			ptrStageManager->CreateFixedBox();
 			ptrStageManager->CreateEnemy();
+			ptrStageManager->CreateSprite();
 		}
 		else
 		{

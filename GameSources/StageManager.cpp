@@ -78,7 +78,7 @@ namespace basecross {
 		else if (m_StageName == L"ToTitle")
 		{
 			plVec = {
-				Vec3(0.0f, 5.0f,0.0f),
+				Vec3(+20.0f, 5.0f,0.0f),
 				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
@@ -465,7 +465,34 @@ namespace basecross {
 			break;
 
 		case GameStatus::TEST_PLAY:
-
+			if (m_CameraSelect == CameraSelect::openingCamera)
+			{
+				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+				auto& vec = group->GetGroupVector();
+				for (auto v : vec)
+				{
+					auto shObj = v.lock();
+					if (shObj)
+					{
+						shObj->SetUpdateActive(false);
+					}
+				}
+			}
+			if (m_CameraSelect == CameraSelect::myCamera)
+			{
+				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+				auto& vec = group->GetGroupVector();
+				for (auto v : vec)
+				{
+					auto shObj = v.lock();
+					if (shObj->GetUpdateActive() == false)
+					{
+						shObj->SetUpdateActive(true);
+					}
+				}
+				GoalJudge();
+				GameOverJudge();
+			}
 			break;
 
 		default:
