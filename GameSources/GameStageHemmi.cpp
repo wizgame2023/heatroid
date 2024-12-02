@@ -342,6 +342,5 @@ namespace basecross {
 	//	}
 	//}
 
-
 }
 //end basecross

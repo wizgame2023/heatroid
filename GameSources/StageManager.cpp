@@ -77,6 +77,7 @@ namespace basecross {
 		}
 		//プレーヤーの作成
 		shared_ptr<GameObject> ptrPlayer = GetStage()->AddGameObject<Player>(plVec[0], plVec[1], plVec[2]);
+		GetStage()->AddGameObject<SpritePlayerUI>(dynamic_pointer_cast<Player>(ptrPlayer), L"PLAYERUI", 1);
 		//シェア配列にプレイヤーを追加
 		GetStage()->SetSharedGameObject(L"Player", ptrPlayer);
 		auto playerPos = ptrPlayer->GetComponent<Transform>();
@@ -362,8 +363,15 @@ namespace basecross {
 			}
 			break;
 		case GameStatus::SELECT:
+			if (scene->m_select == 0)
+			{
+				if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+				{
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
 
-			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+				}
+			}
+			else if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 			}
@@ -461,6 +469,7 @@ namespace basecross {
 				m_SpriteDraw->SetDrawActive(true);
 				m_nextStageUI->SetDrawActive(true);
 				m_clearSelectStage->SetDrawActive(true);
+
 				GetStage()->AddGameObject<FadeOut>();
 				MoveSprite(m_nextStageUI, m_clearSelectStage);
 
@@ -487,6 +496,16 @@ namespace basecross {
 		m_Diedtrue = playerSh->GetDied();
 		if (m_Diedtrue)
 		{
+			auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+			auto& vec = group->GetGroupVector();
+			for (auto v : vec)
+			{
+				auto shObj = v.lock();
+				if (shObj)
+				{
+					shObj->SetUpdateActive(false);
+				}
+			}
 			if (m_Flag)
 			{
 				m_StageUI->SetDrawActive(false);
@@ -616,7 +635,7 @@ namespace basecross {
 		auto PlayPos =  PtrPlayer->AddComponent<Transform>()->GetPosition();
 		Vec3 CameraPos = Vec3(PlayPos.x + 10.0f, PlayPos.y + 5.0f, PlayPos.z);
 		Vec3 CameraStartEndPos = Vec3(PlayPos.x -5.0f, PlayPos.y + 5.0f, PlayPos.z);
-		Vec3 CameraEndPos = Vec3(PlayPos.x + 10.0f, PlayPos.y + 15.0f, PlayPos.z);
+		Vec3 CameraEndPos = Vec3(PlayPos.x + 15.0f, PlayPos.y + 15.0f, PlayPos.z);
 		Vec3 PlayEndpos = Vec3(PlayPos.x - 5.0f, PlayPos.y, PlayPos.z);
 		Vec3 PlayStartpos = Vec3(PlayPos.x, PlayPos.y + 3.0f, PlayPos.z);
 		auto view = GetStage()->CreateView<SingleView>();

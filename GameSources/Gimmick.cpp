@@ -7,6 +7,7 @@
 #include "stdafx.h"
 #include "Project.h"
 #include "FixedBox.h"
+#include "Gimmick.h"
 namespace basecross {
 
 
@@ -88,6 +89,7 @@ namespace basecross {
 	GimmickButton::~GimmickButton() {}
 	//èâä˙âª
 	void GimmickButton::OnCreate() {
+		m_open = false;
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_Position);
 		Trans->SetRotation(m_Rotation);
@@ -116,38 +118,29 @@ namespace basecross {
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		group->IntoGroup(GetThis<GameObject>());
 	}
-
+	
 	void GimmickButton::OnUpdate()
 	{
-		if (m_open == true)
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		float time = 0;
+		if (m_open && m_flag == false)
 		{
-
-		}
-		else {
-
+			PlaySE(L"SwitchSE", 0, 1.0);
+			m_flag = true;
+			time += ElapsedTime;
+			if (time > 5.0f)
+			{
+				m_flag = false;
+			}
 		}
 	}
 
-	void GimmickButton::PlaySE(wstring path, float volume, float loopcnt) {
+	void GimmickButton::PlaySE(wstring path, float loopcnt, float volume) {
 		auto playSE = App::GetApp()->GetXAudio2Manager();
 		playSE->Start(path, loopcnt, volume);
 	}
 
-	void GimmickButton::OnCollisionEnter(shared_ptr<GameObject>& Other)
-	{
-		if ((Other->FindTag(L"Player")))
-		{
-			m_open = true;
-		}
-	}
 
-	void GimmickButton::OnCollisionExit(shared_ptr<GameObject>& Other)
-	{
-		//if ((Other->FindTag(L"Player")) || Other->FindTag(L"Enemy"))
-		//{
-		//	m_open = false;
-		//}
-	}
 
 	GimmickDoor::GimmickDoor(const shared_ptr<Stage>& StagePtr,
 		const Vec3& position,
@@ -175,8 +168,8 @@ namespace basecross {
 	//èâä˙âª
 	void GimmickDoor::OnCreate() {
 		m_open = false;
+		m_open2 = false;
 		m_Flag = false;
-		m_Flag2 = false;
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_Position);
 		Trans->SetRotation(m_Rotation);
@@ -238,6 +231,11 @@ namespace basecross {
 					{
 						for (int i = 0; i < 1; i++)
 						{
+							if (m_Flag == false)
+							{
+								PlaySE(L"DoorSE", 0, 1.0);
+								m_Flag = true;
+							}
 							if (m_Scale.x < m_Scale.z)
 							{
 								ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
@@ -261,6 +259,11 @@ namespace basecross {
 								{
 									for (int i = 0; i < 1; i++)
 									{
+										if (m_Flag == false)
+										{
+											PlaySE(L"DoorSE", 0, 1.0);
+											m_Flag = true;
+										}
 										if (m_Scale.x < m_Scale.z)
 										{
 											ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
@@ -274,6 +277,7 @@ namespace basecross {
 								else
 								{
 									ptrTransform->SetPosition(m_Position);
+									m_Flag == false;
 								}									
 							}
 						}
@@ -283,11 +287,19 @@ namespace basecross {
 				else
 				{
 					ptrTransform->SetPosition(m_Position);
+					m_Flag == false;
 				}
 
 			}
 		}
 	}
+
+
+	void GimmickDoor::PlaySE(wstring path, float loopcnt, float volume) {
+			auto SE = App::GetApp()->GetXAudio2Manager();
+			SE->Start(path, loopcnt, volume);
+	}
+
 
 	Door::Door(const shared_ptr<Stage>& StagePtr,
 		const Vec3& position,
