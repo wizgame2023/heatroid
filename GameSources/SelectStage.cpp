@@ -103,6 +103,9 @@ namespace basecross {
 		case 4:
 			scene->SetSelectedMap(4);
 			break;
+		case 5:
+			scene->SetSelectedMap(5);
+			break;
 		}
 	}
 

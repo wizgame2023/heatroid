@@ -37,32 +37,39 @@ namespace basecross {
 	{
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-		if (m_pause)
-		{
-			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
-			{
-				auto obj = GetGameObjectVec();
-				for (auto object : obj)
-				{
-					object->SetUpdateActive(true);
-				}
-				m_pause = false;
-			}
-			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
-			{
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
-				OnDestroy();
-			}
-		}
+		auto playerSh = GetSharedGameObject<Player>(L"Player");
+		bool m_Diedtrue = playerSh->GetDied();
+		bool m_Goaltrue = playerSh->GetArrivedGoal();
+		if (m_Diedtrue){}
+		else if (m_Goaltrue) {}
 		else {
-			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+			if (m_pause)
 			{
-				auto obj = GetGameObjectVec();
-				for (auto object : obj)
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
 				{
-					object->SetUpdateActive(false);
+					auto obj = GetGameObjectVec();
+					for (auto object : obj)
+					{
+						object->SetUpdateActive(true);
+					}
+					m_pause = false;
 				}
-				m_pause = true;
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
+				{
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+					OnDestroy();
+				}
+			}
+			else {
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+				{
+					auto obj = GetGameObjectVec();
+					for (auto object : obj)
+					{
+						object->SetUpdateActive(false);
+					}
+					m_pause = true;
+				}
 			}
 		}
 	}
