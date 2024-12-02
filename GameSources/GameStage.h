@@ -20,6 +20,11 @@ namespace basecross {
 		shared_ptr<GameObject> m_fadeIn;
 		shared_ptr<GameObject> m_fadeOut;
 
+		shared_ptr<GameObject> m_pauseBackGround;
+		shared_ptr<GameObject> m_PauseSelect;
+		shared_ptr<GameObject> m_PauseTitle;
+		shared_ptr<GameObject> m_PauseBack;
+
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage(){}

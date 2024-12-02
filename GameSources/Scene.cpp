@@ -100,6 +100,12 @@ namespace basecross{
 
 		//GameStageUI
 		app->RegisterTexture(L"GameStageUI", texPath + L"UIGameStage.png");
+		app->RegisterTexture(L"PauseBG", texPath + L"PauseBackGround.png");
+		app->RegisterTexture(L"PauseSelect", texPath + L"PauseSelect.png");
+		app->RegisterTexture(L"PauseTitle", texPath + L"PauseTitle.png");
+		app->RegisterTexture(L"PauseBack", texPath + L"PauseBack.png");
+		app->RegisterTexture(L"PauseSelectCharge", texPath + L"PauseSelectCharge.png");
+		app->RegisterTexture(L"PauseTitleCharge", texPath + L"PauseTitleCharge.png");
 
 		//サウンド
 		//SE
@@ -115,6 +121,14 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"PlayerDamage", soundWav);
 		soundWav = sdPath + L"Switch.wav";
 		App::GetApp()->RegisterWav(L"SwitchSE", soundWav);
+		soundWav = sdPath + L"Decision.wav";
+		App::GetApp()->RegisterWav(L"DecisionSE", soundWav);
+
+		soundWav = sdPath + L"Confirm.wav";
+		App::GetApp()->RegisterWav(L"Confirm", soundWav);
+
+		soundWav = sdPath + L"GameClear.wav";
+		App::GetApp()->RegisterWav(L"GameClearSE", soundWav);
 		soundWav = sdPath + L"Door.wav";
 		App::GetApp()->RegisterWav(L"DoorSE", soundWav);
 		//BGM
