@@ -77,6 +77,7 @@ namespace basecross {
 		}
 		//プレーヤーの作成
 		shared_ptr<GameObject> ptrPlayer = GetStage()->AddGameObject<Player>(plVec[0], plVec[1], plVec[2]);
+		GetStage()->AddGameObject<SpritePlayerUI>(dynamic_pointer_cast<Player>(ptrPlayer), L"PLAYERUI", 1);
 		//シェア配列にプレイヤーを追加
 		GetStage()->SetSharedGameObject(L"Player", ptrPlayer);
 		auto playerPos = ptrPlayer->GetComponent<Transform>();

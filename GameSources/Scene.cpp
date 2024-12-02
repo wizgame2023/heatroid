@@ -51,8 +51,10 @@ namespace basecross{
 		// 仮テクスチャ
 		app->RegisterTexture(L"White", texPath + L"White.png");
 		app->RegisterTexture(L"FIRE", texPath + L"fire_kari.png");
-		app->RegisterTexture(L"HEALTH", texPath + L"health.png");
-		app->RegisterTexture(L"CHARGE", texPath + L"charge.png");
+		app->RegisterTexture(L"PLAYERUI", texPath + L"PlayerMeterBack.png");
+		app->RegisterTexture(L"PLAYERUI2", texPath + L"PlayerMeterFront.png");
+		app->RegisterTexture(L"HEALTH", texPath + L"PlayerMeterHP.png");
+		app->RegisterTexture(L"CHARGE", texPath + L"PlayerMeterCharge.png");
 		//ロード画面テクスチャ
 		app->RegisterTexture(L"LoadBG", texPath + L"loadblack.png");
 		app->RegisterTexture(L"LoadText", texPath + L"loadtext.png");
@@ -100,6 +102,8 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"PlayerProj", soundWav);
 		soundWav = sdPath + L"PlayerLand.wav";
 		App::GetApp()->RegisterWav(L"PlayerLand", soundWav);
+		soundWav = sdPath + L"PlayerDamage.wav";
+		App::GetApp()->RegisterWav(L"PlayerDamage", soundWav);
 		soundWav = sdPath + L"Switch.wav";
 		App::GetApp()->RegisterWav(L"SwitchSE", soundWav);
 		//BGM
@@ -143,6 +147,9 @@ namespace basecross{
 		}
 		else if (event->m_MsgStr == L"ToGameStageTsuboi") {
 			ResetActiveStage<GameStageTsuboi>();
+		}
+		else if (event->m_MsgStr == L"ToLoad") {
+			ResetActiveStage<LoadScreen>();
 		}
 	}
 

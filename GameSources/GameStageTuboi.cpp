@@ -19,8 +19,6 @@ namespace basecross {
 			a->CreateViewLight();
 			a->CreatePlayer();
 			auto player = GetSharedGameObject<Player>(L"Player");
-			AddGameObject<SpriteHealth>(player);
-			AddGameObject<SpriteCharge>(player);
 			a->CreateEnemy();
 			a->CreateFixedBox();
 			a->CreateGimmick();

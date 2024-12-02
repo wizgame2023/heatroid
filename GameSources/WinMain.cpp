@@ -148,7 +148,7 @@ int MainLoop(HINSTANCE hInstance, HWND hWnd, bool isFullScreen, int iClientWidth
 		vector<DWORD> UseKeyVec = {
 			VK_PRIOR,VK_NEXT,VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT,VK_SPACE,
 			VK_LBUTTON, VK_RBUTTON, VK_MBUTTON, VK_LCONTROL,VK_RETURN,VK_TAB,
-			'W','A','S','D','X','B'
+			'W','A','S','D','X','B','Q'
 		};
 		while (WM_QUIT != msg.message) {
 			if (!App::GetApp()->ResetInputState(hWnd, UseKeyVec)) {
