@@ -87,15 +87,29 @@ namespace basecross {
 		auto scene = app->GetScene<Scene>();
 		auto ptrStageManager = AddGameObject<StageManager>();
 		SetSharedGameObject(L"StageManager", ptrStageManager);
-		auto Status = ptrStageManager->GameStatus::GAME_PLAYING;
-		ptrStageManager->SetNowGameStatus(Status);
-		ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
-		ptrStageManager->CreatePlayer();
-		ptrStageManager->CreateViewLight();
-		ptrStageManager->CreateEnemy();
-		ptrStageManager->CreateFixedBox();
-		ptrStageManager->CreateGimmick();
-		ptrStageManager->CreateSprite();
+		if (scene->GetSelectedMap() == L"ToTitle")
+		{
+			auto Status = ptrStageManager->GameStatus::TEST_PLAY;
+			ptrStageManager->SetNowGameStatus(Status);
+			ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
+			ptrStageManager->CreateViewLight();
+			ptrStageManager->CreatePlayer();
+			ptrStageManager->CreateFixedBox();
+			ptrStageManager->CreateEnemy();
+			ptrStageManager->CreateSprite();
+		}
+		else
+		{
+			auto Status = ptrStageManager->GameStatus::GAME_PLAYING;
+			ptrStageManager->SetNowGameStatus(Status);
+			ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
+			ptrStageManager->CreatePlayer();
+			ptrStageManager->CreateViewLight();
+			ptrStageManager->CreateEnemy();
+			ptrStageManager->CreateFixedBox();
+			ptrStageManager->CreateGimmick();
+			ptrStageManager->CreateSprite();
+		}
 	}
 
 

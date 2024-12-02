@@ -157,6 +157,9 @@ namespace basecross{
 		else if (event->m_MsgStr == L"ToGameStageTsuboi") {
 			ResetActiveStage<GameStageTsuboi>();
 		}
+		else if (event->m_MsgStr == L"ToTestStage") {
+			ResetActiveStage<GameStage>();
+		}
 		else if (event->m_MsgStr == L"ToLoad") {
 			ResetActiveStage<LoadScreen>();
 		}

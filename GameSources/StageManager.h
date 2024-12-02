@@ -22,6 +22,8 @@ namespace basecross {
 			SELECT,
 			// ゲームが開始してから終了するまで
 			GAME_PLAYING,
+
+			TEST_PLAY
 		};
 		CameraSelect m_CameraSelect;
 		shared_ptr<SingleView> m_OpeningCameraView;

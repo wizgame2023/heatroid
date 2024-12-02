@@ -16,6 +16,7 @@ namespace basecross {
 		try {
 			CreateStageManager();
 			auto player = GetSharedGameObject<Player>(L"Player");
+
 			//AddGameObject<FadeIn>();
 			PlayBGM(L"StageBGM");
 		}
