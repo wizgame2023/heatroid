@@ -542,30 +542,6 @@ namespace basecross {
 				}
 			}
 		}
-
-		//if (other->FindTag(L"PlayerGrab")) {
-		//	auto playerGrab = dynamic_pointer_cast<PlayerGrab>(other);
-
-		//	if (m_stateType == m_overHeatState) {
-		//		m_test = 1.0f;
-		//		auto player = m_player.lock();
-		//		if (!player) return;
-		//		m_trans->SetParent(player);
-		//		auto playerPos = player->GetComponent<Transform>()->GetPosition();
-		//		auto playerFor = player->GetComponent<Transform>()->GetForward();
-		//		auto grabScal = playerGrab->GetComponent<Transform>()->GetScale();
-		//		Vec3 scal = Vec3(grabScal.x / 2, 0.0f, grabScal.z / 2);
-		//		auto fixedBox = m_fixedBox.lock();
-		//		if (fixedBox) {
-		//			m_pos = Vec3(0.0f, -0.5f, 0.0f) + scal;
-		//			m_trans->SetPosition(m_pos);
-
-		//		}
-		//		float angle = atan2(playerFor.z, playerFor.x);
-		//		//m_trans->SetRotation(Vec3(0.0f, angle, 0.0f));
-		//	}
-		//}
-
 	}
 
 	void Enemy::EnemyAnime(wstring anime) {

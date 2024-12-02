@@ -106,6 +106,8 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"PlayerDamage", soundWav);
 		soundWav = sdPath + L"Switch.wav";
 		App::GetApp()->RegisterWav(L"SwitchSE", soundWav);
+		soundWav = sdPath + L"Door.wav";
+		App::GetApp()->RegisterWav(L"DoorSE", soundWav);
 		//BGM
 		soundWav = sdPath + L"TitleTheme.wav";
 		App::GetApp()->RegisterWav(L"TitleBGM", soundWav);
@@ -158,22 +160,26 @@ namespace basecross{
 		switch (select)
 		{
 		case 0:
-			m_SelectedMap =  L"GameStage.csv";
+			m_SelectedMap = L"ToTitle";
 			m_select = select;
 			break;
 		case 1:
-			m_SelectedMap = L"Stagedata1.csv";
+			m_SelectedMap =  L"GameStage.csv";
 			m_select = select;
 			break;
 		case 2:
-			m_SelectedMap = L"Stagedata2.csv";
+			m_SelectedMap = L"Stagedata1.csv";
 			m_select = select;
 			break;
 		case 3:
-			m_SelectedMap = L"Stagedata3.csv";
+			m_SelectedMap = L"Stagedata2.csv";
 			m_select = select;
 			break;
 		case 4:
+			m_SelectedMap = L"Stagedata3.csv";
+			m_select = select;
+			break;
+		case 5:
 			m_SelectedMap = L"Stagedata4.csv";
 			m_select = select;
 			break;
