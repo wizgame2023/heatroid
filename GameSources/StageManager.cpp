@@ -75,6 +75,14 @@ namespace basecross {
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
 		}
+		else if (m_StageName == L"ToTitle")
+		{
+			plVec = {
+				Vec3(+20.0f, 5.0f,0.0f),
+				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
+				Vec3(3.0f, 3.0f, 3.0f)
+			};
+		}
 		//プレーヤーの作成
 		shared_ptr<GameObject> ptrPlayer = GetStage()->AddGameObject<Player>(plVec[0], plVec[1], plVec[2]);
 		GetStage()->AddGameObject<SpritePlayerUI>(dynamic_pointer_cast<Player>(ptrPlayer), L"PLAYERUI", 1);
@@ -297,33 +305,71 @@ namespace basecross {
 	}
 
 	void StageManager::CreateEnemy() {
-		GetStage()->CreateSharedObjectGroup(L"Enemy");
-		vector<wstring> LineVec;
-		m_GameStage.GetSelect(LineVec, 0, L"Enemy");
-		for (auto& v : LineVec) {
-			Enemy::State stateBefore;
-			Enemy::State stateAfter;
-			vector<wstring> Tokens;
-			Util::WStrToTokenVector(Tokens, v, L',');
-			Vec3 Scale(3,3,3);
-			Vec3 Rot;
-			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
-			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
-			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+		if (m_nowGameStatus == GameStatus::GAME_PLAYING)
+		{
+			GetStage()->CreateSharedObjectGroup(L"Enemy");
+			vector<wstring> LineVec;
+			m_GameStage.GetSelect(LineVec, 0, L"Enemy");
+			for (auto& v : LineVec) {
+				Enemy::State stateBefore;
+				Enemy::State stateAfter;
+				vector<wstring> Tokens;
+				Util::WStrToTokenVector(Tokens, v, L',');
+				Vec3 Scale(3,3,3);
+				Vec3 Rot;
+				Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+				Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+				Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
 
-			Vec3 Pos(
-				(float)_wtof(Tokens[1].c_str()),
-				(float)_wtof(Tokens[2].c_str()),
-				(float)_wtof(Tokens[3].c_str())
-			);
-			auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
-			if (Tokens[10] == L"Enemy::rightMove")			stateBefore = Enemy::rightMove;
-			else if (Tokens[10] == L"Enemy::rightMove")		stateBefore = Enemy::fly;
-			if (Tokens[11] == L"Enemy::stay")				stateAfter = Enemy::stay;
-			else if (Tokens[11] == L"Enemy::stay")			stateAfter = Enemy::fixedStay;
-			auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale, stateBefore, stateAfter, player);
-			auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
-			group->IntoGroup(enemy);
+				Vec3 Pos(
+					(float)_wtof(Tokens[1].c_str()),
+					(float)_wtof(Tokens[2].c_str()),
+					(float)_wtof(Tokens[3].c_str())
+				);
+				auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
+				if (Tokens[10] == L"Enemy::rightMove" && Tokens[11] == L"Enemy::stay") {
+					stateBefore = Enemy::rightMove;
+					stateAfter = Enemy::stay;
+					auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+					group->IntoGroup(enemy);
+				}
+				else if (Tokens[10] == L"Enemy::fly" && Tokens[11] == L"Enemy::fixedStay") {
+					stateBefore = Enemy::fly;
+					stateAfter = Enemy::fixedStay;
+					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+					group->IntoGroup(enemy);
+				}
+			}
+		}
+		if (m_nowGameStatus == GameStatus::TEST_PLAY)
+		{
+			GetStage()->CreateSharedObjectGroup(L"Enemy");
+			vector<wstring> LineVec;
+			m_GameStage.GetSelect(LineVec, 0, L"Enemy");
+			for (auto& v : LineVec) {
+				Enemy::State stateBefore;
+				Enemy::State stateAfter;
+				vector<wstring> Tokens;
+				Util::WStrToTokenVector(Tokens, v, L',');
+				Vec3 Scale(3, 3, 3);
+				Vec3 Rot;
+				Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+				Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+				Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+				Vec3 Pos(
+					(float)_wtof(Tokens[1].c_str()),
+					(float)_wtof(Tokens[2].c_str()),
+					(float)_wtof(Tokens[3].c_str())
+				);
+				auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
+				auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+				group->IntoGroup(enemy);
+			}
+
 		}
 	}
 
@@ -339,8 +385,15 @@ namespace basecross {
 			//CSVパスを取得
 			if (m_StageName != L"")
 			{
-				m_GameStage.SetFileName(csvPath + m_StageName);
-				m_GameStage.ReadCsv();
+				if (m_StageName == L"ToTitle")
+				{
+					m_GameStage.SetFileName(csvPath + L"TestStage.csv");
+					m_GameStage.ReadCsv();
+				}
+				else {
+					m_GameStage.SetFileName(csvPath + m_StageName);
+					m_GameStage.ReadCsv();
+				}
 			}
 		}
 		catch (...) {
@@ -357,7 +410,7 @@ namespace basecross {
 
 		switch (m_nowGameStatus) {
 		case GameStatus::TITLE:
-			if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
 			}
@@ -365,13 +418,17 @@ namespace basecross {
 		case GameStatus::SELECT:
 			if (scene->m_select == 0)
 			{
-				if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
 					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
-
 				}
+				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+				{
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTestStage");
+				}
+
 			}
-			else if (cntlVec[0].wPressedButtons || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			else if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 			}
@@ -406,6 +463,38 @@ namespace basecross {
 				GameOverJudge();
 			}
 			break;
+
+		case GameStatus::TEST_PLAY:
+			if (m_CameraSelect == CameraSelect::openingCamera)
+			{
+				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+				auto& vec = group->GetGroupVector();
+				for (auto v : vec)
+				{
+					auto shObj = v.lock();
+					if (shObj)
+					{
+						shObj->SetUpdateActive(false);
+					}
+				}
+			}
+			if (m_CameraSelect == CameraSelect::myCamera)
+			{
+				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+				auto& vec = group->GetGroupVector();
+				for (auto v : vec)
+				{
+					auto shObj = v.lock();
+					if (shObj->GetUpdateActive() == false)
+					{
+						shObj->SetUpdateActive(true);
+					}
+				}
+				GoalJudge();
+				GameOverJudge();
+			}
+			break;
+
 		default:
 			break;
 		}
@@ -418,22 +507,22 @@ namespace basecross {
 		m_TextDraw->SetDrawLayer(5);
 
 		m_SpriteDraw = GetStage()->AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(.0f, 0.0f, 0.0f));
-		m_SpriteDraw->SetDrawLayer(0);
+		m_SpriteDraw->SetDrawLayer(4);
 
 		m_StageUI = GetStage()->AddGameObject<Sprite>(L"GameStageUI", true, Vec2(640.0f, 400.0f), Vec3(10, 0, 0.0f));
-		m_StageUI->SetDrawLayer(1);
+		m_StageUI->SetDrawLayer(3);
 
 		m_nextStageUI = GetStage()->AddGameObject<Sprite>(L"NextStage", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
-		m_nextStageUI->SetDrawLayer(4);
+		m_nextStageUI->SetDrawLayer(5);
 
 		m_clearSelectStage = GetStage()->AddGameObject<Sprite>(L"ClearSelectStage", true, Vec2(400.0f, 300.0f), Vec3(-1000.0f, -200.0f, 0.0f));
-		m_clearSelectStage->SetDrawLayer(4);
+		m_clearSelectStage->SetDrawLayer(5);
 
 		m_retryStageUI = GetStage()->AddGameObject<Sprite>(L"Retry", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
-		m_retryStageUI->SetDrawLayer(4);
+		m_retryStageUI->SetDrawLayer(5);
 
 		m_overSelectStage = GetStage()->AddGameObject<Sprite>(L"OverSelectStage", true, Vec2(400.0f, 300.0f), Vec3(-1000.0f, -200.0f, 0.0f));
-		m_overSelectStage->SetDrawLayer(4);
+		m_overSelectStage->SetDrawLayer(5);
 
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
@@ -470,9 +559,14 @@ namespace basecross {
 				m_nextStageUI->SetDrawActive(true);
 				m_clearSelectStage->SetDrawActive(true);
 
-				GetStage()->AddGameObject<FadeOut>();
+				auto BGSprite = GetStage()->AddGameObject<FadeOut>();
+				BGSprite->SetDrawLayer(-1);
+				auto end = BGSprite->GetFadeOutEnd();
+				if (end)
+				{
+					BGSprite->SetColor(Col4(0.0f, 0.0f, 0.0f, 0.6f));
+				}
 				MoveSprite(m_nextStageUI, m_clearSelectStage);
-
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
 					m_select = 1;
