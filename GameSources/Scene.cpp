@@ -35,6 +35,9 @@ namespace basecross{
 		//敵のモデル
 		auto enemyAruki = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_ARUKU.bmf");
 		app->RegisterResource(L"ENEMYARUKU", enemyAruki);
+		auto enemyTobi = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_TOBU.bmf");
+		app->RegisterResource(L"ENEMYTOBU", enemyTobi);
+
 
 
 		//ステージオブジェクトのモデル
