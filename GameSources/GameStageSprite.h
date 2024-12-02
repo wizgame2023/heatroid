@@ -70,4 +70,27 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
+
+	class NumberSprite :public GameObject {
+	private:
+		int m_number;
+		float m_width;
+		float m_height;
+		float m_moveW;
+		float m_moveH;
+		Vec3 m_pos;
+		Col4 m_color;
+		wstring m_meshName;
+
+		vector<VertexPositionColorTexture> m_vertices;
+		vector<uint16_t> m_indices;
+		shared_ptr<PCTSpriteDraw> m_draw;
+		shared_ptr<Transform> m_trans;
+
+	public:
+		NumberSprite(const shared_ptr<Stage>& stage,const int& number,const Vec3& pos);
+		virtual ~NumberSprite() {};
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+	};
 }

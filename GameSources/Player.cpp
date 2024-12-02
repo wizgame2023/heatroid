@@ -63,7 +63,7 @@ namespace basecross {
 		m_fallTerminal(-50.0f),
 		m_firePos(Vec3(1.0f, .8f, -.75f)),
 		m_moveVel(Vec3(0, 0, 0)),
-		m_moveAngle(0.0f),
+		m_moveAngle(rot.y),
 		m_collideCountInit(3),
 		m_collideCount(m_collideCountInit),
 
@@ -238,17 +238,22 @@ namespace basecross {
 		auto key = App::GetApp()->GetInputDevice().GetKeyState();
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 
-		if (m_landSEcooltime > 0.0f) m_landSEcooltime -= _delta;
-
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 
+
+		//無敵時間
 		if (m_invincibleTime > 0 && m_stateType != died) {
 			m_invincibleTime -= _delta;
-			GetDrawPtr()->SetDiffuse(Col4(1, 1, 1, 0.3f));
+			GetDrawPtr()->SetBlendState(BlendState::NonPremultiplied);
+			if (m_invincibleTime > m_invincibleTimeMax * .9f)
+				GetDrawPtr()->SetDiffuse(Col4(10, 1, 1, 1));
+			else
+				GetDrawPtr()->SetDiffuse(Col4(1, 1, 1, 0.3f));
 		}
 		else {
 			GetDrawPtr()->SetDiffuse(Col4(1, 1, 1, 1));
+			GetDrawPtr()->SetBlendState(BlendState::AlphaBlend);
 		}
 
 		if(GetDrawPtr()->GetCurrentAnimation()==L"Died") m_invincibleTime = m_invincibleTimeMax;
@@ -257,6 +262,7 @@ namespace basecross {
 		if (m_stateType == air || m_stateType == hit_stand || m_stateType == hit_air || m_stateType == died || m_stateType == goal) {
 			m_isCarrying = false;
 			m_isCharging = false;
+			m_isOverCharge = false;
 			m_chargePerc = 0.0f;
 		}
 
@@ -295,24 +301,30 @@ namespace basecross {
 			break;
 			//---------------------------------------空中
 		case air:
+			if (m_HP <= 0) {
+				m_stateType = died_air;
+			}
 			MovePlayer();
 			Gravity();
 
 			break;
 			//---------------------------------------地上のけぞり
 		case hit_stand:
+			if (m_HP <= 0) {
+				m_stateType = died;
+			}
 			SetAnim(L"GetHit_Stand");
 			Friction();
 			Gravity();
 			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Stand" && GetDrawPtr()->GetCurrentAnimationTime() >= .33f) {
 				m_stateType = stand;
 			}
-			if (m_HP <= 0) {
-				m_stateType = died;
-      }
 			break;
 			//---------------------------------------空中のけぞり
 		case hit_air:
+			if (m_HP <= 0) {
+				m_stateType = died_air;
+			}
 			SetAnim(L"GetHit_Air");
 			Gravity();
 			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Air" && GetDrawPtr()->GetCurrentAnimationTime() >= .33f
@@ -357,6 +369,15 @@ namespace basecross {
 			Died();
 			Friction();
 
+			//空中判定
+			if (m_collideCount <= 0) m_stateType = died_air;
+
+			break;
+			//---------------------------------------死亡
+		case died_air:
+			SetAnim(L"GetHit_Air");
+			Gravity();
+
 			break;
 			//---------------------------------------ゴール
 		case goal:
@@ -369,6 +390,16 @@ namespace basecross {
 		SwitchFireAnim(GetDrawPtr()->GetCurrentAnimationTime());
 
 		GetComponent<Transform>()->SetPosition((m_moveVel * _delta) + GetComponent<Transform>()->GetPosition());
+
+		if (m_isCarrying == true) {
+			m_pGrab.lock()->SetCollActive(true);
+			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(true);
+		}
+		else {
+			m_pGrab.lock()->SetCollActive(false);
+			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(false);
+		}
+
 
 		GetDrawPtr()->UpdateAnimation(_delta);
 	}
@@ -415,14 +446,19 @@ namespace basecross {
 				GetHit();
 		}
 
-
-		if ((m_stateType == air || m_stateType == hit_air) && Other->FindTag(L"Floor")) {
-			SetAnim(AddFire() + L"Land");
-			if (m_landSEcooltime <= 0.0f) {
+		if (Other->FindTag(L"Floor")) 
+		{
+			if (m_stateType == died_air) {
 				PlaySnd(L"PlayerLand", 1.0f, 0);
-				m_landSEcooltime = .3f;
+				m_stateType = stand;
+				return;
 			}
-			m_stateType = stand;
+
+			if (m_stateType == air || m_stateType == hit_air) {
+				SetAnim(AddFire() + L"Land");
+				PlaySnd(L"PlayerLand", 1.0f, 0);
+				m_stateType = stand;
+			}
 		}
 	}
 
@@ -430,13 +466,11 @@ namespace basecross {
 		auto key = App::GetApp()->GetInputDevice().GetKeyState();
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 
-		if (pad[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bPushKeyTbl['Z'] == true) {
-			m_pGrab.lock()->SetCollActive(true);
-			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(true);
+		if (pad[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bPushKeyTbl['Q'] == true) {
+			m_isCarrying = true;
 		}
 		else {
-			m_pGrab.lock()->SetCollActive(false);
-			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(false);
+			m_isCarrying = false;
 		}
 	}
 
@@ -463,7 +497,7 @@ namespace basecross {
 
 
 	void Player::Animate() {
-		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .23f) {
+		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .13f) {
 			SetAnim(AddFire() + L"Idle");
 		}
 		if (m_stateType == stand) {
@@ -476,7 +510,7 @@ namespace basecross {
 		}
 		if (m_stateType == air && m_moveVel.y > 0)
 			SetAnim(L"Jumping");
-		if (m_stateType == air && (m_moveVel.y <= 0 || (GetDrawPtr()->GetCurrentAnimation() != L"Jumping" && GetDrawPtr()->GetCurrentAnimationTime() >= .5f)))
+		if (m_stateType == air && (m_moveVel.y <= 0 || (GetDrawPtr()->GetCurrentAnimation() != L"Jumping" && GetDrawPtr()->GetCurrentAnimationTime() >= .13f)))
 			SetAnim(L"Falling");
 
 	}
@@ -512,6 +546,7 @@ namespace basecross {
 		if (abs(m_moveVel.z) <= m_frictionThreshold) m_moveVel.z = 0;
 	}
 
+	//四捨五入(デバッグ用)
 	Vec3 Player::RoundOff(Vec3 number, int point) {
 		Vec3 r = number *= pow(10, point);
 		r.x = round(r.x);
@@ -533,7 +568,7 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Jumping", 320, 15, false, anim_fps);
 		ptrDraw->AddAnimation(L"Falling", 350, 20, true, anim_fps);
 		ptrDraw->AddAnimation(L"Land", 336, 4, false, anim_fps);
-		ptrDraw->AddAnimation(L"Walk", 100, 29, false, anim_fps);
+		ptrDraw->AddAnimation(L"Walk", 100, 29, true, anim_fps);
 		//火炎放射+行動
 		ptrDraw->AddAnimation(L"Fire_Idle", 170, 60, true, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_Run", 140, 19, true, 38.0f);//アニメーションを合わせるため
@@ -556,6 +591,7 @@ namespace basecross {
 			m_stateType = hit_air;
 		}
 
+		PlaySnd(L"PlayerDamage", 1.0f, 0);
 		auto trans = GetComponent<Transform>();
 		auto fwd = trans->GetForward();
 		m_moveVel.x = fwd.x * 30.0f;
@@ -655,7 +691,9 @@ namespace basecross {
 			distPlus.z = (cosf(plRot) * m_dist.z) + (sinf(plRot) * m_dist.x);
 
 			trans->SetPosition(plPos + distPlus);
-			trans->SetRotation(trans->GetRotation().x, plRot, trans->GetRotation().z);
+			Vec3 r = Vec3(0);
+			r.y = -plRot;
+			trans->SetRotation(r);
 		}
 	}
 
@@ -718,7 +756,7 @@ namespace basecross {
 
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(
-			Vec3(1.0f / trans->GetScale().x, 1.0f / trans->GetScale().y, 1.0f / trans->GetScale().z), //(.1f, .1f, .1f),
+			Vec3(2.0f / trans->GetScale().x, 2.0f / trans->GetScale().y, 2.0f / trans->GetScale().z), //(.1f, .1f, .1f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f)
@@ -797,6 +835,44 @@ namespace basecross {
 	}
 
 	//====================================================================
+	// class SpritePlayerUI
+	// プレイヤーのゲージ類
+	//====================================================================
+
+	void SpritePlayerUI::OnCreate() {
+		Col4 color(1, 1, 1, 1);
+
+		m_Vertices = {
+			{Vec3(0, 0, 0.0f), color, Vec2(0, 0)},
+			{Vec3(m_width, 0, 0.0f), color, Vec2(1, 0)},
+			{Vec3(0, -m_height, 0.0f), color, Vec2(0, 1)},
+			{Vec3(m_width, -m_height, 0.0f), color, Vec2(1, 1)},
+		};
+		vector<uint16_t> indices = {
+			0, 1, 2,
+			2, 1, 3,
+		};
+		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
+		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
+		m_DrawComp->SetTextureResource(m_resKey);
+		m_DrawComp->SetDrawActive(true);
+		SetDrawLayer(m_layer);
+		SetAlphaActive(true);
+
+		GetComponent<Transform>()->SetPosition(windowWidth * -.52, windowHeight * .5, 0);
+
+		if (m_resKey == L"PLAYERUI") {
+			m_health = GetStage()->AddGameObject<SpriteHealth>(m_player.lock(), GetThis<SpritePlayerUI>());
+			m_charge = GetStage()->AddGameObject<SpriteCharge>(m_player.lock(), GetThis<SpritePlayerUI>());
+			m_frame = GetStage()->AddGameObject<SpritePlayerUI>(m_player.lock(), L"PLAYERUI2", 3);
+		}
+	}
+
+	void SpritePlayerUI::OnUpdate() {
+
+	}
+
+	//====================================================================
 	// class SpriteHealth
 	// プレイヤーのライフ
 	//====================================================================
@@ -805,10 +881,10 @@ namespace basecross {
 		Col4 color(1, 1, 1, 1);
 
 		m_Vertices = {
-			{Vec3(0, 0, 0.0f), color, Vec2(0, 0)},
-			{Vec3(m_width, 0, 0.0f), color, Vec2(1, 0)},
-			{Vec3(0, m_height, 0.0f), color, Vec2(0, 1)},
-			{Vec3(m_width, m_height, 0.0f), color, Vec2(1, 1)},
+			{Vec3(0 + m_bottomSlip, 0, 0.0f), color, Vec2(0, 0)},
+			{Vec3(m_width + m_bottomSlip, 0, 0.0f), color, Vec2(1, 0)},
+			{Vec3(0, -m_height, 0.0f), color, Vec2(0, 1)},
+			{Vec3(m_width, -m_height, 0.0f), color, Vec2(1, 1)},
 		};
 		vector<uint16_t> indices = {
 			0, 1, 2,
@@ -818,10 +894,11 @@ namespace basecross {
 		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
 		m_DrawComp->SetTextureResource(L"HEALTH");
 		m_DrawComp->SetDrawActive(true);
-		SetDrawLayer(1);
+		SetDrawLayer(2);
 		SetAlphaActive(true);
 
-		GetComponent<Transform>()->SetPosition(windowWidth * -.45, windowHeight * .45, 0);
+		Vec3 pos = m_meter->GetComponent<Transform>()->GetPosition();
+		GetComponent<Transform>()->SetPosition(pos + addPos);
 	}
 
 	void SpriteHealth::OnUpdate() {
@@ -829,7 +906,7 @@ namespace basecross {
 
 		auto player = m_player.lock();
 		float perc = player->GetHPRate();
-		m_Vertices[1].position.x = m_width * perc;
+		m_Vertices[1].position.x = m_width * perc + m_bottomSlip;
 		m_Vertices[3].position.x = m_width * perc;
 		m_Vertices[1].textureCoordinate.x = perc;
 		m_Vertices[3].textureCoordinate.x = perc;
@@ -845,10 +922,10 @@ namespace basecross {
 		Col4 color(1, 1, 1, 1);
 
 		m_Vertices = {
-			{Vec3(0, 0, 0.0f), color, Vec2(0, 0)},
-			{Vec3(m_width, 0, 0.0f), color, Vec2(1, 0)},
-			{Vec3(0, m_height, 0.0f), color, Vec2(0, 1)},
-			{Vec3(m_width, m_height, 0.0f), color, Vec2(1, 1)},
+			{Vec3(0 + m_bottomSlip, 0, 0.0f), color, Vec2(0, 0)},
+			{Vec3(m_width + m_bottomSlip, 0, 0.0f), color, Vec2(1, 0)},
+			{Vec3(0, -m_height, 0.0f), color, Vec2(0, 1)},
+			{Vec3(m_width, -m_height, 0.0f), color, Vec2(1, 1)},
 		};
 		vector<uint16_t> indices = {
 			0, 1, 2,
@@ -858,10 +935,11 @@ namespace basecross {
 		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
 		m_DrawComp->SetTextureResource(L"CHARGE");
 		m_DrawComp->SetDrawActive(false);
-		SetDrawLayer(1);
+		SetDrawLayer(2);
 		SetAlphaActive(true);
 
-		GetComponent<Transform>()->SetPosition(windowWidth * -.45, windowHeight * .42, 0);
+		Vec3 pos = m_meter->GetComponent<Transform>()->GetPosition();
+		GetComponent<Transform>()->SetPosition(pos + addPos);
 	}
 
 	void SpriteCharge::OnUpdate() {
@@ -871,8 +949,8 @@ namespace basecross {
 		if (player->IsCharging()) {
 			draw->SetDrawActive(true);
 			float perc = player->GetChargePerc();
-			m_Vertices[1].position.x = m_width * perc;
-			m_Vertices[3].position.x = m_width * perc;
+			m_Vertices[1].position.x = (m_width * perc) + m_bottomSlip;
+			m_Vertices[3].position.x = (m_width * perc);
 			m_Vertices[1].textureCoordinate.x = perc;
 			m_Vertices[3].textureCoordinate.x = perc;
 

@@ -9,19 +9,32 @@
 
 namespace basecross {
 
+	class LoadScreen;
+	class SpriteLoadBG;
+	class SpriteLoad;
+
 	//====================================================================
 	// class LoadScreen
-	// ロード時に表示するトランジション画面
+	// ロード画面もどき
 	//====================================================================
 	class LoadScreen : public Stage
 	{
-		//0 = ロード開始、1 = ロード終了
-		int m_loadState;
+		//ロード終了
+		bool m_loadEnd;
+		//経過時間
 		float m_time;
+		//進行度合いを管理するためのvector
+		vector<float> m_progress;
+		//何番目まで進んでいるかのカウント
+		int m_progCnt = 1;
+
+		shared_ptr<SpriteLoad> m_loadSpr;
+
 	public:
-		LoadScreen();
+		LoadScreen(): Stage() {}
 		virtual ~LoadScreen() {}
 
+		void CreateViewLight();
 		virtual void OnCreate()override; //初期化
 		virtual void OnUpdate()override; //初期化
 	};
@@ -38,9 +51,8 @@ namespace basecross {
 		const float windowWidth = App::GetApp()->GetGameWidth();
 		const float windowHeight = App::GetApp()->GetGameHeight();
 	public:
-		SpriteLoadBG(const shared_ptr<Stage>& StagePtr, int loadState) :
-			GameObject(StagePtr),
-			m_loadState(loadState)
+		SpriteLoadBG(const shared_ptr<Stage>& StagePtr) :
+			GameObject(StagePtr)
 		{}
 
 		~SpriteLoadBG() {}
@@ -55,7 +67,7 @@ namespace basecross {
 	// ローディングの文字
 	//====================================================================
 	class SpriteLoad : public GameObject {
-		int m_loadState;
+		float m_time;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
 
@@ -65,9 +77,8 @@ namespace basecross {
 		const float windowWidth = App::GetApp()->GetGameWidth();
 		const float windowHeight = App::GetApp()->GetGameHeight();
 	public:
-		SpriteLoad(const shared_ptr<Stage>& StagePtr, int loadState) :
-			GameObject(StagePtr),
-			m_loadState(loadState)
+		SpriteLoad(const shared_ptr<Stage>& StagePtr) :
+			GameObject(StagePtr)
 		{}
 
 		~SpriteLoad() {}
@@ -75,5 +86,8 @@ namespace basecross {
 		virtual void OnCreate() override;
 
 		virtual void OnUpdate() override;
+
+		//ここに外部から進行度の見た目を変えられる関数を作る
+		void UpdateProgress(float load);
 	};
 }

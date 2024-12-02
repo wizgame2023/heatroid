@@ -59,7 +59,8 @@ namespace basecross {
 		m_flyFlag(false),
 		m_floorFlag(false),
 		m_hitDropFlag(false),
-		m_plungeFlag(false)
+		m_plungeFlag(false),
+		m_pGrabFlag(false)
 	{}
 
 	void Enemy::OnCreate() {
@@ -129,6 +130,7 @@ namespace basecross {
 		m_playerTrans = player->GetComponent<Transform>();
 		m_playerPos = m_playerTrans.lock()->GetPosition();
 
+		Debug();
 		FindFixed();
 		if (m_stateType != m_beforeState) {
 			m_plungeFlag = false;
@@ -204,7 +206,6 @@ namespace basecross {
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			Bullet();
 			EnemyAngle();
-
 			break;
 		default:
 			break;
@@ -219,12 +220,13 @@ namespace basecross {
 		}
 		m_trans->SetPosition(m_pos);
 		m_beforeState = m_stateType;
-
-
+		if (GetOverHeat()) {
+			Grab();
+		}
 		OverHeat();
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ
@@ -435,15 +437,11 @@ namespace basecross {
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
 			m_deathPos = m_pos;
+
 		}
 		if (other->FindTag(L"Wall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
 		}
-		//if (other->FindTag(L"Floor")) {
-		//	m_fixedBox = dynamic_pointer_cast<TilingFixedBox>(other);
-		//	m_trans->SetParent(m_fixedBox.lock());
-		//	m_floorPos = m_pos;
-		//}
 		if ((other->FindTag(L"GimmickButton")))
 		{
 			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
@@ -461,20 +459,66 @@ namespace basecross {
 			m_heat = m_maxHeat;
 			PlayerSE(L"OverHeatSE");
 		}
+		if (other->FindTag(L"PlayerGrab")) {
+			m_playerGrab = dynamic_pointer_cast<PlayerGrab>(other);
+			m_pGrabFlag = true;
+		}
+
 	}
-	void Enemy::OnCollisionExit(shared_ptr<GameObject>& Other)
+	void Enemy::Grab() {
+		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+			m_pGrabFlag = false;
+		}
+		if (m_pGrabFlag) {
+			m_floorFlag = false;
+			auto player = m_player.lock();
+			if (!player) return;
+			auto pGrab = m_playerGrab.lock();
+			if(!pGrab) return;
+			auto playerPos = player->GetComponent<Transform>()->GetPosition();
+			auto playerFor = player->GetComponent<Transform>()->GetForward();
+			auto grabScal = m_playerGrab.lock()->GetComponent<Transform>()->GetScale();
+			Vec3 scal = Vec3(grabScal.x / 2.5, 0.0f, grabScal.z / 2.5);
+			auto grabPos = pGrab->GetComponent<Transform>();
+			float rad = XMConvertToRadians(-45);
+			if (pGrab) {
+				m_trans->SetParent(pGrab);
+				m_pos = Vec3(0.0f, 0.0f, 0.0f);
+				m_trans->SetPosition(m_pos);
+				m_trans->SetRotation(Vec3(0.0f, 0.0f, 0.0f));
+
+			}
+			else {
+				return;
+			}
+			float angle = atan2(playerFor.z, playerFor.x);
+			m_trans->SetRotation(Vec3(0.0f, -angle, 0.0f));
+
+		}
+		else {
+			m_trans->ClearParent();
+		}
+	}
+	void Enemy::OnCollisionExit(shared_ptr<GameObject>& other)
 	{
-		if ((Other->FindTag(L"GimmickButton")))
+		if ((other->FindTag(L"GimmickButton")))
 		{
 			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 			auto& vec = group->GetGroupVector();
 			for (auto& v : vec) {
 				auto shObj = v.lock();
-				if (Other == shObj) {
+				if (other == shObj) {
 					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
 					Switchs->SetButton(false);
 				}
 			}
+		}
+		if (other->FindTag(L"PlayerGrab")) {
+			//m_trans->ClearParent();
+			//m_pGrabFlag = false;
+			//m_playerGrabFlag = true;
+
 		}
 	}
 
@@ -511,11 +555,11 @@ namespace basecross {
 	void Enemy::Debug() {
 		auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
 		if (keyState.m_bPushKeyTbl[VK_DOWN]) {
-			m_stateType = plunge;
+			//m_stateType = plunge;
 
 		}
 		if (keyState.m_bPressedKeyTbl[VK_UP]) {
-			HipDropJump();
+			//HipDropJump();
 			//stage->AddGameObject<EnemyBullet>(GetThis<Enemy>());
 		}
 		//デバック用
@@ -548,7 +592,7 @@ namespace basecross {
 			<<L"\nOverHeat : "
 			<< GetOverHeat()
 			<<L"\n"
-			<< m_direcNorm.x
+			<< m_pGrabFlag
 			<< endl;
 		scene->SetDebugString(wss.str());
 
@@ -782,7 +826,7 @@ namespace basecross {
 
 		AddTag(L"Floor");
 		AddTag(L"EnemyFloor");
-		//AddTag(L"Enemy");
+
 	}
 	void EnemyFloorCol::OnUpdate() {
 		auto enemy = m_enemy.lock();

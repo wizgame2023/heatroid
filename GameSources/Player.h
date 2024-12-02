@@ -66,6 +66,7 @@ namespace basecross {
 			release,	//発射
 			start,		//ゲーム開始演出
 			died,		//死亡
+			died_air,		//死亡空中
 			goal		//ステージクリア
 		};
 		//プレイヤーの状態
@@ -156,7 +157,7 @@ namespace basecross {
 
 		//死んだらtrueを返す
 		const bool GetDied() {
-			return (m_stateType == died);
+			return (m_stateType == died || m_stateType == died_air);
 		}
 
 		//ゴールに到達したらtrueを返す
@@ -173,7 +174,6 @@ namespace basecross {
 		void Player::PlaySnd(wstring sndname, float volume, float loopcount) {
 			auto audio = App::GetApp()->GetXAudio2Manager();
 			audio->Start(sndname, loopcount, volume);
-
 		}
 
 		//isChargingフラグの取得
@@ -232,7 +232,7 @@ namespace basecross {
 		PlayerGrab(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player) :
 			GameObject(StagePtr),
 			m_player(player),
-			m_dist(Vec3(-1.5f, 1, 0)),
+			m_dist(Vec3(-5.0f, 1, 0)),
 			m_scale(Vec3(8.0f)),
 			m_isHit(false)
 		{};
@@ -323,23 +323,62 @@ namespace basecross {
 	};
 
 	//====================================================================
+	// class SpritePlayerUI
+	// プレイヤーのゲージ類
+	//====================================================================
+	class SpriteHealth;
+	class SpriteCharge;
+
+	class SpritePlayerUI : public GameObject {
+		wstring m_resKey;
+		int m_layer;
+		weak_ptr<Player> m_player;
+		shared_ptr<PCTSpriteDraw> m_DrawComp;
+		vector<VertexPositionColorTexture> m_Vertices;
+
+		shared_ptr<SpriteHealth> m_health;
+		shared_ptr<SpriteCharge> m_charge;
+		shared_ptr<SpritePlayerUI> m_frame;
+
+		const float m_width = 400.0f;
+		const float m_height = 100.0f;
+		const float windowWidth = App::GetApp()->GetGameWidth();
+		const float windowHeight = App::GetApp()->GetGameHeight();
+	public:
+		SpritePlayerUI(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const wstring& resKey, const int& layer = 1):
+		GameObject(StagePtr),
+		m_player(player),
+		m_resKey(resKey),
+		m_layer(layer)
+		{}
+
+		~SpritePlayerUI() {};
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+	};
+
+
+	//====================================================================
 	// class SpriteHealth
 	// プレイヤーのライフ
 	//====================================================================
 	class SpriteHealth : public GameObject {
 		weak_ptr<Player> m_player;
+		shared_ptr<SpritePlayerUI> m_meter;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
 
-		const float m_width = 150.0f;
-		const float m_height = 15.0f;
+		const float m_width = 160.0f;
+		const float m_height = 10.0f;
+		const float m_bottomSlip = -10.0f;
+		Vec3 addPos = Vec3(159.0f, -40.0f, 0.0f);
 
-		const float windowWidth = App::GetApp()->GetGameWidth();
-		const float windowHeight = App::GetApp()->GetGameHeight();
 	public:
-		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player) :
+		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
 			GameObject(StagePtr),
-			m_player(player)
+			m_player(player),
+			m_meter(meter)
 		{}
 
 		~SpriteHealth() {}
@@ -355,18 +394,20 @@ namespace basecross {
 	//====================================================================
 	class SpriteCharge : public GameObject {
 		weak_ptr<Player> m_player;
+		shared_ptr<SpritePlayerUI> m_meter;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
 
-		const float m_width = 150.0f;
-		const float m_height = 15.0f;
+		const float m_width = 160.0f;
+		const float m_height = 8.0f;
+		const float m_bottomSlip = 10.0f;
+		Vec3 addPos = Vec3(190.0f, -55.0f, 0.0f);
 
-		const float windowWidth = App::GetApp()->GetGameWidth();
-		const float windowHeight = App::GetApp()->GetGameHeight();
 	public:
-		SpriteCharge(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player) :
+		SpriteCharge(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
 			GameObject(StagePtr),
-			m_player(player)
+			m_player(player),
+			m_meter(meter)
 		{}
 
 		~SpriteCharge() {}
