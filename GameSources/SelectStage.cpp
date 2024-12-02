@@ -45,6 +45,12 @@ namespace basecross {
 			CreateViewLight();
 			OnSelectSprite();
 			PlayBGM(L"TitleBGM");
+			auto backGround = AddGameObject<GameSprite>(1280, 800, L"SelectStageBack", Vec3(0.0f));
+			backGround->SetDrawLayer(-1);
+			auto selectSprite =AddGameObject<SelectSprite>();
+			SetSharedGameObject(L"selectSprite", selectSprite);
+			SetSelect(selectSprite->GetSelectNum());
+			//AddGameObject<NumberSprite>(5);
 		}
 		catch (...) {
 			throw;
@@ -61,10 +67,13 @@ namespace basecross {
 		InputHandler<SelectStage> m_InputHandler;
 		m_InputHandler.PushHandle(GetThis<SelectStage>());
 		auto time = App::GetApp()->GetElapsedTime();
-		ShowDebug();
+		//ShowDebug();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		StageSelect();
+		auto selectSprite = GetSharedGameObject<SelectSprite>(L"selectSprite");
+		SetSelect(selectSprite->GetSelectNum());
+		int a = 0;
 	}
 
 	void SelectStage::OnDestroy() {
@@ -102,6 +111,8 @@ namespace basecross {
 			break;
 		case 4:
 			scene->SetSelectedMap(4);
+			break;
+		default:
 			break;
 		}
 	}
