@@ -54,6 +54,7 @@ namespace basecross {
 
 		if (!GetOverHeat()) {
 			if (m_plungeTime >= 0.0f) {
+				EnemyAnime(L"spare");
 				SetState(m_attackState);
 			}
 			else if (m_plungeTime < 0.0f) {
