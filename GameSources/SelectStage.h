@@ -29,6 +29,9 @@ namespace basecross {
 		void OnSelectSprite();
 		void PlayBGM(const wstring& StageBGM);
 		void CreateStageManager();
+		void SetSelect(int select) {
+			m_select = select;
+		}
 	};
 
 

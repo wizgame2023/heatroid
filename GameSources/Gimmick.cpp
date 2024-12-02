@@ -115,8 +115,22 @@ namespace basecross {
 
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		group->IntoGroup(GetThis<GameObject>());
+	}
 
+	void GimmickButton::OnUpdate()
+	{
+		if (m_open == true)
+		{
 
+		}
+		else {
+
+		}
+	}
+
+	void GimmickButton::PlaySE(wstring path, float volume, float loopcnt) {
+		auto playSE = App::GetApp()->GetXAudio2Manager();
+		playSE->Start(path, loopcnt, volume);
 	}
 
 	void GimmickButton::OnCollisionEnter(shared_ptr<GameObject>& Other)

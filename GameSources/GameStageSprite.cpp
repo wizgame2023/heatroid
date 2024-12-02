@@ -127,5 +127,44 @@ namespace basecross {
 			m_fadeOut->SetColor(Col4(0.0f, 0.0f, 0.0f, 0.6f));
 		}
 	}
+
+	NumberSprite::NumberSprite(const shared_ptr<Stage>& stage,
+		const int& number,
+		const Vec3& pos
+	):
+		GameObject(stage),
+		m_width(70),
+		m_height(140),
+		m_moveW((800.0f/10)/800.0f),
+		m_moveH(0.0f),
+		m_meshName(L"SelectNumber"),
+		m_color(Col4(1.0f)),
+		m_number(number - 1),
+		m_pos(pos)
+	{}
+	void NumberSprite::OnCreate() {
+		m_vertices = {
+			{Vec3(0.0f,0.0f,0.0f),m_color,Vec2((m_moveW * m_number),0.0f)},
+			{Vec3(m_width,0.0f,0.0f),m_color,Vec2((m_moveW * (m_number + 1)),0.0f)},
+			{Vec3(0.0f,-m_height,0.0f),m_color,Vec2((m_moveW * m_number),1.0f)},
+			{Vec3(m_width,-m_height,0.0f),m_color,Vec2((m_moveW * (m_number + 1)),1.0f)},
+		};
+		m_indices = {
+			0,1,2,
+			2,1,3
+		};
+		m_draw = AddComponent<PCTSpriteDraw>(m_vertices, m_indices);
+		m_draw->SetTextureResource(m_meshName);
+		m_draw->SetSamplerState(SamplerState::LinearWrap);
+		m_draw->SetDiffuse(Col4(m_color));
+		SetAlphaActive(true);
+		SetDrawLayer(3);
+
+		m_trans = GetComponent<Transform>();
+		m_trans->SetPosition(m_pos);
+	}
+	void NumberSprite::OnUpdate() {
+
+	}
 }
 

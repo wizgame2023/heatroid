@@ -45,6 +45,12 @@ namespace basecross {
 			CreateViewLight();
 			OnSelectSprite();
 			PlayBGM(L"TitleBGM");
+			auto backGround = AddGameObject<GameSprite>(1280, 800, L"SelectStageBack", Vec3(0.0f));
+			backGround->SetDrawLayer(-1);
+			auto selectSprite =AddGameObject<SelectSprite>();
+			SetSharedGameObject(L"selectSprite", selectSprite);
+			SetSelect(selectSprite->GetSelectNum());
+			//AddGameObject<NumberSprite>(5);
 		}
 		catch (...) {
 			throw;
@@ -61,10 +67,13 @@ namespace basecross {
 		InputHandler<SelectStage> m_InputHandler;
 		m_InputHandler.PushHandle(GetThis<SelectStage>());
 		auto time = App::GetApp()->GetElapsedTime();
-		ShowDebug();
+		//ShowDebug();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		StageSelect();
+		auto selectSprite = GetSharedGameObject<SelectSprite>(L"selectSprite");
+		SetSelect(selectSprite->GetSelectNum());
+		int a = 0;
 	}
 
 	void SelectStage::OnDestroy() {
@@ -85,22 +94,6 @@ namespace basecross {
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
-		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || KeyState.m_bPressedKeyTbl[VK_UP])
-		{
-			m_select++;
-			if (m_select > m_maxSelect)
-			{
-				m_select = 0;
-			}
-		}
-		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || KeyState.m_bPressedKeyTbl[VK_DOWN])
-		{
-			m_select--;
-			if (m_select < 0)
-			{
-				m_select = m_maxSelect;
-			}
-		}
 
 		switch (m_select)
 		{
@@ -118,6 +111,8 @@ namespace basecross {
 			break;
 		case 4:
 			scene->SetSelectedMap(4);
+			break;
+		default:
 			break;
 		}
 	}

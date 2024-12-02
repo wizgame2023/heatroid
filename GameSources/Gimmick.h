@@ -76,9 +76,11 @@ namespace basecross {
 		Vec3 m_Rotation;
 		Vec3 m_Scale;
 		bool m_open;
+		bool m_flag = false;
 		shared_ptr<GameObject> GDoor;
 		int m_number;
 		wstring m_Texname;
+		//bool m_flag = false;
 	public:
 		int m_switch;
 		GimmickButton(const shared_ptr<Stage>& stage,
@@ -92,6 +94,8 @@ namespace basecross {
 		virtual ~GimmickButton();
 		//èâä˙âª
 		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		void PlaySE(wstring path, float volume, float loopcnt);
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 

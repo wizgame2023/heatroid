@@ -32,9 +32,11 @@ namespace basecross {
 		TargetPos = Vec3(0.0f, 0.0f, 0.0f);
 		GetPos = Vec3(0.0f, 1.0f, 0.0f);
 		//“–‚½‚è”»’è
+		auto ptrTarget = ptrCamera->GetTargetObject();
 		auto m_camera = AddComponent<CollisionSphere>();
 		ptrCamera->SetCameraObject(GetThis<GameObject>());
 		m_camera->SetAfterCollision(AfterCollision::Auto);
+		m_camera->AddExcludeCollisionGameObject(ptrTarget);
 	}
 
 	void CameraCollision::OnUpdate() {
@@ -147,7 +149,6 @@ namespace basecross {
 		Vec3 vec =toAt - Pos;
 		m_ArmLen = length(vec);
 
-		auto StageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
 		if (m_ArmLen >= ptrCamera->m_MaxArm) {
 			//m_MaxArmˆÈã—£‚ê‚È‚¢‚æ‚¤‚É‚·‚é
 			m_ArmLen = ptrCamera->m_MaxArm;
@@ -419,7 +420,7 @@ namespace basecross {
 		Obj->ToGoalEnterBehavior();
 	}
 	void OpeningCameramanToFirstState::Execute(const shared_ptr<OpeningCameraman>& Obj) {
-		if (Obj->ExcuteBehavior(1.0f)) {
+		if (Obj->ExcuteBehavior(4.0f)) {
 			Obj->GetStateMachine()->ChangeState(OpeningCameramanToSecondState::Instance());
 		}
 	}
@@ -437,7 +438,7 @@ namespace basecross {
 		Obj->ToStartEnterBehavior();
 	}
 	void OpeningCameramanToSecondState::Execute(const shared_ptr<OpeningCameraman>& Obj) {
-		if (Obj->ExcuteBehavior(3.0f)) {
+		if (Obj->ExcuteBehavior(2.0f)) {
 			Obj->GetStateMachine()->ChangeState(OpeningCameramanEndState::Instance());
 		}
 	}

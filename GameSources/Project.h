@@ -28,3 +28,4 @@
 #include "Sprite.h"
 #include "GameStageSprite.h"
 #include "SelectStage.h"
+#include "SelectSprite.h"

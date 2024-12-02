@@ -25,7 +25,7 @@ namespace basecross {
 			fixedStay, //プレイヤーに触れた位置で固定
 			jump,      //ジャンプ
 			plunge,    //突っ込み
-			bullet     //弾を撃ってくる
+			bullet,    //弾を撃ってくる
 		};
 
 		
@@ -64,6 +64,7 @@ namespace basecross {
 		bool m_floorFlag;
 		bool m_hitDropFlag;
 		bool m_plungeFlag;
+		bool m_pGrabFlag;
 
 		//重力
 		float m_gravity;
@@ -92,6 +93,7 @@ namespace basecross {
 		weak_ptr<FixedBox> m_box;
 		shared_ptr<CollisionObb> m_collision;
 		weak_ptr<TilingFixedBox> m_fixedBox;
+		weak_ptr<PlayerGrab> m_playerGrab;
 		
 
 	public:
@@ -119,6 +121,7 @@ namespace basecross {
 		void Plunge();
 		void JumpMove();
 		void FindFixed();
+		void Grab();
 		void Bullet();
 		void EnemyAnime(wstring anime);
 		void OverHeat();

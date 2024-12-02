@@ -23,7 +23,12 @@ namespace basecross {
 	}
 	void GameStage::OnUpdate()
 	{
-		GamePause();
+		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
+		int camerastatus = stageMane->GetNowCameraStatus();
+		if (stageMane->m_CameraSelect == StageManager::CameraSelect::myCamera)
+		{
+			GamePause();
+		}
 	}
 
 	void GameStage::GamePause()
@@ -32,7 +37,7 @@ namespace basecross {
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		if (m_pause)
 		{
-			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
 			{
 				auto obj = GetGameObjectVec();
 				for (auto object : obj)
@@ -41,9 +46,14 @@ namespace basecross {
 				}
 				m_pause = false;
 			}
+			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
+			{
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+				OnDestroy();
+			}
 		}
 		else {
-			if (cntlVec[0].wPressedButtons && XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
 			{
 				auto obj = GetGameObjectVec();
 				for (auto object : obj)
