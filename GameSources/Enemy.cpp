@@ -113,9 +113,9 @@ namespace basecross {
 		//足場コリジョンの追加
 		GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
 		//オーバーヒートゲージの追加
-		GetStage()->AddGameObject<GaugeSquare>(3.0f, 0.3f, L"White",
+		GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
 			Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
-		GetStage()->AddGameObject<Square>(3.0f, 0.3f, L"OverHeatText",
+		GetStage()->AddGameObject<Square>(4.0f, 2.0f, L"OverHeatFram",
 			Col4(1.0f, 1.0f, 1.0f, 1.0f), GetThis<Enemy>());
 		AddTag(L"Enemy");
 	}
@@ -467,7 +467,9 @@ namespace basecross {
 	}
 	void Enemy::Grab() {
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
+		if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ||
+			keyState.m_bLastKeyTbl['Q'] == true) {
 			m_pGrabFlag = false;
 		}
 		if (m_pGrabFlag) {
