@@ -87,6 +87,10 @@ namespace basecross{
 		app->RegisterTexture(L"SelectFram", texPath + L"SelectFram.png");
 		app->RegisterTexture(L"SelectText", texPath + L"SelectText.png");
 		app->RegisterTexture(L"SelectNumber", texPath + L"SelectNumber.png");
+		app->RegisterTexture(L"SelectTitle", texPath + L"SelectTitle.png");
+		app->RegisterTexture(L"OverHeatFram", texPath + L"OverHeatFram.png");
+		app->RegisterTexture(L"OverHeatGauge", texPath + L"OverHeatGauge.png");
+
 		//GameStageUI
 		app->RegisterTexture(L"GameStageUI", texPath + L"UIGameStage.png");
 
