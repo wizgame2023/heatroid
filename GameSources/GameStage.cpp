@@ -16,6 +16,24 @@ namespace basecross {
 			auto player = GetSharedGameObject<Player>(L"Player");
 			//AddGameObject<FadeIn>();
 			PlayBGM(L"StageBGM");
+
+			m_pauseBackGround = AddGameObject<Sprite>(L"PauseBG", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
+			m_pauseBackGround->SetDrawLayer(3);
+
+			m_PauseSelect = AddGameObject<Sprite>(L"PauseSelect", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
+			m_PauseSelect->SetDrawLayer(3);
+
+			m_PauseTitle = AddGameObject<Sprite>(L"PauseTitle", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
+			m_PauseTitle->SetDrawLayer(3);
+
+			m_PauseBack = AddGameObject<Sprite>(L"PauseBack", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
+			m_PauseBack->SetDrawLayer(3);
+
+			m_pauseBackGround->SetDrawActive(false);
+			m_PauseSelect->SetDrawActive(false);
+			m_PauseTitle->SetDrawActive(false);
+			m_PauseBack->SetDrawActive(false);
+
 		}
 		catch (...) {
 			throw;
@@ -38,11 +56,57 @@ namespace basecross {
 		auto playerSh = GetSharedGameObject<Player>(L"Player");
 		bool m_Diedtrue = playerSh->GetDied();
 		bool m_Goaltrue = playerSh->GetArrivedGoal();
-		if (m_Diedtrue){}
-		else if (m_Goaltrue) {}
+		if (m_Diedtrue){
+			auto group = GetSharedObjectGroup(L"Enemy");
+			auto& vec = group->GetGroupVector();
+			for (auto v : vec)
+			{
+				auto shObj = v.lock();
+				if (shObj)
+				{
+					shObj->SetUpdateActive(false);
+				}
+			}
+			auto group2 = GetSharedObjectGroup(L"Door");
+			auto& vec2 = group2->GetGroupVector();
+			for (auto v : vec2)
+			{
+				auto shObj = v.lock();
+				if (shObj)
+				{
+					shObj->SetUpdateActive(false);
+				}
+			}
+		}
+		else if (m_Goaltrue) {
+			auto group = GetSharedObjectGroup(L"Enemy");
+			auto& vec = group->GetGroupVector();
+			for (auto v : vec)
+			{
+				auto shObj = v.lock();
+				if (shObj)
+				{
+					shObj->SetUpdateActive(false);
+				}
+			}
+			auto group2 = GetSharedObjectGroup(L"Door");
+			auto& vec2 = group2->GetGroupVector();
+			for (auto v : vec2)
+			{
+				auto shObj = v.lock();
+				if (shObj)
+				{
+					shObj->SetUpdateActive(false);
+				}
+			}
+		}
 		else {
 			if (m_pause)
 			{
+				m_pauseBackGround->SetDrawActive(true);
+				m_PauseSelect->SetDrawActive(true);
+				m_PauseTitle->SetDrawActive(true);
+				m_PauseBack->SetDrawActive(true);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
 				{
 					auto obj = GetGameObjectVec();
@@ -52,13 +116,22 @@ namespace basecross {
 					}
 					m_pause = false;
 				}
-				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
+				if (cntlVec[0].wNowUpdateButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 				{
 					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
 					OnDestroy();
 				}
+				if (cntlVec[0].wNowUpdateButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_BACK])
+				{
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+					OnDestroy();
+				}
 			}
 			else {
+				m_pauseBackGround->SetDrawActive(false);
+				m_PauseSelect->SetDrawActive(false);
+				m_PauseTitle->SetDrawActive(false);
+				m_PauseBack->SetDrawActive(false);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
 				{
 					auto obj = GetGameObjectVec();
@@ -69,6 +142,7 @@ namespace basecross {
 					m_pause = true;
 				}
 			}
+
 		}
 	}
 

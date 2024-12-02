@@ -233,7 +233,7 @@ namespace basecross {
 						{
 							if (m_Flag == false)
 							{
-								PlaySE(L"DoorSE", 0, 1.0);
+								PlaySE(L"DoorSE", 0, 0.5f);
 								m_Flag = true;
 							}
 							if (m_Scale.x < m_Scale.z)
@@ -261,7 +261,7 @@ namespace basecross {
 									{
 										if (m_Flag == false)
 										{
-											PlaySE(L"DoorSE", 0, 1.0);
+											PlaySE(L"DoorSE", 0, 0.5f);
 											m_Flag = true;
 										}
 										if (m_Scale.x < m_Scale.z)
