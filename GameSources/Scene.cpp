@@ -59,8 +59,10 @@ namespace basecross{
 		app->RegisterTexture(L"HEALTH", texPath + L"PlayerMeterHP.png");
 		app->RegisterTexture(L"CHARGE", texPath + L"PlayerMeterCharge.png");
 		//ロード画面テクスチャ
-		app->RegisterTexture(L"LoadBG", texPath + L"loadblack.png");
-		app->RegisterTexture(L"LoadText", texPath + L"loadtext.png");
+		app->RegisterTexture(L"LoadBG", texPath + L"LoadBG.png");
+		app->RegisterTexture(L"LoadText", texPath + L"loadtext_wip.png");
+		app->RegisterTexture(L"LoadCircle", texPath + L"LoadCircle.png");
+		app->RegisterTexture(L"LoadBar", texPath + L"LoadBar.png");
 		//ステージオブジェクトテクスチャ
 		app->RegisterTexture(L"Wall", texPath + L"UV_WALL.png");
 		app->RegisterTexture(L"Floor", texPath + L"UV_FLOOR.png");
@@ -98,6 +100,12 @@ namespace basecross{
 
 		//GameStageUI
 		app->RegisterTexture(L"GameStageUI", texPath + L"UIGameStage.png");
+		app->RegisterTexture(L"PauseBG", texPath + L"PauseBackGround.png");
+		app->RegisterTexture(L"PauseSelect", texPath + L"PauseSelect.png");
+		app->RegisterTexture(L"PauseTitle", texPath + L"PauseTitle.png");
+		app->RegisterTexture(L"PauseBack", texPath + L"PauseBack.png");
+		app->RegisterTexture(L"PauseSelectCharge", texPath + L"PauseSelectCharge.png");
+		app->RegisterTexture(L"PauseTitleCharge", texPath + L"PauseTitleCharge.png");
 
 		//サウンド
 		//SE
@@ -113,6 +121,14 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"PlayerDamage", soundWav);
 		soundWav = sdPath + L"Switch.wav";
 		App::GetApp()->RegisterWav(L"SwitchSE", soundWav);
+		soundWav = sdPath + L"Decision.wav";
+		App::GetApp()->RegisterWav(L"DecisionSE", soundWav);
+
+		soundWav = sdPath + L"Confirm.wav";
+		App::GetApp()->RegisterWav(L"Confirm", soundWav);
+
+		soundWav = sdPath + L"GameClear.wav";
+		App::GetApp()->RegisterWav(L"GameClearSE", soundWav);
 		soundWav = sdPath + L"Door.wav";
 		App::GetApp()->RegisterWav(L"DoorSE", soundWav);
 		//BGM

@@ -412,6 +412,7 @@ namespace basecross {
 		case GameStatus::TITLE:
 			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
+				PlaySE(L"DecisionSE", 0, 1.0f);
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
 			}
 			break;
@@ -420,16 +421,19 @@ namespace basecross {
 			{
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
+					PlaySE(L"DecisionSE", 0, 1.0f);
 					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
 				}
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
 				{
+					PlaySE(L"DecisionSE", 0, 1.0f);
 					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTestStage");
 				}
 
 			}
 			else if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
+				PlaySE(L"DecisionSE", 0, 1.0f);
 				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 			}
 			break;
@@ -492,6 +496,7 @@ namespace basecross {
 				}
 				GoalJudge();
 				GameOverJudge();
+				GamePause();
 			}
 			break;
 
@@ -551,8 +556,13 @@ namespace basecross {
 		{
 			if (m_select == 0)
 			{
-				GetTypeStage<GameStage>()->OnDestroy();
+				if (m_Flag)
+				{
+					PlaySE(L"GameClearSE", 0, 1.0f);
+					m_Flag = false;
+				}
 
+				GetTypeStage<GameStage>()->OnDestroy();
 				m_StageUI->SetDrawActive(false);
 				m_TextDraw->SetDrawActive(true);
 				m_SpriteDraw->SetDrawActive(true);
@@ -566,14 +576,17 @@ namespace basecross {
 				{
 					BGSprite->SetColor(Col4(0.0f, 0.0f, 0.0f, 0.6f));
 				}
+
 				MoveSprite(m_nextStageUI, m_clearSelectStage);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
+					PlaySE2(L"Confirm", 0, 1.0f);
 					m_select = 1;
 					m_totalTime = 0.0f;
 				}
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 				{
+					PlaySE2(L"Confirm", 0, 1.0f);
 					m_select = 2;
 					m_totalTime = 0.0f;
 				}
@@ -602,6 +615,7 @@ namespace basecross {
 			}
 			if (m_Flag)
 			{
+				GetTypeStage<GameStage>()->OnDestroy();
 				m_StageUI->SetDrawActive(false);
 				m_retryStageUI->SetDrawActive(true);
 				m_overSelectStage->SetDrawActive(true);
@@ -613,17 +627,24 @@ namespace basecross {
 				MoveSprite(m_retryStageUI, m_overSelectStage);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
+					PlaySE2(L"Confirm", 0, 1.0f);
 					m_select = 1;
 					m_totalTime = 0.0f;
 				}
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 				{
+					PlaySE2(L"Confirm", 0, 1.0f);
 					m_select = 3;
 					m_totalTime = 0.0f;
 				}
 			}
 			SelectMoveSprite(m_retryStageUI, m_overSelectStage);
 		}
+	}
+	void StageManager::GamePause()
+	{
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 	}
 	void StageManager::SetGameStageSelect(const wstring& m_csvFail)
 	{
@@ -749,5 +770,15 @@ namespace basecross {
 			m_CameraSelect = CameraSelect::openingCamera;
 		}
 	}
+
+	void StageManager::PlaySE(wstring path, float loopcnt, float volume) {
+		auto playSE = App::GetApp()->GetXAudio2Manager();
+		playSE->Start(path, loopcnt, volume);
+	}
+	void StageManager::PlaySE2(wstring path, float loopcnt, float volume) {
+		auto playSE = App::GetApp()->GetXAudio2Manager();
+		playSE->Start(path, loopcnt, volume);
+	}
+
 }
 //end basecross

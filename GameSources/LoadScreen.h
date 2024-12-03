@@ -12,6 +12,8 @@ namespace basecross {
 	class LoadScreen;
 	class SpriteLoadBG;
 	class SpriteLoad;
+	class SpriteLoadCircle;
+	class SpriteLoadFade;
 
 	//====================================================================
 	// class LoadScreen
@@ -29,6 +31,7 @@ namespace basecross {
 		int m_progCnt = 1;
 
 		shared_ptr<SpriteLoad> m_loadSpr;
+		shared_ptr<SpriteLoadFade> m_fade;
 
 	public:
 		LoadScreen(): Stage() {}
@@ -63,6 +66,34 @@ namespace basecross {
 	};
 
 	//====================================================================
+	// class SpriteLoadCircle
+	// ローディング画面のぐるぐるするやつ
+	//====================================================================
+	class SpriteLoadCircle : public GameObject {
+		shared_ptr<PCTSpriteDraw> m_DrawComp;
+		vector<VertexPositionColorTexture> m_Vertices;
+
+		const float m_rotateSpeed = -360.0f;
+		const float m_radius = 50.0f;
+		float m_rotate = 0.0f;
+
+		const float windowWidth = App::GetApp()->GetGameWidth();
+		const float windowHeight = App::GetApp()->GetGameHeight();
+	public:
+		SpriteLoadCircle(const shared_ptr<Stage>& StagePtr) :
+			GameObject(StagePtr)
+		{}
+
+		~SpriteLoadCircle() {}
+
+		virtual void OnCreate() override;
+
+		virtual void OnUpdate() override;
+	};
+
+
+
+	//====================================================================
 	// class SpriteLoad
 	// ローディングの文字
 	//====================================================================
@@ -70,9 +101,6 @@ namespace basecross {
 		float m_time;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
-
-		const float m_width = 256.0f;
-		const float m_height = 128.0f;
 
 		const float windowWidth = App::GetApp()->GetGameWidth();
 		const float windowHeight = App::GetApp()->GetGameHeight();
@@ -89,5 +117,32 @@ namespace basecross {
 
 		//ここに外部から進行度の見た目を変えられる関数を作る
 		void UpdateProgress(float load);
+	};
+
+	//====================================================================
+	// class SpriteLoadFade
+	// ローディング画面の画面遷移
+	//====================================================================
+	class SpriteLoadFade : public GameObject {
+		bool m_loadState = false;
+		float m_fade = 1.0f;
+		shared_ptr<PCTSpriteDraw> m_DrawComp;
+		vector<VertexPositionColorTexture> m_Vertices;
+
+		const float m_fadeSpeed = 2.0f;
+
+		const float windowWidth = App::GetApp()->GetGameWidth();
+		const float windowHeight = App::GetApp()->GetGameHeight();
+	public:
+		SpriteLoadFade(const shared_ptr<Stage>& StagePtr) :
+			GameObject(StagePtr)
+		{}
+
+		~SpriteLoadFade() {}
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+
+		void SetLoadState(int state);
 	};
 }
