@@ -1,6 +1,7 @@
 /*!
 @file SelectSprite.cpp
-@brief スプライト実体
+@brief セレクトステージのUI実体
+担当：逸見
 */
 
 #include "stdafx.h"
