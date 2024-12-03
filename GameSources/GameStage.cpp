@@ -196,6 +196,7 @@ namespace basecross {
 			ptrStageManager->CreateFixedBox();
 			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateSprite();
+			ptrStageManager->CreateGimmick();
 		}
 		else
 		{
@@ -206,8 +207,8 @@ namespace basecross {
 			ptrStageManager->CreateViewLight();
 			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateFixedBox();
-			ptrStageManager->CreateGimmick();
 			ptrStageManager->CreateSprite();
+			ptrStageManager->CreateGimmick();
 		}
 	}
 

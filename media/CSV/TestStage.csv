@@ -1,3 +1,5 @@
-Name,Pos,,,Rot,,,Scale,,,
-Floor,0,0,0,0,0,0,100,1,100,Floor
-Enemy,0,2,0,0,0,0,3,3,3,
+Name,Pos,,,Rot,,,Scale,,,,,
+Floor,0,0,0,0,0,0,100,1,100,Floor,,
+Enemy,0,2,0,0,0,0,3,3,3,,,
+GimmickUp,0,1,10,0,0,0,10,1,10,0,1,FIRE
+Switch,5,0.4,0,0,0,0,10,0.5,10,0,1,BLUCKSWITCH
