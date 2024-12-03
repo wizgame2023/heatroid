@@ -40,6 +40,10 @@ namespace basecross {
 		shared_ptr<GameObject> m_clearSelectStage;
 		shared_ptr<GameObject> m_retryStageUI;
 		shared_ptr<GameObject> m_overSelectStage;
+		shared_ptr<GameObject> m_SelectCharge;
+		shared_ptr<GameObject> m_TitleCharge;
+		shared_ptr<GameObject> m_BGfade;
+
 		float m_totalTime = 0.0f;
 		int m_select = 0;
 
@@ -47,6 +51,7 @@ namespace basecross {
 		bool m_Diedtrue = false;
 		bool m_pause = false;
 		bool m_Flag = true;
+		int m_PushState = 0;
 
 		void CreateViewLight(); //ÉrÉÖÅ[ÇÃçÏê¨
 		void CreatePlayer(); //PlayerÇÃê∂ê¨
@@ -56,7 +61,8 @@ namespace basecross {
 		void CreateSprite();
 		void GoalJudge();
 		void GameOverJudge();
-		void GamePause();
+		void SetPushState(const int PushState);
+		int GetPushState();
 		void SetGameStageSelect(const wstring& m_csvFail);
 		void MoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStage);
 		void SelectMoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStage);

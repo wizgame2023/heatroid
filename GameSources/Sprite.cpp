@@ -39,6 +39,95 @@ namespace basecross {
 		ptrDraw->SetTextureResource(m_TextureKey);
 	}
 
+	SelectCharge::SelectCharge(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
+		const Vec2& StartScale, const Vec3& StartPos) :
+		GameObject(StagePtr),
+		m_TextureKey(TextureKey),
+		m_Trace(Trace),
+		m_StartScale(StartScale),
+		m_StartPos(StartPos)
+	{}
+
+	void SelectCharge::OnCreate() {
+		UVCharge = 1.0f;
+		float helfSize = 1.0f;
+		//頂点配列(縦横5個ずつ表示)
+		m_Vertices = {
+			{ VertexPositionColorTexture(Vec3(-helfSize, helfSize, 0),Col4(1.0f,1.0f,1.0f,1.0f), Vec2(0.0f, 0.0f)) },
+			{ VertexPositionColorTexture(Vec3(helfSize, helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, 0.0f)) },
+			{ VertexPositionColorTexture(Vec3(-helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(0.0f, UVCharge)) },
+			{ VertexPositionColorTexture(Vec3(helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, UVCharge)) },
+		};
+		//インデックス配列
+		vector<uint16_t> indices = { 0, 1, 2, 1, 3, 2 };
+		SetAlphaActive(m_Trace);
+		auto ptrTrans = GetComponent<Transform>();
+		ptrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0.2f);
+		ptrTrans->SetRotation(0, 0, 0);
+		ptrTrans->SetPosition(m_StartPos);
+		//頂点とインデックスを指定してスプライト作成
+		auto ptrDraw = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
+		ptrDraw->SetBlendState(BlendState::AlphaBlend);
+		ptrDraw->SetTextureResource(m_TextureKey);
+
+	}
+	void SelectCharge::OnUpdate()
+	{
+		ChargeUV();
+	}
+	void SelectCharge::ChargeUV()
+	{
+		auto time = App::GetApp()->GetElapsedTime();
+		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		m_SelectCharge = stageMane->m_SelectCharge;
+		m_TitleCharge = stageMane->m_TitleCharge;
+		m_PushState = stageMane->GetPushState();
+
+		if (m_PushState == 0) {
+			m_fade -= time * m_fadeSpeed;
+			for (auto& vtx : m_Vertices) {
+				vtx.color = Col4(0.0f, 0.0f, 0.0f, 1.0f);
+			}
+		}
+		else{
+			m_fade += time * m_fadeSpeed;
+			for (auto& vtx : m_Vertices) {
+				vtx.color = Col4(1.0f, 1.0f, 1.0f, 1.0f);
+			}
+		}
+
+		if (m_fade > 1.0f) m_fade = 1.0f;
+		if (m_fade < 0.0f) m_fade = 0.0f;
+		if (m_PushState == 1)
+		{
+			m_SelectCharge->GetComponent<PCTSpriteDraw>()->SetDiffuse(Col4(1.0f, 1.0f, 1.0f, m_fade));
+			m_SelectCharge->GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
+		}
+		if (m_PushState == 2)
+		{
+			m_TitleCharge->GetComponent<PCTSpriteDraw>()->SetDiffuse(Col4(1.0f, 1.0f, 1.0f, m_fade));
+			m_TitleCharge->GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
+		}
+	}
+
+	void SelectCharge::UpdateProgress(float load) {
+		//float progress = load;
+		//m_Vertices[1].position.x = windowWidth * (progress - .5f);
+		//m_Vertices[3].position.x = windowWidth * (progress - .5f);
+		//m_Vertices[1].textureCoordinate.x = progress;
+		//m_Vertices[3].textureCoordinate.x = progress;
+
+		//GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
+	}
+
+
+	void SelectCharge::SetPushState(const bool PushState)
+	{
+		m_PushState = PushState;
+	}
+
 	BlinkingSprite::BlinkingSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
 		const Vec2& StartScale, const Vec3& StartPos) :
 		GameObject(StagePtr),

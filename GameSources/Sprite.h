@@ -22,6 +22,34 @@ namespace basecross {
 		virtual void OnUpdate() override {}
 	};
 
+	class SelectCharge : public GameObject
+	{
+	public:
+
+		bool m_PushState = false;
+		shared_ptr<PCTSpriteDraw> m_DrawComp;
+		vector<VertexPositionColorTexture> m_Vertices;
+		shared_ptr<GameObject> m_SelectCharge;
+		shared_ptr<GameObject> m_TitleCharge;
+		float m_fade = 1.0f;
+
+		const float m_fadeSpeed = 2.0f;
+		bool m_Trace;
+		Vec2 m_StartScale;
+		Vec3 m_StartPos;
+		wstring m_TextureKey;
+		float UVCharge;
+
+		SelectCharge(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
+			const Vec2& StartScale, const Vec3& StartPos);
+		virtual ~SelectCharge() {}
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		void ChargeUV();
+		void UpdateProgress(float load);
+		void SetPushState(const bool PushState);
+	};
+
 	class BlinkingSprite : public GameObject
 	{
 		float m_TotalTime;
