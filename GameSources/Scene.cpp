@@ -35,6 +35,9 @@ namespace basecross{
 		//敵のモデル
 		auto enemyAruki = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_ARUKU.bmf");
 		app->RegisterResource(L"ENEMYARUKU", enemyAruki);
+		auto enemyTobi = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_TOBU.bmf");
+		app->RegisterResource(L"ENEMYTOBU", enemyTobi);
+
 
 
 		//ステージオブジェクトのモデル
@@ -91,8 +94,18 @@ namespace basecross{
 		app->RegisterTexture(L"SelectFram", texPath + L"SelectFram.png");
 		app->RegisterTexture(L"SelectText", texPath + L"SelectText.png");
 		app->RegisterTexture(L"SelectNumber", texPath + L"SelectNumber.png");
+		app->RegisterTexture(L"SelectTitle", texPath + L"SelectTitle.png");
+		app->RegisterTexture(L"OverHeatFram", texPath + L"OverHeatFram.png");
+		app->RegisterTexture(L"OverHeatGauge", texPath + L"OverHeatGauge.png");
+
 		//GameStageUI
 		app->RegisterTexture(L"GameStageUI", texPath + L"UIGameStage.png");
+		app->RegisterTexture(L"PauseBG", texPath + L"PauseBackGround.png");
+		app->RegisterTexture(L"PauseSelect", texPath + L"PauseSelect.png");
+		app->RegisterTexture(L"PauseTitle", texPath + L"PauseTitle.png");
+		app->RegisterTexture(L"PauseBack", texPath + L"PauseBack.png");
+		app->RegisterTexture(L"PauseSelectCharge", texPath + L"PauseSelectCharge.png");
+		app->RegisterTexture(L"PauseTitleCharge", texPath + L"PauseTitleCharge.png");
 
 		//サウンド
 		//SE
@@ -108,6 +121,16 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"PlayerDamage", soundWav);
 		soundWav = sdPath + L"Switch.wav";
 		App::GetApp()->RegisterWav(L"SwitchSE", soundWav);
+		soundWav = sdPath + L"Decision.wav";
+		App::GetApp()->RegisterWav(L"DecisionSE", soundWav);
+
+		soundWav = sdPath + L"Confirm.wav";
+		App::GetApp()->RegisterWav(L"Confirm", soundWav);
+
+		soundWav = sdPath + L"GameClear.wav";
+		App::GetApp()->RegisterWav(L"GameClearSE", soundWav);
+		soundWav = sdPath + L"Door.wav";
+		App::GetApp()->RegisterWav(L"DoorSE", soundWav);
 		//BGM
 		soundWav = sdPath + L"TitleTheme.wav";
 		App::GetApp()->RegisterWav(L"TitleBGM", soundWav);
@@ -150,6 +173,9 @@ namespace basecross{
 		else if (event->m_MsgStr == L"ToGameStageTsuboi") {
 			ResetActiveStage<GameStageTsuboi>();
 		}
+		else if (event->m_MsgStr == L"ToTestStage") {
+			ResetActiveStage<GameStage>();
+		}
 		else if (event->m_MsgStr == L"ToLoad") {
 			ResetActiveStage<LoadScreen>();
 		}
@@ -160,22 +186,26 @@ namespace basecross{
 		switch (select)
 		{
 		case 0:
-			m_SelectedMap =  L"GameStage.csv";
+			m_SelectedMap = L"ToTitle";
 			m_select = select;
 			break;
 		case 1:
-			m_SelectedMap = L"Stagedata1.csv";
+			m_SelectedMap =  L"GameStage.csv";
 			m_select = select;
 			break;
 		case 2:
-			m_SelectedMap = L"Stagedata2.csv";
+			m_SelectedMap = L"Stagedata1.csv";
 			m_select = select;
 			break;
 		case 3:
-			m_SelectedMap = L"Stagedata3.csv";
+			m_SelectedMap = L"Stagedata2.csv";
 			m_select = select;
 			break;
 		case 4:
+			m_SelectedMap = L"Stagedata3.csv";
+			m_select = select;
+			break;
+		case 5:
 			m_SelectedMap = L"Stagedata4.csv";
 			m_select = select;
 			break;

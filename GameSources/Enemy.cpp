@@ -28,6 +28,7 @@ namespace basecross {
 		m_stateType(state),
 		m_overHeatState(overHeatState),
 		m_player(player),
+		m_meshName(L"ENEMYARUKU"),
 		m_heat(0),
 		m_maxHeat(100),
 		m_angle(0.0f),
@@ -62,7 +63,57 @@ namespace basecross {
 		m_plungeFlag(false),
 		m_pGrabFlag(false)
 	{}
-
+	Enemy::Enemy(const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotatoin,
+		const Vec3& scale,
+		const State& state,
+		const State& overHeatState,
+		const wstring& meshName,
+		const shared_ptr<Player>& player
+	) :
+		GameObject(stage),
+		m_pos(position),
+		m_rot(rotatoin),
+		m_scal(scale),
+		m_stateType(state),
+		m_overHeatState(overHeatState),
+		m_meshName(meshName),
+		m_player(player),
+		m_heat(0),
+		m_maxHeat(100),
+		m_angle(0.0f),
+		m_speed(5.0f),
+		m_maxSpeed(5.0f),
+		m_upSpeed(3.0f),
+		m_upHeight(10.0f),
+		m_jumpPower(5.0f),
+		m_jumpTime(1.0f),
+		m_dicUp(0),
+		m_direcNorm(Vec3(0.0f)),
+		m_dropTime(4.0f),
+		m_maxDropTime(m_dropTime),
+		m_hitDropTime(1.0f),
+		m_maxHitDropTime(m_hitDropTime),
+		m_spareTime(0.75f),
+		m_maxSpareTime(m_spareTime),
+		m_bulletTime(5.0f),
+		m_maxBulletTime(m_bulletTime),
+		m_trackingRange(20.0f),
+		m_firstDirec(Vec3(0.0f)),
+		m_gravity(-9.8f),
+		m_grav(Vec3(0.0f, m_gravity, 0.0f)),
+		m_gravVel(Vec3(0.0f)),
+		m_moveRot(Vec3(0.0f)),
+		m_bulletFlag(true),
+		m_jumpFlag(false),
+		m_jumpMoveFlag(false),
+		m_flyFlag(false),
+		m_floorFlag(false),
+		m_hitDropFlag(false),
+		m_plungeFlag(false),
+		m_pGrabFlag(false)
+	{}
 	void Enemy::OnCreate() {
 		m_trans = GetComponent<Transform>();
 		m_trans->SetPosition(m_pos);
@@ -74,10 +125,6 @@ namespace basecross {
 		if (!player) return;
 		m_playerScale = m_player.lock()->GetScale();
 		//描画
-		//auto ptrDraw = AddComponent<BcPNTStaticDraw>();
-		//ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
-		//ptrDraw->SetTextureResource(L"White");
-		//ptrDraw->SetDiffuse(Col4(0.0f,0.0f,1.0f,1.0f));
 		
 		auto ptrDraw = AddComponent<PNTBoneModelDraw>();
 		float rad = XMConvertToRadians(-90.0f);
@@ -89,7 +136,7 @@ namespace basecross {
 			Vec3(0.0f, -0.5f, 0.0f)
 		);
 
-		ptrDraw->SetMeshResource(L"ENEMYARUKU");
+		ptrDraw->SetMeshResource(m_meshName);
 		ptrDraw->SetMeshToTransformMatrix(meshMat);
 		ptrDraw->SetOwnShadowActive(true);
 
@@ -103,7 +150,7 @@ namespace basecross {
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(true);
+		m_collision->SetDrawActive(false);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
 		//影
@@ -111,11 +158,12 @@ namespace basecross {
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 
 		//足場コリジョンの追加
-		GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
+		auto floorCol = GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
+		floorCol->SetDrawActive(false);
 		//オーバーヒートゲージの追加
-		GetStage()->AddGameObject<GaugeSquare>(3.0f, 0.3f, L"White",
+		GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
 			Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
-		GetStage()->AddGameObject<Square>(3.0f, 0.3f, L"OverHeatText",
+		GetStage()->AddGameObject<Square>(4.0f, 2.0f, L"OverHeatFram",
 			Col4(1.0f, 1.0f, 1.0f, 1.0f), GetThis<Enemy>());
 		AddTag(L"Enemy");
 	}
@@ -171,13 +219,14 @@ namespace basecross {
 			break;
 		//追従浮遊
 		case flyMove:
-			OneJump(0.1f);
+			OneJump(0.5f);
 			PlayerDic();
 			EnemyAngle();
 			Bullet();
 			break;
 		//浮遊
 		case fly:
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			OneJump(5.0f);
 			EnemyAngle();
 			break;
@@ -187,7 +236,6 @@ namespace basecross {
 			Grav();
 			m_pos = m_deathPos;
 			m_collision->SetFixed(true);
-			//AddTag(L"FixedBox");
 			break;
 		//ジャンプ
 		case jump:
@@ -196,7 +244,7 @@ namespace basecross {
 			break;
 		//突っ込み
 		case plunge:
-			EnemyAnime(L"spare");
+			//EnemyAnime(L"spare");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			Plunge();
 			break;
@@ -218,6 +266,7 @@ namespace basecross {
 			GravZero();
 			Grav();
 		}
+
 		m_trans->SetPosition(m_pos);
 		m_beforeState = m_stateType;
 		if (GetOverHeat()) {
@@ -226,7 +275,7 @@ namespace basecross {
 		OverHeat();
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		//Debug();
+		Debug();
 	}
 
 	//ジャンプ
@@ -467,7 +516,9 @@ namespace basecross {
 	}
 	void Enemy::Grab() {
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
+		if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ||
+			keyState.m_bLastKeyTbl['Q'] == true) {
 			m_pGrabFlag = false;
 		}
 		if (m_pGrabFlag) {
@@ -486,15 +537,11 @@ namespace basecross {
 				m_trans->SetParent(pGrab);
 				m_pos = Vec3(0.0f, 0.0f, 0.0f);
 				m_trans->SetPosition(m_pos);
-				m_trans->SetRotation(Vec3(0.0f, 0.0f, 0.0f));
 
 			}
 			else {
 				return;
 			}
-			float angle = atan2(playerFor.z, playerFor.x);
-			m_trans->SetRotation(Vec3(0.0f, -angle, 0.0f));
-
 		}
 		else {
 			m_trans->ClearParent();
@@ -542,30 +589,6 @@ namespace basecross {
 				}
 			}
 		}
-
-		//if (other->FindTag(L"PlayerGrab")) {
-		//	auto playerGrab = dynamic_pointer_cast<PlayerGrab>(other);
-
-		//	if (m_stateType == m_overHeatState) {
-		//		m_test = 1.0f;
-		//		auto player = m_player.lock();
-		//		if (!player) return;
-		//		m_trans->SetParent(player);
-		//		auto playerPos = player->GetComponent<Transform>()->GetPosition();
-		//		auto playerFor = player->GetComponent<Transform>()->GetForward();
-		//		auto grabScal = playerGrab->GetComponent<Transform>()->GetScale();
-		//		Vec3 scal = Vec3(grabScal.x / 2, 0.0f, grabScal.z / 2);
-		//		auto fixedBox = m_fixedBox.lock();
-		//		if (fixedBox) {
-		//			m_pos = Vec3(0.0f, -0.5f, 0.0f) + scal;
-		//			m_trans->SetPosition(m_pos);
-
-		//		}
-		//		float angle = atan2(playerFor.z, playerFor.x);
-		//		//m_trans->SetRotation(Vec3(0.0f, angle, 0.0f));
-		//	}
-		//}
-
 	}
 
 	void Enemy::EnemyAnime(wstring anime) {
@@ -615,8 +638,8 @@ namespace basecross {
 			<<m_grav.y
 			<<L"\nOverHeat : "
 			<< GetOverHeat()
-			<<L"\n"
-			<< m_pGrabFlag
+			<<L"\nheat"
+			<< m_heat
 			<< endl;
 		scene->SetDebugString(wss.str());
 

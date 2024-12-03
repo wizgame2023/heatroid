@@ -1,6 +1,7 @@
 /*!
 @file SelectSprite.cpp
-@brief スプライト実体
+@brief セレクトステージのUI実体
+担当：逸見
 */
 
 #include "stdafx.h"
@@ -12,7 +13,7 @@ namespace basecross{
 	) :
 		GameObject(stage),
 		m_widthNum(1),
-		m_heightNum(5),
+		m_heightNum(6),
 		m_wSize(80*10.0f),//800
 		m_hSize(15*10.0f),//150
 		m_wSpace(420),
@@ -24,7 +25,7 @@ namespace basecross{
 		m_maxKeepTime(m_keepTime),
 		m_coolTime(0.3f),
 		m_maxCoolTime(m_coolTime),
-		m_pos(Vec3(400.0f, -500.0f, 0.0f)),//Vec3(400.0f, -500.0f, 0.0f)
+		m_pos(Vec3(400.0f, -600.0f, 0.0f)),//Vec3(400.0f, -500.0f, 0.0f)
 		m_maxPos(0.0f),
 		m_minPos(0.0f),
 		m_sCheck{ false },
@@ -41,21 +42,27 @@ namespace basecross{
 		m_trans = GetComponent<Transform>();
 		for (int i = 0; i < m_widthNum; i++) {
 			for (int j = 0; j < m_heightNum; j++) {
-				m_sprite[i + j * m_widthNum] = stage->AddGameObject<GameSprite>(
+				int sNum = i + j * m_widthNum;
+				m_sprite[sNum] = stage->AddGameObject<GameSprite>(
 					m_wSize, m_hSize, L"SelectFram", Vec3(m_pos.x + i * -m_widthSpace, m_pos.y + j * m_heightSpace, 0.0), Col4(1.0f));
-				m_sText[i + j * m_widthNum] = stage->AddGameObject<GameSprite>(800, 150, L"SelectText", 
-					Vec3(m_pos.x + i * -m_widthSpace, m_pos.y + j * m_heightSpace, 0.0), Col4(1.0f));
-				m_sText[i + j * m_widthNum]->SetDrawLayer(3);
-				m_sNum[i + j * m_widthNum] = stage->AddGameObject<NumberSprite>
-					(j + i * m_heightNum + 1, Vec3(m_pos.x + i * -m_widthSpace + 60, 
-						(m_pos.y + j * m_heightSpace) + 70, 0.0f));
-				m_sNum[i + j * m_widthNum]->SetDrawLayer(3);
+				if (sNum < m_heightNum * m_widthNum-1) {
+					m_sText[sNum] = stage->AddGameObject<GameSprite>(800, 150, L"SelectText",
+						Vec3(m_pos.x + i * -m_widthSpace, m_pos.y + (j+1) * m_heightSpace, 0.0), Col4(1.0f));
+					m_sText[sNum]->SetDrawLayer(3);
+					m_sNum[sNum] = stage->AddGameObject<NumberSprite>
+						(j + i * m_heightNum + 1, Vec3(m_pos.x + i * -m_widthSpace + 60, 
+							(m_pos.y + (j+1) * m_heightSpace) + 70, 0.0f));
+					m_sNum[sNum]->SetDrawLayer(3);
+				}
 			}
 		}
 		m_selectSprite = stage->AddGameObject<GameSprite>
 			(m_wSize, m_hSize, L"SelectFram", Vec3(m_pos), Col4(0.0f, 1.0f, 1.0f, 0.5f));
 		m_selectSprite->SetDrawLayer(2);
-		m_selectPos = Vec3(m_pos.x, m_pos.y, 0.0f);
+		m_selectPos = Vec3(m_pos.x, m_pos.y+m_heightSpace, 0.0f);
+		auto TitleText = stage->AddGameObject<GameSprite>(800, 150, L"SelectTitle", Vec3(m_pos.x+70,m_pos.y,m_pos.z));
+		TitleText->SetDrawLayer(3);
+		
 	}
 	void SelectSprite::OnUpdate() {
 		auto selectTrans = m_selectSprite->GetComponent<Transform>();

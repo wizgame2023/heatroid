@@ -22,6 +22,8 @@ namespace basecross {
 			SELECT,
 			// ゲームが開始してから終了するまで
 			GAME_PLAYING,
+
+			TEST_PLAY
 		};
 		CameraSelect m_CameraSelect;
 		shared_ptr<SingleView> m_OpeningCameraView;
@@ -38,13 +40,19 @@ namespace basecross {
 		shared_ptr<GameObject> m_clearSelectStage;
 		shared_ptr<GameObject> m_retryStageUI;
 		shared_ptr<GameObject> m_overSelectStage;
+		shared_ptr<GameObject> m_SelectCharge;
+		shared_ptr<GameObject> m_TitleCharge;
+		shared_ptr<GameObject> m_BGfade;
 
 		float m_totalTime = 0.0f;
 		int m_select = 0;
 
 		bool m_Goaltrue = false;
 		bool m_Diedtrue = false;
+		bool m_pause = false;
 		bool m_Flag = true;
+		int m_PushState = 0;
+
 		void CreateViewLight(); //ビューの作成
 		void CreatePlayer(); //Playerの生成
 		void CreateFixedBox();
@@ -53,6 +61,8 @@ namespace basecross {
 		void CreateSprite();
 		void GoalJudge();
 		void GameOverJudge();
+		void SetPushState(const int PushState);
+		int GetPushState();
 		void SetGameStageSelect(const wstring& m_csvFail);
 		void MoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStage);
 		void SelectMoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStage);
@@ -62,6 +72,9 @@ namespace basecross {
 		int GetNowCameraStatus();
 		void ToMainCamera();
 		void ToOpeningCamera();
+
+		void PlaySE(wstring path, float loopcnt, float volume);
+		void PlaySE2(wstring path, float loopcnt, float volume);
 		
 		//構築と破棄
 		StageManager(const shared_ptr<Stage>& stage) :
