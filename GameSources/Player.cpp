@@ -405,7 +405,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		ShowDebug();
+		//ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -669,7 +669,7 @@ namespace basecross {
 
 		auto coll = AddComponent<CollisionSphere>();
 		coll->SetAfterCollision(AfterCollision::None);
-		coll->SetDrawActive(true);//debug
+		coll->SetDrawActive(false);//debug
 		coll->AddExcludeCollisionTag(L"Player");
 		coll->AddExcludeCollisionTag(L"Attack");
 
