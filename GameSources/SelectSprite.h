@@ -1,6 +1,7 @@
 /*!
 @file SelectSprite.h
-@briefスプライト など
+@brief　セレクトステージのUI など
+担当：逸見
 */
 
 #pragma once
