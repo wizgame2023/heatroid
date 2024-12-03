@@ -9,10 +9,10 @@
 
 namespace basecross {
 
-//====================================================================
-// class LoadScreen
-// ロード画面もどき
-//====================================================================
+	//====================================================================
+	// class LoadScreen
+	// ロード画面もどき
+	//====================================================================
 
 	void LoadScreen::CreateViewLight() {
 		//ビューのカメラの設定
@@ -61,9 +61,13 @@ namespace basecross {
 		m_loadSpr = AddGameObject<SpriteLoad>();
 		AddGameObject<SpriteLoadCircle>();
 		m_fade = AddGameObject<SpriteLoadFade>();
+
 	}
-	
+
 	void LoadScreen::OnUpdate() {
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
+
 		if (m_loadEnd == false) {
 
 			auto delta = App::GetApp()->GetElapsedTime();
@@ -78,11 +82,14 @@ namespace basecross {
 				}
 			}
 		}
+		else {
+			PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+		}
 		if (m_progCnt < m_progress.size()) {
 			float load = Lerp::CalculateLerp(m_progress[m_progCnt - 1], m_progress[m_progCnt], 0.0f, 1.0f, m_time, Lerp::Linear);
 			m_loadSpr->UpdateProgress(load);
 		}
-		
+
 	}
 
 	//====================================================================
@@ -132,7 +139,7 @@ namespace basecross {
 	void SpriteLoadCircle::OnCreate() {
 
 		Col4 color(1, 1, 1, 1);
-		
+
 		float width = sinf(XMConvertToRadians(45.0f)) * m_radius;
 
 		m_Vertices = {
@@ -167,10 +174,10 @@ namespace basecross {
 		GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
 	}
 
-//====================================================================
-// class SpriteLoad
-// ローディングの文字
-//====================================================================
+	//====================================================================
+	// class SpriteLoad
+	// ローディングの文字
+	//====================================================================
 
 	void SpriteLoad::OnCreate() {
 
@@ -220,13 +227,13 @@ namespace basecross {
 	}
 
 	void SpriteLoad::UpdateProgress(float load) {
-		 float progress = load;
-		 m_Vertices[1].position.x = windowWidth * (progress - .5f);
-		 m_Vertices[3].position.x = windowWidth * (progress - .5f);
-		 m_Vertices[1].textureCoordinate.x = progress;
-		 m_Vertices[3].textureCoordinate.x = progress;
+		float progress = load;
+		m_Vertices[1].position.x = windowWidth * (progress - .5f);
+		m_Vertices[3].position.x = windowWidth * (progress - .5f);
+		m_Vertices[1].textureCoordinate.x = progress;
+		m_Vertices[3].textureCoordinate.x = progress;
 
-		 GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
+		GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
 	}
 
 	//====================================================================
@@ -264,7 +271,7 @@ namespace basecross {
 
 	void SpriteLoadFade::OnUpdate() {
 		auto delta = App::GetApp()->GetElapsedTime();
-				
+
 		if (!m_loadState) {
 			m_fade -= delta * m_fadeSpeed;
 			for (auto& vtx : m_Vertices) {
@@ -283,7 +290,7 @@ namespace basecross {
 		GetComponent<PCTSpriteDraw>()->SetDiffuse(Col4(1.0f, 1.0f, 1.0f, m_fade));
 		GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
 	}
-	
+
 	void SpriteLoadFade::SetLoadState(int state) {
 		m_loadState = state;
 	}
