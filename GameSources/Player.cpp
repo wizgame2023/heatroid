@@ -405,7 +405,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		ShowDebug();
+		//ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -669,7 +669,7 @@ namespace basecross {
 
 		auto coll = AddComponent<CollisionSphere>();
 		coll->SetAfterCollision(AfterCollision::None);
-		coll->SetDrawActive(true);//debug
+		coll->SetDrawActive(false);//debug
 		coll->AddExcludeCollisionTag(L"Player");
 		coll->AddExcludeCollisionTag(L"Attack");
 
@@ -859,7 +859,7 @@ namespace basecross {
 		SetDrawLayer(m_layer);
 		SetAlphaActive(true);
 
-		GetComponent<Transform>()->SetPosition(windowWidth * -.52, windowHeight * .5, 0);
+		GetComponent<Transform>()->SetPosition(windowWidth * -.6, windowHeight * .525, 0);
 
 		if (m_resKey == L"PLAYERUI") {
 			m_health = GetStage()->AddGameObject<SpriteHealth>(m_player.lock(), GetThis<SpritePlayerUI>());
