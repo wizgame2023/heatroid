@@ -150,7 +150,7 @@ namespace basecross {
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(true);
+		m_collision->SetDrawActive(false);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
 		//影
@@ -158,7 +158,8 @@ namespace basecross {
 		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 
 		//足場コリジョンの追加
-		GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
+		auto floorCol = GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
+		floorCol->SetDrawActive(false);
 		//オーバーヒートゲージの追加
 		GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
 			Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
@@ -218,13 +219,14 @@ namespace basecross {
 			break;
 		//追従浮遊
 		case flyMove:
-			OneJump(0.1f);
+			OneJump(0.5f);
 			PlayerDic();
 			EnemyAngle();
 			Bullet();
 			break;
 		//浮遊
 		case fly:
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			OneJump(5.0f);
 			EnemyAngle();
 			break;
@@ -234,7 +236,6 @@ namespace basecross {
 			Grav();
 			m_pos = m_deathPos;
 			m_collision->SetFixed(true);
-			//AddTag(L"FixedBox");
 			break;
 		//ジャンプ
 		case jump:
@@ -265,6 +266,7 @@ namespace basecross {
 			GravZero();
 			Grav();
 		}
+
 		m_trans->SetPosition(m_pos);
 		m_beforeState = m_stateType;
 		if (GetOverHeat()) {
@@ -273,7 +275,7 @@ namespace basecross {
 		OverHeat();
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		//Debug();
+		Debug();
 	}
 
 	//ジャンプ
@@ -636,8 +638,8 @@ namespace basecross {
 			<<m_grav.y
 			<<L"\nOverHeat : "
 			<< GetOverHeat()
-			<<L"\n"
-			<< m_pGrabFlag
+			<<L"\nheat"
+			<< m_heat
 			<< endl;
 		scene->SetDebugString(wss.str());
 
