@@ -73,7 +73,7 @@ namespace basecross {
 			auto delta = App::GetApp()->GetElapsedTime();
 			m_time += delta;
 
-			if (m_time > 1.0f) {
+			if (m_time > loadLength) {
 				m_progCnt++;
 				m_time = 0;
 				if (m_progCnt >= m_progress.size()) {
@@ -83,10 +83,10 @@ namespace basecross {
 			}
 		}
 		else {
-			PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+			PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 		}
 		if (m_progCnt < m_progress.size()) {
-			float load = Lerp::CalculateLerp(m_progress[m_progCnt - 1], m_progress[m_progCnt], 0.0f, 1.0f, m_time, Lerp::Linear);
+			float load = Lerp::CalculateLerp(m_progress[m_progCnt - 1], m_progress[m_progCnt], 0.0f, loadLength, m_time, Lerp::Linear);
 			m_loadSpr->UpdateProgress(load);
 		}
 
