@@ -393,11 +393,9 @@ namespace basecross {
 
 		if (m_isCarrying == true) {
 			m_pGrab.lock()->SetCollActive(true);
-			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(true);
 		}
 		else {
 			m_pGrab.lock()->SetCollActive(false);
-			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(false);
 		}
 
 
