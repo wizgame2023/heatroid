@@ -340,8 +340,8 @@ namespace basecross {
 		shared_ptr<SpriteCharge> m_charge;
 		shared_ptr<SpritePlayerUI> m_frame;
 
-		const float m_width = 400.0f;
-		const float m_height = 100.0f;
+		const float m_width = 600.0f;
+		const float m_height = 150.0f;
 		const float windowWidth = App::GetApp()->GetGameWidth();
 		const float windowHeight = App::GetApp()->GetGameHeight();
 	public:
@@ -369,10 +369,10 @@ namespace basecross {
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
 
-		const float m_width = 160.0f;
-		const float m_height = 10.0f;
-		const float m_bottomSlip = -10.0f;
-		Vec3 addPos = Vec3(159.0f, -40.0f, 0.0f);
+		const float m_width = 240.0f;
+		const float m_height = 15.0f;
+		const float m_bottomSlip = -15.0f;
+		Vec3 addPos = Vec3(240.0f, -60.0f, 0.0f);
 
 	public:
 		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
@@ -398,10 +398,10 @@ namespace basecross {
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
 
-		const float m_width = 160.0f;
-		const float m_height = 8.0f;
-		const float m_bottomSlip = 10.0f;
-		Vec3 addPos = Vec3(190.0f, -55.0f, 0.0f);
+		const float m_width = 240.0f;
+		const float m_height = 13.5f;
+		const float m_bottomSlip = 13.5f;
+		Vec3 addPos = Vec3(287.0f, -82.0f, 0.0f);
 
 	public:
 		SpriteCharge(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
