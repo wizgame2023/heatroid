@@ -71,7 +71,7 @@ namespace basecross{
 		//KeepStick();
 		selectTrans->SetPosition(m_selectPos);
 		//m_sprite[m_selectNum+1]->SetColor(Col4(0.0f, 1.0f, 1.0f, 1.0f));
-		Debug();
+		//Debug();
 	}
 	//À•W‚ğ^‚ñ’†‚É‚·‚éŒvZ
 	void SelectSprite::PosSetting() {
