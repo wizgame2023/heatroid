@@ -27,8 +27,14 @@ namespace basecross {
 		shared_ptr<GameObject> m_TitleCharge;
 		float totaltime = 0.0f;
 
+
 	public:
 		bool m_pause = false;
+		//エフェクト
+		shared_ptr<EfkEffect> m_EfkEffect;
+		//エフェクト実行オブジェクト
+		shared_ptr<EfkPlay> m_EfkPlay;
+		shared_ptr<EfkInterface> m_EfkInterface;
 
 		//構築と破棄
 		GameStage() :Stage(){}
@@ -36,6 +42,9 @@ namespace basecross {
 		
 		virtual void OnCreate()override; //初期化
 		virtual void OnUpdate()override; //初期化
+		virtual void OnDraw()override; //初期化
+
+		void OnPushA();
 
 		void PlayBGM(const wstring& StageBGM);
 
@@ -44,6 +53,13 @@ namespace basecross {
 		void CreateStageManager();
 
 		void GamePause();
+
+		void EffectPlay();
+
+		shared_ptr<EfkInterface> GetEfkInterface() const {
+			return m_EfkInterface;
+		}
+
 	};
 
 }
