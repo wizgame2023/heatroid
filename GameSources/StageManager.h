@@ -25,6 +25,9 @@ namespace basecross {
 
 			TEST_PLAY
 		};
+		//エフェクトのインターフェイス
+		shared_ptr<EfkInterface> m_EfkInterface;
+
 		CameraSelect m_CameraSelect;
 		shared_ptr<SingleView> m_OpeningCameraView;
 		shared_ptr<SingleView> m_MyCameraView;
@@ -85,6 +88,7 @@ namespace basecross {
 
 		virtual void OnCreate()override; //初期化
 		virtual void OnUpdate()override; //初期化
+		virtual void OnDraw()override; //初期化
 
 	};
 }
