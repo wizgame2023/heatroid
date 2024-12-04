@@ -329,9 +329,10 @@ namespace basecross {
 
 			float Switch = (float)_wtof(Tokens[10].c_str());
 			int number = (float)_wtof(Tokens[11].c_str());
+			int max = (float)_wtof(Tokens[13].c_str());
 
 			//各値がそろったのでオブジェクト作成
-			auto door = GetStage()->AddGameObject<GimmickUp>(Pos, Rot, Scale, Scale.x, Scale.y, Switch, number, Tokens[12]);
+			auto door = GetStage()->AddGameObject<GimmickUp>(Pos, Rot, Scale, Scale.x, Scale.y, Switch, number, Tokens[12], max);
 		}
 	}
 
@@ -433,6 +434,7 @@ namespace basecross {
 					m_GameStage.ReadCsv();
 				}
 			}
+
 		}
 		catch (...) {
 			throw;
@@ -534,6 +536,7 @@ namespace basecross {
 				}
 				GoalJudge();
 				GameOverJudge();
+				OnDraw();
 			}
 			break;
 
@@ -541,6 +544,10 @@ namespace basecross {
 			break;
 		}
 
+	}
+
+	void StageManager::OnDraw()
+	{
 	}
 
 	void StageManager::CreateSprite()

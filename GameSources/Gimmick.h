@@ -83,6 +83,7 @@ namespace basecross {
 		int m_number;
 		bool m_Flag;
 	public:
+		float m_Max;
 		float m_OpenSwitch;
 		wstring m_Texname;
 		//\’z‚Æ”jŠü
@@ -94,7 +95,8 @@ namespace basecross {
 			float VPic,
 			float m_OpenSwitch,
 			int number,
-			const wstring& m_Texname
+			const wstring& m_Texname,
+			float m_Max
 		);
 		virtual ~GimmickUp();
 		//‰Šú‰»

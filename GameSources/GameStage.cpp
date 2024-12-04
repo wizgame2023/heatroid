@@ -34,6 +34,16 @@ namespace basecross {
 			m_PauseTitle->SetDrawActive(false);
 			m_PauseBack->SetDrawActive(false);
 
+			//エフェクト作成
+
+			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
+
+			//エフェクトの初期化
+			wstring DataDir;
+			App::GetApp()->GetDataDirectory(DataDir);
+			wstring TestEffectStr = DataDir + L"Effects\\Laser01.efk";
+			auto ShEfkInterface = m_EfkInterface;
+			m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
 		}
 		catch (...) {
 			throw;
@@ -41,12 +51,29 @@ namespace basecross {
 	}
 	void GameStage::OnUpdate()
 	{
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
 		int camerastatus = stageMane->GetNowCameraStatus();
 		if (stageMane->m_CameraSelect == StageManager::CameraSelect::myCamera)
 		{
+			m_EfkInterface->OnUpdate();
 			GamePause();
+			if (KeyState.m_bPressedKeyTbl[VK_TAB])
+			{
+				EffectPlay();
+			}
 		}
+	}
+
+	void GameStage::OnDraw()
+	{
+		auto& camera = GetView()->GetTargetCamera();
+		m_EfkInterface->SetViewProj(camera->GetViewMatrix(), camera->GetProjMatrix());
+		m_EfkInterface->OnDraw();
+	}
+
+	void GameStage::OnPushA()
+	{
 	}
 
 	void GameStage::GamePause()
@@ -171,6 +198,12 @@ namespace basecross {
 		}
 	}
 
+	void GameStage::EffectPlay()
+	{
+		auto ShEfkInterface = m_EfkInterface;
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
+
+	}
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{

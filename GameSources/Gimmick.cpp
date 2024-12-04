@@ -303,7 +303,8 @@ namespace basecross {
 		float VPic,
 		float m_OpenSwitch,
 		int number,
-		const wstring& m_Texname) :
+		const wstring& m_Texname,
+		float Max) :
 		GameObject(stage),
 		m_Position(position),
 		m_Rotation(rotation),
@@ -312,7 +313,8 @@ namespace basecross {
 		m_VPic(VPic),
 		m_OpenSwitch(m_OpenSwitch),
 		m_number(number),
-		m_Texname(m_Texname)
+		m_Texname(m_Texname),
+		m_Max(Max)
 	{
 	}
 	GimmickUp::~GimmickUp() {}
@@ -382,7 +384,7 @@ namespace basecross {
 				{
 					if (m_number == 1)
 					{
-						if(pos.y < 10.0f)
+						if(pos.y < m_Max)
 						{
 							ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
 						}
