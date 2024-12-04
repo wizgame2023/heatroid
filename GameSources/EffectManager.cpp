@@ -1,15 +1,14 @@
 /*!
 @file EffectManager.cpp
-@brief ƒGƒtƒFƒNƒg‚È‚ÇÀ‘Ì
+@brief ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãªã©å®Ÿä½“
 */
 
 #include "stdafx.h"
 #include "Project.h"
-
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
-	///	EffekseerƒGƒtƒFƒNƒg‚ÌƒGƒtƒFƒNƒg
+	///	Effekseerã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 	//--------------------------------------------------------------------------------------
 	EfkEffect::EfkEffect(const shared_ptr<EfkInterface>& iface, const wstring& filename) :
 		m_FileName(filename),
@@ -19,14 +18,14 @@ namespace basecross {
 		try {
 			if (m_FileName == L"") {
 				throw BaseException(
-					L"ƒGƒtƒFƒNƒgƒtƒ@ƒCƒ‹–¼‚ª‹ó”’‚Å‚·B",
+					L"ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¤ãƒ«åãŒç©ºç™½ã§ã™ã€‚",
 					L"if (m_FileName == L\"\")",
 					L"EfkEffect::EfkEffect()"
 				);
 			}
 			auto m_Efk = m_EfkInterface.lock();
 			m_manager = m_Efk->m_Manager;
-			// ƒGƒtƒFƒNƒg‚Ì“Ç
+			// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®èª­è¾¼
 			m_Effect = ::Effekseer::Effect::Create(m_manager, (const char16_t*)filename.c_str());
 		}
 		catch (...) {
@@ -40,7 +39,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	///	EffekseerƒGƒtƒFƒNƒg‚ÌPlayƒIƒuƒWƒFƒNƒg
+	///	Effekseerã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®Playã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	//--------------------------------------------------------------------------------------
 	EfkPlay::EfkPlay(const shared_ptr<EfkEffect>& effect, const bsm::Vec3& Emitter) :
 		m_handle(-1)
@@ -64,6 +63,16 @@ namespace basecross {
 		}
 	}
 
+	void EfkPlay::SetRotation(const bsm::Vec3& Location, const float angle)
+	{
+		m_Manager->SetRotation(m_handle, ::Effekseer::Vector3D(Location.x, Location.y, Location.z), angle);
+	}
+
+	void EfkPlay::SetScale(const bsm::Vec3& Scale)
+	{
+		m_Manager->SetScale(m_handle, Scale.x, Scale.y, Scale.z);
+	}
+
 	void EfkPlay::StopEffect() {
 		if (m_handle != -1) {
 			m_Manager->StopEffect(m_handle);
@@ -71,7 +80,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	///	EffekseerƒGƒtƒFƒNƒg‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
+	///	Effekseerã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
 	//--------------------------------------------------------------------------------------
 	EfkInterface::EfkInterface() :
 		ObjectInterface(),
@@ -79,48 +88,48 @@ namespace basecross {
 		m_renderer(nullptr)
 	{}
 	EfkInterface::~EfkInterface() {
-		// æ‚ÉƒGƒtƒFƒNƒgŠÇ——pƒCƒ“ƒXƒ^ƒ“ƒX‚ğ”jŠü
+		// å…ˆã«ã‚¨ãƒ•ã‚§ã‚¯ãƒˆç®¡ç†ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç ´æ£„
 		m_Manager.Reset();
-		// Ÿ‚É•`‰æ—pƒCƒ“ƒXƒ^ƒ“ƒX‚ğ”jŠü
+		// æ¬¡ã«æç”»ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç ´æ£„
 		m_renderer.Reset();
 	}
 
 	void EfkInterface::OnCreate() {
-		//ƒfƒoƒCƒX‚Ìæ“¾
+		//ãƒ‡ãƒã‚¤ã‚¹ã®å–å¾—
 		auto Dev = App::GetApp()->GetDeviceResources();
 		auto pDx11Device = Dev->GetD3DDevice();
 		auto pID3D11DeviceContext = Dev->GetD3DDeviceContext();
-		// •`‰æ—pƒCƒ“ƒXƒ^ƒ“ƒX‚Ì¶¬
+		// æç”»ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ç”Ÿæˆ
 		m_renderer = EffekseerRendererDX11::Renderer::Create(pDx11Device, pID3D11DeviceContext, 2000);
-		// ƒGƒtƒFƒNƒgŠÇ——pƒCƒ“ƒXƒ^ƒ“ƒX‚Ì¶¬
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆç®¡ç†ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ç”Ÿæˆ
 		m_Manager = Effekseer::Manager::Create(2000);
 
-		// •`‰æ—pƒCƒ“ƒXƒ^ƒ“ƒX‚©‚ç•`‰æ‹@”\‚ğİ’è
+		// æç”»ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‹ã‚‰æç”»æ©Ÿèƒ½ã‚’è¨­å®š
 		m_Manager->SetSpriteRenderer(m_renderer->CreateSpriteRenderer());
 		m_Manager->SetRibbonRenderer(m_renderer->CreateRibbonRenderer());
 		m_Manager->SetRingRenderer(m_renderer->CreateRingRenderer());
 		m_Manager->SetTrackRenderer(m_renderer->CreateTrackRenderer());
 		m_Manager->SetModelRenderer(m_renderer->CreateModelRenderer());
 
-		// •`‰æ—pƒCƒ“ƒXƒ^ƒ“ƒX‚©‚çƒeƒNƒXƒ`ƒƒ‚Ì“Ç‹@”\‚ğİ’è
-		// “Æ©Šg’£‰Â”\AŒ»İ‚Íƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚ñ‚Å‚¢‚éB
+		// æç”»ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­è¾¼æ©Ÿèƒ½ã‚’è¨­å®š
+		// ç‹¬è‡ªæ‹¡å¼µå¯èƒ½ã€ç¾åœ¨ã¯ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚“ã§ã„ã‚‹ã€‚
 		m_Manager->SetTextureLoader(m_renderer->CreateTextureLoader());
 		m_Manager->SetModelLoader(m_renderer->CreateModelLoader());
 	}
 
 	void  EfkInterface::OnUpdate() {
-		// ƒGƒtƒFƒNƒg‚ÌXVˆ—‚ğs‚¤
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æ›´æ–°å‡¦ç†ã‚’è¡Œã†
 		m_Manager->Update();
 	}
 
 	void EfkInterface::OnDraw() {
-		// ƒGƒtƒFƒNƒg‚Ì•`‰æŠJnˆ—‚ğs‚¤B
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æç”»é–‹å§‹å‡¦ç†ã‚’è¡Œã†ã€‚
 		m_renderer->BeginRendering();
 
-		// ƒGƒtƒFƒNƒg‚Ì•`‰æ‚ğs‚¤B
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æç”»ã‚’è¡Œã†ã€‚
 		m_Manager->Draw();
 
-		// ƒGƒtƒFƒNƒg‚Ì•`‰æI—¹ˆ—‚ğs‚¤B
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æç”»çµ‚äº†å‡¦ç†ã‚’è¡Œã†ã€‚
 		m_renderer->EndRendering();
 
 	}

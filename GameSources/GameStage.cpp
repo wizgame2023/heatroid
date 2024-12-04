@@ -1,7 +1,7 @@
 /*!
-äôìcëÂãP
+ÈéåÁî∞Â§ßËºù
 @file GameStage.cpp
-@brief ÉQÅ[ÉÄÉXÉeÅ[ÉWé¿ëÃ
+@brief „Ç≤„Éº„É†„Çπ„ÉÜ„Éº„Ç∏ÂÆü‰Ωì
 */
 
 #include "stdafx.h"
@@ -34,11 +34,11 @@ namespace basecross {
 			m_PauseTitle->SetDrawActive(false);
 			m_PauseBack->SetDrawActive(false);
 
-			//ÉGÉtÉFÉNÉgçÏê¨
+			//„Ç®„Éï„Çß„ÇØ„Éà‰ΩúÊàê
 
 			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
 
-			//ÉGÉtÉFÉNÉgÇÃèâä˙âª
+			//„Ç®„Éï„Çß„ÇØ„Éà„ÅÆÂàùÊúüÂåñ
 			wstring DataDir;
 			App::GetApp()->GetDataDirectory(DataDir);
 			wstring TestEffectStr = DataDir + L"Effects\\Laser01.efk";
@@ -60,7 +60,7 @@ namespace basecross {
 			GamePause();
 			if (KeyState.m_bPressedKeyTbl[VK_TAB])
 			{
-				EffectPlay();
+				//EffectPlay();
 			}
 		}
 	}
@@ -197,12 +197,11 @@ namespace basecross {
 
 		}
 	}
-
 	void GameStage::EffectPlay()
 	{
 		auto ShEfkInterface = m_EfkInterface;
 		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
-
+		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
 	}
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
@@ -211,7 +210,7 @@ namespace basecross {
 	}
 
 	void GameStage::OnDestroy() {
-		//BGMÇÃÉXÉgÉbÉv
+		//BGM„ÅÆ„Çπ„Éà„ÉÉ„Éó
 		m_ptrXA->Stop(m_BGM);
 	}
 	void GameStage::CreateStageManager() {
