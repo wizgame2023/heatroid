@@ -1,7 +1,7 @@
 /*!
-Š™“c‘å‹P
+éŒç”°å¤§è¼
 @file GameStage.cpp
-@brief ƒQ[ƒ€ƒXƒe[ƒWÀ‘Ì
+@brief ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸å®Ÿä½“
 */
 
 #include "stdafx.h"
@@ -34,11 +34,11 @@ namespace basecross {
 			m_PauseTitle->SetDrawActive(false);
 			m_PauseBack->SetDrawActive(false);
 
-			//ƒGƒtƒFƒNƒgì¬
+			//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆä½œæˆ
 
 			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
 
-			//ƒGƒtƒFƒNƒg‚Ì‰Šú‰»
+			//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®åˆæœŸåŒ–
 			wstring DataDir;
 			App::GetApp()->GetDataDirectory(DataDir);
 			wstring TestEffectStr = DataDir + L"Effects\\Laser01.efk";
@@ -58,20 +58,10 @@ namespace basecross {
 		{
 			m_EfkInterface->OnUpdate();
 			GamePause();
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
 			if (KeyState.m_bPressedKeyTbl[VK_TAB])
 			{
 				//EffectPlay();
 			}
->>>>>>> Stashed changes
-=======
-			if (KeyState.m_bPressedKeyTbl[VK_TAB])
-			{
-				EffectPlay();
-			}
->>>>>>> Stashed changes
 		}
 	}
 
@@ -207,24 +197,12 @@ namespace basecross {
 
 		}
 	}
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
 	void GameStage::EffectPlay()
 	{
 		auto ShEfkInterface = m_EfkInterface;
 		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
-<<<<<<< Updated upstream
 		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
 	}
->>>>>>> Stashed changes
-=======
-
-	}
->>>>>>> Stashed changes
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{
@@ -232,7 +210,7 @@ namespace basecross {
 	}
 
 	void GameStage::OnDestroy() {
-		//BGM‚ÌƒXƒgƒbƒv
+		//BGMã®ã‚¹ãƒˆãƒƒãƒ—
 		m_ptrXA->Stop(m_BGM);
 	}
 	void GameStage::CreateStageManager() {
