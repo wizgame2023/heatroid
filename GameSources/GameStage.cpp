@@ -46,6 +46,13 @@ namespace basecross {
 		if (stageMane->m_CameraSelect == StageManager::CameraSelect::myCamera)
 		{
 			GamePause();
+<<<<<<< Updated upstream
+=======
+			if (KeyState.m_bPressedKeyTbl[VK_TAB])
+			{
+				//EffectPlay();
+			}
+>>>>>>> Stashed changes
 		}
 	}
 
@@ -171,6 +178,15 @@ namespace basecross {
 		}
 	}
 
+<<<<<<< Updated upstream
+=======
+	void GameStage::EffectPlay()
+	{
+		auto ShEfkInterface = m_EfkInterface;
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
+		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
+	}
+>>>>>>> Stashed changes
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{
