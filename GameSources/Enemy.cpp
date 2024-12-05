@@ -518,7 +518,7 @@ namespace basecross {
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
 		if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ||
-			keyState.m_bLastKeyTbl['Q'] == true) {
+			keyState.m_bUpKeyTbl['Q'] == true) {
 			m_pGrabFlag = false;
 		}
 		if (m_pGrabFlag) {
