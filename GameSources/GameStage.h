@@ -34,7 +34,6 @@ namespace basecross {
 		shared_ptr<EfkEffect> m_EfkEffect;
 		//エフェクト実行オブジェクト
 		shared_ptr<EfkPlay> m_EfkPlay;
-		shared_ptr<EfkInterface> m_EfkInterface;
 
 		//構築と破棄
 		GameStage() :Stage(){}
@@ -55,10 +54,6 @@ namespace basecross {
 		void GamePause();
 
 		void EffectPlay();
-
-		shared_ptr<EfkInterface> GetEfkInterface() const {
-			return m_EfkInterface;
-		}
 
 	};
 

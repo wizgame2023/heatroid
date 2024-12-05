@@ -5,6 +5,7 @@
 
 #include "stdafx.h"
 #include "Project.h"
+
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
@@ -18,10 +19,10 @@ namespace basecross {
 		try {
 			if (m_FileName == L"") {
 				throw BaseException(
-					L"エフェクトファイル名が空白です。",
+					L"",
 					L"if (m_FileName == L\"\")",
 					L"EfkEffect::EfkEffect()"
-				);
+					);
 			}
 			auto m_Efk = m_EfkInterface.lock();
 			m_manager = m_Efk->m_Manager;
@@ -71,6 +72,13 @@ namespace basecross {
 	void EfkPlay::SetScale(const bsm::Vec3& Scale)
 	{
 		m_Manager->SetScale(m_handle, Scale.x, Scale.y, Scale.z);
+	}
+
+	void EfkPlay::SetAllColor(const bsm::Col4 Color)
+	{
+		auto color = ::Effekseer::ColorMode::COLOR_MODE_RGBA;
+		::Effekseer::Color().A;
+		m_Manager->SetAllColor(m_handle, ::Effekseer::Color(255, Color.y, Color.z, 255));
 	}
 
 	void EfkPlay::StopEffect() {
