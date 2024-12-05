@@ -88,6 +88,8 @@ namespace basecross {
 		float m_chargePerc, m_chargeSpeed, m_chargeReduceSpeed;
 		//無敵時間
 		float m_invincibleTime, m_invincibleTimeMax;
+		//掴み判定の持続秒数
+		float m_grabTime, m_grabTimeMax;
 		//何かを持っているか否か
 		bool m_isCarrying;
 
@@ -193,11 +195,13 @@ namespace basecross {
 				draw->ChangeCurrentAnimation(animname, time);
 		}
 
-		void SwitchFireAnim(const float time);
+		void SwitchAnim(const float time, const float condition, const wstring prefix);
 
 		void Charging(bool charge) {
+			if (m_isCarrying == true) return;
 			m_isCharging = charge;
 			if (charge == false) return;
+			
 			if (m_isOverCharge) {
 				m_chargePerc += m_chargeReduceSpeed * m_chargePerc * _delta;
 			}
@@ -208,8 +212,9 @@ namespace basecross {
 			if (m_chargePerc > 1.0f) m_isOverCharge = true;
 		}
 
-		const wstring AddFire() {
+		const wstring AddPrefix() {
 			if (m_isCharging) return L"Fire_";
+			if (m_isCarrying) return L"Grab_";
 			else return L"";
 		}
 	};
@@ -225,7 +230,7 @@ namespace basecross {
 		//プレイヤーに追従させるためのポインタ
 		weak_ptr<Player> m_player;
 		//触れた敵のポインタを保管しておく
-		shared_ptr<GameObject> m_target;
+		shared_ptr<Enemy> m_target;
 		//敵に当たっているかどうか
 		bool m_isHit;
 	public:
@@ -251,9 +256,7 @@ namespace basecross {
 		}
 
 		//何かに接触している判定
-		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
-		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
-
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 
 	};
 

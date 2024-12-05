@@ -30,7 +30,7 @@ namespace basecross {
 		//何番目まで進んでいるかのカウント
 		int m_progCnt = 1;
 
-		const float loadLength = .25f;
+		const float loadLength = .05f;
 
 		shared_ptr<SpriteLoad> m_loadSpr;
 		shared_ptr<SpriteLoadFade> m_fade;
