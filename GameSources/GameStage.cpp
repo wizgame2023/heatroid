@@ -203,7 +203,7 @@ namespace basecross {
 		auto ShEfkInterface = stageMane->GetEfkInterface();
 		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
 		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
-		//m_EfkPlay->SetAllColor(Col4(1.0f, 0, 0, 1));
+		m_EfkPlay->SetAllColor(Col4(1.0f, 0.0f, 1.0f, 1.0f));
 	}
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
