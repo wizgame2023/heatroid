@@ -404,7 +404,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		ShowDebug();
+		//ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -699,7 +699,7 @@ namespace basecross {
 		auto plPtr = m_player.lock();
 
 		//debug
-		if (true) {
+		if (false) {
 			bool update = GetComponent<CollisionSphere>()->GetUpdateActive();
 			GetComponent<CollisionSphere>()->SetDrawActive(update);
 		}
@@ -737,9 +737,6 @@ namespace basecross {
 				return;
 			}
 		}
-	}
-	void PlayerGrab::OnCollisionExit(shared_ptr<GameObject>& Other) {
-
 	}
 
 	//====================================================================
