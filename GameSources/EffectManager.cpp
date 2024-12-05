@@ -76,9 +76,8 @@ namespace basecross {
 
 	void EfkPlay::SetAllColor(const bsm::Col4 Color)
 	{
-		auto color = ::Effekseer::ColorMode::COLOR_MODE_RGBA;
-		::Effekseer::Color().A;
-		m_Manager->SetAllColor(m_handle, ::Effekseer::Color(255, Color.y, Color.z, 255));
+		auto color = Col4(Color) * 255;
+		m_Manager->SetAllColor(m_handle, ::Effekseer::Color(color.x, color.y, color.z, color.w));
 	}
 
 	void EfkPlay::StopEffect() {
