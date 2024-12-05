@@ -178,7 +178,6 @@ namespace basecross {
 		m_playerTrans = player->GetComponent<Transform>();
 		m_playerPos = m_playerTrans.lock()->GetPosition();
 
-		Debug();
 		FindFixed();
 		if (m_stateType != m_beforeState) {
 			m_plungeFlag = false;
@@ -275,7 +274,7 @@ namespace basecross {
 		OverHeat();
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ
@@ -812,7 +811,7 @@ namespace basecross {
 		if (m_pos.y <= -10) {
 			ThisDestroy();
 		}
-		Debug();
+		//Debug();
 	}
 
 	void EnemyBullet::OnCollisionEnter(shared_ptr<GameObject>& other) {

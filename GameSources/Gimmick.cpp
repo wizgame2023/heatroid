@@ -294,6 +294,144 @@ namespace basecross {
 		}
 	}
 
+	GimmickUp::GimmickUp(
+		const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotation,
+		const Vec3& scale,
+		float UPic,
+		float VPic,
+		float m_OpenSwitch,
+		int number,
+		const wstring& m_Texname,
+		float Max) :
+		GameObject(stage),
+		m_Position(position),
+		m_Rotation(rotation),
+		m_Scale(scale),
+		m_UPic(UPic),
+		m_VPic(VPic),
+		m_OpenSwitch(m_OpenSwitch),
+		m_number(number),
+		m_Texname(m_Texname),
+		m_Max(Max)
+	{
+	}
+	GimmickUp::~GimmickUp() {}
+
+	//èâä˙âª
+	void GimmickUp::OnCreate() {
+		m_open = false;
+		m_open2 = false;
+		m_Flag = false;
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Position);
+		Trans->SetRotation(m_Rotation);
+		Trans->SetScale(m_Scale);
+		auto Coll = AddComponent<CollisionObb>();
+		Coll->SetFixed(true);
+		//Coll->SetDrawActive(true);
+		vector<VertexPositionNormalTexture> vertices;
+		vector<uint16_t> indices;
+		MeshUtill::CreateCube(1.0f, vertices, indices);
+		float UCount = m_Scale.x / m_UPic;
+		float VCount = m_Scale.z / m_VPic;
+		for (size_t i = 0; i < vertices.size(); i++) {
+			if (vertices[i].textureCoordinate.x >= 1.0f) {
+				vertices[i].textureCoordinate.x = UCount;
+			}
+			if (vertices[i].textureCoordinate.y >= 1.0f) {
+				float FrontBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, 1, 0));
+				float BackBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, -1, 0));
+				if (FrontBetween < 0.01f || BackBetween < 0.01f) {
+					vertices[i].textureCoordinate.y = VCount;
+				}
+			}
+		}
+		AddTag(L"FixedBox");
+		AddTag(L"GimmickUp");
+		AddTag(L"Floor");
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		PtrDraw->CreateOriginalMesh(vertices, indices);
+		PtrDraw->SetOriginalMeshUse(true);
+		PtrDraw->SetTextureResource(m_Texname);
+		//É^ÉCÉäÉìÉOê›íË
+		PtrDraw->SetSamplerState(SamplerState::PointWrap);
+
+		auto group = GetStage()->GetSharedObjectGroup(L"GimmickUp");
+		group->IntoGroup(GetThis<GameObject>());
+	}
+
+	void GimmickUp::OnUpdate()
+	{
+		OpenDoor();
+	}
+
+	void GimmickUp::OpenDoor()
+	{
+		auto ptrTransform = GetComponent<Transform>();
+		Vec3 pos = ptrTransform->GetPosition();
+		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+		auto& vec = group->GetGroupVector();
+		for (auto& v : vec) {
+			auto shObj = v.lock();
+			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+			auto Switch = Switchs->GetSwitch();
+			if (Switch == m_OpenSwitch)
+			{
+				m_open = Switchs->GetButton();
+				if (m_open)
+				{
+					if (m_number == 1)
+					{
+						if(pos.y < m_Max)
+						{
+							ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
+						}
+						
+					}
+					else if (m_number == 2)
+					{
+						for (auto& v2 : vec) {
+							auto shObj2 = v2.lock();
+							auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
+							auto Switch2 = Switchs2->GetSwitch();
+							if (Switch2 == m_OpenSwitch && Switchs2 != Switchs)
+							{
+								m_open2 = Switchs2->GetButton();
+								if (m_open2)
+								{
+									if (pos.y < 10.0f)
+									{
+										ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
+									}
+								}
+								else
+								{
+									ptrTransform->SetPosition(m_Position);
+									m_Flag == false;
+								}
+							}
+						}
+					}
+
+				}
+				else
+				{
+					ptrTransform->SetPosition(m_Position);
+					m_Flag == false;
+				}
+
+			}
+		}
+	}
+
+
+	void GimmickUp::PlaySE(wstring path, float loopcnt, float volume) {
+		auto SE = App::GetApp()->GetXAudio2Manager();
+		SE->Start(path, loopcnt, volume);
+	}
+
 
 	void GimmickDoor::PlaySE(wstring path, float loopcnt, float volume) {
 			auto SE = App::GetApp()->GetXAudio2Manager();
@@ -362,6 +500,7 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
 	}
+
 
 
 }

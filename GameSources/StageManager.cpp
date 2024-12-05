@@ -62,7 +62,7 @@ namespace basecross {
 		else if (m_StageName == L"Stagedata3.csv")
 		{
 			plVec = {
-				Vec3(65.0f, 5.0f,0.0f),
+				Vec3(80.0f, 5.0f,0.0f),
 				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
@@ -121,7 +121,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x / 1, Scale.z / 1, Tokens[10]);
 			ptrFloor->AddTag(L"Floor");
 			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
 		}
@@ -219,6 +219,7 @@ namespace basecross {
 		GetStage()->CreateSharedObjectGroup(L"Door");
 		GetStage()->CreateSharedObjectGroup(L"Switch");
 		GetStage()->CreateSharedObjectGroup(L"StageDoor");
+		GetStage()->CreateSharedObjectGroup(L"GimmickUp");
 		vector<wstring> LineVec;
 		m_GameStage.GetSelect(LineVec, 0, L"Door");
 		for (auto& v : LineVec) {
@@ -283,7 +284,7 @@ namespace basecross {
 			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
 			Util::WStrToTokenVector(Tokens, v, L',');
 			//各トークン（カラム）をスケール、回転、位置に読み込む
-			Vec3 Scale(5,5,5);
+			Vec3 Scale(5, 5, 5);
 			Vec3 Rot;
 			//回転は「XM_PIDIV2」の文字列になっている場合がある
 			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
@@ -301,6 +302,37 @@ namespace basecross {
 			ptrStageDoor->AddTag(L"StageDoor");
 			auto group = GetStage()->GetSharedObjectGroup(L"StageDoor");
 			group->IntoGroup(ptrStageDoor);
+		}
+		m_GameStage.GetSelect(LineVec, 0, L"GimmickUp");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			float Switch = (float)_wtof(Tokens[10].c_str());
+			int number = (float)_wtof(Tokens[11].c_str());
+			int max = (float)_wtof(Tokens[13].c_str());
+
+			//各値がそろったのでオブジェクト作成
+			auto door = GetStage()->AddGameObject<GimmickUp>(Pos, Rot, Scale, Scale.x, Scale.y, Switch, number, Tokens[12], max);
 		}
 	}
 
@@ -337,6 +369,13 @@ namespace basecross {
 				else if (Tokens[10] == L"Enemy::fly" && Tokens[11] == L"Enemy::fixedStay") {
 					stateBefore = Enemy::fly;
 					stateAfter = Enemy::fixedStay;
+					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+					group->IntoGroup(enemy);
+				}
+				else if (Tokens[10] == L"Enemy::bullet" && Tokens[11] == L"Enemy::stay") {
+					stateBefore = Enemy::bullet;
+					stateAfter = Enemy::stay;
 					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
 					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 					group->IntoGroup(enemy);
@@ -395,6 +434,7 @@ namespace basecross {
 					m_GameStage.ReadCsv();
 				}
 			}
+
 		}
 		catch (...) {
 			throw;
@@ -496,6 +536,7 @@ namespace basecross {
 				}
 				GoalJudge();
 				GameOverJudge();
+				OnDraw();
 			}
 			break;
 
@@ -503,6 +544,10 @@ namespace basecross {
 			break;
 		}
 
+	}
+
+	void StageManager::OnDraw()
+	{
 	}
 
 	void StageManager::CreateSprite()
@@ -568,7 +613,7 @@ namespace basecross {
 				{
 					PlaySE(L"GameClearSE", 0, 1.0f);
 					m_BGfade = GetStage()->AddGameObject<FadeOut>();
-					m_BGfade->SetDrawLayer(2);
+					m_BGfade->SetDrawLayer(3);
 					m_Flag = false;
 				}
 
@@ -757,7 +802,7 @@ namespace basecross {
 		auto PlayPos =  PtrPlayer->AddComponent<Transform>()->GetPosition();
 		Vec3 CameraPos = Vec3(PlayPos.x + 10.0f, PlayPos.y + 5.0f, PlayPos.z);
 		Vec3 CameraStartEndPos = Vec3(PlayPos.x -5.0f, PlayPos.y + 5.0f, PlayPos.z);
-		Vec3 CameraEndPos = Vec3(PlayPos.x + 15.0f, PlayPos.y + 1.0f, PlayPos.z);
+		Vec3 CameraEndPos = Vec3(PlayPos.x + 15.0f, PlayPos.y + 10.0f, PlayPos.z);
 		Vec3 PlayEndpos = Vec3(PlayPos.x - 5.0f, PlayPos.y, PlayPos.z);
 		Vec3 PlayStartpos = Vec3(PlayPos.x, PlayPos.y + 3.0f, PlayPos.z);
 		auto view = GetStage()->CreateView<SingleView>();

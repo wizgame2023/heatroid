@@ -70,6 +70,42 @@ namespace basecross {
 		void PlaySE(wstring path, float loopcnt, float volume);
 	};
 
+	class GimmickUp : public GameObject {
+		Vec3 m_Position;
+		Vec3 m_Rotation;
+		Vec3 m_Scale;
+		bool m_open;
+		bool m_open2;
+		float m_UPic;
+		float m_VPic;
+		shared_ptr<GimmickButton> GDoor;
+		int kazu = 1;
+		int m_number;
+		bool m_Flag;
+	public:
+		float m_Max;
+		float m_OpenSwitch;
+		wstring m_Texname;
+		//ç\ízÇ∆îjä¸
+		GimmickUp(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scales,
+			float UPic,
+			float VPic,
+			float m_OpenSwitch,
+			int number,
+			const wstring& m_Texname,
+			float m_Max
+		);
+		virtual ~GimmickUp();
+		//èâä˙âª
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		void OpenDoor();
+		void PlaySE(wstring path, float loopcnt, float volume);
+	};
+
 	class GimmickButton : public GameObject
 	{
 		public:

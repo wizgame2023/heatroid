@@ -1,7 +1,7 @@
 /*!
-äôìcëÂãP
+ÈéåÁî∞Â§ßËºù
 @file GameStage.cpp
-@brief ÉQÅ[ÉÄÉXÉeÅ[ÉWé¿ëÃ
+@brief „Ç≤„Éº„É†„Çπ„ÉÜ„Éº„Ç∏ÂÆü‰Ωì
 */
 
 #include "stdafx.h"
@@ -34,6 +34,16 @@ namespace basecross {
 			m_PauseTitle->SetDrawActive(false);
 			m_PauseBack->SetDrawActive(false);
 
+			//„Ç®„Éï„Çß„ÇØ„Éà‰ΩúÊàê
+
+			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
+
+			//„Ç®„Éï„Çß„ÇØ„Éà„ÅÆÂàùÊúüÂåñ
+			wstring DataDir;
+			App::GetApp()->GetDataDirectory(DataDir);
+			wstring TestEffectStr = DataDir + L"Effects\\Laser01.efk";
+			auto ShEfkInterface = m_EfkInterface;
+			m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
 		}
 		catch (...) {
 			throw;
@@ -41,12 +51,29 @@ namespace basecross {
 	}
 	void GameStage::OnUpdate()
 	{
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
 		int camerastatus = stageMane->GetNowCameraStatus();
 		if (stageMane->m_CameraSelect == StageManager::CameraSelect::myCamera)
 		{
+			m_EfkInterface->OnUpdate();
 			GamePause();
+			if (KeyState.m_bPressedKeyTbl[VK_TAB])
+			{
+				//EffectPlay();
+			}
 		}
+	}
+
+	void GameStage::OnDraw()
+	{
+		auto& camera = GetView()->GetTargetCamera();
+		m_EfkInterface->SetViewProj(camera->GetViewMatrix(), camera->GetProjMatrix());
+		m_EfkInterface->OnDraw();
+	}
+
+	void GameStage::OnPushA()
+	{
 	}
 
 	void GameStage::GamePause()
@@ -170,7 +197,12 @@ namespace basecross {
 
 		}
 	}
-
+	void GameStage::EffectPlay()
+	{
+		auto ShEfkInterface = m_EfkInterface;
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
+		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
+	}
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{
@@ -178,7 +210,7 @@ namespace basecross {
 	}
 
 	void GameStage::OnDestroy() {
-		//BGMÇÃÉXÉgÉbÉv
+		//BGM„ÅÆ„Çπ„Éà„ÉÉ„Éó
 		m_ptrXA->Stop(m_BGM);
 	}
 	void GameStage::CreateStageManager() {
@@ -196,6 +228,7 @@ namespace basecross {
 			ptrStageManager->CreateFixedBox();
 			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateSprite();
+			ptrStageManager->CreateGimmick();
 		}
 		else
 		{
@@ -206,8 +239,8 @@ namespace basecross {
 			ptrStageManager->CreateViewLight();
 			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateFixedBox();
-			ptrStageManager->CreateGimmick();
 			ptrStageManager->CreateSprite();
+			ptrStageManager->CreateGimmick();
 		}
 	}
 

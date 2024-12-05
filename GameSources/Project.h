@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "EffectManager.h"
 #include "StageManager.h"
 #include "ProjectShader.h"
 #include "ProjectBehavior.h"
