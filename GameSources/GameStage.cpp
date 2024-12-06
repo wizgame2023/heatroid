@@ -12,6 +12,15 @@ namespace basecross {
 
 	void GameStage::OnCreate() {
 		try {
+			//エフェクト作成
+			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
+			//エフェクトの初期化
+			wstring DataDir;
+			App::GetApp()->GetDataDirectory(DataDir);
+			wstring TestEffectStr = DataDir + L"Effects\\Laser01.efk";
+			auto ShEfkInterface = m_EfkInterface;
+			m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
+
 			CreateStageManager();
 			auto player = GetSharedGameObject<Player>(L"Player");
 			//AddGameObject<FadeIn>();
@@ -34,6 +43,7 @@ namespace basecross {
 			m_PauseTitle->SetDrawActive(false);
 			m_PauseBack->SetDrawActive(false);
 
+<<<<<<< HEAD
 			//エフェクトの初期化
 			wstring DataDir;
 			App::GetApp()->GetDataDirectory(DataDir);
@@ -41,6 +51,8 @@ namespace basecross {
 			auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
 			auto ShEfkInterface = stageMane->GetEfkInterface();
 			m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
+=======
+>>>>>>> origin/kamatadaiki
 		}
 		catch (...) {
 			throw;
@@ -201,8 +213,15 @@ namespace basecross {
 	{
 		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
 		auto ShEfkInterface = stageMane->GetEfkInterface();
+<<<<<<< HEAD
 		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0), 5);
 		m_EfkPlay->SetRotation(Vec3(0, 1.0f, 0.0f), 0.5f);
+=======
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
+		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
+
+		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
+>>>>>>> origin/kamatadaiki
 	}
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
