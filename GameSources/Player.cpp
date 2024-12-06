@@ -185,11 +185,16 @@ namespace basecross {
 	void Player::OnCreate() {
 		AddTag(L"Player");
 
+		//ステージマネージャ
+		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		//敵を掴む判定用オブジェクト
+		m_pGrab = GetStage()->AddGameObject<PlayerGrab>(GetThis<Player>());
+		
 		//エフェクト読み込み
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
 		wstring TestEffectStr = DataDir + L"Effects\\Muzzle.efk";
-		auto ShEfkInterface = GetTypeStage<GameStage>()->GetEfkInterface();
+		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
 		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
 
 		//初期位置などの設定
@@ -237,10 +242,6 @@ namespace basecross {
 
 		m_HP = m_HP_max;
 
-		//ステージマネージャ
-		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
-		//敵を掴む判定用オブジェクト
-		m_pGrab = GetStage()->AddGameObject<PlayerGrab>(GetThis<Player>());
 	}
 
 	void Player::OnUpdate() {
@@ -669,9 +670,9 @@ namespace basecross {
 		pos += firepos;
 
 		//エフェクトのプレイ
-		auto ShEfkInterface = GetTypeStage<GameStage>()->GetEfkInterface();
+		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
 		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos);
-		m_EfkPlay->SetRotation(Vec3(0), face);
+		m_EfkPlay->SetRotation(Vec3(0, 0, face), 0);
 		m_EfkPlay->SetScale(Vec3(.25f));
 
 		//飛び道具発射
