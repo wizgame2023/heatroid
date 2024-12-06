@@ -96,6 +96,7 @@ namespace basecross {
 		void AddLocation(const bsm::Vec3& Location);
 		void SetRotation(const bsm::Vec3& Rotation, const float angle);
 		void SetScale(const bsm::Vec3& Scale);
+		void SetAllColor(const bsm::Col4 color);
 	};
 
 

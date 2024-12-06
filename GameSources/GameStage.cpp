@@ -43,7 +43,6 @@ namespace basecross {
 			m_PauseTitle->SetDrawActive(false);
 			m_PauseBack->SetDrawActive(false);
 
-
 		}
 		catch (...) {
 			throw;
@@ -54,9 +53,10 @@ namespace basecross {
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
 		int camerastatus = stageMane->GetNowCameraStatus();
+		auto ShEfkInterface = stageMane->GetEfkInterface();
 		if (stageMane->m_CameraSelect == StageManager::CameraSelect::myCamera)
 		{
-			m_EfkInterface->OnUpdate();
+			ShEfkInterface->OnUpdate();
 			GamePause();
 			if (KeyState.m_bPressedKeyTbl[VK_TAB])
 			{
@@ -68,8 +68,10 @@ namespace basecross {
 	void GameStage::OnDraw()
 	{
 		auto& camera = GetView()->GetTargetCamera();
-		m_EfkInterface->SetViewProj(camera->GetViewMatrix(), camera->GetProjMatrix());
-		m_EfkInterface->OnDraw();
+		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
+		auto ShEfkInterface = stageMane->GetEfkInterface();
+		ShEfkInterface->SetViewProj(camera->GetViewMatrix(), camera->GetProjMatrix());
+		ShEfkInterface->OnDraw();
 	}
 
 	void GameStage::OnPushA()
@@ -199,10 +201,12 @@ namespace basecross {
 	}
 	void GameStage::EffectPlay()
 	{
-		auto ShEfkInterface = m_EfkInterface;
+		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
+		auto ShEfkInterface = stageMane->GetEfkInterface();
 		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
 		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
 
+		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
 	}
 
 	void GameStage::PlayBGM(const wstring& StageBGM)

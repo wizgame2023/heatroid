@@ -77,7 +77,6 @@ namespace basecross {
 		void ToOpeningCamera();
 
 		void PlaySE(wstring path, float loopcnt, float volume);
-		void PlaySE2(wstring path, float loopcnt, float volume);
 		
 		//\’z‚Æ”jŠü
 		StageManager(const shared_ptr<Stage>& stage) :
@@ -90,5 +89,8 @@ namespace basecross {
 		virtual void OnUpdate()override; //‰Šú‰»
 		virtual void OnDraw()override; //‰Šú‰»
 
+		shared_ptr<EfkInterface> GetEfkInterface() const {
+			return m_EfkInterface;
+		}
 	};
 }

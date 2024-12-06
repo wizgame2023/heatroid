@@ -434,7 +434,9 @@ namespace basecross {
 					m_GameStage.ReadCsv();
 				}
 			}
+			//エフェクト作成
 
+			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
 		}
 		catch (...) {
 			throw;
@@ -626,13 +628,13 @@ namespace basecross {
 				MoveSprite(m_nextStageUI, m_clearSelectStage);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
-					PlaySE2(L"Confirm", 0, 1.0f);
+					PlaySE(L"Confirm", 0, 1.0f);
 					m_select = 1;
 					m_totalTime = 0.0f;
 				}
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 				{
-					PlaySE2(L"Confirm", 0, 1.0f);
+					PlaySE(L"Confirm", 0, 1.0f);
 					m_select = 2;
 					m_totalTime = 0.0f;
 				}
@@ -673,13 +675,13 @@ namespace basecross {
 				MoveSprite(m_retryStageUI, m_overSelectStage);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
-					PlaySE2(L"Confirm", 0, 1.0f);
+					PlaySE(L"Confirm", 0, 1.0f);
 					m_select = 1;
 					m_totalTime = 0.0f;
 				}
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 				{
-					PlaySE2(L"Confirm", 0, 1.0f);
+					PlaySE(L"Confirm", 0, 1.0f);
 					m_select = 3;
 					m_totalTime = 0.0f;
 				}
@@ -798,6 +800,7 @@ namespace basecross {
 	}
 	void StageManager::ToOpeningCamera()
 	{
+		GetStage()->AddGameObject<FadeIn>();
 		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
 		auto PlayPos =  PtrPlayer->AddComponent<Transform>()->GetPosition();
 		Vec3 CameraPos = Vec3(PlayPos.x + 10.0f, PlayPos.y + 5.0f, PlayPos.z);
@@ -827,10 +830,5 @@ namespace basecross {
 		auto playSE = App::GetApp()->GetXAudio2Manager();
 		playSE->Start(path, loopcnt, volume);
 	}
-	void StageManager::PlaySE2(wstring path, float loopcnt, float volume) {
-		auto playSE = App::GetApp()->GetXAudio2Manager();
-		playSE->Start(path, loopcnt, volume);
-	}
-
 }
 //end basecross
