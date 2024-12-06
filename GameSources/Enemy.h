@@ -10,6 +10,7 @@
 #include "Gimmick.h"
 
 namespace basecross {
+	class EnemyFloorCol;
 	//--------------------------------------------------------------------------------------
 	//	class Enemy : public GameObject;
 	//--------------------------------------------------------------------------------------
@@ -26,6 +27,9 @@ namespace basecross {
 			jump,      //ƒWƒƒƒ“ƒv
 			plunge,    //“Ë‚Á‚İ
 			bullet,    //’e‚ğŒ‚‚Á‚Ä‚­‚é
+			bulletMove,//‰¡‚Ì“®‚«‚¾‚¯‚Â‚¢‚Ä‚«‚Ä’e‚ğŒ‚‚Â
+			wait,      //—§‚¿ã‚ª‚é
+			slide
 		};
 
 		
@@ -41,7 +45,9 @@ namespace basecross {
 		float m_jumpTime;      //ƒWƒƒƒ“ƒv‘¬“x
 		float m_jumpHight;     //ƒWƒƒƒ“ƒv‚·‚é‚‚³
 		float m_bulletTime;    //’e‚Ì”­ËŠÔŠu
-		float m_maxBulletTime;
+		float m_maxBulletTime; //ª‚ÌÅ‘å’l
+		int m_bulletCnt;
+		float m_bulletTime2;
 		float m_trackingRange; //’e‚ğ”­Ë‚·‚é‹——£
 		float m_dropTime;      //ƒqƒbƒgƒhƒƒbƒv‚Ü‚Å‚ÌŠÔ
 		float m_maxDropTime;   //ª‚ÌÅ‘å’l
@@ -65,6 +71,7 @@ namespace basecross {
 		bool m_hitDropFlag;
 		bool m_plungeFlag;
 		bool m_pGrabFlag;
+		bool m_playerFlag;
 
 		wstring m_meshName;
 
@@ -90,6 +97,7 @@ namespace basecross {
 		Vec3 m_jumpPos;
 
 		shared_ptr<Transform> m_trans;
+		shared_ptr<EnemyFloorCol> m_floorCol;
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<FixedBox> m_box;
@@ -132,8 +140,10 @@ namespace basecross {
 		void Plunge();
 		void JumpMove();
 		void FindFixed();
+		void EnemyAngle();
 		void Grab();
-		void Bullet();
+		void FallBullet();
+		void StraightXBullet();
 		void EnemyAnime(wstring anime);
 		void OverHeat();
 		void PlayerSE(wstring path, float volume = 1.0f, float loopcnt = 0);
@@ -149,7 +159,6 @@ namespace basecross {
 		Vec3 GetPos();
 		Vec3 GetChangePos();
 		bool GetFloorFlag();
-		void EnemyAngle();
 		float GetHeatRatio();
 		bool GetOverHeat();
 		void SetPlungeFlag(bool flag);
@@ -165,25 +174,55 @@ namespace basecross {
 
 	};
 
-
 	//--------------------------------------------------------------------------------------
-	//	class Enemy : public GameObject;
+	//	class StraightXBullet : public GameObject; //’¼ü‚É’µ‚Ô’e
 	//--------------------------------------------------------------------------------------
 	class EnemyBullet : public GameObject {
+	protected:
+		shared_ptr<PNTStaticDraw> m_draw;
+
+	public:
+		EnemyBullet(const shared_ptr<Stage>& stage);
+		virtual ~EnemyBullet() {};
+		virtual void OnCreate();
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);
+		void SetColor(Col4 color);
+		void ThisDestroy();
+
+	};
+	//--------------------------------------------------------------------------------------
+	//	class StraightXBullet : public GameObject; //’¼ü‚É’µ‚Ô’e
+	//--------------------------------------------------------------------------------------
+	class StraightBullet : public EnemyBullet {
+	private:
+		float m_speed;   //’e‚Ì‘¬‚³
+		float m_Range;   //Ë’ö
+		Vec3 m_pos;
+		Vec3 m_scal;
+		Vec3 m_enemyPos;
+
+		shared_ptr<Transform> m_trans;
+		weak_ptr<Enemy> m_enemy;
+	public:
+		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
+		virtual ~StraightBullet() {};
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		void Debug();
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class ParabolaBullet : public GameObject; //•ú•¨üó‚É’µ‚Ô’e
+	//--------------------------------------------------------------------------------------
+	class ParabolaBullet : public EnemyBullet {
 	private:
 		
 		float m_speed;   //’e‚Ì‘¬‚³
-		float m_Range;   //Ë’ö
-		float m_power;
-		float m_maxPower;
-		Vec3 m_direc;
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
 		Vec3 m_velocity;
-		bool m_floorCheck;
-		bool m_beforFlag;
 		float m_test;
 
 		shared_ptr<Transform> m_trans;
@@ -194,14 +233,12 @@ namespace basecross {
 		
 
 	public :
-		EnemyBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
-		virtual ~EnemyBullet(){}
+		ParabolaBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
+		virtual ~ParabolaBullet(){}
 		virtual void OnCreate();
 		virtual void OnUpdate();
-		void OnCollisionEnter(shared_ptr<GameObject>& other);
 
 		void StartVel();
-		void ThisDestroy();
 		void Debug();
 		void Grav();
 
