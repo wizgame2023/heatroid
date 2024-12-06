@@ -15,6 +15,12 @@ namespace basecross {
 //====================================================================
 	class PlayerGrab;
 	class Player : public GameObject {
+
+		//エフェクト
+		shared_ptr<EfkEffect> m_EfkEffect;
+		//エフェクト実行オブジェクト
+		shared_ptr<EfkPlay> m_EfkPlay;
+
 		//Transformの初期化
 		Vec3 m_initPos;
 		Vec3 m_initRot;
@@ -92,6 +98,8 @@ namespace basecross {
 		float m_grabTime, m_grabTimeMax;
 		//何かを持っているか否か
 		bool m_isCarrying;
+		//歩行音用
+		float m_walkSndTime;
 
 		//HP
 		int m_HP, m_HP_max;
@@ -133,6 +141,8 @@ namespace basecross {
 		void Friction();
 		//演出中の摩擦
 		void FrictionMovie();
+		//歩行音
+		void WalkSound();
 
 		//四捨五入
 		Vec3 RoundOff(Vec3 number, int point);
