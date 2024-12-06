@@ -25,7 +25,7 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(slide),
+		m_stateType(state),
 		m_overHeatState(overHeatState),
 		m_player(player),
 		m_meshName(L"ENEMYARUKU"),
