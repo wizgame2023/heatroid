@@ -380,6 +380,13 @@ namespace basecross {
 					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 					group->IntoGroup(enemy);
 				}
+				else if (Tokens[10] == L"Enemy::bulletMove" && Tokens[11] == L"Enemy::stay") {
+					stateBefore = Enemy::bulletMove;
+					stateAfter = Enemy::stay;
+					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+					group->IntoGroup(enemy);
+				}
 			}
 		}
 		if (m_nowGameStatus == GameStatus::TEST_PLAY)

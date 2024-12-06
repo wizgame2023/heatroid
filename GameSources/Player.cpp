@@ -183,8 +183,14 @@ namespace basecross {
 	}
 
 	void Player::OnCreate() {
-
 		AddTag(L"Player");
+
+		//エフェクト読み込み
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		wstring TestEffectStr = DataDir + L"Effects\\Muzzle.efk";
+		auto ShEfkInterface = GetTypeStage<GameStage>()->GetEfkInterface();
+		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
@@ -275,6 +281,8 @@ namespace basecross {
 		if (m_stateType != start) {
 			m_animTime = 0.0f;
 		}
+
+		WalkSound();
 
 		m_collideCount--;
 
@@ -509,6 +517,21 @@ namespace basecross {
 	{
 	}
 
+	void Player::WalkSound() {
+		m_walkSndTime += _delta;
+		if (GetDrawPtr()->GetCurrentAnimation() == AddPrefix() + L"Run" &&
+			m_walkSndTime >= .25f) {
+			PlaySnd(L"PlayerWalk", .6f, 0.0f);
+			m_walkSndTime = 0.0f;
+		}
+		else if (GetDrawPtr()->GetCurrentAnimation() == L"Walk" && m_walkSndTime >= .5f) {
+			PlaySnd(L"PlayerWalk", .6f, 0.0f);
+			m_walkSndTime = 0.0f;
+		}
+		else {
+			m_walkSndTime == 0.0f;
+		}
+	}
 
 	void Player::Animate() {
 		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .13f) {
@@ -627,8 +650,11 @@ namespace basecross {
 
 	//飛び道具を発射
 	void Player::Projectile() {
+		//敵運搬中は無効
 		if (m_isCarrying == true) return;
 		Charging(false);
+
+		//位置・回転周りの処理
 		auto trans = GetComponent<Transform>();
 		auto pos = trans->GetPosition();
 		auto fwd = -1 * trans->GetForward();
@@ -639,9 +665,16 @@ namespace basecross {
 		firepos.x = (cosf(face) * m_firePos.x) - (sinf(face) * m_firePos.z);
 		firepos.y = m_firePos.y;
 		firepos.z = (cosf(face) * m_firePos.z) + (sinf(face) * m_firePos.x);
-
 		firepos = firepos * scale;
 		pos += firepos;
+
+		//エフェクトのプレイ
+		auto ShEfkInterface = GetTypeStage<GameStage>()->GetEfkInterface();
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos);
+		m_EfkPlay->SetRotation(Vec3(0), face);
+		m_EfkPlay->SetScale(Vec3(.25f));
+
+		//飛び道具発射
 		GetStage()->AddGameObject<FireProjectile>(pos, fwd, m_chargePerc);
 		m_chargePerc = 0.0f;
 		m_isOverCharge = false;
