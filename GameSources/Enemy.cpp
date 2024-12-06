@@ -46,8 +46,10 @@ namespace basecross {
 		m_maxHitDropTime(m_hitDropTime),
 		m_spareTime(0.75f),
 		m_maxSpareTime(m_spareTime),
-		m_bulletTime(5.0f),
+		m_bulletTime(0.1f),
 		m_maxBulletTime(m_bulletTime),
+		m_bulletCnt(0),
+		m_bulletTime2(5.0f),
 		m_trackingRange(20.0f),
 		m_firstDirec(Vec3(0.0f)),
 		m_gravity(-9.8f),
@@ -61,7 +63,8 @@ namespace basecross {
 		m_floorFlag(false),
 		m_hitDropFlag(false),
 		m_plungeFlag(false),
-		m_pGrabFlag(false)
+		m_pGrabFlag(false),
+		m_playerFlag(false)
 	{}
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
@@ -114,20 +117,22 @@ namespace basecross {
 		m_plungeFlag(false),
 		m_pGrabFlag(false)
 	{}
+
 	void Enemy::OnCreate() {
 		m_trans = GetComponent<Transform>();
 		m_trans->SetPosition(m_pos);
-		m_trans->SetRotation(m_rot);
+		m_trans->SetRotation(Vec3(m_rot.x,m_rot.y+XM_PIDIV2,m_rot.z));
 		m_trans->SetScale(m_scal);
 		m_fastState = m_stateType;
 		m_beforePos = m_pos;
+		
 		auto player = m_player.lock();
 		if (!player) return;
 		m_playerScale = m_player.lock()->GetScale();
 		//描画
 		
 		auto ptrDraw = AddComponent<PNTBoneModelDraw>();
-		float rad = XMConvertToRadians(-90.0f);
+		float rad = XMConvertToRadians(180.0f);
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(
 			Vec3(1.0f, 1.0f, 1.0f),
@@ -145,21 +150,22 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"attack", 50, 40, false, 30); //攻撃
 		ptrDraw->AddAnimation(L"spare", 50, 10, false, 15);  //突っ込み前の予備動作
 		ptrDraw->AddAnimation(L"wait", 90, 25, false, 30);   //オーバーヒート状態
+		ptrDraw->AddAnimation(L"stand", 120, 30, false, 30);
 		ptrDraw->ChangeCurrentAnimation(L"walk");
 		//衝突判定
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(false);
+		m_collision->SetDrawActive(true);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
 		//影
 		auto shadowPtr = AddComponent<Shadowmap>();
-		shadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		shadowPtr->SetMeshResource(m_meshName);
 
 		//足場コリジョンの追加
-		auto floorCol = GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
-		floorCol->SetDrawActive(false);
+		m_floorCol = GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
+		m_floorCol->SetDrawActive(true);
 		//オーバーヒートゲージの追加
 		GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
 			Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
@@ -177,8 +183,8 @@ namespace basecross {
 		if (!player) return;
 		m_playerTrans = player->GetComponent<Transform>();
 		m_playerPos = m_playerTrans.lock()->GetPosition();
+		auto shaft = GetDirec().cross(Vec3(0.0f, 1.0f, 0.0f));
 
-		Debug();
 		FindFixed();
 		if (m_stateType != m_beforeState) {
 			m_plungeFlag = false;
@@ -198,7 +204,6 @@ namespace basecross {
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			EnemyAnime(L"walk");
 			m_speed = m_maxSpeed;
-
 			PlayerDic();
 			EnemyAngle();
 			if (m_direc.length() <= m_trackingRange * 2) {
@@ -222,20 +227,20 @@ namespace basecross {
 			OneJump(0.5f);
 			PlayerDic();
 			EnemyAngle();
-			Bullet();
+			FallBullet();
 			break;
 		//浮遊
 		case fly:
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			OneJump(5.0f);
-			EnemyAngle();
+			OneJump(3.0f);
+			//EnemyAngle();
+			//RemoveTag(L"Enemy");
 			break;
 		//プレイヤーに触れた位置で固定
 		case fixedStay:
 			GravZero();
 			Grav();
 			m_pos = m_deathPos;
-			m_collision->SetFixed(true);
 			break;
 		//ジャンプ
 		case jump:
@@ -252,8 +257,38 @@ namespace basecross {
 		case bullet:
 			EnemyAnime(L"walk");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			Bullet();
+			FallBullet();
 			EnemyAngle();
+			break;
+		case bulletMove:
+			PlayerDic();
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
+			m_pos += m_speed * 0.2f * Vec3(0.0f, 0.0f, m_direc.z) * elapsed;
+			if (m_bulletTime2 <= 0.0f) {
+				m_bulletTime2 = 5.0f;
+				m_bulletCnt = 0;
+			}
+			if (m_bulletCnt < 3) { 
+				StraightXBullet();
+				m_speed = 0.0f;
+			}
+			else if (m_bulletCnt >= 3) {
+				m_bulletTime2 -= elapsed;
+				m_speed = m_maxSpeed;
+			}
+			break;
+		case wait:
+			EnemyAnime(L"stand");
+			m_spareTime -= elapsed;
+			if (m_spareTime <= 0.0f) {
+				m_stateType = m_fastState;
+			}
+			break;
+		case slide:
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
+			PlayerDic();
+
+			m_pos += shaft * 1.0f * elapsed;
 			break;
 		default:
 			break;
@@ -306,14 +341,16 @@ namespace basecross {
 	//プレイヤーの方向を向かせる
 	void Enemy::EnemyAngle()
 	{
-		PlayerDic();
-		auto front = GetDirec();
-		auto elapsed = App::GetApp()->GetElapsedTime();
-		front.y = 0;
-		front.normalize();
-		m_angle = atan2(front.z, front.x);
-		float rad = XMConvertToRadians(90.0f);
-		m_trans->SetRotation(Vec3(0.0f, -m_angle, 0.0f));
+		if (!m_playerFlag) {
+			PlayerDic();
+			auto front = GetDirec();
+			auto elapsed = App::GetApp()->GetElapsedTime();
+			front.y = 0;
+			front.normalize();
+			m_angle = atan2(front.z, front.x);
+			float rad = XMConvertToRadians(90.0f);
+			m_trans->SetRotation(Vec3(0.0f, -m_angle+rad, 0.0f));
+		}
 	}
 	//オーバーヒート
 	void Enemy::OverHeat() {
@@ -322,13 +359,17 @@ namespace basecross {
 			m_stateType = m_overHeatState;
 		}
 		if (m_heat > 0.0f) {
-			m_heat -= elapsed * 5;
+			m_heat -= elapsed * 50;
 		}
 		else if (GetOverHeat()&&m_heat <= 0.0f) {
 			m_heat = 0.0f;
-			if (m_stateType != m_fastState) {
-				m_stateType = m_fastState;
-			}
+			m_stateType = wait;
+			//EnemyAnime(L"stand");
+			//m_spareTime -= elapsed;
+			//if (m_stateType != m_fastState) {
+			//	m_stateType = m_fastState;
+			//	
+			//}
 		}
 	}
 
@@ -382,6 +423,38 @@ namespace basecross {
 		}
 
 	}
+	//弾の発射
+	//放物線に発射する弾
+	void Enemy::FallBullet() {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		auto stage = GetStage();
+		m_bulletTime += elapsed;
+		if (!m_bulletFlag) {
+			stage->AddGameObject<ParabolaBullet>(GetThis<Enemy>());
+			m_bulletFlag = true;
+			m_bulletTime = 0.0f;
+		}
+		if (m_bulletTime >= m_maxBulletTime) {
+			m_bulletFlag = false;
+		}
+
+	}
+	//真っ直ぐ発射する弾
+	void Enemy::StraightXBullet() {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		auto stage = GetStage();
+		m_bulletTime -= elapsed;
+		if (m_bulletTime <= 0.0f) {
+			m_bulletFlag = false;
+			m_bulletTime = m_maxBulletTime;
+		}
+		if (!m_bulletFlag) {
+			m_bulletCnt++;
+			stage->AddGameObject<StraightBullet>(GetThis<Enemy>());
+			m_bulletFlag = true;
+		}
+	}
+
 	//ヒップドロップ
 	void Enemy::HitDrop() {
 		auto fixed = m_fixedBox.lock();
@@ -457,21 +530,6 @@ namespace basecross {
 		}
 
 	}
-	//弾の発射
-	void Enemy::Bullet() {
-		auto elapsed = App::GetApp()->GetElapsedTime();
-		auto stage = GetStage();
-		m_bulletTime += elapsed;
-		if (!m_bulletFlag) {
-			stage->AddGameObject<EnemyBullet>(GetThis<Enemy>());
-			m_bulletFlag = true;
-			m_bulletTime = 0.0f;
-		}
-		if (m_bulletTime >= m_maxBulletTime) {
-			m_bulletFlag = false;
-		}
-
-	}
 	//削除
 	void Enemy::ThisDestroy() {
 		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
@@ -486,7 +544,7 @@ namespace basecross {
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
 			m_deathPos = m_pos;
-
+			m_playerFlag = true;
 		}
 		if (other->FindTag(L"Wall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
@@ -510,7 +568,12 @@ namespace basecross {
 		}
 		if (other->FindTag(L"PlayerGrab")) {
 			m_playerGrab = dynamic_pointer_cast<PlayerGrab>(other);
-			m_pGrabFlag = true;
+			if (GetOverHeat()) {
+				m_pGrabFlag = true;
+			}
+			else {
+				m_pGrabFlag = false;
+			}
 		}
 
 	}
@@ -532,7 +595,6 @@ namespace basecross {
 			auto grabScal = m_playerGrab.lock()->GetComponent<Transform>()->GetScale();
 			Vec3 scal = Vec3(grabScal.x / 2.5, 0.0f, grabScal.z / 2.5);
 			auto grabPos = pGrab->GetComponent<Transform>();
-			float rad = XMConvertToRadians(-45);
 			if (pGrab) {
 				m_trans->SetParent(pGrab);
 				m_pos = Vec3(0.0f, 0.0f, 0.0f);
@@ -567,6 +629,9 @@ namespace basecross {
 			//m_playerGrabFlag = true;
 
 		}
+		if (other->FindTag(L"Player")) {
+			m_playerFlag = false;
+		}
 	}
 
 	void Enemy::OnCollisionExcute(shared_ptr<GameObject>& other)
@@ -589,6 +654,11 @@ namespace basecross {
 				}
 			}
 		}
+
+		if (other->FindTag(L"Player")) {
+			m_playerFlag = false;
+		}
+
 	}
 
 	void Enemy::EnemyAnime(wstring anime) {
@@ -607,7 +677,7 @@ namespace basecross {
 		}
 		if (keyState.m_bPressedKeyTbl[VK_UP]) {
 			//HipDropJump();
-			//stage->AddGameObject<EnemyBullet>(GetThis<Enemy>());
+			//stage->AddGameObject<ParabolaBullet>(GetThis<Enemy>());
 		}
 		//デバック用
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
@@ -640,6 +710,8 @@ namespace basecross {
 			<< GetOverHeat()
 			<<L"\nheat"
 			<< m_heat
+			<<L"\n"
+			<< m_beforePos.length()
 			<< endl;
 		scene->SetDebugString(wss.str());
 
@@ -736,51 +808,131 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	//	class EnemyBullet : public GameObject;  
 	//--------------------------------------------------------------------------------------
-	EnemyBullet::EnemyBullet(const shared_ptr<Stage>& stage,
-		const shared_ptr<Enemy>& enemy
-	) :
-		GameObject(stage),
-		m_enemy(enemy),
-		m_pos(Vec3(0, 0, 0)),
-		m_rot(Vec3(0, 0, 0)),
-		m_scal(Vec3(1.5f, 1.5f, 1.5f)),
-		m_speed(20.0f),
-		m_Range(1.0f),
-		m_power(15.0f),
-		m_maxPower(m_power),
-		m_grav(Vec3(0.0f,-9.8f,0.0f)),
-		m_floorCheck(false)
+	EnemyBullet::EnemyBullet(const shared_ptr<Stage>& stage
+	):
+		GameObject(stage)
 	{}
 	void EnemyBullet::OnCreate() {
-		//描画
-		auto ptrDraw = AddComponent<PNTStaticDraw>();
-		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		ptrDraw->SetTextureResource(L"White");
-		ptrDraw->SetDiffuse(Col4(0.0f, 0.0f, 1.0f, 1.0f));
+		m_draw = AddComponent<PNTStaticDraw>();
+		m_draw->SetMeshResource(L"DEFAULT_SPHERE");
+		m_draw->SetTextureResource(L"White");
+		m_draw->SetDiffuse(Col4(0.0f, 0.0f, 1.0f, 1.0f));
 
 		//衝突判定
 		auto ptrColl = AddComponent<CollisionSphere>();
 		ptrColl->SetAfterCollision(AfterCollision::None);
-		ptrColl->SetFixed(false); //空間に固定するか
 		ptrColl->SetDrawActive(false);
 		//影
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 
-		GetStage()->SetCollisionPerformanceActive(true);
-		GetStage()->SetUpdatePerformanceActive(true);
-		GetStage()->SetDrawPerformanceActive(true);
+		AddTag(L"EnemyBullet");
+	}
+	void EnemyBullet::SetColor(Col4 color) {
+		m_draw->SetDiffuse(color);
+	}
+	void EnemyBullet::ThisDestroy() {
+		GetStage()->RemoveGameObject<EnemyBullet>(GetThis<EnemyBullet>());
+	}
+	void EnemyBullet::OnCollisionEnter(shared_ptr<GameObject>& other) {
+		if (other->FindTag(L"Player")) {
+			ThisDestroy();
+		}
+		if (other->FindTag(L"Wall")) {
+			ThisDestroy();
+		}
+		if (other->FindTag(L"Floor")) {
+			ThisDestroy();
+		}
+	}
 
+	//--------------------------------------------------------------------------------------
+	//	class StraightXBullet : public EnemyBullet;  
+	//--------------------------------------------------------------------------------------
+
+	StraightBullet::StraightBullet(const shared_ptr<Stage>& stage,
+		const shared_ptr<Enemy>& enemy
+	):
+		EnemyBullet(stage),
+		m_enemy(enemy),
+		m_speed(30.0f),
+		m_Range(70.0f),
+		m_pos(Vec3(0.0f)),
+		m_scal(Vec3(1.0f))
+
+	{}
+	void StraightBullet::OnCreate() {
+		EnemyBullet::OnCreate();
+		m_trans = GetComponent<Transform>();
+		m_trans->SetRotation(Vec3(0.0f,0.0f, 0.0f));
+		m_trans->SetScale(m_scal);
+
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
+		m_enemyPos = enemy->GetChangePos();
+		m_trans->SetPosition(m_enemyPos);
+
+	}
+	void StraightBullet::OnUpdate() {
+		float elapsed = App::GetApp()->GetElapsedTime();
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
+		auto enemyFor= enemy->GetComponent<Transform>()->GetForward();
+		m_pos = m_trans->GetPosition();
+		m_pos.y = m_enemyPos.y;
+		m_pos += enemyFor *m_speed * elapsed;
+		Vec3 pos = m_enemyPos - m_pos;
+		if (pos.length() >= m_Range) {
+			ThisDestroy();
+		}
+		m_trans->SetPosition(m_pos);
+
+		Debug();
+	}
+	void StraightBullet::Debug() {
+		auto scene = App::GetApp()->GetScene<Scene>();
+		auto enemy = m_enemy.lock();
+		wstringstream wss(L"");
+		wss << L"pos : ( "
+			<< m_pos.x
+			<< L" , "
+			<< m_pos.y
+			<< L" , "
+			<< m_pos.z
+			<< L" ) "
+			<< L"\nDirec : "
+			<< m_enemy.lock()->GetDirec().length()
+			<< endl;
+		scene->SetDebugString(wss.str());
+
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class ParabolaBullet : public EnemyBullet;  
+	//--------------------------------------------------------------------------------------
+	ParabolaBullet::ParabolaBullet(const shared_ptr<Stage>& stage,
+		const shared_ptr<Enemy>& enemy
+	) :
+		EnemyBullet(stage),
+		m_enemy(enemy),
+		m_pos(Vec3(0, 0, 0)),
+		m_rot(Vec3(0, 0, 0)),
+		m_scal(Vec3(1.5f, 1.5f, 1.5f)),
+		m_speed(20.0f),
+		m_grav(Vec3(0.0f,-9.8f,0.0f))
+	{}
+	void ParabolaBullet::OnCreate() {
+		EnemyBullet::OnCreate();
 		StartVel();
 	}
-	void EnemyBullet::StartVel() {
+
+	void ParabolaBullet::StartVel() {
 		m_trans = GetComponent<Transform>();
 		m_trans->SetRotation(m_rot);
 		m_trans->SetScale(m_scal);
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 		m_enemyPos = enemy->GetChangePos();
-		m_beforFlag = enemy->GetFloorFlag();
 
 		m_pos = m_enemyPos;
 		m_pos.y += 5.0f;
@@ -795,13 +947,13 @@ namespace basecross {
 		m_trans->SetPosition(m_pos);
 
 	}
-	void EnemyBullet::Grav() {
+	void ParabolaBullet::Grav() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		m_gravVel += m_grav * elapsed;
 		m_pos += m_gravVel * elapsed;
 		m_trans->SetPosition(m_pos);
 	}
-	void EnemyBullet::OnUpdate() {
+	void ParabolaBullet::OnUpdate() {
 		Grav();
 		auto elapsed = App::GetApp()->GetElapsedTime();
 
@@ -814,23 +966,7 @@ namespace basecross {
 		}
 		Debug();
 	}
-
-	void EnemyBullet::OnCollisionEnter(shared_ptr<GameObject>& other) {
-		if (other->FindTag(L"Player")) {
-			ThisDestroy();
-		}
-		if (other->FindTag(L"Wall")) {
-			ThisDestroy();
-		}
-		if (other->FindTag(L"Floor")) {
-			ThisDestroy();
-		}
-	}
-	void EnemyBullet::ThisDestroy() {
-		GetStage()->RemoveGameObject<EnemyBullet>(GetThis<EnemyBullet>());
-	}
-
-	void EnemyBullet::Debug() {
+	void ParabolaBullet::Debug() {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		auto scene = App::GetApp()->GetScene<Scene>();
 		auto enemy = m_enemy.lock();
