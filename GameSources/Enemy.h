@@ -46,6 +46,8 @@ namespace basecross {
 		float m_jumpHight;     //ジャンプする高さ
 		float m_bulletTime;    //弾の発射間隔
 		float m_maxBulletTime; //↑の最大値
+		float m_pBulletTime;
+		float m_maxPbulletTime;
 		int m_bulletCnt;
 		float m_bulletRangeTime;//弾の発射クールタイム
 		float m_maxBulletRangeTime;//↑の最大値
@@ -56,6 +58,7 @@ namespace basecross {
 		float m_maxHitDropTime;//↑の最大値
 		float m_spareTime;    //突っ込みの予備時間
 		float m_maxSpareTime; //↑の最大値
+		float m_rad;
 		int m_dicUp;
 		Vec3 m_direc;
 		Vec3 m_direcNorm;
@@ -101,6 +104,8 @@ namespace basecross {
 		shared_ptr<Transform> m_trans;
 		shared_ptr<PNTBoneModelDraw> m_draw;
 		shared_ptr<EnemyFloorCol> m_floorCol;
+		shared_ptr<EfkEffect> m_efkEffect;
+		shared_ptr<EfkPlay> m_EfkPlayer;
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<FixedBox> m_box;
@@ -134,6 +139,7 @@ namespace basecross {
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
 		void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
+	protected:
 		void EnemyJump();
 		void HipDropJump();
 		void ThisDestroy();
@@ -151,7 +157,9 @@ namespace basecross {
 		void EnemyAnime(wstring anime);
 		void OverHeat();
 		void PlayerSE(wstring path, float volume = 1.0f, float loopcnt = 0);
+		void EffectPlay();
 		void Debug();
+	public:
 		//get,set
 		float GetAngle();
 		void SetEnemyFlayFlag(bool flag);

@@ -25,7 +25,7 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(bulletMove),
+		m_stateType(slide),
 		m_overHeatState(overHeatState),
 		m_player(player),
 		m_meshName(L"ENEMYARUKU"),
@@ -48,6 +48,8 @@ namespace basecross {
 		m_maxSpareTime(m_spareTime),
 		m_bulletTime(0.1f),
 		m_maxBulletTime(m_bulletTime),
+		m_pBulletTime(3.0f),
+		m_maxPbulletTime(m_pBulletTime),
 		m_bulletCnt(0),
 		m_bulletRangeTime(5.0f),
 		m_maxBulletRangeTime(m_bulletRangeTime),
@@ -94,6 +96,7 @@ namespace basecross {
 		m_upHeight(10.0f),
 		m_jumpPower(5.0f),
 		m_jumpTime(1.0f),
+		m_rad(0.0f),
 		m_dicUp(0),
 		m_direcNorm(Vec3(0.0f)),
 		m_dropTime(4.0f),
@@ -148,6 +151,8 @@ namespace basecross {
 		m_draw->SetOwnShadowActive(true);
 
 		m_draw->AddAnimation(L"walk", 10, 30, true, 30);    //歩き
+		m_draw->AddAnimation(L"speedWalk", 10, 30, true, 60);    //歩き
+
 		m_draw->AddAnimation(L"jump", 10, 30, false, 15);
 		m_draw->AddAnimation(L"attack", 50, 40, false, 30); //攻撃
 		m_draw->AddAnimation(L"spare", 50, 10, false, 15);  //突っ込み前の予備動作
@@ -179,6 +184,14 @@ namespace basecross {
 		GetStage()->AddGameObject<Square>(4.0f, 2.0f, L"OverHeatFram",
 			Col4(1.0f, 1.0f, 1.0f, 1.0f), GetThis<Enemy>());
 		AddTag(L"Enemy");
+
+		wstring DataDir;
+		App::GetApp()->GetAssetsDirectory(DataDir);
+		wstring effectPath = DataDir + L"Effects\\EnemyEye 1.efk";
+		auto stageManager = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto efkInterface = stageManager->GetEfkInterface();
+		m_efkEffect = ObjectFactory::Create<EfkEffect>(efkInterface, effectPath);
+		//EffectPlay();
 	}
 
 	void Enemy::OnUpdate() {
@@ -283,10 +296,18 @@ namespace basecross {
 			}
 			break;
 		case slide:
+			EnemyAnime(L"walk");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			PlayerDic();
+			EnemyAngle();
+			m_maxBulletTime = 3.0f;
+			StraightXBullet();
+			m_rad += 0.05f;
+			if (XMConvertToRadians(m_rad)>=360) {
+				m_rad = 0;
+			}
 
-			m_pos += shaft * 1.0f * elapsed;
+			m_pos += shaft.normalize() * sinf(m_rad)*10.0f* elapsed;
 			break;
 		default:
 			break;
@@ -356,17 +377,11 @@ namespace basecross {
 			m_stateType = m_overHeatState;
 		}
 		if (m_heat > 0.0f) {
-			m_heat -= elapsed * 50;
+			m_heat -= elapsed * 5;
 		}
 		else if (GetOverHeat()&&m_heat <= 0.0f) {
 			m_heat = 0.0f;
 			m_stateType = wait;
-			//EnemyAnime(L"stand");
-			//m_spareTime -= elapsed;
-			//if (m_stateType != m_fastState) {
-			//	m_stateType = m_fastState;
-			//	
-			//}
 		}
 	}
 
@@ -425,13 +440,13 @@ namespace basecross {
 	void Enemy::FallBullet() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto stage = GetStage();
-		m_bulletTime += elapsed;
+		m_pBulletTime += elapsed;
 		if (!m_bulletFlag) {
 			stage->AddGameObject<ParabolaBullet>(GetThis<Enemy>());
 			m_bulletFlag = true;
-			m_bulletTime = 0.0f;
+			m_pBulletTime = 0.0f;
 		}
-		if (m_bulletTime >= m_maxBulletTime) {
+		if (m_pBulletTime >= m_maxPbulletTime) {
 			m_bulletFlag = false;
 		}
 
@@ -549,11 +564,6 @@ namespace basecross {
 	void Enemy::ThisDestroy() {
 		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
 		m_floorCol->ThisDestroy();
-	}
-	//SEの再生
-	void Enemy::PlayerSE(wstring path, float volume, float loopcnt) {
-		auto playerSE = App::GetApp()->GetXAudio2Manager();
-		playerSE->Start(path, loopcnt, volume);
 	}
 
 	//衝突判定
@@ -676,13 +686,22 @@ namespace basecross {
 		}
 
 	}
-
+	//SEの再生
+	void Enemy::PlayerSE(wstring path, float volume, float loopcnt) {
+		auto playerSE = App::GetApp()->GetXAudio2Manager();
+		playerSE->Start(path, loopcnt, volume);
+	}
+	//アニメーションの再生
 	void Enemy::EnemyAnime(wstring anime) {
 		auto draw = GetComponent<PNTBoneModelDraw>()->GetCurrentAnimation();
 		if ( draw!= anime) {
 			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(anime);
 		}
-
+	}
+	void Enemy::EffectPlay() {
+		m_EfkPlayer = ObjectFactory::Create<EfkPlay>(m_efkEffect, m_pos);
+		m_EfkPlayer->SetScale(Vec3(1.0f, 1.0f, 1.0f));
+		m_EfkPlayer->SetAllColor(Col4(1.0f));
 	}
 	//デバック
 	void Enemy::Debug() {
