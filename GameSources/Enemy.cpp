@@ -25,7 +25,7 @@ namespace basecross {
 		m_pos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(state),
+		m_stateType(bulletMove),
 		m_overHeatState(overHeatState),
 		m_player(player),
 		m_meshName(L"ENEMYARUKU"),
@@ -49,9 +49,11 @@ namespace basecross {
 		m_bulletTime(0.1f),
 		m_maxBulletTime(m_bulletTime),
 		m_bulletCnt(0),
-		m_bulletTime2(5.0f),
+		m_bulletRangeTime(5.0f),
+		m_maxBulletRangeTime(m_bulletRangeTime),
 		m_trackingRange(20.0f),
 		m_firstDirec(Vec3(0.0f)),
+		m_bulletDic(Vec2(0.0f, 1.0f)),
 		m_gravity(-9.8f),
 		m_grav(Vec3(0.0f, m_gravity, 0.0f)),
 		m_gravVel(Vec3(0.0f)),
@@ -131,7 +133,7 @@ namespace basecross {
 		m_playerScale = m_player.lock()->GetScale();
 		//描画
 		
-		auto ptrDraw = AddComponent<PNTBoneModelDraw>();
+		m_draw = AddComponent<PNTBoneModelDraw>();
 		float rad = XMConvertToRadians(180.0f);
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(
@@ -141,17 +143,22 @@ namespace basecross {
 			Vec3(0.0f, -0.5f, 0.0f)
 		);
 
-		ptrDraw->SetMeshResource(m_meshName);
-		ptrDraw->SetMeshToTransformMatrix(meshMat);
-		ptrDraw->SetOwnShadowActive(true);
+		m_draw->SetMeshResource(m_meshName);
+		m_draw->SetMeshToTransformMatrix(meshMat);
+		m_draw->SetOwnShadowActive(true);
 
-		ptrDraw->AddAnimation(L"walk", 10, 30, true, 30);    //歩き
-		ptrDraw->AddAnimation(L"jump", 10, 30, false, 15);
-		ptrDraw->AddAnimation(L"attack", 50, 40, false, 30); //攻撃
-		ptrDraw->AddAnimation(L"spare", 50, 10, false, 15);  //突っ込み前の予備動作
-		ptrDraw->AddAnimation(L"wait", 90, 25, false, 30);   //オーバーヒート状態
-		ptrDraw->AddAnimation(L"stand", 120, 30, false, 30);
-		ptrDraw->ChangeCurrentAnimation(L"walk");
+		m_draw->AddAnimation(L"walk", 10, 30, true, 30);    //歩き
+		m_draw->AddAnimation(L"jump", 10, 30, false, 15);
+		m_draw->AddAnimation(L"attack", 50, 40, false, 30); //攻撃
+		m_draw->AddAnimation(L"spare", 50, 10, false, 15);  //突っ込み前の予備動作
+		m_draw->AddAnimation(L"wait", 90, 25, false, 30);   //オーバーヒート状態
+		m_draw->AddAnimation(L"stand", 120, 30, false, 30);
+
+		m_draw->AddAnimation(L"walks", 10, 59, true, 30);    //歩き
+		m_draw->AddAnimation(L"jumps", 10, 30, false, 30);
+		m_draw->AddAnimation(L"waits", 210, 30, false, 30);  //突っ込み前の予備動作
+
+		m_draw->ChangeCurrentAnimation(L"walk");
 		//衝突判定
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
@@ -205,7 +212,10 @@ namespace basecross {
 			EnemyAnime(L"walk");
 			m_speed = m_maxSpeed;
 			PlayerDic();
-			EnemyAngle();
+			if (!m_floorCol->GetPlayerFlag()) {
+				EnemyAngle();
+
+			}
 			if (m_direc.length() <= m_trackingRange * 2) {
 				m_pos += m_speed * m_direcNorm * elapsed;
 			}
@@ -263,19 +273,7 @@ namespace basecross {
 		case bulletMove:
 			PlayerDic();
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			m_pos += m_speed * 0.2f * Vec3(0.0f, 0.0f, m_direc.z) * elapsed;
-			if (m_bulletTime2 <= 0.0f) {
-				m_bulletTime2 = 5.0f;
-				m_bulletCnt = 0;
-			}
-			if (m_bulletCnt < 3) { 
-				StraightXBullet();
-				m_speed = 0.0f;
-			}
-			else if (m_bulletCnt >= 3) {
-				m_bulletTime2 -= elapsed;
-				m_speed = m_maxSpeed;
-			}
+			RapidFireBullet(3);
 			break;
 		case wait:
 			EnemyAnime(L"stand");
@@ -308,8 +306,7 @@ namespace basecross {
 			Grab();
 		}
 		OverHeat();
-		auto draw = GetComponent<PNTBoneModelDraw>();
-		draw->UpdateAnimation(elapsed);
+		m_draw->UpdateAnimation(elapsed);
 		//Debug();
 	}
 
@@ -454,6 +451,24 @@ namespace basecross {
 			m_bulletFlag = true;
 		}
 	}
+	void Enemy::RapidFireBullet(int bulletNum) {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		m_pos += m_speed * 0.2f * Vec3(m_direc.x * m_bulletDic.x, 0.0f,
+			m_direc.z * m_bulletDic.y) * elapsed;
+		if (m_bulletRangeTime <= 0.0f) {
+			m_bulletRangeTime = m_maxBulletRangeTime;
+			m_bulletCnt = 0;
+		}
+		if (m_bulletCnt < bulletNum) {
+			StraightXBullet();
+			m_speed = 0.0f;
+		}
+		else if (m_bulletCnt >= bulletNum) {
+			m_bulletRangeTime -= elapsed;
+			m_speed = m_maxSpeed;
+		}
+
+	}
 
 	//ヒップドロップ
 	void Enemy::HitDrop() {
@@ -533,6 +548,7 @@ namespace basecross {
 	//削除
 	void Enemy::ThisDestroy() {
 		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
+		m_floorCol->ThisDestroy();
 	}
 	//SEの再生
 	void Enemy::PlayerSE(wstring path, float volume, float loopcnt) {
@@ -804,6 +820,9 @@ namespace basecross {
 	void Enemy::SetPlungeFlag(bool flag) {
 		m_plungeFlag = flag;
 	}
+	void Enemy::SetBulletDirec(Vec2 direc) {
+		m_bulletDic = direc;
+	}
 
 	//--------------------------------------------------------------------------------------
 	//	class EnemyBullet : public GameObject;  
@@ -989,7 +1008,8 @@ namespace basecross {
 		const shared_ptr<Enemy>& enemy
 	):
 		GameObject(stage),
-		m_enemy(enemy)
+		m_enemy(enemy),
+		m_playerFlag(false)
 	{}
 	void EnemyFloorCol::OnCreate() {
 		auto enemy = m_enemy.lock();
@@ -1025,5 +1045,18 @@ namespace basecross {
 	}
 	void EnemyFloorCol::ThisDestroy() {
 		GetStage()->RemoveGameObject<EnemyFloorCol>(GetThis<EnemyFloorCol>());
+	}
+	void EnemyFloorCol::OnCollisionEnter(shared_ptr<GameObject>& other) {
+		if (other->FindTag(L"Player")) {
+			m_playerFlag = true;
+		}
+	}
+	void EnemyFloorCol::OnCollisionExit(shared_ptr<GameObject>& other) {
+		if (other->FindTag(L"Player")) {
+			m_playerFlag = false;
+		}
+	}
+	bool EnemyFloorCol::GetPlayerFlag() {
+		return m_playerFlag;
 	}
 }
