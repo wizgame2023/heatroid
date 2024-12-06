@@ -414,6 +414,9 @@ namespace basecross {
 
 	void StageManager::OnCreate() {
 		try {
+			//エフェクト作成
+			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
+
 			auto& app = App::GetApp();
 			auto scene = app->GetScene<Scene>();
 			// mediaパスを取得
@@ -434,9 +437,6 @@ namespace basecross {
 					m_GameStage.ReadCsv();
 				}
 			}
-			//エフェクト作成
-
-			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
 		}
 		catch (...) {
 			throw;
@@ -778,7 +778,7 @@ namespace basecross {
 	void StageManager::SetNowGameStatus(int afterGameStatus) {
 		m_nowGameStatus = afterGameStatus;
 	}
-	//���݂̃J�����X�e�[�^�X��
+
 	int StageManager::GetNowCameraStatus() {
 		return m_nowGameStatus;
 	}
