@@ -47,7 +47,8 @@ namespace basecross {
 		float m_bulletTime;    //弾の発射間隔
 		float m_maxBulletTime; //↑の最大値
 		int m_bulletCnt;
-		float m_bulletTime2;
+		float m_bulletRangeTime;//弾の発射クールタイム
+		float m_maxBulletRangeTime;//↑の最大値
 		float m_trackingRange; //弾を発射する距離
 		float m_dropTime;      //ヒットドロップまでの時間
 		float m_maxDropTime;   //↑の最大値
@@ -60,6 +61,7 @@ namespace basecross {
 		Vec3 m_direcNorm;
 		Vec3 m_firstDirec;
 		Vec3 m_moveRot;
+		Vec2 m_bulletDic;
 		//テスト用
 		float m_test;
 
@@ -97,6 +99,7 @@ namespace basecross {
 		Vec3 m_jumpPos;
 
 		shared_ptr<Transform> m_trans;
+		shared_ptr<PNTBoneModelDraw> m_draw;
 		shared_ptr<EnemyFloorCol> m_floorCol;
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
@@ -144,6 +147,7 @@ namespace basecross {
 		void Grab();
 		void FallBullet();
 		void StraightXBullet();
+		void RapidFireBullet(int bulletNum);
 		void EnemyAnime(wstring anime);
 		void OverHeat();
 		void PlayerSE(wstring path, float volume = 1.0f, float loopcnt = 0);
@@ -252,6 +256,8 @@ namespace basecross {
 		Vec3 m_pos;
 		Vec3 m_enemyPos;
 		Vec3 m_enemyScal;
+
+		bool m_playerFlag;
 		shared_ptr<Transform> m_trans;
 		weak_ptr<Enemy> m_enemy;
 
@@ -262,7 +268,10 @@ namespace basecross {
 		virtual ~EnemyFloorCol(){}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);
+		virtual void OnCollisionExit(shared_ptr<GameObject>& other);
 		void ThisDestroy();
+		bool GetPlayerFlag();
 	};
 
 }
