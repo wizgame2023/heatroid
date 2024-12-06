@@ -109,6 +109,11 @@ namespace basecross {
 	class GimmickButton : public GameObject
 	{
 		public:
+			//エフェクト
+			shared_ptr<EfkEffect> m_EfkEffect;
+			//エフェクト実行オブジェクト
+			shared_ptr<EfkPlay> m_EfkPlay;
+
 
 			Vec3 m_Position;
 			Vec3 m_Rotation;
@@ -133,6 +138,7 @@ namespace basecross {
 			virtual void OnCreate() override;
 			virtual void OnUpdate() override;
 			void PlaySE(wstring path, float volume, float loopcnt);
+			void EfectPlay();
 			//押されているのかの判定
 			bool GetButton() 
 			{

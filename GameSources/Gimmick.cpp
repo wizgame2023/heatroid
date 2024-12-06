@@ -117,6 +117,15 @@ namespace basecross {
 
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		group->IntoGroup(GetThis<GameObject>());
+		//エフェクトの初期化
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		wstring TestEffectStr = DataDir + L"Effects\\Switch.efk";
+		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto ShEfkInterface = stageMane->GetEfkInterface();
+		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
+
+
 	}
 	
 	void GimmickButton::OnUpdate()
@@ -126,9 +135,10 @@ namespace basecross {
 		if (m_open && m_flag == false)
 		{
 			PlaySE(L"SwitchSE", 0, 1.0);
+			EfectPlay();
 			m_flag = true;
 			time += ElapsedTime;
-			if (time > 5.0f)
+			if (time > 5.0f || m_open == false)
 			{
 				m_flag = false;
 			}
@@ -138,6 +148,16 @@ namespace basecross {
 	void GimmickButton::PlaySE(wstring path, float loopcnt, float volume) {
 		auto playSE = App::GetApp()->GetXAudio2Manager();
 		playSE->Start(path, loopcnt, volume);
+	}
+
+	void GimmickButton::EfectPlay()
+	{
+		auto pos = GetComponent<Transform>()->GetPosition();
+		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto ShEfkInterface = stageMane->GetEfkInterface();
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos);
+		m_EfkPlay->SetScale(Vec3(2, 2, 2));
+		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
 	}
 
 
