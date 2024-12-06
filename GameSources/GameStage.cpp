@@ -12,16 +12,17 @@ namespace basecross {
 
 	void GameStage::OnCreate() {
 		try {
-			//エフェクト作成
-			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
+			CreateStageManager();
+
+			auto stMgr = GetSharedGameObject<StageManager>(L"StageManager");
+
 			//エフェクトの初期化
 			wstring DataDir;
 			App::GetApp()->GetDataDirectory(DataDir);
 			wstring TestEffectStr = DataDir + L"Effects\\Laser01.efk";
-			auto ShEfkInterface = m_EfkInterface;
+			auto ShEfkInterface = stMgr->GetEfkInterface();
 			m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
 
-			CreateStageManager();
 			auto player = GetSharedGameObject<Player>(L"Player");
 			//AddGameObject<FadeIn>();
 			PlayBGM(L"StageBGM");
