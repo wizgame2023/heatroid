@@ -1,7 +1,7 @@
 /*!
-Š™“c‘å‹P
+éŽŒç”°å¤§è¼
 @file GameStage.cpp
-@brief ƒQ[ƒ€ƒXƒe[ƒWŽÀ‘Ì
+@brief ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸å®Ÿä½“
 */
 
 #include "stdafx.h"
@@ -34,6 +34,13 @@ namespace basecross {
 			m_PauseTitle->SetDrawActive(false);
 			m_PauseBack->SetDrawActive(false);
 
+			//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®åˆæœŸåŒ–
+			wstring DataDir;
+			App::GetApp()->GetDataDirectory(DataDir);
+			wstring TestEffectStr = DataDir + L"Effects\\Laser01.efk";
+			auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
+			auto ShEfkInterface = stageMane->GetEfkInterface();
+			m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
 		}
 		catch (...) {
 			throw;
@@ -41,12 +48,32 @@ namespace basecross {
 	}
 	void GameStage::OnUpdate()
 	{
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
 		int camerastatus = stageMane->GetNowCameraStatus();
+		auto ShEfkInterface = stageMane->GetEfkInterface();
 		if (stageMane->m_CameraSelect == StageManager::CameraSelect::myCamera)
 		{
+			ShEfkInterface->OnUpdate();
 			GamePause();
+			if (KeyState.m_bPressedKeyTbl[VK_TAB])
+			{
+				EffectPlay();
+			}
 		}
+	}
+
+	void GameStage::OnDraw()
+	{
+		auto& camera = GetView()->GetTargetCamera();
+		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
+		auto ShEfkInterface = stageMane->GetEfkInterface();
+		ShEfkInterface->SetViewProj(camera->GetViewMatrix(), camera->GetProjMatrix());
+		ShEfkInterface->OnDraw();
+	}
+
+	void GameStage::OnPushA()
+	{
 	}
 
 	void GameStage::GamePause()
@@ -54,10 +81,13 @@ namespace basecross {
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto playerSh = GetSharedGameObject<Player>(L"Player");
+		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
 		bool m_Diedtrue = playerSh->GetDied();
 		bool m_Goaltrue = playerSh->GetArrivedGoal();
+		auto group = GetSharedObjectGroup(L"Enemy");
+		auto group2 = GetSharedObjectGroup(L"Door");
+
 		if (m_Diedtrue){
-			auto group = GetSharedObjectGroup(L"Enemy");
 			auto& vec = group->GetGroupVector();
 			for (auto v : vec)
 			{
@@ -67,7 +97,6 @@ namespace basecross {
 					shObj->SetUpdateActive(false);
 				}
 			}
-			auto group2 = GetSharedObjectGroup(L"Door");
 			auto& vec2 = group2->GetGroupVector();
 			for (auto v : vec2)
 			{
@@ -79,7 +108,6 @@ namespace basecross {
 			}
 		}
 		else if (m_Goaltrue) {
-			auto group = GetSharedObjectGroup(L"Enemy");
 			auto& vec = group->GetGroupVector();
 			for (auto v : vec)
 			{
@@ -89,7 +117,6 @@ namespace basecross {
 					shObj->SetUpdateActive(false);
 				}
 			}
-			auto group2 = GetSharedObjectGroup(L"Door");
 			auto& vec2 = group2->GetGroupVector();
 			for (auto v : vec2)
 			{
@@ -107,31 +134,56 @@ namespace basecross {
 				m_PauseSelect->SetDrawActive(true);
 				m_PauseTitle->SetDrawActive(true);
 				m_PauseBack->SetDrawActive(true);
+				stageMane->m_SelectCharge->SetDrawActive(false);
+				stageMane->m_TitleCharge->SetDrawActive(false);
+				auto time = App::GetApp()->GetElapsedTime();
+				stageMane->SetPushState(0);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
 				{
 					auto obj = GetGameObjectVec();
-					for (auto object : obj)
+					for (auto& object : obj)
 					{
 						object->SetUpdateActive(true);
 					}
 					m_pause = false;
 				}
-				if (cntlVec[0].wNowUpdateButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
+				if (cntlVec[0].wButtons & XINPUT_GAMEPAD_A || KeyState.m_bPushKeyTbl[VK_RETURN])
 				{
-					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
-					OnDestroy();
+					totaltime += time;
+					stageMane->SetPushState(1);
+					if (totaltime > 1.0f)
+					{
+						PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+						OnDestroy();
+					}
 				}
-				if (cntlVec[0].wNowUpdateButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_BACK])
+				if (cntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A || KeyState.m_bUpKeyTbl[VK_RETURN])
 				{
-					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
-					OnDestroy();
+					stageMane->SetPushState(0);
 				}
+				if (cntlVec[0].wButtons & XINPUT_GAMEPAD_B || KeyState.m_bPushKeyTbl[VK_BACK])
+				{
+					stageMane->SetPushState(2);
+					totaltime += time;
+					if (totaltime > 1.0f)
+					{
+						PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+						OnDestroy();
+					}
+				}
+				if (cntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_B || KeyState.m_bUpKeyTbl[VK_BACK])
+				{
+					stageMane->SetPushState(0);
+				}
+
 			}
 			else {
 				m_pauseBackGround->SetDrawActive(false);
 				m_PauseSelect->SetDrawActive(false);
 				m_PauseTitle->SetDrawActive(false);
 				m_PauseBack->SetDrawActive(false);
+				stageMane->m_SelectCharge->SetDrawActive(false);
+				stageMane->m_TitleCharge->SetDrawActive(false);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
 				{
 					auto obj = GetGameObjectVec();
@@ -145,7 +197,14 @@ namespace basecross {
 
 		}
 	}
-
+	void GameStage::EffectPlay()
+	{
+		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
+		auto ShEfkInterface = stageMane->GetEfkInterface();
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
+		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
+		m_EfkPlay->SetAllColor(Col4(1.0f, 0.0f, 1.0f, 1.0f));
+	}
 
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{
@@ -153,7 +212,7 @@ namespace basecross {
 	}
 
 	void GameStage::OnDestroy() {
-		//BGM‚ÌƒXƒgƒbƒv
+		//BGMã®ã‚¹ãƒˆãƒƒãƒ—
 		m_ptrXA->Stop(m_BGM);
 	}
 	void GameStage::CreateStageManager() {
@@ -171,6 +230,7 @@ namespace basecross {
 			ptrStageManager->CreateFixedBox();
 			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateSprite();
+			ptrStageManager->CreateGimmick();
 		}
 		else
 		{
@@ -181,8 +241,8 @@ namespace basecross {
 			ptrStageManager->CreateViewLight();
 			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateFixedBox();
-			ptrStageManager->CreateGimmick();
 			ptrStageManager->CreateSprite();
+			ptrStageManager->CreateGimmick();
 		}
 	}
 

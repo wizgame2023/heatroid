@@ -88,6 +88,8 @@ namespace basecross {
 		float m_chargePerc, m_chargeSpeed, m_chargeReduceSpeed;
 		//無敵時間
 		float m_invincibleTime, m_invincibleTimeMax;
+		//掴み判定の持続秒数
+		float m_grabTime, m_grabTimeMax;
 		//何かを持っているか否か
 		bool m_isCarrying;
 
@@ -193,11 +195,13 @@ namespace basecross {
 				draw->ChangeCurrentAnimation(animname, time);
 		}
 
-		void SwitchFireAnim(const float time);
+		void SwitchAnim(const float time, const float condition, const wstring prefix);
 
 		void Charging(bool charge) {
+			if (m_isCarrying == true) return;
 			m_isCharging = charge;
 			if (charge == false) return;
+			
 			if (m_isOverCharge) {
 				m_chargePerc += m_chargeReduceSpeed * m_chargePerc * _delta;
 			}
@@ -208,8 +212,9 @@ namespace basecross {
 			if (m_chargePerc > 1.0f) m_isOverCharge = true;
 		}
 
-		const wstring AddFire() {
+		const wstring AddPrefix() {
 			if (m_isCharging) return L"Fire_";
+			if (m_isCarrying) return L"Grab_";
 			else return L"";
 		}
 	};
@@ -225,7 +230,7 @@ namespace basecross {
 		//プレイヤーに追従させるためのポインタ
 		weak_ptr<Player> m_player;
 		//触れた敵のポインタを保管しておく
-		shared_ptr<GameObject> m_target;
+		shared_ptr<Enemy> m_target;
 		//敵に当たっているかどうか
 		bool m_isHit;
 	public:
@@ -251,9 +256,7 @@ namespace basecross {
 		}
 
 		//何かに接触している判定
-		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
-		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
-
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 
 	};
 
@@ -340,8 +343,8 @@ namespace basecross {
 		shared_ptr<SpriteCharge> m_charge;
 		shared_ptr<SpritePlayerUI> m_frame;
 
-		const float m_width = 400.0f;
-		const float m_height = 100.0f;
+		const float m_width = 600.0f;
+		const float m_height = 150.0f;
 		const float windowWidth = App::GetApp()->GetGameWidth();
 		const float windowHeight = App::GetApp()->GetGameHeight();
 	public:
@@ -369,10 +372,10 @@ namespace basecross {
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
 
-		const float m_width = 160.0f;
-		const float m_height = 10.0f;
-		const float m_bottomSlip = -10.0f;
-		Vec3 addPos = Vec3(159.0f, -40.0f, 0.0f);
+		const float m_width = 240.0f;
+		const float m_height = 15.0f;
+		const float m_bottomSlip = -15.0f;
+		Vec3 addPos = Vec3(240.0f, -60.0f, 0.0f);
 
 	public:
 		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
@@ -398,10 +401,10 @@ namespace basecross {
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
 
-		const float m_width = 160.0f;
-		const float m_height = 8.0f;
-		const float m_bottomSlip = 10.0f;
-		Vec3 addPos = Vec3(190.0f, -55.0f, 0.0f);
+		const float m_width = 240.0f;
+		const float m_height = 13.5f;
+		const float m_bottomSlip = 13.5f;
+		Vec3 addPos = Vec3(287.0f, -82.0f, 0.0f);
 
 	public:
 		SpriteCharge(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :

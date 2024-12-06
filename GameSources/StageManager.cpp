@@ -62,7 +62,7 @@ namespace basecross {
 		else if (m_StageName == L"Stagedata3.csv")
 		{
 			plVec = {
-				Vec3(65.0f, 5.0f,0.0f),
+				Vec3(80.0f, 5.0f,0.0f),
 				Vec3(0.0f, XMConvertToRadians(90.0f), 0.0f),
 				Vec3(3.0f, 3.0f, 3.0f)
 			};
@@ -121,7 +121,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x / 1, Scale.z / 1, Tokens[10]);
 			ptrFloor->AddTag(L"Floor");
 			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
 		}
@@ -219,6 +219,7 @@ namespace basecross {
 		GetStage()->CreateSharedObjectGroup(L"Door");
 		GetStage()->CreateSharedObjectGroup(L"Switch");
 		GetStage()->CreateSharedObjectGroup(L"StageDoor");
+		GetStage()->CreateSharedObjectGroup(L"GimmickUp");
 		vector<wstring> LineVec;
 		m_GameStage.GetSelect(LineVec, 0, L"Door");
 		for (auto& v : LineVec) {
@@ -283,7 +284,7 @@ namespace basecross {
 			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
 			Util::WStrToTokenVector(Tokens, v, L',');
 			//各トークン（カラム）をスケール、回転、位置に読み込む
-			Vec3 Scale(5,5,5);
+			Vec3 Scale(5, 5, 5);
 			Vec3 Rot;
 			//回転は「XM_PIDIV2」の文字列になっている場合がある
 			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
@@ -301,6 +302,37 @@ namespace basecross {
 			ptrStageDoor->AddTag(L"StageDoor");
 			auto group = GetStage()->GetSharedObjectGroup(L"StageDoor");
 			group->IntoGroup(ptrStageDoor);
+		}
+		m_GameStage.GetSelect(LineVec, 0, L"GimmickUp");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+
+			float Switch = (float)_wtof(Tokens[10].c_str());
+			int number = (float)_wtof(Tokens[11].c_str());
+			int max = (float)_wtof(Tokens[13].c_str());
+
+			//各値がそろったのでオブジェクト作成
+			auto door = GetStage()->AddGameObject<GimmickUp>(Pos, Rot, Scale, Scale.x, Scale.y, Switch, number, Tokens[12], max);
 		}
 	}
 
@@ -337,6 +369,13 @@ namespace basecross {
 				else if (Tokens[10] == L"Enemy::fly" && Tokens[11] == L"Enemy::fixedStay") {
 					stateBefore = Enemy::fly;
 					stateAfter = Enemy::fixedStay;
+					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+					group->IntoGroup(enemy);
+				}
+				else if (Tokens[10] == L"Enemy::bullet" && Tokens[11] == L"Enemy::stay") {
+					stateBefore = Enemy::bullet;
+					stateAfter = Enemy::stay;
 					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
 					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 					group->IntoGroup(enemy);
@@ -395,6 +434,9 @@ namespace basecross {
 					m_GameStage.ReadCsv();
 				}
 			}
+			//エフェクト作成
+
+			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
 		}
 		catch (...) {
 			throw;
@@ -434,7 +476,7 @@ namespace basecross {
 			else if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
 				PlaySE(L"DecisionSE", 0, 1.0f);
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
 			}
 			break;
 		case GameStatus::GAME_PLAYING: 
@@ -496,7 +538,7 @@ namespace basecross {
 				}
 				GoalJudge();
 				GameOverJudge();
-				GamePause();
+				OnDraw();
 			}
 			break;
 
@@ -506,28 +548,38 @@ namespace basecross {
 
 	}
 
+	void StageManager::OnDraw()
+	{
+	}
+
 	void StageManager::CreateSprite()
 	{
 		m_TextDraw = GetStage()->AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
-		m_TextDraw->SetDrawLayer(5);
+		m_TextDraw->SetDrawLayer(3);
 
 		m_SpriteDraw = GetStage()->AddGameObject<Sprite>(L"CLEARBackGround", true, Vec2(640.0f, 400.0f), Vec3(.0f, 0.0f, 0.0f));
-		m_SpriteDraw->SetDrawLayer(4);
+		m_SpriteDraw->SetDrawLayer(1);
 
 		m_StageUI = GetStage()->AddGameObject<Sprite>(L"GameStageUI", true, Vec2(640.0f, 400.0f), Vec3(10, 0, 0.0f));
 		m_StageUI->SetDrawLayer(3);
 
 		m_nextStageUI = GetStage()->AddGameObject<Sprite>(L"NextStage", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
-		m_nextStageUI->SetDrawLayer(5);
+		m_nextStageUI->SetDrawLayer(3);
 
 		m_clearSelectStage = GetStage()->AddGameObject<Sprite>(L"ClearSelectStage", true, Vec2(400.0f, 300.0f), Vec3(-1000.0f, -200.0f, 0.0f));
-		m_clearSelectStage->SetDrawLayer(5);
+		m_clearSelectStage->SetDrawLayer(3);
 
 		m_retryStageUI = GetStage()->AddGameObject<Sprite>(L"Retry", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
-		m_retryStageUI->SetDrawLayer(5);
+		m_retryStageUI->SetDrawLayer(4);
 
 		m_overSelectStage = GetStage()->AddGameObject<Sprite>(L"OverSelectStage", true, Vec2(400.0f, 300.0f), Vec3(-1000.0f, -200.0f, 0.0f));
-		m_overSelectStage->SetDrawLayer(5);
+		m_overSelectStage->SetDrawLayer(4);
+
+		m_SelectCharge = GetStage()->AddGameObject<SelectCharge>(L"PauseSelectCharge", false, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
+		m_SelectCharge->SetDrawLayer(4);
+
+		m_TitleCharge = GetStage()->AddGameObject<SelectCharge>(L"PauseTitleCharge", false, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
+		m_TitleCharge->SetDrawLayer(4);
 
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
@@ -535,6 +587,9 @@ namespace basecross {
 		m_clearSelectStage->SetDrawActive(false);
 		m_retryStageUI->SetDrawActive(false);
 		m_overSelectStage->SetDrawActive(false);
+		m_SelectCharge->SetDrawActive(false);
+		m_TitleCharge->SetDrawActive(false);
+
 		ToOpeningCamera();
 	}
 
@@ -559,6 +614,8 @@ namespace basecross {
 				if (m_Flag)
 				{
 					PlaySE(L"GameClearSE", 0, 1.0f);
+					m_BGfade = GetStage()->AddGameObject<FadeOut>();
+					m_BGfade->SetDrawLayer(3);
 					m_Flag = false;
 				}
 
@@ -568,25 +625,16 @@ namespace basecross {
 				m_SpriteDraw->SetDrawActive(true);
 				m_nextStageUI->SetDrawActive(true);
 				m_clearSelectStage->SetDrawActive(true);
-
-				auto BGSprite = GetStage()->AddGameObject<FadeOut>();
-				BGSprite->SetDrawLayer(-1);
-				auto end = BGSprite->GetFadeOutEnd();
-				if (end)
-				{
-					BGSprite->SetColor(Col4(0.0f, 0.0f, 0.0f, 0.6f));
-				}
-
 				MoveSprite(m_nextStageUI, m_clearSelectStage);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
-					PlaySE2(L"Confirm", 0, 1.0f);
+					PlaySE(L"Confirm", 0, 1.0f);
 					m_select = 1;
 					m_totalTime = 0.0f;
 				}
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 				{
-					PlaySE2(L"Confirm", 0, 1.0f);
+					PlaySE(L"Confirm", 0, 1.0f);
 					m_select = 2;
 					m_totalTime = 0.0f;
 				}
@@ -627,13 +675,13 @@ namespace basecross {
 				MoveSprite(m_retryStageUI, m_overSelectStage);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || KeyState.m_bPressedKeyTbl[VK_SPACE])
 				{
-					PlaySE2(L"Confirm", 0, 1.0f);
+					PlaySE(L"Confirm", 0, 1.0f);
 					m_select = 1;
 					m_totalTime = 0.0f;
 				}
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_RETURN])
 				{
-					PlaySE2(L"Confirm", 0, 1.0f);
+					PlaySE(L"Confirm", 0, 1.0f);
 					m_select = 3;
 					m_totalTime = 0.0f;
 				}
@@ -641,11 +689,17 @@ namespace basecross {
 			SelectMoveSprite(m_retryStageUI, m_overSelectStage);
 		}
 	}
-	void StageManager::GamePause()
+
+	void StageManager::SetPushState(const int PushState)
 	{
-		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		m_PushState = PushState;
 	}
+
+	int StageManager::GetPushState()
+	{
+		return m_PushState;
+	}
+
 	void StageManager::SetGameStageSelect(const wstring& m_csvFail)
 	{
 		m_StageName = m_csvFail;
@@ -696,7 +750,7 @@ namespace basecross {
 			if (m_totalTime > 1.0f)
 			{
 				scene->SetSelectedMap(scene->m_select + 1);
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
 			}
 		}
 		else if (m_select == 3) {
@@ -705,7 +759,7 @@ namespace basecross {
 			nextStage->SetPosition(m_nxsttPos);
 			if (m_totalTime > 1.0f)
 			{
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
 			}
 		}
 	}
@@ -746,11 +800,12 @@ namespace basecross {
 	}
 	void StageManager::ToOpeningCamera()
 	{
+		GetStage()->AddGameObject<FadeIn>();
 		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
 		auto PlayPos =  PtrPlayer->AddComponent<Transform>()->GetPosition();
 		Vec3 CameraPos = Vec3(PlayPos.x + 10.0f, PlayPos.y + 5.0f, PlayPos.z);
 		Vec3 CameraStartEndPos = Vec3(PlayPos.x -5.0f, PlayPos.y + 5.0f, PlayPos.z);
-		Vec3 CameraEndPos = Vec3(PlayPos.x + 15.0f, PlayPos.y + 15.0f, PlayPos.z);
+		Vec3 CameraEndPos = Vec3(PlayPos.x + 15.0f, PlayPos.y + 10.0f, PlayPos.z);
 		Vec3 PlayEndpos = Vec3(PlayPos.x - 5.0f, PlayPos.y, PlayPos.z);
 		Vec3 PlayStartpos = Vec3(PlayPos.x, PlayPos.y + 3.0f, PlayPos.z);
 		auto view = GetStage()->CreateView<SingleView>();
@@ -775,10 +830,5 @@ namespace basecross {
 		auto playSE = App::GetApp()->GetXAudio2Manager();
 		playSE->Start(path, loopcnt, volume);
 	}
-	void StageManager::PlaySE2(wstring path, float loopcnt, float volume) {
-		auto playSE = App::GetApp()->GetXAudio2Manager();
-		playSE->Start(path, loopcnt, volume);
-	}
-
 }
 //end basecross

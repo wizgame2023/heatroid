@@ -310,7 +310,7 @@ namespace basecross {
 		OverHeat();
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ
@@ -581,7 +581,7 @@ namespace basecross {
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
 		if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ||
-			keyState.m_bLastKeyTbl['Q'] == true) {
+			keyState.m_bUpKeyTbl['Q'] == true) {
 			m_pGrabFlag = false;
 		}
 		if (m_pGrabFlag) {
@@ -964,7 +964,7 @@ namespace basecross {
 		if (m_pos.y <= -10) {
 			ThisDestroy();
 		}
-		Debug();
+		//Debug();
 	}
 	void ParabolaBullet::Debug() {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();

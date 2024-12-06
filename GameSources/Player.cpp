@@ -32,7 +32,7 @@ namespace basecross {
 		m_firePos(Vec3(1.0f, .8f, -.75f)),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_moveAngle(0.0f),
-		m_collideCountInit(3),
+		m_collideCountInit(10),
 		m_collideCount(m_collideCountInit),
 
 		m_stateType(start),
@@ -42,7 +42,9 @@ namespace basecross {
 		m_chargeSpeed(1.2f),
 		m_chargeReduceSpeed(-.4f),
 		m_HP_max(4),
-		m_invincibleTimeMax(1.8f)
+		m_invincibleTimeMax(1.8f),
+		m_grabTime(0),
+		m_grabTimeMax(.2f)
 	{}
 
 	Player::Player(const shared_ptr<Stage>&StagePtr,
@@ -64,7 +66,7 @@ namespace basecross {
 		m_firePos(Vec3(1.0f, .8f, -.75f)),
 		m_moveVel(Vec3(0, 0, 0)),
 		m_moveAngle(rot.y),
-		m_collideCountInit(3),
+		m_collideCountInit(10),
 		m_collideCount(m_collideCountInit),
 
 		m_stateType(start),
@@ -73,9 +75,11 @@ namespace basecross {
 		m_chargePerc(0.0f),
 		m_chargeSpeed(1.2f),
 		m_chargeReduceSpeed(-.4f),
-
 		m_HP_max(4),
-		m_invincibleTimeMax(1.2f)
+		m_invincibleTimeMax(1.8f),
+		m_grabTime(0),
+		m_grabTimeMax(.2f)
+
 	{}
 
 	Vec2 Player::GetInputState() const {
@@ -259,8 +263,9 @@ namespace basecross {
 		if(GetDrawPtr()->GetCurrentAnimation()==L"Died") m_invincibleTime = m_invincibleTimeMax;
 
 		//チャージも運搬も出来ない状況
-		if (m_stateType == air || m_stateType == hit_stand || m_stateType == hit_air || m_stateType == died || m_stateType == goal) {
+		if (m_stateType != stand) {
 			m_isCarrying = false;
+			m_pGrab.lock()->SetCollActive(false);
 			m_isCharging = false;
 			m_isOverCharge = false;
 			m_chargePerc = 0.0f;
@@ -387,25 +392,19 @@ namespace basecross {
 			break;
 		}
 
-		SwitchFireAnim(GetDrawPtr()->GetCurrentAnimationTime());
+		if (m_grabTime > 0) m_grabTime -= _delta;
+		if (m_grabTime < 0) m_grabTime = 0;
+
+		SwitchAnim(GetDrawPtr()->GetCurrentAnimationTime(), m_isCharging, L"Fire");
+		SwitchAnim(GetDrawPtr()->GetCurrentAnimationTime(), m_isCarrying, L"Grab");
 
 		GetComponent<Transform>()->SetPosition((m_moveVel * _delta) + GetComponent<Transform>()->GetPosition());
-
-		if (m_isCarrying == true) {
-			m_pGrab.lock()->SetCollActive(true);
-			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(true);
-		}
-		else {
-			m_pGrab.lock()->SetCollActive(false);
-			m_pGrab.lock()->GetComponent<CollisionSphere>()->SetDrawActive(false);
-		}
-
 
 		GetDrawPtr()->UpdateAnimation(_delta);
 	}
 
 	void Player::OnUpdate2() {
-		ShowDebug();
+		//ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -421,6 +420,7 @@ namespace basecross {
 		wss << "fire : " << m_isCharging << " " << m_chargePerc << endl;
 		wss << "carry : " << m_isCarrying << endl;
 		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
+		wss << "grab : " << m_pGrab.lock()->IsHit() << " : " << m_grabTime << endl;
 		wss << "fps : " << App::GetApp()->GetStepTimer().GetFramesPerSecond() << " delta : " << _delta << endl;
 
 		auto scene = App::GetApp()->GetScene<Scene>();
@@ -455,7 +455,7 @@ namespace basecross {
 			}
 
 			if (m_stateType == air || m_stateType == hit_air) {
-				SetAnim(AddFire() + L"Land");
+				SetAnim(L"Land");
 				PlaySnd(L"PlayerLand", 1.0f, 0);
 				m_stateType = stand;
 			}
@@ -465,9 +465,23 @@ namespace basecross {
 	void Player::GrabEnemy() {
 		auto key = App::GetApp()->GetInputDevice().GetKeyState();
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto grab = m_pGrab.lock();
 
-		if (pad[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bPushKeyTbl['Q'] == true) {
+		if (m_grabTime == 0 && (pad[0].wPressedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bPressedKeyTbl['Q'] == true)) {
+			m_grabTime = m_grabTimeMax;
+		}
+
+		if (!(grab->IsHit())){
+			grab->SetCollActive(m_grabTime > 0);
+		}
+
+		if ((grab->IsHit()) && (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bUpKeyTbl['Q'] == true)) {
+			grab->SetCollActive(false);
+		}
+
+		if (grab->IsHit()) {
 			m_isCarrying = true;
+			m_grabTime = 0.0f;
 		}
 		else {
 			m_isCarrying = false;
@@ -498,14 +512,14 @@ namespace basecross {
 
 	void Player::Animate() {
 		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .13f) {
-			SetAnim(AddFire() + L"Idle");
+			SetAnim(AddPrefix() + L"Idle");
 		}
 		if (m_stateType == stand) {
 			if (abs(GetMoveVector().x) > 0)
-				SetAnim(AddFire() + L"Run");
+				SetAnim(AddPrefix() + L"Run");
 			else
 				if (GetDrawPtr()->GetCurrentAnimation() != L"Land" && GetDrawPtr()->GetCurrentAnimation() != L"Fire_Land") {
-					SetAnim(AddFire() + L"Idle");
+					SetAnim(AddPrefix() + L"Idle");
 				}
 		}
 		if (m_stateType == air && m_moveVel.y > 0)
@@ -569,13 +583,16 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Falling", 350, 20, true, anim_fps);
 		ptrDraw->AddAnimation(L"Land", 336, 4, false, anim_fps);
 		ptrDraw->AddAnimation(L"Walk", 100, 29, true, anim_fps);
+		ptrDraw->AddAnimation(L"Release", 242, 8, false, anim_fps);
+		//敵を持つ+行動
+		ptrDraw->AddAnimation(L"Grab_Idle", 375, 60, true, anim_fps);
+		ptrDraw->AddAnimation(L"Grab_Run", 260, 15, true, anim_fps);
 		//火炎放射+行動
 		ptrDraw->AddAnimation(L"Fire_Idle", 170, 60, true, anim_fps);
 		ptrDraw->AddAnimation(L"Fire_Run", 140, 19, true, 38.0f);//アニメーションを合わせるため
-		ptrDraw->AddAnimation(L"Fire_JumpStart", 0, 1, true, anim_fps);//330, 2, false, anim_fps);
-		ptrDraw->AddAnimation(L"Fire_Jumping", 0, 1, true, anim_fps);//332, 28, false, anim_fps);
-		ptrDraw->AddAnimation(L"Fire_Land", 0, 1, true, anim_fps);//360, 7, false, anim_fps);
-		ptrDraw->AddAnimation(L"Release", 242, 8, false, anim_fps);
+		//ptrDraw->AddAnimation(L"Fire_JumpStart", 0, 1, true, anim_fps);//330, 2, false, anim_fps);
+		//ptrDraw->AddAnimation(L"Fire_Jumping", 0, 1, true, anim_fps);//332, 28, false, anim_fps);
+		//ptrDraw->AddAnimation(L"Fire_Land", 336, 4, false, anim_fps);//360, 7, false, anim_fps);
 		//やられ・死亡
 		ptrDraw->AddAnimation(L"GetHit_Air", 280, 10, false, anim_fps);
 		ptrDraw->AddAnimation(L"GetHit_Stand", 280, 10, false, anim_fps);
@@ -610,6 +627,7 @@ namespace basecross {
 
 	//飛び道具を発射
 	void Player::Projectile() {
+		if (m_isCarrying == true) return;
 		Charging(false);
 		auto trans = GetComponent<Transform>();
 		auto pos = trans->GetPosition();
@@ -633,24 +651,24 @@ namespace basecross {
 	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え
-	void Player::SwitchFireAnim(const float time) {
+	void Player::SwitchAnim(const float time, const float condition, const wstring prefix) {
 		const float animTime = time;
 		auto draw = GetComponent<PNTBoneModelDraw>();
-		if (m_isCharging) {
-			vector<wstring> target = { (L"Idle"), (L"Run"), (L"Jump_Start"), (L"Jumping"), (L"Land") };
+		if (condition) {
+			vector<wstring> target = { (L"Idle"), (L"Run") };
 			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
-					wstring changeanim = L"Fire_" + anim;
+					wstring changeanim = prefix + L"_" + anim;
 					GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
 					return;
 				}
 			}
 		}
-		if (!m_isCharging) {
-			vector<wstring> target = { (L"Fire_Idle"), (L"Fire_Run"), (L"Fire_Jump_Start"), (L"Fire_Jumping"), (L"Fire_Land") };
+		if (!condition) {
+			vector<wstring> target = { (prefix + L"_Idle"), (prefix + L"_Run")};
 			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
-					wstring changeanim = anim.replace(0, 5, L"");
+					wstring changeanim = anim.replace(0, static_cast<int>(prefix.length()) + 1, L"");
 					GetDrawPtr()->ChangeCurrentAnimation(changeanim, animTime);
 					return;
 				}
@@ -669,15 +687,28 @@ namespace basecross {
 
 		auto coll = AddComponent<CollisionSphere>();
 		coll->SetAfterCollision(AfterCollision::None);
-		coll->SetDrawActive(true);//debug
+		coll->SetDrawActive(false);//debug
 		coll->AddExcludeCollisionTag(L"Player");
 		coll->AddExcludeCollisionTag(L"Attack");
+		coll->AddExcludeCollisionTag(L"EnemyFloor");
 
 		AddTag(L"PlayerGrab");
 	}
 
 	void PlayerGrab::OnUpdate() {
 		auto plPtr = m_player.lock();
+
+		//debug
+		if (false) {
+			bool update = GetComponent<CollisionSphere>()->GetUpdateActive();
+			GetComponent<CollisionSphere>()->SetDrawActive(update);
+		}
+
+		//判定を出さないときはヒット判定も消す
+		if (m_isHit && GetComponent<CollisionSphere>()->GetUpdateActive() == false) {
+			m_isHit = false;
+			m_target = nullptr;
+		}
 
 		if (plPtr) {
 			auto trans = GetComponent<Transform>();
@@ -689,27 +720,22 @@ namespace basecross {
 			distPlus.x = (cosf(plRot) * m_dist.x) - (sinf(plRot) * m_dist.z);
 			distPlus.y = m_dist.y;
 			distPlus.z = (cosf(plRot) * m_dist.z) + (sinf(plRot) * m_dist.x);
-
 			trans->SetPosition(plPos + distPlus);
+
+			//プレイヤーの向きに回転を合わせる
 			Vec3 r = Vec3(0);
 			r.y = -plRot;
 			trans->SetRotation(r);
 		}
 	}
 
-	void PlayerGrab::OnCollisionExcute(shared_ptr<GameObject>& Other) {
+	void PlayerGrab::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		if (Other->FindTag(L"Enemy")) {
-			auto m_target = dynamic_pointer_cast<Enemy>(Other);
-			if (m_target->GetOverHeat() == false) {
-				m_isHit = false;
+			m_target = dynamic_pointer_cast<Enemy>(Other);
+			if (m_target->GetOverHeat() == true && !m_isHit) {
+				m_isHit = true;
 				return;
 			}
-			m_isHit = true;
-		}
-	}
-	void PlayerGrab::OnCollisionExit(shared_ptr<GameObject>& Other) {
-		if (Other->FindTag(L"Enemy")) {
-			m_isHit = false;
 		}
 	}
 
@@ -859,7 +885,7 @@ namespace basecross {
 		SetDrawLayer(m_layer);
 		SetAlphaActive(true);
 
-		GetComponent<Transform>()->SetPosition(windowWidth * -.52, windowHeight * .5, 0);
+		GetComponent<Transform>()->SetPosition(windowWidth * -.6, windowHeight * .525, 0);
 
 		if (m_resKey == L"PLAYERUI") {
 			m_health = GetStage()->AddGameObject<SpriteHealth>(m_player.lock(), GetThis<SpritePlayerUI>());
