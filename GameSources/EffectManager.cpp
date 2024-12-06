@@ -16,13 +16,13 @@ namespace basecross {
 		m_Effect(nullptr)
 	{
 		try {
-			if (m_FileName == L"") {
-				throw BaseException(
-					L"エフェクトファイル名が空白です。",
-					L"if (m_FileName == L\"\")",
-					L"EfkEffect::EfkEffect()"
-				);
-			}
+			//if (m_FileName == L"") {
+			//	throw BaseException(
+			//		L"エフェクトファイル名が空白です。",
+			//		L"if (m_FileName == L\"\")",
+			//		L"EfkEffect::EfkEffect()"
+			//	);
+			//}
 			auto m_Efk = m_EfkInterface.lock();
 			m_manager = m_Efk->m_Manager;
 			// エフェクトの読込
