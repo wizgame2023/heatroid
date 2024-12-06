@@ -135,7 +135,6 @@ namespace basecross {
 		if (m_open && m_flag == false)
 		{
 			PlaySE(L"SwitchSE", 0, 1.0);
-			EfectPlay();
 			m_flag = true;
 			time += ElapsedTime;
 			if (time > 5.0f || m_open == false)
@@ -155,7 +154,7 @@ namespace basecross {
 		auto pos = GetComponent<Transform>()->GetPosition();
 		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
 		auto ShEfkInterface = stageMane->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos);
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos, 0);
 		m_EfkPlay->SetScale(Vec3(2, 2, 2));
 		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
 	}

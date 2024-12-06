@@ -147,6 +147,10 @@ namespace basecross {
 			void SetButton(const bool& open)
 			{
 				m_open = open;
+				if (open == true)
+				{
+					EfectPlay();
+				}
 			}
 			//swich”»•Ê
 			int GetSwitch()
