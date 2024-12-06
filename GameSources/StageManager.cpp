@@ -123,7 +123,7 @@ namespace basecross {
 			//各値がそろったのでオブジェクト作成
 			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x / 1, Scale.z / 1, Tokens[10]);
 			ptrFloor->AddTag(L"Floor");
-			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
+			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(false);
 		}
 		m_GameStage.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
