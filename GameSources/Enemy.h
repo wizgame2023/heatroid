@@ -166,6 +166,7 @@ namespace basecross {
 		float GetHeatRatio();
 		bool GetOverHeat();
 		void SetPlungeFlag(bool flag);
+		void SetBulletDirec(Vec2 direc);
 
 	protected:
 		//d—Í‚ÉŠÖ‚·‚éŠÖ”
