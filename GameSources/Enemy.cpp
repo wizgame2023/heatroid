@@ -699,7 +699,7 @@ namespace basecross {
 		}
 	}
 	void Enemy::EffectPlay() {
-		m_EfkPlayer = ObjectFactory::Create<EfkPlay>(m_efkEffect, m_pos);
+		m_EfkPlayer = ObjectFactory::Create<EfkPlay>(m_efkEffect, m_pos, 0.0f);
 		m_EfkPlayer->SetScale(Vec3(1.0f, 1.0f, 1.0f));
 		m_EfkPlayer->SetAllColor(Col4(1.0f));
 	}
