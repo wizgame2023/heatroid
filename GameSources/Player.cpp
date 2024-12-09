@@ -798,6 +798,16 @@ namespace basecross {
 
 	void FireProjectile::OnCreate() {
 
+		//ステージマネージャ
+		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+
+		//エフェクト読み込み
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		wstring TestEffectStr = DataDir + L"Effects\\playerproj.efk";
+		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
+
 		auto trans = GetComponent<Transform>();
 		trans->SetScale(Vec3(8.0f));
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
@@ -813,6 +823,7 @@ namespace basecross {
 		auto ptrDraw = AddComponent<PNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetBlendState(BlendState::Additive);
+		ptrDraw->SetDrawActive(false);//debug
 
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(
@@ -829,12 +840,28 @@ namespace basecross {
 
 		m_speed = (m_speed * m_power) + m_speedBase;
 		m_range = m_rangeMax;
+
 	}
 
 	void FireProjectile::OnUpdate() {
-		auto delta = App::GetApp()->GetElapsedTime();
-
 		auto trans = GetComponent<Transform>();
+
+		//エフェクトのプレイ
+		if(m_playTime <= 0.0f)
+		{
+			auto fwd = -1 * trans->GetForward();
+			auto face = atan2f(fwd.z, fwd.x);
+
+			auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+			m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, trans->GetPosition());
+			m_EfkPlay->SetRotation(Vec3(0, 1, 0), -face);
+			m_EfkPlay->SetScale(Vec3(.8f));
+		}
+
+		auto delta = App::GetApp()->GetElapsedTime();
+		m_playTime += delta;
+
+		m_EfkPlay->SetLocation(trans->GetPosition());
 
 		if (!m_stopped) {
 			trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
