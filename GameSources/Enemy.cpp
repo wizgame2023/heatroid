@@ -740,9 +740,11 @@ namespace basecross {
 			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(anime);
 		}
 	}
+
 	//エフェクトの再生
 	void Enemy::EffectPlay(const shared_ptr<EfkEffect>& efk) {
 		m_EfkPlayer = ObjectFactory::Create<EfkPlay>(efk, m_pos);
+
 		m_EfkPlayer->SetScale(Vec3(1.0f, 1.0f, 1.0f));
 		m_EfkPlayer->SetAllColor(Col4(1.0f));
 	}

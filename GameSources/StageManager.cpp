@@ -123,7 +123,7 @@ namespace basecross {
 			//各値がそろったのでオブジェクト作成
 			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x / 1, Scale.z / 1, Tokens[10]);
 			ptrFloor->AddTag(L"Floor");
-			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
+			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(false);
 		}
 		m_GameStage.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -347,7 +347,7 @@ namespace basecross {
 				Enemy::State stateAfter;
 				vector<wstring> Tokens;
 				Util::WStrToTokenVector(Tokens, v, L',');
-				Vec3 Scale(3,3,3);
+				Vec3 Scale(3, 3, 3);
 				Vec3 Rot;
 				Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
 				Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
@@ -386,6 +386,31 @@ namespace basecross {
 					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
 					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 					group->IntoGroup(enemy);
+					if (Tokens[12] == L"X")
+					{
+						Vec2 X = Vec2(1, 0);
+						enemy->SetBulletDirec(Vec2(X));
+						if (Pos.z < 0)
+						{
+							enemy->GetComponent<Transform>()->SetRotation(0, 0, 0);
+						}
+						else {
+							enemy->GetComponent<Transform>()->SetRotation(0, 180, 0);
+						}
+					}
+					else if (Tokens[12] == L"Z")
+					{
+						Vec2 Z = Vec2(0, 1);
+						enemy->SetBulletDirec(Vec2(Z));
+					}
+				}
+				else if (Tokens[10] == L"Enemy::slide" && Tokens[11] == L"Enemy::stay") {
+					stateBefore = Enemy::slide;
+					stateAfter = Enemy::stay;
+					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+					group->IntoGroup(enemy);
+
 				}
 			}
 		}
@@ -417,8 +442,8 @@ namespace basecross {
 			}
 
 		}
-	}
 
+	}
 	void StageManager::OnCreate() {
 		try {
 			//エフェクト作成
