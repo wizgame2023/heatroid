@@ -194,16 +194,19 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class StraightXBullet : public GameObject; //íºê¸Ç…íµÇ‘íe
+	//	class EnemyBullet : public GameObject; //íe
 	//--------------------------------------------------------------------------------------
 	class EnemyBullet : public GameObject {
 	protected:
+		float m_colTime;
+		bool m_playerColFlag;
 		shared_ptr<PNTStaticDraw> m_draw;
 
 	public:
 		EnemyBullet(const shared_ptr<Stage>& stage);
 		virtual ~EnemyBullet() {};
 		virtual void OnCreate();
+		virtual void OnUpdate();
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);
 		void SetColor(Col4 color);
 		void ThisDestroy();
