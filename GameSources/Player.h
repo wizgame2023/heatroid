@@ -291,6 +291,16 @@ namespace basecross {
 	//====================================================================
 
 	class FireProjectile : public GameObject {
+		//ステージマネージャ
+		shared_ptr<StageManager> m_stageMgr;
+
+		//エフェクト
+		shared_ptr<EfkEffect> m_EfkEffect;
+		//エフェクト実行オブジェクト
+		shared_ptr<EfkPlay> m_EfkPlay;
+
+		float m_playTime = 0;
+
 		//どれくらいの位置からスタートするか
 		Vec3 m_dist;
 		//速度と方向

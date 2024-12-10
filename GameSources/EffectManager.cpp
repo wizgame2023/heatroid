@@ -65,9 +65,14 @@ namespace basecross {
 		}
 	}
 
+
 	void EfkPlay::SetRotation(const bsm::Vec3& Location, const float angle)
 	{
 		m_Manager->SetRotation(m_handle, ::Effekseer::Vector3D(Location.x, Location.y, Location.z), angle);
+	}
+
+	void EfkPlay::SetLocation(const bsm::Vec3& Location) {
+		m_Manager->SetLocation(m_handle, Location.x, Location.y, Location.z);
 	}
 
 	void EfkPlay::SetScale(const bsm::Vec3& Scale)
