@@ -38,6 +38,7 @@ namespace basecross {
 		m_upHeight(10.0f),
 		m_jumpPower(5.0f),
 		m_jumpTime(1.0f),
+		m_rad(0.0f),
 		m_dicUp(0),
 		m_direcNorm(Vec3(0.0f)),
 		m_dropTime(4.0f),
@@ -107,10 +108,16 @@ namespace basecross {
 		m_maxHitDropTime(m_hitDropTime),
 		m_spareTime(0.75f),
 		m_maxSpareTime(m_spareTime),
-		m_bulletTime(5.0f),
+		m_bulletTime(0.1f),
 		m_maxBulletTime(m_bulletTime),
-		m_trackingRange(20.0f),
+		m_pBulletTime(3.0f),
+		m_maxPbulletTime(m_pBulletTime),
+		m_bulletCnt(0),
+		m_bulletRangeTime(5.0f),
+		m_maxBulletRangeTime(m_bulletRangeTime),
+		m_trackingRange(30.0f),
 		m_firstDirec(Vec3(0.0f)),
+		m_bulletDic(Vec2(0.0f, 1.0f)),
 		m_gravity(-9.8f),
 		m_grav(Vec3(0.0f, m_gravity, 0.0f)),
 		m_gravVel(Vec3(0.0f)),
@@ -123,6 +130,7 @@ namespace basecross {
 		m_hitDropFlag(false),
 		m_plungeFlag(false),
 		m_pGrabFlag(false),
+		m_playerFlag(false),
 		m_overHeatSE(false),
 		m_plungeSE(false)
 	{}
@@ -187,6 +195,7 @@ namespace basecross {
 		m_draw->AddAnimation(L"kaihi", 40, 60, true, 30);
 		m_draw->AddAnimation(L"hassya", 100, 10, false, 30);
 		m_draw->AddAnimation(L"overheat", 120, 30, false, 30);
+		m_draw->AddAnimation(L"stand2", 160, 20, false, 30);
 
 		m_draw->ChangeCurrentAnimation(L"walk");
 		//衝突判定
@@ -323,10 +332,16 @@ namespace basecross {
 			RapidFireBullet(3);
 			break;
 		case wait:
-			EnemyAnime(L"stand");
+			if (m_fastState == slide) {
+				EnemyAnime(L"stand2");
+			}
+			else {
+				EnemyAnime(L"stand");
+			}
 			if (!m_overHeatSE) {
-				EffectPlay(m_eyeEffect);
-				PlaySE(L"EnemyRevival");
+				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, 0.5f)),1,Vec3(0.5f));
+				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, -0.5f)),2, Vec3(0.5f));
+				PlaySE(L"EnemyRevival",2.0f);
 				m_overHeatSE = true;
 			}
 			m_spareTime -= elapsed;
@@ -409,12 +424,24 @@ namespace basecross {
 			m_trans->SetRotation(Vec3(0.0f, -m_angle+rad, 0.0f));
 		}
 	}
+	Vec3 Enemy::GetEyePos(const Vec3& eye) {
+		Vec3 pos = m_pos;
+		Vec3 forward = m_trans->GetForward();
+		float face = atan2f(forward.z, forward.x);
+		Vec3 eyePos;
+		eyePos.x = (cosf(face) * eye.x) - (sinf(face) * eye.z);
+		eyePos.y = eye.y;
+		eyePos.z = (cosf(face) * eye.z) + (sinf(face) * eye.x);
+		eyePos = eyePos * m_scal / 2;
+		pos += eyePos;
+		return pos;
+	}
 	//オーバーヒート
 	void Enemy::OverHeat() {
 		float elapsed = App::GetApp()->GetElapsedTime();
 		if (m_heat >= m_maxHeat) {
 			m_stateType = m_overHeatState;
-			EffectPlay(m_heatEffect);
+			EffectPlay(m_heatEffect,m_pos,3);
 		}
 		if (m_heat > 0.0f) {
 			m_heat -= elapsed * 5;
@@ -642,7 +669,7 @@ namespace basecross {
 			m_deathPos = m_pos;
 			m_heat = m_maxHeat;
 			if (!m_overHeatSE) {
-				PlaySE(L"OverHeatSE");
+				PlaySE(L"OverHeatSE",5.0f);
 				m_overHeatSE = true;
 			}
 		}
@@ -742,11 +769,12 @@ namespace basecross {
 	}
 
 	//エフェクトの再生
-	void Enemy::EffectPlay(const shared_ptr<EfkEffect>& efk) {
-		m_EfkPlayer = ObjectFactory::Create<EfkPlay>(efk, m_pos);
+	void Enemy::EffectPlay(const shared_ptr<EfkEffect>& efk,const Vec3& pos, 
+		const int num, const Vec3& scale) {
+		m_EfkPlayer[num - 1] = ObjectFactory::Create<EfkPlay>(efk, pos, 0.0f);
 
-		m_EfkPlayer->SetScale(Vec3(1.0f, 1.0f, 1.0f));
-		m_EfkPlayer->SetAllColor(Col4(1.0f));
+		m_EfkPlayer[num - 1]->SetScale(scale);
+		m_EfkPlayer[num - 1]->SetAllColor(Col4(1.0f));
 	}
 	//デバック
 	void Enemy::Debug() {
@@ -893,13 +921,15 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	EnemyBullet::EnemyBullet(const shared_ptr<Stage>& stage
 	):
-		GameObject(stage)
+		GameObject(stage),
+		m_colTime(0.0f),
+		m_playerColFlag(false)
 	{}
 	void EnemyBullet::OnCreate() {
 		m_draw = AddComponent<PNTStaticDraw>();
 		m_draw->SetMeshResource(L"DEFAULT_SPHERE");
-		m_draw->SetTextureResource(L"White");
-		m_draw->SetDiffuse(Col4(0.0f, 0.0f, 1.0f, 1.0f));
+		m_draw->SetTextureResource(L"AreaDoorBLUCK");
+		m_draw->SetDiffuse(Col4(1.0f, 1.0f, 1.0f, 1.0f));
 
 		//衝突判定
 		auto ptrColl = AddComponent<CollisionSphere>();
@@ -919,7 +949,8 @@ namespace basecross {
 	}
 	void EnemyBullet::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
-			ThisDestroy();
+			m_playerColFlag = true;
+			m_draw->SetDrawActive(false);
 		}
 		if (other->FindTag(L"Wall")) {
 			ThisDestroy();
@@ -927,8 +958,21 @@ namespace basecross {
 		if (other->FindTag(L"Floor")) {
 			ThisDestroy();
 		}
+		if (other->FindTag(L"GimmickDoor")) {
+			ThisDestroy();
+		}
 	}
-
+	void EnemyBullet::OnUpdate() {
+		float elapsed = App::GetApp()->GetElapsedTime();
+		if (m_playerColFlag) {
+			m_colTime += elapsed;
+		}
+		if (m_colTime >= 0.1f) {
+			ThisDestroy();
+			m_playerColFlag = false;
+			m_colTime = 0.0f;
+		}
+	}
 	//--------------------------------------------------------------------------------------
 	//	class StraightXBullet : public EnemyBullet;  
 	//--------------------------------------------------------------------------------------
@@ -957,6 +1001,7 @@ namespace basecross {
 
 	}
 	void StraightBullet::OnUpdate() {
+		EnemyBullet::OnUpdate();
 		float elapsed = App::GetApp()->GetElapsedTime();
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
@@ -1037,6 +1082,7 @@ namespace basecross {
 		m_trans->SetPosition(m_pos);
 	}
 	void ParabolaBullet::OnUpdate() {
+		EnemyBullet::OnUpdate();
 		Grav();
 		auto elapsed = App::GetApp()->GetElapsedTime();
 
