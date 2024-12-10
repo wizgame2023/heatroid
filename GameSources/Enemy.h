@@ -115,7 +115,7 @@ namespace basecross {
 		//エフェクト
 		shared_ptr<EfkEffect> m_heatEffect;
 		shared_ptr<EfkEffect> m_eyeEffect;
-		shared_ptr<EfkPlay> m_EfkPlayer;
+		shared_ptr<EfkPlay> m_EfkPlayer[3];
 
 
 	public:
@@ -161,7 +161,9 @@ namespace basecross {
 		void EnemyAnime(wstring anime);
 		void OverHeat();
 		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
-		void EffectPlay(const shared_ptr<EfkEffect>& efk);
+		void EffectPlay(const shared_ptr<EfkEffect>& efk,
+			const Vec3& pos,const int num,const Vec3& scale=Vec3(1.0f));
+		Vec3 GetEyePos(const Vec3& eye);
 		void Debug();
 	public:
 		//get,set

@@ -187,6 +187,7 @@ namespace basecross {
 		m_draw->AddAnimation(L"kaihi", 40, 60, true, 30);
 		m_draw->AddAnimation(L"hassya", 100, 10, false, 30);
 		m_draw->AddAnimation(L"overheat", 120, 30, false, 30);
+		m_draw->AddAnimation(L"stand2", 160, 20, false, 30);
 
 		m_draw->ChangeCurrentAnimation(L"walk");
 		//衝突判定
@@ -323,10 +324,16 @@ namespace basecross {
 			RapidFireBullet(3);
 			break;
 		case wait:
-			EnemyAnime(L"stand");
+			if (m_fastState == slide) {
+				EnemyAnime(L"stand2");
+			}
+			else {
+				EnemyAnime(L"stand");
+			}
 			if (!m_overHeatSE) {
-				EffectPlay(m_eyeEffect);
-				PlaySE(L"EnemyRevival");
+				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, 0.5f)),1,Vec3(0.5f));
+				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, -0.5f)),2, Vec3(0.5f));
+				PlaySE(L"EnemyRevival",2.0f);
 				m_overHeatSE = true;
 			}
 			m_spareTime -= elapsed;
@@ -409,15 +416,27 @@ namespace basecross {
 			m_trans->SetRotation(Vec3(0.0f, -m_angle+rad, 0.0f));
 		}
 	}
+	Vec3 Enemy::GetEyePos(const Vec3& eye) {
+		Vec3 pos = m_pos;
+		Vec3 forward = m_trans->GetForward();
+		float face = atan2f(forward.z, forward.x);
+		Vec3 eyePos;
+		eyePos.x = (cosf(face) * eye.x) - (sinf(face) * eye.z);
+		eyePos.y = eye.y;
+		eyePos.z = (cosf(face) * eye.z) + (sinf(face) * eye.x);
+		eyePos = eyePos * m_scal / 2;
+		pos += eyePos;
+		return pos;
+	}
 	//オーバーヒート
 	void Enemy::OverHeat() {
 		float elapsed = App::GetApp()->GetElapsedTime();
 		if (m_heat >= m_maxHeat) {
 			m_stateType = m_overHeatState;
-			EffectPlay(m_heatEffect);
+			EffectPlay(m_heatEffect,m_pos,3);
 		}
 		if (m_heat > 0.0f) {
-			m_heat -= elapsed * 5;
+			m_heat -= elapsed * 50;
 			
 		}
 		else if (GetOverHeat()&&m_heat <= 0.0f) {
@@ -642,7 +661,7 @@ namespace basecross {
 			m_deathPos = m_pos;
 			m_heat = m_maxHeat;
 			if (!m_overHeatSE) {
-				PlaySE(L"OverHeatSE");
+				PlaySE(L"OverHeatSE",5.0f);
 				m_overHeatSE = true;
 			}
 		}
@@ -742,11 +761,12 @@ namespace basecross {
 	}
 
 	//エフェクトの再生
-	void Enemy::EffectPlay(const shared_ptr<EfkEffect>& efk) {
-		m_EfkPlayer = ObjectFactory::Create<EfkPlay>(efk, m_pos,0.0f);
+	void Enemy::EffectPlay(const shared_ptr<EfkEffect>& efk,const Vec3& pos, 
+		const int num, const Vec3& scale) {
+		m_EfkPlayer[num - 1] = ObjectFactory::Create<EfkPlay>(efk, pos, 0.0f);
 
-		m_EfkPlayer->SetScale(Vec3(1.0f, 1.0f, 1.0f));
-		m_EfkPlayer->SetAllColor(Col4(1.0f));
+		m_EfkPlayer[num - 1]->SetScale(scale);
+		m_EfkPlayer[num - 1]->SetAllColor(Col4(1.0f));
 	}
 	//デバック
 	void Enemy::Debug() {
