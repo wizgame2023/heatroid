@@ -55,6 +55,7 @@ namespace basecross {
 		m_bulletRangeTime(5.0f),
 		m_maxBulletRangeTime(m_bulletRangeTime),
 		m_trackingRange(30.0f),
+		m_efcTime(0.0f),
 		m_firstDirec(Vec3(0.0f)),
 		m_bulletDic(Vec2(0.0f, 1.0f)),
 		m_gravity(-9.8f),
@@ -116,6 +117,7 @@ namespace basecross {
 		m_bulletRangeTime(5.0f),
 		m_maxBulletRangeTime(m_bulletRangeTime),
 		m_trackingRange(30.0f),
+		m_efcTime(2.0f),
 		m_firstDirec(Vec3(0.0f)),
 		m_bulletDic(Vec2(0.0f, 1.0f)),
 		m_gravity(-9.8f),
@@ -160,7 +162,6 @@ namespace basecross {
 				Vec3(0.0f, -0.5f, 0.0f)
 			);
 			m_draw->SetMeshToTransformMatrix(meshMat);
-
 		}
 		else {
 			Mat4x4 meshMat;
@@ -441,10 +442,15 @@ namespace basecross {
 		float elapsed = App::GetApp()->GetElapsedTime();
 		if (m_heat >= m_maxHeat) {
 			m_stateType = m_overHeatState;
-			EffectPlay(m_heatEffect,m_pos,3);
+			//EffectPlay(m_heatEffect,m_pos,3);
 		}
 		if (m_heat > 0.0f) {
 			m_heat -= elapsed * 5;
+			m_efcTime -= elapsed;
+			if (m_efcTime <= 0.0f&&m_heat>=20.0f) {
+				EffectPlay(m_heatEffect, m_pos, 3);
+				m_efcTime = 2.0f;
+			}
 			
 		}
 		else if (GetOverHeat()&&m_heat <= 0.0f) {
