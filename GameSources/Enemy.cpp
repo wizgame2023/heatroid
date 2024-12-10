@@ -436,7 +436,7 @@ namespace basecross {
 			EffectPlay(m_heatEffect,m_pos,3);
 		}
 		if (m_heat > 0.0f) {
-			m_heat -= elapsed * 50;
+			m_heat -= elapsed * 5;
 			
 		}
 		else if (GetOverHeat()&&m_heat <= 0.0f) {
