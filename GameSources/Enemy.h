@@ -46,8 +46,11 @@ namespace basecross {
 		float m_jumpHight;     //ジャンプする高さ
 		float m_bulletTime;    //弾の発射間隔
 		float m_maxBulletTime; //↑の最大値
+		float m_pBulletTime;
+		float m_maxPbulletTime;
 		int m_bulletCnt;
-		float m_bulletTime2;
+		float m_bulletRangeTime;//弾の発射クールタイム
+		float m_maxBulletRangeTime;//↑の最大値
 		float m_trackingRange; //弾を発射する距離
 		float m_dropTime;      //ヒットドロップまでの時間
 		float m_maxDropTime;   //↑の最大値
@@ -55,11 +58,13 @@ namespace basecross {
 		float m_maxHitDropTime;//↑の最大値
 		float m_spareTime;    //突っ込みの予備時間
 		float m_maxSpareTime; //↑の最大値
+		float m_rad;
 		int m_dicUp;
 		Vec3 m_direc;
 		Vec3 m_direcNorm;
 		Vec3 m_firstDirec;
 		Vec3 m_moveRot;
+		Vec2 m_bulletDic;
 		//テスト用
 		float m_test;
 
@@ -72,6 +77,8 @@ namespace basecross {
 		bool m_plungeFlag;
 		bool m_pGrabFlag;
 		bool m_playerFlag;
+		bool m_overHeatSE;
+		bool m_plungeSE;
 
 		wstring m_meshName;
 
@@ -97,6 +104,7 @@ namespace basecross {
 		Vec3 m_jumpPos;
 
 		shared_ptr<Transform> m_trans;
+		shared_ptr<PNTBoneModelDraw> m_draw;
 		shared_ptr<EnemyFloorCol> m_floorCol;
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
@@ -104,7 +112,11 @@ namespace basecross {
 		shared_ptr<CollisionObb> m_collision;
 		weak_ptr<TilingFixedBox> m_fixedBox;
 		weak_ptr<PlayerGrab> m_playerGrab;
-		
+		//エフェクト
+		shared_ptr<EfkEffect> m_heatEffect;
+		shared_ptr<EfkEffect> m_eyeEffect;
+		shared_ptr<EfkPlay> m_EfkPlayer;
+
 
 	public:
 		// 構築と破棄
@@ -131,6 +143,7 @@ namespace basecross {
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
 		void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
+	protected:
 		void EnemyJump();
 		void HipDropJump();
 		void ThisDestroy();
@@ -144,10 +157,13 @@ namespace basecross {
 		void Grab();
 		void FallBullet();
 		void StraightXBullet();
+		void RapidFireBullet(int bulletNum);
 		void EnemyAnime(wstring anime);
 		void OverHeat();
-		void PlayerSE(wstring path, float volume = 1.0f, float loopcnt = 0);
+		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
+		void EffectPlay(const shared_ptr<EfkEffect>& efk);
 		void Debug();
+	public:
 		//get,set
 		float GetAngle();
 		void SetEnemyFlayFlag(bool flag);
@@ -162,6 +178,7 @@ namespace basecross {
 		float GetHeatRatio();
 		bool GetOverHeat();
 		void SetPlungeFlag(bool flag);
+		void SetBulletDirec(Vec2 direc);
 
 	protected:
 		//重力に関する関数
@@ -252,6 +269,8 @@ namespace basecross {
 		Vec3 m_pos;
 		Vec3 m_enemyPos;
 		Vec3 m_enemyScal;
+
+		bool m_playerFlag;
 		shared_ptr<Transform> m_trans;
 		weak_ptr<Enemy> m_enemy;
 
@@ -262,7 +281,10 @@ namespace basecross {
 		virtual ~EnemyFloorCol(){}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);
+		virtual void OnCollisionExit(shared_ptr<GameObject>& other);
 		void ThisDestroy();
+		bool GetPlayerFlag();
 	};
 
 }

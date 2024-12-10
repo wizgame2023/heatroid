@@ -61,7 +61,7 @@ namespace basecross {
 			GamePause();
 			if (KeyState.m_bPressedKeyTbl[VK_TAB])
 			{
-				EffectPlay();
+				//EffectPlay();
 			}
 		}
 	}
@@ -204,7 +204,7 @@ namespace basecross {
 	{
 		auto stageMane = GetSharedGameObject<StageManager>(L"StageManager");
 		auto ShEfkInterface = stageMane->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0));
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0),0.0f);
 		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
 
 		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -243,8 +243,8 @@ namespace basecross {
 			ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
 			ptrStageManager->CreatePlayer();
 			ptrStageManager->CreateViewLight();
-			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateFixedBox();
+			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateSprite();
 			ptrStageManager->CreateGimmick();
 		}

@@ -117,27 +117,68 @@ namespace basecross {
 
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		group->IntoGroup(GetThis<GameObject>());
+		//エフェクトの初期化
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		wstring TestEffectStr = DataDir + L"Effects\\Switch.efk";
+		wstring TestEffectStrLoop = DataDir + L"Effects\\SwitchLoop.efk";
+		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto ShEfkInterface = stageMane->GetEfkInterface();
+		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
+		m_EfkEffectLoop = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStrLoop);
 	}
 	
 	void GimmickButton::OnUpdate()
 	{
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
-		float time = 0;
 		if (m_open && m_flag == false)
 		{
 			PlaySE(L"SwitchSE", 0, 1.0);
+			EfectPlay();
 			m_flag = true;
 			time += ElapsedTime;
-			if (time > 5.0f)
-			{
-				m_flag = false;
-			}
+		}
+		if (time > 5.0f || m_open == false)
+		{
+			m_flag = false;
+			time = 0.0f;
 		}
 	}
 
 	void GimmickButton::PlaySE(wstring path, float loopcnt, float volume) {
 		auto playSE = App::GetApp()->GetXAudio2Manager();
 		playSE->Start(path, loopcnt, volume);
+	}
+
+	void GimmickButton::EfectPlay()
+	{
+		auto pos = GetComponent<Transform>()->GetPosition();
+		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto ShEfkInterface = stageMane->GetEfkInterface();
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos, 0);
+		m_EfkPlay->SetScale(Vec3(2, 2, 2));
+		if (m_Texname == L"BLUCKSWITCH")
+		{
+			m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
+		}
+		else if (m_Texname == L"BLUESWITCH")
+		{
+			m_EfkPlay->SetAllColor(Col4(0.0f, 1.0f, 1.0f, 0.5f));
+		}
+		else if (m_Texname == L"REDSWITCH")
+		{
+			m_EfkPlay->SetAllColor(Col4(1.0f, 0.0f, 0.25f, 0.5f));
+		}
+	}
+
+	void GimmickButton::EfectLoopPlay()
+	{
+		auto pos = GetComponent<Transform>()->GetPosition();
+		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto ShEfkInterface = stageMane->GetEfkInterface();
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffectLoop, pos, 0);
+		m_EfkPlay->SetScale(Vec3(2, 2, 2));
+		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
 	}
 
 

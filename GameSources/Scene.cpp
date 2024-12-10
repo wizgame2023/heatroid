@@ -37,8 +37,8 @@ namespace basecross{
 		app->RegisterResource(L"ENEMYARUKU", enemyAruki);
 		auto enemyTobi = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_TOBU.bmf");
 		app->RegisterResource(L"ENEMYTOBU", enemyTobi);
-
-
+		auto enemyYoko = MeshResource::CreateBoneModelMesh(mdlPath, L"ZAKO_YOKOIDOU.bmf");
+		app->RegisterResource(L"ENEMYYOKO", enemyYoko);
 
 		//ステージオブジェクトのモデル
 		auto door = MeshResource::CreateBoneModelMesh(mdlPath, L"Door.bmf");
@@ -109,8 +109,15 @@ namespace basecross{
 
 		//サウンド
 		//SE
-		wstring soundWav = sdPath + L"OverHeatSE.wav";
+		//敵
+		wstring soundWav = sdPath + L"OverHeat.wav";
 		App::GetApp()->RegisterWav(L"OverHeatSE", soundWav);
+		soundWav = sdPath + L"EnemyAttack.wav";
+		App::GetApp()->RegisterWav(L"EnemyAttack", soundWav);
+		soundWav = sdPath + L"EnemyDash.wav";
+		App::GetApp()->RegisterWav(L"EnemyDash", soundWav);
+		soundWav = sdPath + L"EnemyRevival.wav";
+		App::GetApp()->RegisterWav(L"EnemyRevival", soundWav);
 		
 		soundWav = sdPath + L"PlayerJump.wav";
 		App::GetApp()->RegisterWav(L"PlayerJump", soundWav);

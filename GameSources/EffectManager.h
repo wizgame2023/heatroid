@@ -32,7 +32,6 @@ namespace basecross {
 		friend class EfkPlay;
 	public:
 		Effekseer::EffectRef m_Effect;
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	コンスラトクタ
@@ -70,7 +69,7 @@ namespace basecross {
 		@param[in]	Emitter	エミッター
 		*/
 		//--------------------------------------------------------------------------------------
-		EfkPlay(const shared_ptr<EfkEffect>& effect, const bsm::Vec3& Emitter);
+		EfkPlay(const shared_ptr<EfkEffect>& effect, const bsm::Vec3& Emitter, const float freme);
 		virtual ~EfkPlay();
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -98,6 +97,8 @@ namespace basecross {
 		void SetRotation(const bsm::Vec3& Rotation, const float angle);
 		void SetScale(const bsm::Vec3& Scale);
 		void SetAllColor(const bsm::Col4 color);
+		void SetLoop(const bool  loop);
+		void SetLoopStop();
 	};
 
 
@@ -152,6 +153,7 @@ namespace basecross {
 		*/
 		//--------------------------------------------------------------------------------------
 		virtual void OnDraw()override;
+
 	};
 
 

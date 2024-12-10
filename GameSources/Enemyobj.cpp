@@ -52,7 +52,7 @@ namespace basecross {
 		float elapsed = App::GetApp()->GetApp()->GetElapsedTime();
 		m_plungeTime -= elapsed;
 
-		if (!GetOverHeat()) {
+		if (!GetOverHeat() && m_stateType != wait) {
 			if (m_plungeTime >= 0.0f) {
 				EnemyAnime(L"spare");
 				SetState(m_attackState);
@@ -83,4 +83,20 @@ namespace basecross {
 			<< endl;
 		scene->SetDebugString(wss.str());
 	}
+	EnemyBulletChase::EnemyBulletChase(const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotatoin,
+		const Vec3& scale,
+		const State& state,
+		const State& overHeatState,
+		const shared_ptr<Player>& player
+	):
+		Enemy(stage, position, rotatoin, scale, state, overHeatState,player)
+	{}
+	void EnemyBulletChase::OnCreate() {
+		m_meshName = L"ENEMYTOBU";
+		Enemy::OnCreate();
+
+	}
+
 }

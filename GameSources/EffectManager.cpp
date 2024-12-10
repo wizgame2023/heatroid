@@ -42,12 +42,13 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	///	EffekseerエフェクトのPlayオブジェクト
 	//--------------------------------------------------------------------------------------
-	EfkPlay::EfkPlay(const shared_ptr<EfkEffect>& effect, const bsm::Vec3& Emitter) :
+	EfkPlay::EfkPlay(const shared_ptr<EfkEffect>& effect, const bsm::Vec3& Emitter, const float freme) :
 		m_handle(-1)
 	{
 		try {
 			m_Manager = effect->m_manager;
-			m_handle = m_Manager->Play(effect->m_Effect, Emitter.x, Emitter.y, Emitter.z);
+			int32_t Freme = freme;
+			m_handle = m_Manager->Play(effect->m_Effect, ::Effekseer::Vector3D(Emitter.x, Emitter.y, Emitter.z), Freme);
 		}
 		catch (...) {
 			throw;
