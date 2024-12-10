@@ -77,6 +77,8 @@ namespace basecross {
 		bool m_plungeFlag;
 		bool m_pGrabFlag;
 		bool m_playerFlag;
+		bool m_overHeatSE;
+		bool m_plungeSE;
 
 		wstring m_meshName;
 
@@ -104,15 +106,17 @@ namespace basecross {
 		shared_ptr<Transform> m_trans;
 		shared_ptr<PNTBoneModelDraw> m_draw;
 		shared_ptr<EnemyFloorCol> m_floorCol;
-		shared_ptr<EfkEffect> m_efkEffect;
-		shared_ptr<EfkPlay> m_EfkPlayer;
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<FixedBox> m_box;
 		shared_ptr<CollisionObb> m_collision;
 		weak_ptr<TilingFixedBox> m_fixedBox;
 		weak_ptr<PlayerGrab> m_playerGrab;
-		
+		//エフェクト
+		shared_ptr<EfkEffect> m_heatEffect;
+		shared_ptr<EfkEffect> m_eyeEffect;
+		shared_ptr<EfkPlay> m_EfkPlayer;
+
 
 	public:
 		// 構築と破棄
@@ -156,8 +160,8 @@ namespace basecross {
 		void RapidFireBullet(int bulletNum);
 		void EnemyAnime(wstring anime);
 		void OverHeat();
-		void PlayerSE(wstring path, float volume = 1.0f, float loopcnt = 0);
-		void EffectPlay();
+		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
+		void EffectPlay(const shared_ptr<EfkEffect>& efk);
 		void Debug();
 	public:
 		//get,set
