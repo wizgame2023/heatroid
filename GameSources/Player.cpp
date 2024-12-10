@@ -640,7 +640,7 @@ namespace basecross {
 		auto plPos = GetComponent<Transform>()->GetPosition();
 		auto shPos = target->GetComponent<Transform>()->GetPosition();
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(shPos, plPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
 
 		if (m_stateType == stand) {
 			m_stateType = hit_stand;
