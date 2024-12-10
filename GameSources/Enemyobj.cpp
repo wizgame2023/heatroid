@@ -67,9 +67,6 @@ namespace basecross {
 			}
 
 		}
-		//m_trans->SetPosition(m_pos);
-
-		//OverHeat();
 		//Debug();
 	}
 	void EnemyChase::Debug() {
