@@ -202,7 +202,7 @@ namespace basecross {
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(true);
+		m_collision->SetDrawActive(false);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
 		//影
@@ -211,7 +211,7 @@ namespace basecross {
 
 		//足場コリジョンの追加
 		m_floorCol = GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
-		m_floorCol->SetDrawActive(true);
+		m_floorCol->SetDrawActive(false);
 		//オーバーヒートゲージの追加
 		GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
 			Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
@@ -383,7 +383,7 @@ namespace basecross {
 		}
 		OverHeat();
 		m_draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ
@@ -1015,7 +1015,7 @@ namespace basecross {
 		}
 		m_trans->SetPosition(m_pos);
 
-		Debug();
+		//Debug();
 	}
 	void StraightBullet::Debug() {
 		auto scene = App::GetApp()->GetScene<Scene>();
