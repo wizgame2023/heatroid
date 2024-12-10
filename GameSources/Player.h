@@ -17,7 +17,8 @@ namespace basecross {
 	class Player : public GameObject {
 
 		//エフェクト
-		shared_ptr<EfkEffect> m_EfkEffect;
+		shared_ptr<EfkEffect> m_EfkMuzzle;
+		shared_ptr<EfkEffect> m_EfkHit;
 		//エフェクト実行オブジェクト
 		shared_ptr<EfkPlay> m_EfkPlay;
 
@@ -153,7 +154,7 @@ namespace basecross {
 		//飛び道具発射
 		void Projectile();
 		//攻撃をくらう/死ぬ
-		void GetHit();
+		void GetHit(shared_ptr<GameObject>& target);
 		void Died();
 
 		//Transform.Scaleのゲッタ

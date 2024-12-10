@@ -193,9 +193,11 @@ namespace basecross {
 		//エフェクト読み込み
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
-		wstring TestEffectStr = DataDir + L"Effects\\Muzzle.efk";
+		wstring MuzzleDir = DataDir + L"Effects\\Muzzle.efk";
+		wstring HitDir = DataDir + L"Effects\\Hit.efk";
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
+		m_EfkMuzzle = ObjectFactory::Create<EfkEffect>(ShEfkInterface, MuzzleDir);
+		m_EfkHit = ObjectFactory::Create<EfkEffect>(ShEfkInterface, HitDir);
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
@@ -252,6 +254,10 @@ namespace basecross {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 
+		//ステージ外に落下すると強制的に死ぬ(デバッグ？)
+		if (GetComponent<Transform>()->GetPosition().y <= -20.0f) {
+			m_HP = 0;
+		}
 
 		//無敵時間
 		if (m_invincibleTime > 0 && m_stateType != died) {
@@ -451,9 +457,13 @@ namespace basecross {
 		{
 			shared_ptr<Enemy> enemy = dynamic_pointer_cast<Enemy>(Other);//Enemyクラスに変換
 
-			if (m_invincibleTime <= 0 && enemy->GetOverHeat() == false) //オーバーヒート時は被弾しない
-				GetHit();
+			if (m_invincibleTime <= 0 && enemy->GetOverHeat() == false) { //オーバーヒート時は被弾しない
+				GetHit(Other);
+			}
 		}
+		//被弾判定
+		if (Other->FindTag(L"EnemyBullet") && m_invincibleTime <= 0)
+				GetHit(Other);
 
 		if (Other->FindTag(L"Floor")) 
 		{
@@ -624,7 +634,14 @@ namespace basecross {
 		ptrDraw->ChangeCurrentAnimation(L"Idle");
 	}
 
-	void Player::GetHit() {
+	void Player::GetHit(shared_ptr<GameObject>& target) {
+
+		//敵とプレイヤーの間にヒットスパーク
+		auto plPos = GetComponent<Transform>()->GetPosition();
+		auto shPos = target->GetComponent<Transform>()->GetPosition();
+		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(shPos, plPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
+
 		if (m_stateType == stand) {
 			m_stateType = hit_stand;
 		}
@@ -637,6 +654,7 @@ namespace basecross {
 		auto fwd = trans->GetForward();
 		m_moveVel.x = fwd.x * 30.0f;
 		m_moveVel.z = fwd.z * 30.0f;
+
 
 		m_HP -= 1;
 		m_invincibleTime = m_invincibleTimeMax;
@@ -667,16 +685,15 @@ namespace basecross {
 		firepos.y = m_firePos.y;
 		firepos.z = (cosf(face) * m_firePos.z) + (sinf(face) * m_firePos.x);
 		firepos = firepos * scale;
-		pos += firepos;
 
 		//エフェクトのプレイ
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos);
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkMuzzle, pos + firepos, 0.0f);
 		m_EfkPlay->SetRotation(Vec3(0, 1, 0), -face);
 		m_EfkPlay->SetScale(Vec3(.25f));
 
 		//飛び道具発射
-		GetStage()->AddGameObject<FireProjectile>(pos, fwd, m_chargePerc);
+		GetStage()->AddGameObject<FireProjectile>(pos + firepos, fwd, m_chargePerc);
 		m_chargePerc = 0.0f;
 		m_isOverCharge = false;
 		m_stateType = release;
@@ -853,7 +870,7 @@ namespace basecross {
 			auto face = atan2f(fwd.z, fwd.x);
 
 			auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-			m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, trans->GetPosition());
+			m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, trans->GetPosition(), 0.0f);
 			m_EfkPlay->SetRotation(Vec3(0, 1, 0), -face);
 			m_EfkPlay->SetScale(Vec3(.8f));
 		}
