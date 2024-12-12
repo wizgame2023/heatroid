@@ -977,11 +977,11 @@ namespace basecross {
 	}
 
 	//====================================================================
-	// class SpriteHealth
-	// プレイヤーのライフ
+	// class PlayerMeterBase
+	// プレイヤーのゲージ類の親
 	//====================================================================
 
-	void SpriteHealth::OnCreate() {
+	void PlayerMeterBase::Init(wstring ResKey) {
 		Col4 color(1, 1, 1, 1);
 
 		m_Vertices = {
@@ -994,15 +994,33 @@ namespace basecross {
 			0, 1, 2,
 			2, 1, 3,
 		};
+
 		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
-		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
-		m_DrawComp->SetTextureResource(L"HEALTH");
+		m_DrawComp->SetDiffuse(color);
+		m_DrawComp->SetTextureResource(ResKey);
 		m_DrawComp->SetDrawActive(true);
 		SetDrawLayer(2);
 		SetAlphaActive(true);
 
 		Vec3 pos = m_meter->GetComponent<Transform>()->GetPosition();
 		GetComponent<Transform>()->SetPosition(pos + addPos);
+	}
+
+	//====================================================================
+	// class SpriteHealth
+	// プレイヤーのライフ
+	//====================================================================
+
+	void SpriteHealth::OnCreate() {
+		Col4 color(1, 1, 1, 1);
+
+		m_width = 240.0f;
+		m_height = 15.0f;
+		m_bottomSlip = -15.0f;
+
+		addPos = Vec3(240.0f, -60.0f, 0.0f);
+
+		Init(L"HEALTH");
 	}
 
 	void SpriteHealth::OnUpdate() {
@@ -1023,27 +1041,14 @@ namespace basecross {
 	//====================================================================
 
 	void SpriteCharge::OnCreate() {
-		Col4 color(1, 1, 1, 1);
 
-		m_Vertices = {
-			{Vec3(0 + m_bottomSlip, 0, 0.0f), color, Vec2(0, 0)},
-			{Vec3(m_width + m_bottomSlip, 0, 0.0f), color, Vec2(1, 0)},
-			{Vec3(0, -m_height, 0.0f), color, Vec2(0, 1)},
-			{Vec3(m_width, -m_height, 0.0f), color, Vec2(1, 1)},
-		};
-		vector<uint16_t> indices = {
-			0, 1, 2,
-			2, 1, 3,
-		};
-		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
-		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
-		m_DrawComp->SetTextureResource(L"CHARGE");
-		m_DrawComp->SetDrawActive(false);
-		SetDrawLayer(2);
-		SetAlphaActive(true);
+		m_width = 240.0f;
+		m_height = 13.5f;
+		m_bottomSlip = 13.5f;
 
-		Vec3 pos = m_meter->GetComponent<Transform>()->GetPosition();
-		GetComponent<Transform>()->SetPosition(pos + addPos);
+		addPos = Vec3(287.0f, -82.0f, 0.0f);
+
+		Init(L"CHARGE");
 	}
 
 	void SpriteCharge::OnUpdate() {
