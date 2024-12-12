@@ -458,12 +458,6 @@ namespace basecross {
 			m_heat = 0.0f;
 			m_stateType = wait;
 		}
-		if (m_EfkPlayer[2]) {
-			if (!m_pGrabFlag) {
-				m_EfkPlayer[2]->SetLocation(Vec3(m_pos));
-			}
-			
-		}
 	}
 
 	//ジャンプ
@@ -723,6 +717,10 @@ namespace basecross {
 			}
 		}
 		else {
+			if (m_EfkPlayer[2]) {
+				m_EfkPlayer[2]->SetLocation(GetChangePos());
+			}
+
 			m_trans->ClearParent();
 		}
 	}
