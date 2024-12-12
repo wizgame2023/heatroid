@@ -442,20 +442,27 @@ namespace basecross {
 		float elapsed = App::GetApp()->GetElapsedTime();
 		if (m_heat >= m_maxHeat) {
 			m_stateType = m_overHeatState;
-			//EffectPlay(m_heatEffect,m_pos,3);
+			EffectPlay(m_heatEffect,m_pos,3);
 		}
 		if (m_heat > 0.0f) {
 			m_heat -= elapsed * 5;
 			m_efcTime -= elapsed;
-			if (m_efcTime <= 0.0f&&m_heat>=20.0f) {
-				EffectPlay(m_heatEffect, m_pos, 3);
-				m_efcTime = 2.0f;
-			}
+			//EffectPlay(m_heatEffect, m_pos, 3);
+			//if (m_efcTime <= 0.0f && m_heat >= 20.0f) {
+			//	EffectPlay(m_heatEffect, m_pos, 3);
+			//	m_efcTime = 2.0f;
+			//}
 			
 		}
 		else if (GetOverHeat()&&m_heat <= 0.0f) {
 			m_heat = 0.0f;
 			m_stateType = wait;
+		}
+		if (m_EfkPlayer[2]) {
+			if (!m_pGrabFlag) {
+				m_EfkPlayer[2]->SetLocation(Vec3(m_pos));
+			}
+			
 		}
 	}
 
@@ -701,11 +708,14 @@ namespace basecross {
 			m_floorFlag = false;
 			auto pGrab = m_playerGrab.lock();
 			if(!pGrab) return;
-			auto grabPos = pGrab->GetComponent<Transform>();
+			auto grabTrans = pGrab->GetComponent<Transform>();
 			if (pGrab) {
 				m_trans->SetParent(pGrab);
 				m_pos = Vec3(0.0f, 0.0f, 0.0f);
 				m_trans->SetPosition(m_pos);
+				if (m_EfkPlayer[2]) {
+					m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
+				}
 
 			}
 			else {
@@ -778,7 +788,7 @@ namespace basecross {
 	void Enemy::EffectPlay(const shared_ptr<EfkEffect>& efk,const Vec3& pos, 
 		const int num, const Vec3& scale) {
 		m_EfkPlayer[num - 1] = ObjectFactory::Create<EfkPlay>(efk, pos, 0.0f);
-
+		
 		m_EfkPlayer[num - 1]->SetScale(scale);
 		m_EfkPlayer[num - 1]->SetAllColor(Col4(1.0f));
 	}
