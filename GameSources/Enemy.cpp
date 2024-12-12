@@ -426,7 +426,7 @@ namespace basecross {
 		}
 	}
 	Vec3 Enemy::GetEyePos(const Vec3& eye) {
-		Vec3 pos = m_pos;
+		Vec3 pos = GetChangePos();
 		Vec3 forward = m_trans->GetForward();
 		float face = atan2f(forward.z, forward.x);
 		Vec3 eyePos;
