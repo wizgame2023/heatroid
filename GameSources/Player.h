@@ -384,25 +384,38 @@ namespace basecross {
 
 
 	//====================================================================
-	// class SpriteHealth
-	// プレイヤーのライフ
+	// class PlayerMeterBase
+	// プレイヤーのゲージ類の親
 	//====================================================================
-	class SpriteHealth : public GameObject {
+	class PlayerMeterBase : public GameObject {
+	protected:
 		weak_ptr<Player> m_player;
 		shared_ptr<SpritePlayerUI> m_meter;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
 
-		const float m_width = 240.0f;
-		const float m_height = 15.0f;
-		const float m_bottomSlip = -15.0f;
-		Vec3 addPos = Vec3(240.0f, -60.0f, 0.0f);
-
+		float m_width;
+		float m_height;
+		float m_bottomSlip;
+		Vec3 addPos;
 	public:
-		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
+		PlayerMeterBase(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
 			GameObject(StagePtr),
 			m_player(player),
 			m_meter(meter)
+		{}
+		void Init(wstring ResKey);
+	};
+
+	//====================================================================
+	// class SpriteHealth
+	// プレイヤーのライフ
+	//====================================================================
+	class SpriteHealth : public PlayerMeterBase {
+
+	public:
+		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
+			PlayerMeterBase(StagePtr, player, meter)
 		{}
 
 		~SpriteHealth() {}
@@ -416,22 +429,11 @@ namespace basecross {
 	// class SpriteCharge
 	// プレイヤーの長押しゲージ
 	//====================================================================
-	class SpriteCharge : public GameObject {
-		weak_ptr<Player> m_player;
-		shared_ptr<SpritePlayerUI> m_meter;
-		shared_ptr<PCTSpriteDraw> m_DrawComp;
-		vector<VertexPositionColorTexture> m_Vertices;
-
-		const float m_width = 240.0f;
-		const float m_height = 13.5f;
-		const float m_bottomSlip = 13.5f;
-		Vec3 addPos = Vec3(287.0f, -82.0f, 0.0f);
+	class SpriteCharge : public PlayerMeterBase {
 
 	public:
 		SpriteCharge(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
-			GameObject(StagePtr),
-			m_player(player),
-			m_meter(meter)
+			PlayerMeterBase(StagePtr, player, meter)
 		{}
 
 		~SpriteCharge() {}
