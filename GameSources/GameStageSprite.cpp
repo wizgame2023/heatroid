@@ -11,7 +11,7 @@ namespace basecross {
 	GameSprite::GameSprite(const shared_ptr<Stage>& stage,
 		float width, float heigth,
 		wstring meshName, Vec3 pos,
-		Col4 color
+		Col4 color, int layer
 	):
 		GameObject(stage),
 		m_width(width),
@@ -20,7 +20,7 @@ namespace basecross {
 		m_pos(pos),
 		m_color(color),
 		m_time(1.0f),
-		m_layer(1)
+		m_layer(layer)
 	{}
 	void GameSprite::OnCreate() {
 		m_vertices = {
@@ -91,7 +91,7 @@ namespace basecross {
 	void FadeIn::OnCreate() {
 		auto stage = GetStage();
 		m_sprite = stage->AddGameObject<GameSprite>(1280, 800,
-			L"White", Vec3(0.0f), Col4(1.0f, 1.0f, 1.0f, 1.0f));
+			L"White", Vec3(0.0f), Col4(1.0f, 1.0f, 1.0f, 1.0f), 10);
 
 	}
 	void FadeIn::OnUpdate() {

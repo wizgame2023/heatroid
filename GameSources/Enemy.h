@@ -58,6 +58,7 @@ namespace basecross {
 		float m_maxHitDropTime;//Å™ÇÃç≈ëÂíl
 		float m_spareTime;    //ìÀÇ¡çûÇ›ÇÃó\îıéûä‘
 		float m_maxSpareTime; //Å™ÇÃç≈ëÂíl
+		float m_efcTime;
 		float m_rad;
 		int m_dicUp;
 		Vec3 m_direc;
@@ -77,6 +78,8 @@ namespace basecross {
 		bool m_plungeFlag;
 		bool m_pGrabFlag;
 		bool m_playerFlag;
+		bool m_overHeatSE;
+		bool m_plungeSE;
 
 		wstring m_meshName;
 
@@ -104,15 +107,17 @@ namespace basecross {
 		shared_ptr<Transform> m_trans;
 		shared_ptr<PNTBoneModelDraw> m_draw;
 		shared_ptr<EnemyFloorCol> m_floorCol;
-		shared_ptr<EfkEffect> m_efkEffect;
-		shared_ptr<EfkPlay> m_EfkPlayer;
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<FixedBox> m_box;
 		shared_ptr<CollisionObb> m_collision;
 		weak_ptr<TilingFixedBox> m_fixedBox;
 		weak_ptr<PlayerGrab> m_playerGrab;
-		
+		//ÉGÉtÉFÉNÉg
+		shared_ptr<EfkEffect> m_heatEffect;
+		shared_ptr<EfkEffect> m_eyeEffect;
+		shared_ptr<EfkPlay> m_EfkPlayer[3];
+
 
 	public:
 		// ç\ízÇ∆îjä¸
@@ -156,8 +161,10 @@ namespace basecross {
 		void RapidFireBullet(int bulletNum);
 		void EnemyAnime(wstring anime);
 		void OverHeat();
-		void PlayerSE(wstring path, float volume = 1.0f, float loopcnt = 0);
-		void EffectPlay();
+		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
+		void EffectPlay(const shared_ptr<EfkEffect>& efk,
+			const Vec3& pos,const int num,const Vec3& scale=Vec3(1.0f));
+		Vec3 GetEyePos(const Vec3& eye);
 		void Debug();
 	public:
 		//get,set
@@ -188,16 +195,19 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class StraightXBullet : public GameObject; //íºê¸Ç…íµÇ‘íe
+	//	class EnemyBullet : public GameObject; //íe
 	//--------------------------------------------------------------------------------------
 	class EnemyBullet : public GameObject {
 	protected:
+		float m_colTime;
+		bool m_playerColFlag;
 		shared_ptr<PNTStaticDraw> m_draw;
 
 	public:
 		EnemyBullet(const shared_ptr<Stage>& stage);
 		virtual ~EnemyBullet() {};
 		virtual void OnCreate();
+		virtual void OnUpdate();
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);
 		void SetColor(Col4 color);
 		void ThisDestroy();

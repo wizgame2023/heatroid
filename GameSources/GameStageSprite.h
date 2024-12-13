@@ -26,9 +26,10 @@ namespace basecross {
 
 	public:
 		GameSprite(const shared_ptr<Stage>& stage,
-			float width,float heigth,
-			wstring meshName,Vec3 pos,
-			Col4 color = Col4(1.0f,1.0f,1.0f,1.0f)
+			float width, float heigth,
+			wstring meshName, Vec3 pos,
+			Col4 color = Col4(1.0f, 1.0f, 1.0f, 1.0f),
+			int layer = 1
 		);
 		virtual ~GameSprite() {};
 		virtual void OnCreate() override;

@@ -193,9 +193,11 @@ namespace basecross {
 		//エフェクト読み込み
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
-		wstring TestEffectStr = DataDir + L"Effects\\Muzzle.efk";
+		wstring MuzzleDir = DataDir + L"Effects\\Muzzle.efk";
+		wstring HitDir = DataDir + L"Effects\\Hit.efk";
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
+		m_EfkMuzzle = ObjectFactory::Create<EfkEffect>(ShEfkInterface, MuzzleDir);
+		m_EfkHit = ObjectFactory::Create<EfkEffect>(ShEfkInterface, HitDir);
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
@@ -252,6 +254,10 @@ namespace basecross {
 		//コントローラチェックして入力があればコマンド呼び出し
 		m_InputHandler.PushHandle(GetThis<Player>());
 
+		//ステージ外に落下すると強制的に死ぬ(デバッグ？)
+		if (GetComponent<Transform>()->GetPosition().y <= -20.0f) {
+			m_HP = 0;
+		}
 
 		//無敵時間
 		if (m_invincibleTime > 0 && m_stateType != died) {
@@ -451,9 +457,13 @@ namespace basecross {
 		{
 			shared_ptr<Enemy> enemy = dynamic_pointer_cast<Enemy>(Other);//Enemyクラスに変換
 
-			if (m_invincibleTime <= 0 && enemy->GetOverHeat() == false) //オーバーヒート時は被弾しない
-				GetHit();
+			if (m_invincibleTime <= 0 && enemy->GetOverHeat() == false) { //オーバーヒート時は被弾しない
+				GetHit(Other);
+			}
 		}
+		//被弾判定
+		if (Other->FindTag(L"EnemyBullet") && m_invincibleTime <= 0)
+				GetHit(Other);
 
 		if (Other->FindTag(L"Floor")) 
 		{
@@ -624,7 +634,14 @@ namespace basecross {
 		ptrDraw->ChangeCurrentAnimation(L"Idle");
 	}
 
-	void Player::GetHit() {
+	void Player::GetHit(shared_ptr<GameObject>& target) {
+
+		//敵とプレイヤーの間にヒットスパーク
+		auto plPos = GetComponent<Transform>()->GetPosition();
+		auto shPos = target->GetComponent<Transform>()->GetPosition();
+		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
+
 		if (m_stateType == stand) {
 			m_stateType = hit_stand;
 		}
@@ -637,6 +654,7 @@ namespace basecross {
 		auto fwd = trans->GetForward();
 		m_moveVel.x = fwd.x * 30.0f;
 		m_moveVel.z = fwd.z * 30.0f;
+
 
 		m_HP -= 1;
 		m_invincibleTime = m_invincibleTimeMax;
@@ -667,16 +685,15 @@ namespace basecross {
 		firepos.y = m_firePos.y;
 		firepos.z = (cosf(face) * m_firePos.z) + (sinf(face) * m_firePos.x);
 		firepos = firepos * scale;
-		pos += firepos;
 
 		//エフェクトのプレイ
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos, 0.0f);
-		m_EfkPlay->SetRotation(Vec3(0, 0, face), 0);
+		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkMuzzle, pos + firepos, 0.0f);
+		m_EfkPlay->SetRotation(Vec3(0, 1, 0), -face);
 		m_EfkPlay->SetScale(Vec3(.25f));
 
 		//飛び道具発射
-		GetStage()->AddGameObject<FireProjectile>(pos, fwd, m_chargePerc);
+		GetStage()->AddGameObject<FireProjectile>(pos + firepos, fwd, m_chargePerc);
 		m_chargePerc = 0.0f;
 		m_isOverCharge = false;
 		m_stateType = release;
@@ -798,6 +815,16 @@ namespace basecross {
 
 	void FireProjectile::OnCreate() {
 
+		//ステージマネージャ
+		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+
+		//エフェクト読み込み
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		wstring TestEffectStr = DataDir + L"Effects\\playerproj.efk";
+		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
+
 		auto trans = GetComponent<Transform>();
 		trans->SetScale(Vec3(8.0f));
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
@@ -813,6 +840,7 @@ namespace basecross {
 		auto ptrDraw = AddComponent<PNTStaticDraw>();
 		ptrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		ptrDraw->SetBlendState(BlendState::Additive);
+		ptrDraw->SetDrawActive(false);//debug
 
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(
@@ -829,12 +857,28 @@ namespace basecross {
 
 		m_speed = (m_speed * m_power) + m_speedBase;
 		m_range = m_rangeMax;
+
 	}
 
 	void FireProjectile::OnUpdate() {
-		auto delta = App::GetApp()->GetElapsedTime();
-
 		auto trans = GetComponent<Transform>();
+
+		//エフェクトのプレイ
+		if(m_playTime <= 0.0f)
+		{
+			auto fwd = -1 * trans->GetForward();
+			auto face = atan2f(fwd.z, fwd.x);
+
+			auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+			m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, trans->GetPosition(), 0.0f);
+			m_EfkPlay->SetRotation(Vec3(0, 1, 0), -face);
+			m_EfkPlay->SetScale(Vec3(.8f));
+		}
+
+		auto delta = App::GetApp()->GetElapsedTime();
+		m_playTime += delta;
+
+		m_EfkPlay->SetLocation(trans->GetPosition());
 
 		if (!m_stopped) {
 			trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
@@ -933,11 +977,11 @@ namespace basecross {
 	}
 
 	//====================================================================
-	// class SpriteHealth
-	// プレイヤーのライフ
+	// class PlayerMeterBase
+	// プレイヤーのゲージ類の親
 	//====================================================================
 
-	void SpriteHealth::OnCreate() {
+	void PlayerMeterBase::Init(wstring ResKey) {
 		Col4 color(1, 1, 1, 1);
 
 		m_Vertices = {
@@ -950,15 +994,33 @@ namespace basecross {
 			0, 1, 2,
 			2, 1, 3,
 		};
+
 		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
-		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
-		m_DrawComp->SetTextureResource(L"HEALTH");
+		m_DrawComp->SetDiffuse(color);
+		m_DrawComp->SetTextureResource(ResKey);
 		m_DrawComp->SetDrawActive(true);
 		SetDrawLayer(2);
 		SetAlphaActive(true);
 
 		Vec3 pos = m_meter->GetComponent<Transform>()->GetPosition();
 		GetComponent<Transform>()->SetPosition(pos + addPos);
+	}
+
+	//====================================================================
+	// class SpriteHealth
+	// プレイヤーのライフ
+	//====================================================================
+
+	void SpriteHealth::OnCreate() {
+		Col4 color(1, 1, 1, 1);
+
+		m_width = 240.0f;
+		m_height = 15.0f;
+		m_bottomSlip = -15.0f;
+
+		addPos = Vec3(240.0f, -60.0f, 0.0f);
+
+		Init(L"HEALTH");
 	}
 
 	void SpriteHealth::OnUpdate() {
@@ -979,27 +1041,14 @@ namespace basecross {
 	//====================================================================
 
 	void SpriteCharge::OnCreate() {
-		Col4 color(1, 1, 1, 1);
 
-		m_Vertices = {
-			{Vec3(0 + m_bottomSlip, 0, 0.0f), color, Vec2(0, 0)},
-			{Vec3(m_width + m_bottomSlip, 0, 0.0f), color, Vec2(1, 0)},
-			{Vec3(0, -m_height, 0.0f), color, Vec2(0, 1)},
-			{Vec3(m_width, -m_height, 0.0f), color, Vec2(1, 1)},
-		};
-		vector<uint16_t> indices = {
-			0, 1, 2,
-			2, 1, 3,
-		};
-		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
-		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
-		m_DrawComp->SetTextureResource(L"CHARGE");
-		m_DrawComp->SetDrawActive(false);
-		SetDrawLayer(2);
-		SetAlphaActive(true);
+		m_width = 240.0f;
+		m_height = 13.5f;
+		m_bottomSlip = 13.5f;
 
-		Vec3 pos = m_meter->GetComponent<Transform>()->GetPosition();
-		GetComponent<Transform>()->SetPosition(pos + addPos);
+		addPos = Vec3(287.0f, -82.0f, 0.0f);
+
+		Init(L"CHARGE");
 	}
 
 	void SpriteCharge::OnUpdate() {

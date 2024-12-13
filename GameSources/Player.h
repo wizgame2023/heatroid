@@ -17,7 +17,8 @@ namespace basecross {
 	class Player : public GameObject {
 
 		//エフェクト
-		shared_ptr<EfkEffect> m_EfkEffect;
+		shared_ptr<EfkEffect> m_EfkMuzzle;
+		shared_ptr<EfkEffect> m_EfkHit;
 		//エフェクト実行オブジェクト
 		shared_ptr<EfkPlay> m_EfkPlay;
 
@@ -153,7 +154,7 @@ namespace basecross {
 		//飛び道具発射
 		void Projectile();
 		//攻撃をくらう/死ぬ
-		void GetHit();
+		void GetHit(shared_ptr<GameObject>& target);
 		void Died();
 
 		//Transform.Scaleのゲッタ
@@ -291,6 +292,16 @@ namespace basecross {
 	//====================================================================
 
 	class FireProjectile : public GameObject {
+		//ステージマネージャ
+		shared_ptr<StageManager> m_stageMgr;
+
+		//エフェクト
+		shared_ptr<EfkEffect> m_EfkEffect;
+		//エフェクト実行オブジェクト
+		shared_ptr<EfkPlay> m_EfkPlay;
+
+		float m_playTime = 0;
+
 		//どれくらいの位置からスタートするか
 		Vec3 m_dist;
 		//速度と方向
@@ -373,25 +384,38 @@ namespace basecross {
 
 
 	//====================================================================
-	// class SpriteHealth
-	// プレイヤーのライフ
+	// class PlayerMeterBase
+	// プレイヤーのゲージ類の親
 	//====================================================================
-	class SpriteHealth : public GameObject {
+	class PlayerMeterBase : public GameObject {
+	protected:
 		weak_ptr<Player> m_player;
 		shared_ptr<SpritePlayerUI> m_meter;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
 
-		const float m_width = 240.0f;
-		const float m_height = 15.0f;
-		const float m_bottomSlip = -15.0f;
-		Vec3 addPos = Vec3(240.0f, -60.0f, 0.0f);
-
+		float m_width;
+		float m_height;
+		float m_bottomSlip;
+		Vec3 addPos;
 	public:
-		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
+		PlayerMeterBase(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
 			GameObject(StagePtr),
 			m_player(player),
 			m_meter(meter)
+		{}
+		void Init(wstring ResKey);
+	};
+
+	//====================================================================
+	// class SpriteHealth
+	// プレイヤーのライフ
+	//====================================================================
+	class SpriteHealth : public PlayerMeterBase {
+
+	public:
+		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
+			PlayerMeterBase(StagePtr, player, meter)
 		{}
 
 		~SpriteHealth() {}
@@ -405,22 +429,11 @@ namespace basecross {
 	// class SpriteCharge
 	// プレイヤーの長押しゲージ
 	//====================================================================
-	class SpriteCharge : public GameObject {
-		weak_ptr<Player> m_player;
-		shared_ptr<SpritePlayerUI> m_meter;
-		shared_ptr<PCTSpriteDraw> m_DrawComp;
-		vector<VertexPositionColorTexture> m_Vertices;
-
-		const float m_width = 240.0f;
-		const float m_height = 13.5f;
-		const float m_bottomSlip = 13.5f;
-		Vec3 addPos = Vec3(287.0f, -82.0f, 0.0f);
+	class SpriteCharge : public PlayerMeterBase {
 
 	public:
 		SpriteCharge(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
-			GameObject(StagePtr),
-			m_player(player),
-			m_meter(meter)
+			PlayerMeterBase(StagePtr, player, meter)
 		{}
 
 		~SpriteCharge() {}
