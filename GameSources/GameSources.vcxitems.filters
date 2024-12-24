@@ -84,7 +84,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)EffectManager.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\Libs\BaseLib\SharedLib\Timer.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)Timer.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -164,7 +164,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)EffectManager.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\Libs\BaseLib\SharedLib\Timer.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)Timer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
