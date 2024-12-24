@@ -178,7 +178,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x / 1, Scale.z / 1, Tokens[10]);
 			ptrFloor->AddTag(L"Floor");
 			ptrFloor->AddTag(L"Goal");
 		}
@@ -207,7 +207,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, 1.0f, 1.0f, Tokens[10]);
+			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x / 1, Scale.z / 1, Tokens[10]);
 			ptrFloor->AddTag(L"Floor");
 			ptrFloor->AddTag(L"GoalBefore");
 		}
@@ -395,7 +395,7 @@ namespace basecross {
 							enemy->GetComponent<Transform>()->SetRotation(0, 0, 0);
 						}
 						else {
-							enemy->GetComponent<Transform>()->SetRotation(0, 180, 0);
+							enemy->GetComponent<Transform>()->SetRotation(0, 135, 0);
 						}
 					}
 					else if (Tokens[12] == L"Z")
@@ -652,6 +652,7 @@ namespace basecross {
 				}
 
 				GetTypeStage<GameStage>()->OnDestroy();
+
 				m_StageUI->SetDrawActive(false);
 				m_TextDraw->SetDrawActive(true);
 				m_SpriteDraw->SetDrawActive(true);
@@ -684,8 +685,10 @@ namespace basecross {
 		if (m_Diedtrue)
 		{
 			auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+			auto group2 = GetStage()->GetSharedObjectGroup(L"Door");
 			auto& vec = group->GetGroupVector();
-			for (auto v : vec)
+			auto& vec2 = group2->GetGroupVector();
+			for (auto v : vec,vec2)
 			{
 				auto shObj = v.lock();
 				if (shObj)

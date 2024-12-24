@@ -58,6 +58,8 @@ namespace basecross{
 		app->RegisterTexture(L"PLAYERUI2", texPath + L"PlayerMeterFront.png");
 		app->RegisterTexture(L"HEALTH", texPath + L"PlayerMeterHP.png");
 		app->RegisterTexture(L"CHARGE", texPath + L"PlayerMeterCharge.png");
+		app->RegisterTexture(L"BLUCK", texPath + L"Black.png");
+		app->RegisterTexture(L"BLUE", texPath + L"Blue.png");
 		//ロード画面テクスチャ
 		app->RegisterTexture(L"LoadBG", texPath + L"LoadBG.png");
 		app->RegisterTexture(L"LoadText", texPath + L"loadtext_wip.png");
