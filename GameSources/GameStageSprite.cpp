@@ -162,9 +162,18 @@ namespace basecross {
 
 		m_trans = GetComponent<Transform>();
 		m_trans->SetPosition(m_pos);
+
 	}
 	void NumberSprite::OnUpdate() {
+		
+	}
+	void NumberSprite::UpdateVar(int num) {
+		m_vertices[0].textureCoordinate.x = m_moveW * num;
+		m_vertices[1].textureCoordinate.x = m_moveW * (num + 1);
+		m_vertices[2].textureCoordinate.x = m_moveW * num;
+		m_vertices[3].textureCoordinate.x = m_moveW * (num + 1);
 
+		m_draw->UpdateVertices(m_vertices);
 	}
 }
 
