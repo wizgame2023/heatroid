@@ -1,32 +1,32 @@
 /*!
-@file Character.h
-@brief キャラクターなど
+@file Timer.h
+@brief タイマーなど
 */
 
 #pragma once
 #include "stdafx.h"
 
 namespace basecross{
-
-
 	//--------------------------------------------------------------------------------------
-	//	class Foo : public GameObject;
+	//	class Timer : public GameObject;
 	//--------------------------------------------------------------------------------------
-	class Foo : public GameObject
+	class Timer : public GameObject
 	{
+	private:
+		float m_time;
+		int m_timeNum[4];
+		Vec3 m_pos;
+		shared_ptr<NumberSprite> m_numSprite[4];
 	public:
 		// 構築と破棄
-		Foo(const shared_ptr<Stage>& stage) :
-			GameObject(stage)
-		{
-		}
-		virtual ~Foo()
-		{
-		}
+		Timer(const shared_ptr<Stage>& stage, const Vec3 pos);
+		virtual ~Timer(){}
 
 		virtual void OnCreate() override; // 初期化
-		//virtual void OnUpdate() override; // 更新
-		//virtual void OnDraw() override; // 描画
+		virtual void OnUpdate() override; // 更新
+		float GetTime();
+
+		void Debug();
 	};
 
 }
