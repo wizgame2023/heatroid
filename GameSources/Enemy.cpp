@@ -203,7 +203,7 @@ namespace basecross {
 		m_draw->SetDrawActive(true);
 		//衝突判定
 		m_collision = AddComponent<CollisionObb>();
-		m_collision->SetAfterCollision(AfterCollision::None);
+		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
 		m_collision->SetDrawActive(false);
 		//敵の別コリジョンとの判定をなくす
