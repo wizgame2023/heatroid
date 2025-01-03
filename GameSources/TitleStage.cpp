@@ -24,7 +24,6 @@ namespace basecross {
 
 	void TitleStage::OnCreate() {
 		try {
-
 			CreateStageManager();
 			//ビューとライトの作成
 			CreateViewLight();

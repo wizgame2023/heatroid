@@ -50,7 +50,7 @@ namespace basecross {
 			auto selectSprite =AddGameObject<SelectSprite>();
 			SetSharedGameObject(L"selectSprite", selectSprite);
 			SetSelect(selectSprite->GetSelectNum());
-			//AddGameObject<NumberSprite>(5);
+			//AddGameObject<Timer>(Vec3(0.0f));
 		}
 		catch (...) {
 			throw;
