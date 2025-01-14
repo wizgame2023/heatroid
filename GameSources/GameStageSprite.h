@@ -93,5 +93,6 @@ namespace basecross {
 		virtual ~NumberSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
+		void UpdateVar(int num);
 	};
 }

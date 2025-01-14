@@ -58,6 +58,7 @@ namespace basecross {
 		float m_maxHitDropTime;//ª‚ÌÅ‘å’l
 		float m_spareTime;    //“Ë‚Á‚İ‚Ì—\”õŠÔ
 		float m_maxSpareTime; //ª‚ÌÅ‘å’l
+		float m_efcTime;
 		float m_rad;
 		int m_dicUp;
 		Vec3 m_direc;

@@ -55,6 +55,7 @@ namespace basecross {
 		m_bulletRangeTime(5.0f),
 		m_maxBulletRangeTime(m_bulletRangeTime),
 		m_trackingRange(30.0f),
+		m_efcTime(0.0f),
 		m_firstDirec(Vec3(0.0f)),
 		m_bulletDic(Vec2(0.0f, 1.0f)),
 		m_gravity(-9.8f),
@@ -116,6 +117,7 @@ namespace basecross {
 		m_bulletRangeTime(5.0f),
 		m_maxBulletRangeTime(m_bulletRangeTime),
 		m_trackingRange(30.0f),
+		m_efcTime(2.0f),
 		m_firstDirec(Vec3(0.0f)),
 		m_bulletDic(Vec2(0.0f, 1.0f)),
 		m_gravity(-9.8f),
@@ -160,7 +162,6 @@ namespace basecross {
 				Vec3(0.0f, -0.5f, 0.0f)
 			);
 			m_draw->SetMeshToTransformMatrix(meshMat);
-
 		}
 		else {
 			Mat4x4 meshMat;
@@ -198,6 +199,8 @@ namespace basecross {
 		m_draw->AddAnimation(L"stand2", 160, 20, false, 30);
 
 		m_draw->ChangeCurrentAnimation(L"walk");
+
+		m_draw->SetDrawActive(true);
 		//衝突判定
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
@@ -205,6 +208,7 @@ namespace basecross {
 		m_collision->SetDrawActive(false);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
+		//m_collision->SetSleepActive(false);
 		//影
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(m_meshName);
@@ -425,7 +429,7 @@ namespace basecross {
 		}
 	}
 	Vec3 Enemy::GetEyePos(const Vec3& eye) {
-		Vec3 pos = m_pos;
+		Vec3 pos = GetChangePos();
 		Vec3 forward = m_trans->GetForward();
 		float face = atan2f(forward.z, forward.x);
 		Vec3 eyePos;
@@ -445,6 +449,12 @@ namespace basecross {
 		}
 		if (m_heat > 0.0f) {
 			m_heat -= elapsed * 5;
+			m_efcTime -= elapsed;
+			//EffectPlay(m_heatEffect, m_pos, 3);
+			//if (m_efcTime <= 0.0f && m_heat >= 20.0f) {
+			//	EffectPlay(m_heatEffect, m_pos, 3);
+			//	m_efcTime = 2.0f;
+			//}
 			
 		}
 		else if (GetOverHeat()&&m_heat <= 0.0f) {
@@ -695,11 +705,14 @@ namespace basecross {
 			m_floorFlag = false;
 			auto pGrab = m_playerGrab.lock();
 			if(!pGrab) return;
-			auto grabPos = pGrab->GetComponent<Transform>();
+			auto grabTrans = pGrab->GetComponent<Transform>();
 			if (pGrab) {
 				m_trans->SetParent(pGrab);
 				m_pos = Vec3(0.0f, 0.0f, 0.0f);
 				m_trans->SetPosition(m_pos);
+				if (m_EfkPlayer[2]) {
+					m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
+				}
 
 			}
 			else {
@@ -707,6 +720,10 @@ namespace basecross {
 			}
 		}
 		else {
+			if (m_EfkPlayer[2]) {
+				m_EfkPlayer[2]->SetLocation(GetChangePos());
+			}
+
 			m_trans->ClearParent();
 		}
 	}
@@ -772,7 +789,7 @@ namespace basecross {
 	void Enemy::EffectPlay(const shared_ptr<EfkEffect>& efk,const Vec3& pos, 
 		const int num, const Vec3& scale) {
 		m_EfkPlayer[num - 1] = ObjectFactory::Create<EfkPlay>(efk, pos, 0.0f);
-
+		
 		m_EfkPlayer[num - 1]->SetScale(scale);
 		m_EfkPlayer[num - 1]->SetAllColor(Col4(1.0f));
 	}
