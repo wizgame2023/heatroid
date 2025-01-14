@@ -12,8 +12,6 @@
 #include "Scene.h"
 #include "LoadScreen.h"
 #include "TitleStage.h"
-#include "GameOver.h"
-#include "GameClear.h"
 #include "GameStage.h"
 #include "GameStageHemmi.h"
 #include "Character.h"

@@ -541,7 +541,4 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
 	}
-
-
-
 }
