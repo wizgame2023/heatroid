@@ -12,50 +12,59 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	//	ゲームステージクラス
 	//--------------------------------------------------------------------------------------
-	class GameStage : public Stage {
-		CsvFile m_GameStage1;
-		shared_ptr<SoundItem> m_BGM;
-		std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager();
-		shared_ptr<GameObject> m_fadeIn;
-		shared_ptr<GameObject> m_fadeOut;
+    class GameStage : public Stage {
+        CsvFile m_GameStage1;                          // ゲームステージのCSVファイル
+        shared_ptr<SoundItem> m_BGM;                   // バックグラウンドミュージックのサウンドアイテム
+        std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
+        shared_ptr<GameObject> m_fadeIn;               // フェードインエフェクト用オブジェクト
+        shared_ptr<GameObject> m_fadeOut;              // フェードアウトエフェクト用オブジェクト
 
-		shared_ptr<GameObject> m_pauseBackGround;
-		shared_ptr<GameObject> m_PauseSelect;
-		shared_ptr<GameObject> m_PauseTitle;
-		shared_ptr<GameObject> m_PauseBack;
-		shared_ptr<GameObject> m_SelectCharge;
-		shared_ptr<GameObject> m_TitleCharge;
-		float totaltime = 0.0f;
+        shared_ptr<GameObject> m_pauseBackGround;      // ポーズ時の背景オブジェクト
+        shared_ptr<GameObject> m_PauseSelect;          // ポーズ選択オブジェクト
+        shared_ptr<GameObject> m_PauseTitle;           // ポーズ時のタイトルオブジェクト
+        shared_ptr<GameObject> m_PauseBack;            // ポーズ時の背景オブジェクト
+        shared_ptr<GameObject> m_SelectCharge;         // 選択画面のチャージオブジェクト
+        shared_ptr<GameObject> m_TitleCharge;          // タイトル画面のチャージオブジェクト
+        float totaltime = 0.0f;                        // 合計時間を計測する変数
 
+    public:
+        bool m_pause = false;                          // ポーズ状態かどうかのフラグ
+        // エフェクト
+        shared_ptr<EfkEffect> m_EfkEffect;             // エフェクトオブジェクト
+        // エフェクト実行オブジェクト
+        shared_ptr<EfkPlay> m_EfkPlay;                 // エフェクト実行オブジェクト
 
-	public:
-		bool m_pause = false;
-		//エフェクト
-		shared_ptr<EfkEffect> m_EfkEffect;
-		//エフェクト実行オブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay;
+        // 構築と破棄
+        GameStage() :Stage() {}
+        virtual ~GameStage() {}
 
-		//構築と破棄
-		GameStage() :Stage(){}
-		virtual ~GameStage() {}
-		
-		virtual void OnCreate()override; //初期化
-		virtual void OnUpdate()override; //初期化
-		virtual void OnDraw()override; //初期化
+        // 初期化
+        virtual void OnCreate() override;
 
-		void OnPushA();
+        // 更新処理
+        virtual void OnUpdate() override;
 
-		void PlayBGM(const wstring& StageBGM);
+        // 描画処理
+        virtual void OnDraw() override;
 
-		void OnDestroy();
+        // ボタンAが押された時の処理
+        void OnPushA();
 
-		void CreateStageManager();
+        // バックグラウンドミュージックを再生する
+        void PlayBGM(const wstring& StageBGM);
 
-		void GamePause();
+        // ゲームステージの破棄処理
+        void OnDestroy();
 
-		void EffectPlay();
+        // ステージマネージャーの作成
+        void CreateStageManager();
 
-	};
+        // ゲームをポーズする
+        void GamePause();
+
+        // エフェクトを再生する
+        void EffectPlay();
+    };
 
 }
 //end basecross

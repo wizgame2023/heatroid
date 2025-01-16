@@ -129,12 +129,13 @@ namespace basecross {
 	}
 
 	BlinkingSprite::BlinkingSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
-		const Vec2& StartScale, const Vec3& StartPos) :
+		const Vec2& StartScale, const Vec3& StartPos, const float& TransSpeed) :
 		GameObject(StagePtr),
 		m_TextureKey(TextureKey),
 		m_Trace(Trace),
 		m_StartScale(StartScale),
-		m_StartPos(StartPos)
+		m_StartPos(StartPos),
+		m_TransSpeed(TransSpeed)
 	{}
 
 	void BlinkingSprite::OnCreate() {
@@ -157,12 +158,26 @@ namespace basecross {
 		auto ptrDraw = AddComponent<PCTSpriteDraw>(vertices, indices);
 		ptrDraw->SetSamplerState(SamplerState::LinearWrap);
 		ptrDraw->SetTextureResource(m_TextureKey);
+		m_start = false;
 	}
 
 	void BlinkingSprite::OnUpdate()
 	{
 		float ElapsedTime = App::GetApp()->GetElapsedTime();
-		m_TotalTime += ElapsedTime * 3.5f;
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+
+		if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
+		{
+			m_start = true;
+		}
+		if (m_start)
+		{
+			m_TotalTime += ElapsedTime * 30.0f;
+		}
+		else {
+			m_TotalTime += ElapsedTime * 3.5f;
+		}
 		if (m_TotalTime >= XM_2PI) {
 			m_TotalTime = 0.0f;
 		}

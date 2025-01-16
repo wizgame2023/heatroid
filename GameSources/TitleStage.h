@@ -1,5 +1,5 @@
 /*!
-@file Character.h
+@file TitleStage.h
 @brief キャラクターなど
 */
 
@@ -7,37 +7,38 @@
 #include "stdafx.h"
 
 namespace basecross {
-	class TitleStage : public Stage
-	{
-		shared_ptr<SoundItem> m_BGM;
-		std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager();
-		void CreateViewLight(); //ビューの作成
+    class TitleStage : public Stage
+    {
+        shared_ptr<SoundItem> m_BGM;                   // バックグラウンドミュージックのサウンドアイテム
+        std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
+        // ビューの作成
+        void CreateViewLight();
 
-	public:
-		TitleStage() : Stage() {}
-		virtual ~TitleStage() {}
+    public:
+        // コンストラクタ
+        TitleStage() : Stage() {}
+        virtual ~TitleStage() {}
 
-		virtual void OnCreate()override; //初期化
-		virtual void OnUpdate()override; //初期化
-		void OnDestroy();
-		void OnPushA();
-		void OnDraw();
-		void OnTitleSprite();
-		void PlayBGM(const wstring& StageBGM);
-		void CreateStageManager();
-	};
+        // 初期化
+        virtual void OnCreate() override;
 
-	class Draw : public GameObject
-	{
-		Vec3 m_scale;
-		Vec3 m_position;
-	public:
-		Draw(const shared_ptr<Stage>& stage,
-			const Vec3& Scale,
-			const Vec3& Position
-		);
-		~Draw() {};
-		virtual void OnCreate()override; //初期化
-	};
+        // 更新処理
+        virtual void OnUpdate() override;
+
+        // 破棄処理
+        void OnDestroy();
+
+        // ボタンAが押された時の処理
+        void OnPushA();
+
+        // タイトルスプライトの描画
+        void OnTitleSprite();
+
+        // バックグラウンドミュージックを再生する
+        void PlayBGM(const wstring& StageBGM);
+
+        // ステージマネージャーの作成
+        void CreateStageManager();
+    };
 
 }
