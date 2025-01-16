@@ -93,6 +93,9 @@ namespace basecross{
 
 		//セレクトステージテクスチャ
 		app->RegisterTexture(L"SelectStageBack", texPath + L"SelectStageBack.png");
+		app->RegisterTexture(L"SelectStageBack2", texPath + L"SelectStageBack2.png");
+		app->RegisterTexture(L"SelectStageBack3", texPath + L"SelectStageBack3.png");
+		app->RegisterTexture(L"SelectStageEffect", texPath + L"SelectStageEffect.png");
 		app->RegisterTexture(L"SelectFram", texPath + L"SelectFram.png");
 		app->RegisterTexture(L"SelectText", texPath + L"SelectText.png");
 		app->RegisterTexture(L"SelectNumber", texPath + L"SelectNumber.png");

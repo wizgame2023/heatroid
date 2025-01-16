@@ -29,9 +29,7 @@ namespace basecross {
 
     public:
         bool m_pause = false;                          // ポーズ状態かどうかのフラグ
-        // エフェクト
         shared_ptr<EfkEffect> m_EfkEffect;             // エフェクトオブジェクト
-        // エフェクト実行オブジェクト
         shared_ptr<EfkPlay> m_EfkPlay;                 // エフェクト実行オブジェクト
 
         // 構築と破棄
