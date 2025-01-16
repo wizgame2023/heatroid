@@ -199,6 +199,8 @@ namespace basecross {
 		m_draw->AddAnimation(L"stand2", 160, 20, false, 30);
 
 		m_draw->ChangeCurrentAnimation(L"walk");
+
+		m_draw->SetDrawActive(true);
 		//衝突判定
 		m_collision = AddComponent<CollisionObb>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
@@ -206,6 +208,7 @@ namespace basecross {
 		m_collision->SetDrawActive(false);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
+		//m_collision->SetSleepActive(false);
 		//影
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(m_meshName);
