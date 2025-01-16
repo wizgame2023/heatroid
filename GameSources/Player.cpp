@@ -20,31 +20,7 @@ namespace basecross {
 		m_initRot(Vec3(0.0f, 0.0f, 0.0f)),
 		m_initSca(Vec3(3.0f, 3.0f, 3.0f)),
 
-		m_speed(36.0f),
-		m_airSpeedPerc(.5f),
-		m_accel(96.0f),
-		m_friction(.5f),
-		m_frictionDynamic(.25f),
-		m_frictionThreshold(.05f),
-		m_jumpHeight(12.0f),
-		m_gravity(-20.0f),
-		m_fallTerminal(-50.0f),
-		m_firePos(Vec3(1.0f, .8f, -.75f)),
-		m_moveVel(Vec3(0, 0, 0)),
-		m_moveAngle(0.0f),
-		m_collideCountInit(10),
-		m_collideCount(m_collideCountInit),
-
-		m_stateType(start),
-		m_isCharging(false),
-		m_isOverCharge(false),
-		m_chargePerc(0.0f),
-		m_chargeSpeed(1.2f),
-		m_chargeReduceSpeed(-.4f),
-		m_HP_max(4),
-		m_invincibleTimeMax(1.8f),
-		m_grabTime(0),
-		m_grabTimeMax(.2f)
+		m_collideCount(m_collideCountInit)
 	{}
 
 	Player::Player(const shared_ptr<Stage>&StagePtr,
@@ -54,32 +30,8 @@ namespace basecross {
 		m_initRot(rot),
 		m_initSca(sca),
 
-		m_speed(36.0f),
-		m_airSpeedPerc(.5f),
-		m_accel(96.0f),
-		m_friction(.5f),
-		m_frictionDynamic(.25f),
-		m_frictionThreshold(.05f),
-		m_jumpHeight(12.0f),
-		m_gravity(-20.0f),
-		m_fallTerminal(-50.0f),
-		m_firePos(Vec3(1.0f, .8f, -.75f)),
-		m_moveVel(Vec3(0, 0, 0)),
-		m_moveAngle(rot.y),
-		m_collideCountInit(10),
 		m_collideCount(m_collideCountInit),
-
-		m_stateType(start),
-		m_isCharging(false),
-		m_isOverCharge(false),
-		m_chargePerc(0.0f),
-		m_chargeSpeed(1.2f),
-		m_chargeReduceSpeed(-.4f),
-		m_HP_max(4),
-		m_invincibleTimeMax(1.8f),
-		m_grabTime(0),
-		m_grabTimeMax(.2f)
-
+		m_moveAngle(rot.y)
 	{}
 
 	Vec2 Player::GetInputState() const {
