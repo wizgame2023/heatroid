@@ -60,8 +60,8 @@ namespace basecross{
 			(m_wSize, m_hSize, L"SelectFram", Vec3(m_pos), Col4(0.0f, 1.0f, 1.0f, 0.5f));
 		m_selectSprite->SetDrawLayer(2);
 		m_selectPos = Vec3(m_pos.x, m_pos.y+m_heightSpace, 0.0f);
-		auto TitleText = stage->AddGameObject<GameSprite>(800, 150, L"SelectTitle", Vec3(m_pos.x+70,m_pos.y,m_pos.z));
-		TitleText->SetDrawLayer(3);
+		m_titleText = stage->AddGameObject<GameSprite>(800, 150, L"SelectTitle", Vec3(m_pos.x+70,m_pos.y,m_pos.z));
+		m_titleText->SetDrawLayer(3);
 		
 	}
 	void SelectSprite::OnUpdate() {
@@ -72,6 +72,15 @@ namespace basecross{
 		selectTrans->SetPosition(m_selectPos);
 		//m_sprite[m_selectNum+1]->SetColor(Col4(0.0f, 1.0f, 1.0f, 1.0f));
 		//Debug();
+		for (int i = 0; i < m_widthNum; i++) {
+			for (int j = 0; j < m_heightNum; j++) {
+				int sNum = i + j * m_widthNum;
+				if (sNum < m_heightNum * m_widthNum - 1) {
+					MoveSprite(sNum, i, j);
+				}
+			}
+		}
+
 	}
 	//À•W‚ð^‚ñ’†‚É‚·‚éŒvŽZ
 	void SelectSprite::PosSetting() {
@@ -194,6 +203,22 @@ namespace basecross{
 	}
 	int SelectSprite::GetSelectNum() {
 		return m_selectNum;
+	}
+	void SelectSprite::MoveSprite(const int& sNum, const int& i, const int& j)
+	{
+		auto titleText = m_titleText->GetComponent<Transform>();
+		auto text = m_sText[sNum]->GetComponent<Transform>();
+		auto num = m_sNum[sNum]->GetComponent<Transform>();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		float totaltime = 5.0f + j;
+		m_totalTime += ElapsedTime;
+		Easing<Vec3> easing;
+		Vec3 titlePos = easing.EaseInOut(EasingType::Exponential, Vec3(m_pos.x + 500, m_pos.y, m_pos.z), Vec3(m_pos.x + 70, m_pos.y, m_pos.z), m_totalTime, 3.5f);
+		titleText->SetPosition(titlePos);
+		Vec3 selectPos = easing.EaseInOut(EasingType::Exponential, Vec3(m_pos.x + i * -m_widthSpace + 500.0f, m_pos.y + (j + 1) * m_heightSpace, 0.0f), Vec3(m_pos.x + i * -m_widthSpace, m_pos.y + (j + 1) * m_heightSpace, 0.0f), m_totalTime, totaltime);
+		text->SetPosition(selectPos);
+		Vec3 numPos = easing.EaseInOut(EasingType::Exponential, Vec3(m_pos.x + i * -m_widthSpace + 500.0f, (m_pos.y + (j + 1) * m_heightSpace) + 70, 0.0f), Vec3(m_pos.x + i * -m_widthSpace + 60, (m_pos.y + (j + 1) * m_heightSpace) + 70, 0.0f), m_totalTime, totaltime);
+		num->SetPosition(numPos);
 	}
 	void SelectSprite::Debug() {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
