@@ -36,15 +36,9 @@ namespace basecross {
 		}
 	}
 
-	void TitleStage::OnDraw()
-	{
-		auto ptrSofa = AddGameObject<Draw>(Vec3(0), Vec3());
-	}
-
 	void TitleStage::OnTitleSprite()
 	{
 		AddGameObject<Sprite>(L"TITLEBACKGROUND", true, Vec2(640.0f, 410.0f), Vec3(0.0f, -5.0f, 0.3f));
-		AddGameObject<BlinkingSprite>(L"TITLETEXT", true, Vec2(640.0f, 410.0f), Vec3(0.0f, -250.0f, 0.1f));
 		AddGameObject<Sprite>(L"TITLEEFFECT", true, Vec2(640.0f, 205.0f), Vec3(0.0f, 0.0f, 0.2f));
 		AddGameObject<Sprite>(L"TITLEROGO", true, Vec2(640.0f, 410.0f), Vec3(0.0f, 0.0f, 0.1f));
 	}
@@ -77,23 +71,6 @@ namespace basecross {
 	{
 		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
 	}
-
-	Draw::Draw(const shared_ptr<Stage>& stage,
-		const Vec3& Scale,
-		const Vec3& Position
-	) :
-		GameObject(stage),
-		m_scale(Scale),
-		m_position(Position)
-	{}
-
-	void Draw::OnCreate()
-	{
-		auto ptrTransform = GetComponent<Transform>();
-		ptrTransform->SetScale(Vec3(0));
-		ptrTransform->SetPosition(Vec3(0));
-	}
-
 
 }
 //end basecross

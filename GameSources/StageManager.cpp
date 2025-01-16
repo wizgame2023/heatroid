@@ -448,6 +448,7 @@ namespace basecross {
 		try {
 			//エフェクト作成
 			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
+			m_titleSprite = GetStage()->AddGameObject<BlinkingSprite>(L"TITLETEXT", true, Vec2(640.0f, 410.0f), Vec3(0.0f, -250.0f, 0.1f), 3.5f);
 
 			auto& app = App::GetApp();
 			auto scene = app->GetScene<Scene>();
@@ -481,16 +482,27 @@ namespace basecross {
 		auto scene = app->GetScene<Scene>();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
 
 		switch (m_nowGameStatus) {
 		case GameStatus::TITLE:
+			m_titleSprite->SetDrawActive(true);
 			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
+				m_startFlag = true;
 				PlaySE(L"DecisionSE", 0, 1.0f);
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+			}
+			if (m_startFlag)
+			{
+				m_updateTime += ElapsedTime;
+				if (m_updateTime > 0.5f)
+				{
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+				}
 			}
 			break;
 		case GameStatus::SELECT:
+			m_titleSprite->SetDrawActive(false);
 			if (scene->m_select == 0)
 			{
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
@@ -586,6 +598,7 @@ namespace basecross {
 
 	void StageManager::CreateSprite()
 	{
+
 		m_TextDraw = GetStage()->AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
 		m_TextDraw->SetDrawLayer(3);
 
@@ -613,6 +626,7 @@ namespace basecross {
 		m_TitleCharge = GetStage()->AddGameObject<SelectCharge>(L"PauseTitleCharge", false, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
 		m_TitleCharge->SetDrawLayer(4);
 
+		m_titleSprite->SetDrawActive(false);
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
 		m_nextStageUI->SetDrawActive(false);
