@@ -46,9 +46,16 @@ namespace basecross {
 			OnSelectSprite();
 			PlayBGM(L"TitleBGM");
 			auto backGround = AddGameObject<GameSprite>(1280, 800, L"SelectStageBack", Vec3(0.0f));
+			auto backGround2 = AddGameObject<GameSprite>(1280, 800, L"SelectStageBack2", Vec3(0.0f));
+			auto backGround3 = AddGameObject<GameSprite>(1280, 800, L"SelectStageBack3", Vec3(0.0f));
+			EffectGround = AddGameObject<GameSprite>(1280, 800, L"SelectStageEffect", Vec3(0.0f,-400.0f,0.0f));
 			backGround->SetDrawLayer(-1);
+			backGround2->SetDrawLayer(-2);
+			backGround3->SetDrawLayer(-3);
+			EffectGround->SetDrawLayer(-2);
 			auto selectSprite =AddGameObject<SelectSprite>();
 			SetSharedGameObject(L"selectSprite", selectSprite);
+			m_escapeSelect = m_select;
 			SetSelect(selectSprite->GetSelectNum());
 			//AddGameObject<Timer>(Vec3(0.0f));
 		}
@@ -72,8 +79,10 @@ namespace basecross {
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		StageSelect();
 		auto selectSprite = GetSharedGameObject<SelectSprite>(L"selectSprite");
+		m_escapeSelect = m_select;
 		SetSelect(selectSprite->GetSelectNum());
 		int a = 0;
+		SelectEffect();
 	}
 
 	void SelectStage::OnDestroy() {
@@ -120,8 +129,20 @@ namespace basecross {
 		}
 	}
 
-
-
+	void SelectStage::SelectEffect()
+	{
+		auto SelectStage = EffectGround->GetComponent<Transform>();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		Easing<Vec3> easing;
+		float totaltime = 3.0f;
+		Vec3 pos = SelectStage->GetPosition();
+		pos -= Vec3(0, 15.0f, 0);
+		if (pos.y < -600)
+		{
+			pos.y = 400.0f;
+		}
+		SelectStage->SetPosition(pos);
+	}
 
 	void SelectStage::OnPushA() {
 		OnDestroy();

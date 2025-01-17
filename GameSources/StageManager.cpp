@@ -451,6 +451,7 @@ namespace basecross {
 		try {
 			//エフェクト作成
 			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
+			m_titleSprite = GetStage()->AddGameObject<BlinkingSprite>(L"TITLETEXT", true, Vec2(640.0f, 410.0f), Vec3(0.0f, -250.0f, 0.1f), 3.5f);
 
 			auto& app = App::GetApp();
 			auto scene = app->GetScene<Scene>();
@@ -484,16 +485,27 @@ namespace basecross {
 		auto scene = app->GetScene<Scene>();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
 
 		switch (m_nowGameStatus) {
 		case GameStatus::TITLE:
+			m_titleSprite->SetDrawActive(true);
 			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
+				m_startFlag = true;
 				PlaySE(L"DecisionSE", 0, 1.0f);
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+			}
+			if (m_startFlag)
+			{
+				m_updateTime += ElapsedTime;
+				if (m_updateTime > 0.5f)
+				{
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+				}
 			}
 			break;
 		case GameStatus::SELECT:
+			m_titleSprite->SetDrawActive(false);
 			if (scene->m_select == 0)
 			{
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
@@ -540,6 +552,7 @@ namespace basecross {
 						shObj->SetUpdateActive(true);
 					}
 				}
+				UImake();
 				GoalJudge();
 				GameOverJudge();
 			}
@@ -585,6 +598,7 @@ namespace basecross {
 						shObj->SetUpdateActive(true);
 					}
 				}
+				UImake();
 				GoalJudge();
 				GameOverJudge();
 				OnDraw();
@@ -603,6 +617,7 @@ namespace basecross {
 
 	void StageManager::CreateSprite()
 	{
+
 		m_TextDraw = GetStage()->AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
 		m_TextDraw->SetDrawLayer(3);
 
@@ -611,6 +626,9 @@ namespace basecross {
 
 		m_StageUI = GetStage()->AddGameObject<Sprite>(L"GameStageUI", true, Vec2(640.0f, 400.0f), Vec3(10, 0, 0.0f));
 		m_StageUI->SetDrawLayer(3);
+
+		m_kakaeruUI = GetStage()->AddGameObject<Sprite>(L"Kakaeru", true, Vec2(100.0f, 15.0f), Vec3(200, 0, 0.0f));
+		m_kakaeruUI->SetDrawLayer(3);
 
 		m_nextStageUI = GetStage()->AddGameObject<Sprite>(L"NextStage", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
 		m_nextStageUI->SetDrawLayer(3);
@@ -630,6 +648,7 @@ namespace basecross {
 		m_TitleCharge = GetStage()->AddGameObject<SelectCharge>(L"PauseTitleCharge", false, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
 		m_TitleCharge->SetDrawLayer(4);
 
+		m_titleSprite->SetDrawActive(false);
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
 		m_nextStageUI->SetDrawActive(false);
@@ -638,6 +657,7 @@ namespace basecross {
 		m_overSelectStage->SetDrawActive(false);
 		m_SelectCharge->SetDrawActive(false);
 		m_TitleCharge->SetDrawActive(false);
+		m_kakaeruUI->SetDrawActive(false);
 
 		ToOpeningCamera();
 	}
@@ -919,6 +939,35 @@ namespace basecross {
 	void StageManager::PlaySE(wstring path, float loopcnt, float volume) {
 		auto playSE = App::GetApp()->GetXAudio2Manager();
 		playSE->Start(path, loopcnt, volume);
+	}
+
+	void StageManager::UImake()
+	{
+		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+		auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
+		auto& vec = group->GetGroupVector();
+		for (auto& v : vec)
+		{
+			auto shObj = v.lock();
+			auto pos = player->GetComponent<Transform>()->GetPosition();
+			auto enemy = dynamic_pointer_cast<Enemy>(shObj);
+			Vec3 enemypos = enemy->GetPos();
+			bool overheat = enemy->GetOverHeat();
+			if (overheat)
+			{
+				if (length(pos - enemypos) < 8.0f) {
+					m_kakaeruUI->SetDrawActive(true);
+				}
+				else {
+					m_kakaeruUI->SetDrawActive(false);
+				}
+			}
+			else {
+				if (length(pos - enemypos) < 8.0f) {
+					m_kakaeruUI->SetDrawActive(false);
+				}
+			}
+		}
 	}
 }
 //end basecross

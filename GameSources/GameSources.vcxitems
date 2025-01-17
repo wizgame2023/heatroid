@@ -20,7 +20,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)EnemyImage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Enemyobj.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FixedBox.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)GameOver.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStageHemmi.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)GameStageSprite.h" />
@@ -33,7 +32,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)ProjectBehavior.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ProjectShader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Scene.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)GameClear.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SelectSprite.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)SelectStage.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Sprite.h" />
@@ -48,7 +46,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Enemy.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Enemyobj.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)FixedBox.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)GameOver.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStageHemmi.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)GameStageSprite.cpp" />
@@ -60,7 +57,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)ProjectBehavior.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)ProjectShader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Scene.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)GameClear.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SelectSprite.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)SelectStage.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Sprite.cpp" />

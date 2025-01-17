@@ -57,9 +57,12 @@ namespace basecross {
 		Vec2 m_StartScale;
 		Vec3 m_StartPos;
 		wstring m_TextureKey;
-	public:
+		bool m_start;
+	public:	
+		float m_TransSpeed;
+
 		BlinkingSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
-			const Vec2& StartScale, const Vec3& StartPos);
+			const Vec2& StartScale, const Vec3& StartPos, const float& m_TransSpeed);
 		virtual ~BlinkingSprite() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
