@@ -542,9 +542,14 @@ namespace basecross {
 		}
 		if (m_Goaltrue)
 		{
-			SetAnim(L"Close");
+			m_animTime += _delta;
+			// プレイヤーがエレベータに入ったら閉じる
+			if (m_animTime >= 3.0f) {
+				SetAnim(L"Close");
+			}
 		}
 		GetComponent<PNTBoneModelDraw>()->UpdateAnimation(_delta);
+		_delta = App::GetApp()->GetElapsedTime();
 	}
 
 	void Door::AddAnim() {

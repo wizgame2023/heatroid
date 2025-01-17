@@ -16,6 +16,9 @@ namespace basecross {
 		m_OpeningCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
 		auto ptrOpeningCamera = ObjectFactory::Create<OpeningCamera>();
 		m_OpeningCameraView->SetCamera(ptrOpeningCamera);
+		m_EndingCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
+		auto ptrEndingCamera = ObjectFactory::Create<EndingCamera>();
+		m_EndingCameraView->SetCamera(ptrEndingCamera);
 		// カメラの設定
 		m_MyCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
 		auto camera = ObjectFactory::Create<MainCamera>();
@@ -553,6 +556,20 @@ namespace basecross {
 				GoalJudge();
 				GameOverJudge();
 			}
+			if (m_CameraSelect == CameraSelect::endingCamera)
+			{
+				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+				auto& vec = group->GetGroupVector();
+				for (auto v : vec)
+				{
+					auto shObj = v.lock();
+					if (shObj->GetUpdateActive() == true)
+					{
+						shObj->SetUpdateActive(false);
+					}
+				}
+				GoalJudge();
+			}
 			break;
 
 		case GameStatus::TEST_PLAY:
@@ -647,6 +664,7 @@ namespace basecross {
 
 	void StageManager::GoalJudge()
 	{
+
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
@@ -661,13 +679,17 @@ namespace basecross {
 		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
 		{
+			if (m_CameraSelect != CameraSelect::endingCamera) {
+				ToEndingCamera();
+			}
+
 			if (m_select == 0)
 			{
 				if (m_Flag)
 				{
 					PlaySE(L"GameClearSE", 0, 1.0f);
-					m_BGfade = GetStage()->AddGameObject<FadeOut>();
-					m_BGfade->SetDrawLayer(3);
+					//m_BGfade = GetStage()->AddGameObject<FadeOut>();
+					//m_BGfade->SetDrawLayer(3);
 					m_Flag = false;
 				}
 
@@ -857,9 +879,9 @@ namespace basecross {
 	{
 		GetStage()->AddGameObject<FadeIn>();
 		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
-		auto PlayPos =  PtrPlayer->AddComponent<Transform>()->GetPosition();
+		auto PlayPos = PtrPlayer->AddComponent<Transform>()->GetPosition();
 		Vec3 CameraPos = Vec3(PlayPos.x + 10.0f, PlayPos.y + 5.0f, PlayPos.z);
-		Vec3 CameraStartEndPos = Vec3(PlayPos.x -5.0f, PlayPos.y + 5.0f, PlayPos.z);
+		Vec3 CameraStartEndPos = Vec3(PlayPos.x - 5.0f, PlayPos.y + 5.0f, PlayPos.z);
 		Vec3 CameraEndPos = Vec3(PlayPos.x + 15.0f, PlayPos.y + 10.0f, PlayPos.z);
 		Vec3 PlayEndpos = Vec3(PlayPos.x - 5.0f, PlayPos.y, PlayPos.z);
 		Vec3 PlayStartpos = Vec3(PlayPos.x, PlayPos.y + 3.0f, PlayPos.z);
@@ -878,6 +900,39 @@ namespace basecross {
 			ptrOpeningCamera->SetCameraObject(ptrOpeningCameraman);
 			GetStage()->SetView(m_OpeningCameraView);
 			m_CameraSelect = CameraSelect::openingCamera;
+		}
+	}
+
+	void StageManager::ToEndingCamera()
+	{
+		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
+		auto PlayPos = PtrPlayer->AddComponent<Transform>()->GetPosition();
+		Vec3 fwd = PtrPlayer->GetComponent<Transform>()->GetForward();
+		float face = atan2f(fwd.z, fwd.x);
+		//位置(eye, at)の決定
+		Vec3 pos = Vec3(12.0f, -3.0f, -9.0f);
+		Vec3 addpos = Vec3((pos.x * cosf(face)) - (pos.z * sinf(face)), pos.y, (pos.z * cosf(face)) + (pos.x * sinf(face)));
+		Vec3 CameraStartPos = PlayPos + addpos;
+		pos = Vec3(15.0f, -1.0f, -3.0f);
+		addpos = Vec3((pos.x * cosf(face)) - (pos.z * sinf(face)), pos.y, (pos.z * cosf(face)) + (pos.x * sinf(face)));
+		Vec3 CameraEndPos = PlayPos + addpos;
+		pos = Vec3(-6.0f, 2.5f, 0);
+		addpos = Vec3((pos.x * cosf(face)) - (pos.z * sinf(face)), pos.y, (pos.z * cosf(face)) + (pos.x * sinf(face)));
+		Vec3 AtStartPos = PlayPos + addpos;
+		Vec3 AtEndPos = PlayPos + addpos;
+		//カメラのオープニングの移動(最初のカメラの位置、最後のカメラの位置、
+// 　　　　　　　　　　　　　最初に見てる所、最後に見てる所、かかる時間)
+		auto ptrEndingCameraman = GetStage()->AddGameObject<EndingCameraman>(CameraStartPos, CameraEndPos,
+			AtStartPos, AtEndPos,
+			0.0f);
+		//シェア配列に追加
+		GetStage()->SetSharedGameObject(L"EndingCameraman", ptrEndingCameraman);
+
+		auto ptrEndingCamera = dynamic_pointer_cast<EndingCamera>(m_EndingCameraView->GetCamera());
+		if (ptrEndingCamera) {
+			ptrEndingCamera->SetCameraObject(ptrEndingCameraman);
+			GetStage()->SetView(m_EndingCameraView);
+			m_CameraSelect = CameraSelect::endingCamera;
 		}
 	}
 
