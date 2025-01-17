@@ -40,6 +40,7 @@ namespace basecross {
         shared_ptr<GameObject> m_SpriteDraw;         // スプライト描画オブジェクト
         shared_ptr<GameObject> m_TextDraw;           // テキスト描画オブジェクト
         shared_ptr<GameObject> m_StageUI;            // ステージUIオブジェクト
+        shared_ptr<GameObject> m_kakaeruUI;            // ステージUIオブジェクト
         shared_ptr<GameObject> m_nextStageUI;        // 次のステージUIオブジェクト
         shared_ptr<GameObject> m_clearSelectStage;   // クリアステージ選択UIオブジェクト
         shared_ptr<GameObject> m_retryStageUI;       // リトライステージUIオブジェクト
@@ -117,6 +118,8 @@ namespace basecross {
 
         // サウンドエフェクトを再生する
         void PlaySE(wstring path, float loopcnt, float volume);
+
+        void UImake();
 
         // 構築と破棄
         StageManager(const shared_ptr<Stage>& stage) :

@@ -105,6 +105,7 @@ namespace basecross{
 
 		//GameStageUI
 		app->RegisterTexture(L"GameStageUI", texPath + L"UIGameStage.png");
+		app->RegisterTexture(L"Kakaeru", texPath + L"kakaeru.png");
 		app->RegisterTexture(L"PauseBG", texPath + L"PauseBackGround.png");
 		app->RegisterTexture(L"PauseSelect", texPath + L"PauseSelect.png");
 		app->RegisterTexture(L"PauseTitle", texPath + L"PauseTitle.png");
