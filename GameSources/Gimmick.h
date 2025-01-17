@@ -167,6 +167,8 @@ namespace basecross {
 		bool m_Goaltrue;
 		wstring m_Texname;
 		float _delta = App::GetApp()->GetElapsedTime();
+		//ゴール演出用時間計測
+		float m_animTime = 0;
 	public:
 		Door(const shared_ptr<Stage>& stage,
 			const Vec3& position,

@@ -237,7 +237,7 @@ namespace basecross {
 		}
 
 		//演出アニメを利用しないステート
-		if (m_stateType != start) {
+		if (m_stateType != start && m_stateType != goalstandby && m_stateType != goal) {
 			m_animTime = 0.0f;
 		}
 
@@ -322,7 +322,7 @@ namespace basecross {
 			}
 			else if(m_animTime > 1.0f && m_animTime <= 3.0f) {
 				SetAnim(L"Walk");
-				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .005f;
+				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .003f;
 			}
 			else if (m_animTime > 3.0f) {
 				SetAnim(L"Idle");
@@ -352,9 +352,54 @@ namespace basecross {
 
 			break;
 			//---------------------------------------ゴール
-		case goal:
+		case goalstandby:
+
+			if (m_animTime == 0){
+				GetStage()->AddGameObject<GoalFade>();
+				PlaySnd(L"RevCymbal", 1.0f, 0.0f);
+			}
+			m_animTime += _delta;
+
 			SetAnim(L"Idle");
 			Friction();
+
+			//Goal床を参照してその手前にワープ
+			if (m_animTime > 1.5f) {
+				shared_ptr<Transform> trans = m_goal->GetComponent<Transform>();
+
+				m_moveVel = Vec3(0);
+				Vec3 fwd = trans->GetForward();
+				float face = atan2f(fwd.z, fwd.x) + XM_PIDIV2;
+				Vec3 addpos = Vec3((m_distToGoal * cosf(face)), GetComponent<Transform>()->GetPosition().y, (m_distToGoal * sinf(face)));
+				GetComponent<Transform>()->SetPosition(trans->GetPosition() + addpos);
+				m_goalRotate = trans->GetRotation();
+				m_goalRotate.y += XM_PIDIV2;
+				GetComponent<Transform>()->SetRotation(m_goalRotate);
+
+				m_animTime = 0.0f; 
+				m_stateType = goal;
+			}
+
+			break;
+			//---------------------------------------ゴール
+		case goal:
+			m_animTime += _delta;
+			//しばらく歩いてからエレベータに入ったところで180°振り向く
+			if (m_animTime > 0.0f && m_animTime <= 3.0f) {
+				SetAnim(L"Walk");
+				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .003f;
+			}
+			else if (m_animTime > 3.0f && m_animTime <= 3.5f) {
+				SetAnim(L"Idle");
+				Easing<Vec3> rot;
+
+				GetComponent<Transform>()->SetRotation(rot.EaseInOut(EasingType::Cubic, m_goalRotate, m_goalRotate + Vec3(0, XM_PI, 0), m_animTime - 3.0f, .5f));
+			}
+			else if (m_animTime > 4.0f) {
+				 SetAnim(L"Idle");
+			 }
+			FrictionMovie();
+			SpeedLimit();
 
 			break;
 		}
@@ -371,7 +416,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		//ShowDebug();
+		ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -382,6 +427,7 @@ namespace basecross {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		wss << "stateType : " << m_stateType << endl;
 		wss << "move : " << m_moveVel.x << " / " << m_moveVel.y << " / " << m_moveVel.z << endl;
+		wss << "pos : " << pos.x << " / " << pos.y << " / " << pos.z << endl;
 		wss << "rotate : " << rot.x << " / " << rot.y << " / " << rot.z << endl;
 		wss << "anim : " << GetDrawPtr()->GetCurrentAnimation() << " animtime : " << GetDrawPtr()->GetCurrentAnimationTime() << endl;
 		wss << "fire : " << m_isCharging << " " << m_chargePerc << endl;
@@ -390,12 +436,20 @@ namespace basecross {
 		wss << "grab : " << m_pGrab.lock()->IsHit() << " : " << m_grabTime << endl;
 		wss << "fps : " << App::GetApp()->GetStepTimer().GetFramesPerSecond() << " delta : " << _delta << endl;
 
+		if (m_goal) {
+			auto gpos = m_goal->GetComponent<Transform>()->GetPosition();
+			auto grot = m_goal->GetComponent<Transform>()->GetRotation();
+			wss << "goal : " << gpos.x << " / " << gpos.y << " / " << gpos.z << endl;
+			wss << "goalrot : " << grot.x << " / " << grot.y << " / " << grot.z << endl;
+		}
+
 		auto scene = App::GetApp()->GetScene<Scene>();
 		scene->SetDebugString(L"Player\n" + wss.str());
 	}
 
 	void Player::OnPushA() {
-		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
+		if (m_stateType == goal) return;	//立ち状態以外ではジャンプしない
+		//if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
 		if (m_isCarrying == true) return;	//敵を持った状態でもジャンプしない
 		m_moveVel.y = m_jumpHeight;
 		m_stateType = air;
@@ -403,6 +457,12 @@ namespace basecross {
 
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
 		m_collideCount = m_collideCountInit;
+
+		//Goal床に触れたらgoalstandbyステートに移行
+		if (Other->FindTag(L"Goal") && m_stateType == stand) {
+			m_goal = Other;
+			m_stateType = goalstandby;
+		}
 
 		//被弾判定
 		if (Other->FindTag(L"Enemy"))
@@ -461,9 +521,6 @@ namespace basecross {
 
 	void Player::OnCollisionEnter(shared_ptr<GameObject>& Other)
 	{
-		if (Other->FindTag(L"Goal") && m_stateType == stand) {
-			m_stateType = goal;
-		}
 		if (Other->FindTag(L"GoalBefore")) {
 			auto group = GetStage()->GetSharedObjectGroup(L"StageDoor");
 			auto& vec = group->GetGroupVector();
@@ -525,6 +582,7 @@ namespace basecross {
 	//摩擦(地上のみ)
 	void Player::Friction() {
 		if (m_doPhysicalProcess = false) return;
+		//静摩擦
 		if (GetMoveVector() == Vec3(0) || m_stateType == died || m_animTime > 0.0f) {
 			m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
 			m_moveVel.z -= m_moveVel.z * m_friction * (1000.0f / 60.0f) * _delta;
@@ -532,6 +590,7 @@ namespace basecross {
 			if (abs(m_moveVel.z) <= m_frictionThreshold) m_moveVel.z = 0;
 			return;
 		}
+		//動摩擦
 		if (GetMoveVector() != Vec3(0)) {
 			m_moveVel.x -= m_moveVel.x * m_frictionDynamic * (1000.0f / 60.0f) * _delta;
 			m_moveVel.z -= m_moveVel.z * m_frictionDynamic * (1000.0f / 60.0f) * _delta;
@@ -911,7 +970,7 @@ namespace basecross {
 		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
 		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
 		m_DrawComp->SetTextureResource(m_resKey);
-		m_DrawComp->SetDrawActive(true);
+		m_DrawComp->SetDrawActive(false);
 		SetDrawLayer(m_layer);
 		SetAlphaActive(true);
 
@@ -950,7 +1009,7 @@ namespace basecross {
 		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
 		m_DrawComp->SetDiffuse(color);
 		m_DrawComp->SetTextureResource(ResKey);
-		m_DrawComp->SetDrawActive(true);
+		m_DrawComp->SetDrawActive(false);
 		SetDrawLayer(2);
 		SetAlphaActive(true);
 

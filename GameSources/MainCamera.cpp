@@ -48,6 +48,9 @@ namespace basecross {
 
 		auto Ptr = GetComponent<Transform>();
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
+		if (!ptrCamera) {
+			return;
+		}
 		auto ptrTarget = ptrCamera->GetTargetObject();
 
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
@@ -482,4 +485,80 @@ namespace basecross {
 			SetAt(pos);
 		}
 	}
+
+	//ステージクリア時のカメラ演出
+	EndingCameraman::EndingCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
+		const Vec3& AtStartPos, const Vec3& AtEndPos, const float& TotalTime) :
+		GameObject(StagePtr),
+		m_startPos(StartPos),
+		m_endPos(EndPos),
+		m_atStartPos(AtStartPos),
+		m_atEndPos(AtEndPos),
+		m_totalTime(TotalTime)
+	{}
+	EndingCameraman::~EndingCameraman() {}
+
+	//初期化
+	void EndingCameraman::OnCreate() {
+		//初期位置などの設定
+		auto ptr = GetComponent<Transform>();
+		ptr->SetScale(0.25f, 0.25f, 0.25f);	//直径25センチの球体
+		ptr->SetRotation(0.0f, 0.0f, 0.0f);
+		ptr->SetPosition(m_startPos);
+		//ステートマシンの構築
+		m_StateMachine.reset(new StateMachine<EndingCameraman>(GetThis<EndingCameraman>()));
+		//ステート設定
+		m_StateMachine->ChangeState(EndingCameramanBasicState::Instance());
+	}
+
+	//操作
+	void EndingCameraman::OnUpdate() {
+		//ステートマシンのUpdateを行う
+		m_StateMachine->Update();
+	}
+
+	void EndingCameraman::ExcuteBehavior(float totaltime) {
+		if (m_totalTime > totaltime) return;
+		m_totalTime += App::GetApp()->GetElapsedTime();
+		Easing<Vec3> easing;
+		m_eyePos = easing.EaseInOut(EasingType::Cubic, m_startPos, m_endPos, m_totalTime, totaltime);
+		m_atPos = easing.EaseInOut(EasingType::Cubic, m_atStartPos, m_atEndPos, m_totalTime, totaltime);
+		auto ptrTrans = GetComponent<Transform>();
+		ptrTrans->SetPosition(m_eyePos);
+	}
+
+	void EndingCameraman::BasicStateEnterBehavior() {
+		auto ptrStageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		ptrStageMgr->ToMainCamera();
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class EndingCameramanBasicState : public ObjState<EndingCameraman>;
+	//--------------------------------------------------------------------------------------
+	void EndingCameramanBasicState::Enter(const shared_ptr<EndingCameraman>& Obj) {
+		Obj->BasicStateEnterBehavior();
+	}
+	void EndingCameramanBasicState::Execute(const shared_ptr<EndingCameraman>& Obj) {
+		Obj->ExcuteBehavior(4.0f);
+	}
+	void EndingCameramanBasicState::Exit(const shared_ptr<EndingCameraman>& Obj) {
+	}
+
+	EndingCamera::EndingCamera() :
+		Camera()
+	{}
+	EndingCamera::~EndingCamera() {}
+
+	void EndingCamera::OnUpdate() {
+		Camera::OnUpdate();
+
+		auto ptrEndingCameraman = dynamic_pointer_cast<EndingCameraman>(GetCameraObject());
+		if (ptrEndingCameraman) {
+			auto pos = ptrEndingCameraman->GetAtPos();
+			auto eye = ptrEndingCameraman->GetEyePos();
+			SetEye(eye);
+			SetAt(pos);
+		}
+	}
+
 }

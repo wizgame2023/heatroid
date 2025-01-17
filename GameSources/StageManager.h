@@ -12,6 +12,7 @@ namespace basecross {
 	public:
 		enum CameraSelect {
 			openingCamera,
+			endingCamera,
 			myCamera,
 		};
 
@@ -30,6 +31,7 @@ namespace basecross {
 
 		CameraSelect m_CameraSelect;
 		shared_ptr<SingleView> m_OpeningCameraView;
+		shared_ptr<SingleView> m_EndingCameraView;
 		shared_ptr<SingleView> m_MyCameraView;
 		int m_nowGameStatus;
 		wstring m_StageName;
@@ -75,6 +77,7 @@ namespace basecross {
 		int GetNowCameraStatus();
 		void ToMainCamera();
 		void ToOpeningCamera();
+		void ToEndingCamera();
 
 		void PlaySE(wstring path, float loopcnt, float volume);
 		
