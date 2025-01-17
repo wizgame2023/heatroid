@@ -549,6 +549,7 @@ namespace basecross {
 						shObj->SetUpdateActive(true);
 					}
 				}
+				UImake();
 				GoalJudge();
 				GameOverJudge();
 			}
@@ -580,6 +581,7 @@ namespace basecross {
 						shObj->SetUpdateActive(true);
 					}
 				}
+				UImake();
 				GoalJudge();
 				GameOverJudge();
 				OnDraw();
@@ -608,6 +610,9 @@ namespace basecross {
 		m_StageUI = GetStage()->AddGameObject<Sprite>(L"GameStageUI", true, Vec2(640.0f, 400.0f), Vec3(10, 0, 0.0f));
 		m_StageUI->SetDrawLayer(3);
 
+		m_kakaeruUI = GetStage()->AddGameObject<Sprite>(L"Kakaeru", true, Vec2(100.0f, 15.0f), Vec3(200, 0, 0.0f));
+		m_kakaeruUI->SetDrawLayer(3);
+
 		m_nextStageUI = GetStage()->AddGameObject<Sprite>(L"NextStage", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
 		m_nextStageUI->SetDrawLayer(3);
 
@@ -635,6 +640,7 @@ namespace basecross {
 		m_overSelectStage->SetDrawActive(false);
 		m_SelectCharge->SetDrawActive(false);
 		m_TitleCharge->SetDrawActive(false);
+		m_kakaeruUI->SetDrawActive(false);
 
 		ToOpeningCamera();
 	}
@@ -878,6 +884,35 @@ namespace basecross {
 	void StageManager::PlaySE(wstring path, float loopcnt, float volume) {
 		auto playSE = App::GetApp()->GetXAudio2Manager();
 		playSE->Start(path, loopcnt, volume);
+	}
+
+	void StageManager::UImake()
+	{
+		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+		auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
+		auto& vec = group->GetGroupVector();
+		for (auto& v : vec)
+		{
+			auto shObj = v.lock();
+			auto pos = player->GetComponent<Transform>()->GetPosition();
+			auto enemy = dynamic_pointer_cast<Enemy>(shObj);
+			Vec3 enemypos = enemy->GetPos();
+			bool overheat = enemy->GetOverHeat();
+			if (overheat)
+			{
+				if (length(pos - enemypos) < 8.0f) {
+					m_kakaeruUI->SetDrawActive(true);
+				}
+				else {
+					m_kakaeruUI->SetDrawActive(false);
+				}
+			}
+			else {
+				if (length(pos - enemypos) < 8.0f) {
+					m_kakaeruUI->SetDrawActive(false);
+				}
+			}
+		}
 	}
 }
 //end basecross
