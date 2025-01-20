@@ -544,7 +544,7 @@ namespace basecross {
 		{
 			m_animTime += _delta;
 			// プレイヤーがエレベータに入ったら閉じる
-			if (m_animTime >= 3.0f) {
+			if (m_animTime >= 3.5f) {
 				SetAnim(L"Close");
 			}
 		}

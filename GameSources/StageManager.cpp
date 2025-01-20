@@ -675,6 +675,7 @@ namespace basecross {
 		float totaltime = 1.0f;
 		Easing<Vec3> easing;
 
+
 		auto playerSh = GetStage()->GetSharedGameObject<Player>(L"Player");
 		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
@@ -688,9 +689,15 @@ namespace basecross {
 				if (m_Flag)
 				{
 					PlaySE(L"GameClearSE", 0, 1.0f);
-					//m_BGfade = GetStage()->AddGameObject<FadeOut>();
-					//m_BGfade->SetDrawLayer(3);
 					m_Flag = false;
+				}
+				else {
+					m_clearTotalTime += ElapsedTime;
+				}
+				if (m_fadeoutFlag && m_clearTotalTime >= 6.0f) {
+					m_BGfade = GetStage()->AddGameObject<FadeOut>();
+					m_BGfade->SetDrawLayer(3);
+					m_fadeoutFlag = false;
 				}
 
 				GetTypeStage<GameStage>()->OnDestroy();

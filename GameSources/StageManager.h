@@ -13,7 +13,7 @@ namespace basecross {
         // カメラの選択
         enum CameraSelect {
             openingCamera,    // オープニングカメラ
-	      		endingCamera,     // クリア演出カメラ
+	      	endingCamera,     // クリア演出カメラ
             myCamera,         // ゲームプレイカメラ
         };
 
@@ -30,7 +30,7 @@ namespace basecross {
 
         CameraSelect m_CameraSelect;                 // 現在のカメラを保持する変数
         shared_ptr<SingleView> m_OpeningCameraView;  // オープニングカメラビュー
-		    shared_ptr<SingleView> m_EndingCameraView;   // クリア演出カメラビュー
+		shared_ptr<SingleView> m_EndingCameraView;   // クリア演出カメラビュー
         shared_ptr<SingleView> m_MyCameraView;       // ゲームプレイカメラビュー
         int m_nowGameStatus;                         // 現在のゲームステータス
         wstring m_StageName;                         // ステージの名前
@@ -52,15 +52,17 @@ namespace basecross {
         shared_ptr<GameObject> m_BGfade;             // 背景フェードオブジェクト
 
         float m_totalTime = 0.0f;                    // 合計時間を計測する変数
+        float m_clearTotalTime = 0.0f;               // クリア後の演出用
         int m_select = 0;                            // 選択された項目のインデックス
 
         bool m_Goaltrue = false;                     // ゴールに達したかのフラグ
         bool m_Diedtrue = false;                     // 死亡したかのフラグ
         bool m_pause = false;                        // ポーズ中かのフラグ
         bool m_Flag = true;                          // フラグ
+        bool m_fadeoutFlag = true;                   // フェードアウトフラグ
         bool m_startFlag = false;                    // タイトルのフラグ
         int m_PushState = 0;                         // ボタンの押下状態
-        float m_updateTime;                           //　計測時間
+        float m_updateTime;                          //　計測時間
         // ビューの作成
         void CreateViewLight();
 
@@ -119,7 +121,7 @@ namespace basecross {
         void ToOpeningCamera();
 
         // クリア演出カメラに切り替える
-		    void ToEndingCamera();
+		void ToEndingCamera();
         
         // サウンドエフェクトを再生する
         void PlaySE(wstring path, float loopcnt, float volume);
