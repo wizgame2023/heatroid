@@ -86,9 +86,10 @@ namespace basecross {
 		shared_ptr<GameObject> m_goal = nullptr;
 		bool m_goalPosMoved = false;
 		//ゴール演出にてゴールから離れる距離
-		const float m_distToGoal = -15.0f;
+		const float m_distToGoal = 15.0f;
 		//ゴール演出で振り向く処理用
-		Vec3 m_goalRotate = Vec3(0);
+		Quat m_goalRotate = Quat(0);
+		Vec3 pos1, addpos1;
 
 		//ステージマネージャ
 		shared_ptr<StageManager> m_stageMgr;
@@ -122,6 +123,13 @@ namespace basecross {
 		
 		float _delta = App::GetApp()->GetElapsedTime();
 
+		//q:最初の回転 v:回転軸 rad:回転量
+		Quat RotateQuat(const Quat q, const Vec3 v,const float rad) {
+			Quat r = Quat(cos(rad / 2), v.x * sin(rad / 2), v.y * sin(rad / 2), v.z * sin(rad / 2));
+			Quat r2 = Quat(cos(rad / 2), -v.x * sin(rad / 2), -v.y * sin(rad / 2), -v.z * sin(rad / 2));
+			return q * r * r2;
+
+		}
 
 	public:
 		//構築と破棄
