@@ -37,28 +37,29 @@ namespace basecross {
 		//入力ハンドラー
 		InputHandler<Player> m_InputHandler;
 		//スピード(最高速)
-		float m_speed;
-		float m_airSpeedPerc;
+		const float m_speed = 72.0f;
+		const float m_airSpeedPerc = .35f;
 		//加速度
-		float m_accel;
+		const float m_accel = 200.0f;
 		//摩擦係数(静/動/完全停止)
-		float m_friction;
-		float m_frictionDynamic;
-		float m_frictionThreshold;
+		const float m_friction = .75f;
+		const float m_frictionDynamic = .5f;
+		const float m_frictionThreshold = .5f;
 		//ジャンプ高度
-		float m_jumpHeight;
+		const float m_jumpHeight = 12.0f;
 		//操作方向の向き
-		float m_moveAngle;
+		float m_moveAngle = 0;
 		//重力
-		float m_gravity;
+		const float m_gravity = -20.0f;
 		//落下時の終端速度
-		float m_fallTerminal;
+		const float m_fallTerminal = -50.0f;
 		//飛び道具が出る場所
-		Vec3 m_firePos;
+		const Vec3 m_firePos = Vec3(1.0f, .8f, -.75f);
 		//移動方向
-		Vec3 m_moveVel;
+		Vec3 m_moveVel = Vec3(0, 0, 0);
 		//CollisionExitの空中判定用カウント
-		int m_collideCount, m_collideCountInit;
+		int m_collideCount;
+		const int m_collideCountInit = 10;
 
 		float m_landSEcooltime = 0.0f;
 
@@ -73,13 +74,21 @@ namespace basecross {
 			release,	//発射
 			start,		//ゲーム開始演出
 			died,		//死亡
-			died_air,		//死亡空中
+			died_air,	//死亡空中
+			goalstandby,//ゴール演出待機	
 			goal		//ステージクリア
 		};
 		//プレイヤーの状態
-		Stats m_stateType;
+		Stats m_stateType = start;
 		//演出アニメ制御用の時間計測変数
-		float m_animTime = 0.0f;
+		float m_animTime = 0;
+		//ゴール床
+		shared_ptr<GameObject> m_goal = nullptr;
+		bool m_goalPosMoved = false;
+		//ゴール演出にてゴールから離れる距離
+		const float m_distToGoal = -15.0f;
+		//ゴール演出で振り向く処理用
+		Vec3 m_goalRotate = Vec3(0);
 
 		//ステージマネージャ
 		shared_ptr<StageManager> m_stageMgr;
@@ -90,20 +99,26 @@ namespace basecross {
 		//移動時の物理学的な計算を行うか否か
 		bool m_doPhysicalProcess;
 		//チャージ中orオーバーチャージ中
-		bool m_isCharging, m_isOverCharge;
+		bool m_isCharging = false;
+		bool m_isOverCharge = false;
 		//タメ
-		float m_chargePerc, m_chargeSpeed, m_chargeReduceSpeed;
+		float m_chargePerc = 0;
+		const float m_chargeSpeed = 1.2f;
+		const float m_chargeReduceSpeed = -.4f;
 		//無敵時間
-		float m_invincibleTime, m_invincibleTimeMax;
+		float m_invincibleTime = 0;
+		const float m_invincibleTimeMax = 1.8f;
 		//掴み判定の持続秒数
-		float m_grabTime, m_grabTimeMax;
+		float m_grabTime = 0;
+		const float m_grabTimeMax = .2f;
 		//何かを持っているか否か
 		bool m_isCarrying;
-		//歩行音用
+		//歩行音の間隔計測用
 		float m_walkSndTime;
 
 		//HP
-		int m_HP, m_HP_max;
+		int m_HP = 0;
+		const int m_HP_max = 4;
 		
 		float _delta = App::GetApp()->GetElapsedTime();
 

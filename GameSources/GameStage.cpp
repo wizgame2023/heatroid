@@ -154,25 +154,19 @@ namespace basecross {
 				{
 					totaltime += time;
 					stageMane->SetPushState(1);
-					if (totaltime > 1.0f)
-					{
-						PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
-						OnDestroy();
-					}
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+					OnDestroy();
 				}
 				if (cntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A || KeyState.m_bUpKeyTbl[VK_RETURN])
 				{
 					stageMane->SetPushState(0);
 				}
-				if (cntlVec[0].wButtons & XINPUT_GAMEPAD_B || KeyState.m_bPushKeyTbl[VK_BACK])
+				if (cntlVec[0].wButtons & XINPUT_GAMEPAD_B || KeyState.m_bPushKeyTbl[VK_SPACE])
 				{
 					stageMane->SetPushState(2);
 					totaltime += time;
-					if (totaltime > 1.0f)
-					{
-						PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
-						OnDestroy();
-					}
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+					OnDestroy();
 				}
 				if (cntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_B || KeyState.m_bUpKeyTbl[VK_BACK])
 				{

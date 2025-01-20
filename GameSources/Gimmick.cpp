@@ -425,11 +425,18 @@ namespace basecross {
 				{
 					if (m_number == 1)
 					{
-						if(pos.y < m_Max)
+						switch (ido)
 						{
+						case 0:
 							ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
+							if (pos.y > m_Max) 
+								ido = 1;
+							break;
+						case 1:
+							ptrTransform->SetPosition(Vec3(pos.x, pos.y -= 0.05f, pos.z));
+							if (pos.y < 0)ido = 0;
+							break;
 						}
-						
 					}
 					else if (m_number == 2)
 					{
@@ -442,9 +449,16 @@ namespace basecross {
 								m_open2 = Switchs2->GetButton();
 								if (m_open2)
 								{
-									if (pos.y < 10.0f)
+									switch (ido)
 									{
+									case 0:
 										ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
+										if (pos.y > 10.0f) ido = 1;
+										break;
+									case 1:
+										ptrTransform->SetPosition(Vec3(pos.x, pos.y -= 0.05f, pos.z));
+										if (pos.y < 0)ido = 0;
+										break;
 									}
 								}
 								else
@@ -528,9 +542,14 @@ namespace basecross {
 		}
 		if (m_Goaltrue)
 		{
-			SetAnim(L"Close");
+			m_animTime += _delta;
+			// プレイヤーがエレベータに入ったら閉じる
+			if (m_animTime >= 3.0f) {
+				SetAnim(L"Close");
+			}
 		}
 		GetComponent<PNTBoneModelDraw>()->UpdateAnimation(_delta);
+		_delta = App::GetApp()->GetElapsedTime();
 	}
 
 	void Door::AddAnim() {
@@ -541,7 +560,4 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
 	}
-
-
-
 }

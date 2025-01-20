@@ -25,6 +25,7 @@ namespace basecross{
 		float m_coolTime;
 		float m_maxCoolTime;
 		float m_sum;
+		float m_totalTime;
 		int m_selectNum;
 		int m_keepNum;
 
@@ -38,6 +39,7 @@ namespace basecross{
 		Vec2 m_minPos;
 		shared_ptr<GameSprite> m_sprite[20];
 		shared_ptr<GameSprite> m_selectSprite;
+		shared_ptr<GameSprite> m_titleText;
 		shared_ptr<Transform> m_trans;
 		shared_ptr<GameSprite> m_sText[20];
 		shared_ptr<NumberSprite> m_sNum[20];
@@ -53,7 +55,7 @@ namespace basecross{
 		void Decision();
 		void Debug();
 		int GetSelectNum();
-
+		void MoveSprite(const int& sNum, const int& i, const int& j);
 	};
 
 }

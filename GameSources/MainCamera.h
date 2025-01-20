@@ -9,275 +9,170 @@
 
 namespace basecross {
 
-	class CameraCollision :public GameObject
+	class CameraCollision : public GameObject
 	{
-		Vec3 GetPos;
-		Vec3 TargetPos;
-		bool m_Hit;
-		float m_ArmLen;
-		float m_ToTargetLerp;	//目標を追いかける際の補間値
-		bsm::Vec3 m_TargetToAt;	//目標から視点を調整する位置ベクトル
-		//回転スピード
-		float m_RotSpeed;
-		//左右スティック変更のモード
-		bool m_LRBaseMode;
-		float m_RadY;
-		float m_RadXZ;
-
+		Vec3 GetPos;                            // カメラの現在位置を保持するベクトル
+		Vec3 TargetPos;                         // カメラの目標位置を保持するベクトル
+		bool m_Hit;                             // ヒット判定フラグ
+		float m_ArmLen;                         // 腕の長さを保持する変数
+		float m_ToTargetLerp;                   // 目標を追いかける際の補間値
+		bsm::Vec3 m_TargetToAt;                 // 目標から視点を調整する位置ベクトル
+		float m_RotSpeed;						// 回転スピード
+		bool m_LRBaseMode;						// 左右スティック変更のモード
+		float m_RadY;                           // Y軸の回転角度
+		float m_RadXZ;                          // XZ平面の回転角度
 
 	public:
+		// コンストラクタ
 		CameraCollision(const shared_ptr<Stage>& StagePtr);
 		virtual ~CameraCollision() {}
-		//初期化
-		virtual void OnCreate();
-		//更新
-		virtual void OnUpdate();
-		virtual void OnCollisionExcute(const CollisionPair& Pair) override;
-		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
-		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
-		void UpdateArmLengh();
-		bool GetLRBaseMode() const;
-		bool IsLRBaseMode() const;
 
+		// 初期化
+		virtual void OnCreate();
+
+		// 更新処理
+		virtual void OnUpdate();
+
+		// 衝突処理の実行
+		virtual void OnCollisionExcute(const CollisionPair& Pair) override;
+
+		// 衝突開始時の処理
+		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+
+		// 衝突終了時の処理
+		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
+
+		// 腕の長さを更新する
+		void UpdateArmLengh();
+
+		// 左右スティック変更のモードを取得する
+		bool GetLRBaseMode() const;
+
+		// 左右スティック変更のモードかどうかを判定する
+		bool IsLRBaseMode() const;
 	};
 
 	class MainCamera : public Camera {
 	public:
-		weak_ptr<GameObject> m_TargetObject;	//目標となるオブジェクト
-		float m_ToTargetLerp;	//目標を追いかける際の補間値
-		bsm::Vec3 m_TargetToAt;	//目標から視点を調整する位置ベクトル
-		float m_RadY;
-		float m_RadXZ;
-		//カメラを下げる下限角度
-		float m_CameraUnderRot;
-		//腕の長さの設定
-		float m_ArmLen;
-		float m_MaxArm;
-		float m_MinArm;
-		//回転スピード
-		float m_RotSpeed;
-		//ズームスピード
-		float m_ZoomSpeed;
-		//左右スティック変更のモード
-		bool m_LRBaseMode;
+		weak_ptr<GameObject> m_TargetObject;    // 目標となるオブジェクト
+		float m_ToTargetLerp;                   // 目標を追いかける際の補間値
+		bsm::Vec3 m_TargetToAt;                 // 目標から視点を調整する位置ベクトル
+		float m_RadY;                           // Y軸の回転角度
+		float m_RadXZ;                          // XZ平面の回転角度
+		float m_CameraUnderRot;					// カメラを下げる下限角度
+		float m_ArmLen;							// 腕の長さの設定
+		float m_MaxArm;                         // 腕の最大長さ
+		float m_MinArm;                         // 腕の最小長さ
+		float m_RotSpeed;						// 回転スピード
+		float m_ZoomSpeed;						// ズームスピード
+		bool m_LRBaseMode;						// 左右スティック変更のモード
 
-		bool m_Hit;
-		bool m_Pushbool = false;
-		POINT m_beforeCursorPos{ 0, 0 };
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		*/
-		//--------------------------------------------------------------------------------------
+		bool m_Hit;                             // ヒット判定
+		bool m_Pushbool = false;                // ボタン押下の状態
+		POINT m_beforeCursorPos{ 0, 0 };        // カーソルの前回位置
+
+		// コンストラクタ
 		MainCamera();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	コンストラクタ
-		@param[in]	ArmLen	最初のArmの長さ
-		*/
-		//--------------------------------------------------------------------------------------
 		MainCamera(float ArmLen);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	デストラクタ
-		*/
-		//--------------------------------------------------------------------------------------
 		virtual ~MainCamera();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief カメラの位置を設定する
-		@param[in]	Eye	カメラ位置
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void SetEye(const bsm::Vec3& Eye)override;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief カメラの位置を設定する
-		@param[in]	x	x位置
-		@param[in]	y	y位置
-		@param[in]	z	z位置
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void SetEye(float x, float y, float z)override;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	カメラの目標オブジェクトを得る
-		@return	カメラの目標
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// カメラの視点を設定する（ベクトル）
+		virtual void SetEye(const bsm::Vec3& Eye) override;
+		// カメラの視点を設定する（座標）
+		virtual void SetEye(float x, float y, float z) override;
+
+		// 目標オブジェクトを取得する
 		shared_ptr<GameObject> GetTargetObject() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	カメラの目標オブジェクトを設定する
-		@param[in]	Obj	カメラの目標オブジェクト
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 目標オブジェクトを設定する
 		void SetTargetObject(const shared_ptr<GameObject>& Obj);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	オブジェクトを追いかける場合の補間値を得る
-		@return	オブジェクトを追いかける場合の補間値
-		*/
-		//-------------------------------------------------------------------------------------
+
+		// 補間値を取得する
 		float GetToTargetLerp() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	オブジェクトを追いかける場合の補間値を設定する
-		@param[in]	f	オブジェクトを追いかける場合の補間値
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 補間値を設定する
 		void SetToTargetLerp(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	EyeとAtの距離を得る
-		@return	EyeとAtの距離
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 腕の長さを取得する
 		float GetArmLengh() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	EyeとAtの距離を更新する（現在のEyeとAtから求める）
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 腕の長さを更新する
 		void UpdateArmLengh();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	EyeとAtの距離の最大値を得る
-		@return	EyeとAtの距離の最大値
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 腕の最大長さを取得する
 		float GetMaxArm() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	EyeとAtの距離の最大値を設定する
-		@param[in]	f	EyeとAtの距離の最大値
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 腕の最大長さを設定する
 		void SetMaxArm(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	EyeとAtの距離の最小値を得る
-		@return	EyeとAtの距離の最小値
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 腕の最小長さを取得する
 		float GetMinArm() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	EyeとAtの距離の最小値設定する
-		@param[in]	f	EyeとAtの距離の最小値
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 腕の最小長さを設定する
 		void SetMinArm(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	回転スピードを得る
-		@return	回転スピード（0.0f以上）
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 回転スピードを取得する
 		float GetRotSpeed() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	回転スピードを設定する
-		@param[in]	f	回転スピード（マイナスを入力してもプラスになる）
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 回転スピードを設定する
 		void SetRotSpeed(float f);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ターゲットからAtへの調整ベクトルを得る
-		@return	ターゲットからAtへの調整ベクトル
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 目標から視点を調整する位置ベクトルを取得する
 		bsm::Vec3 GetTargetToAt() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ターゲットからAtへの調整ベクトルを設定する
-		@param[in]	v	ターゲットからAtへの調整ベクトルを
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 目標から視点を調整する位置ベクトルを設定する
 		void SetTargetToAt(const bsm::Vec3& v);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	Rスティックの左右変更をBaseモードにするかどうかを得る
-		@return	Baseモードならtrue（デフォルト）
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 左右スティック変更のモードを取得する
 		bool GetLRBaseMode() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	Rスティックの左右変更をBaseモードにするかどうかを得る
-		@return	Baseモードならtrue（デフォルト）
-		*/
-		//--------------------------------------------------------------------------------------
+
+		// 左右スティック変更のモードかどうかを判定する
 		bool IsLRBaseMode() const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	Rスティックの左右変更をBaseモードにするかどうかを設定する
-		@param[in]	b	Baseモードならtrue
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void SetAt(const bsm::Vec3& At)override;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief カメラの視点を設定する
-		@param[in]	x	x位置
-		@param[in]	y	y位置
-		@param[in]	z	z位置
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void SetAt(float x, float y, float z)override;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief 更新処理
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void OnUpdate()override;
+
+		// 注視点を設定する（ベクトル）
+		virtual void SetAt(const bsm::Vec3& At) override;
+
+		// 注視点を設定する（座標）
+		virtual void SetAt(float x, float y, float z) override;
+
+		// 更新処理
+		virtual void OnUpdate() override;
 	};
 
 	class OpeningCameraman : public GameObject {
-		Vec3 m_startPos;
-		Vec3 m_endPos;
-		Vec3 m_atStartPos;
-		Vec3 m_atEndPos;
-		Vec3 m_atPos;
-		Vec3 m_eyePos;
-		float m_totalTime;
-		Vec3 m_secondEndPos;
-		Vec3 m_secondAtEndPos;
+		Vec3 m_startPos;                          // カメラの開始位置を保持するベクトル
+		Vec3 m_endPos;                            // カメラの終了位置を保持するベクトル
+		Vec3 m_atStartPos;                        // 注視点の開始位置を保持するベクトル
+		Vec3 m_atEndPos;                          // 注視点の終了位置を保持するベクトル
+		Vec3 m_atPos;                             // 現在の注視点位置を保持するベクトル
+		Vec3 m_eyePos;                            // 現在のカメラ位置を保持するベクトル
+		float m_totalTime;                        // 合計時間を保持する変数
+		Vec3 m_secondEndPos;                      // 二次終了位置を保持するベクトル
+		Vec3 m_secondAtEndPos;                    // 二次注視点終了位置を保持するベクトル
 
-		Vec3 m_tempStartPos;
-		Vec3 m_tempEndPos;
-		Vec3 m_tempAtStartPos;
-		Vec3 m_tempAtEndPos;
-		Vec3 m_tempAtPos;
-		float m_tempTotalTime;
+		Vec3 m_tempStartPos;                      // 一時的な開始位置を保持するベクトル
+		Vec3 m_tempEndPos;                        // 一時的な終了位置を保持するベクトル
+		Vec3 m_tempAtStartPos;                    // 一時的な注視点開始位置を保持するベクトル
+		Vec3 m_tempAtEndPos;                      // 一時的な注視点終了位置を保持するベクトル
+		Vec3 m_tempAtPos;                         // 一時的な注視点位置を保持するベクトル
+		float m_tempTotalTime;                    // 一時的な合計時間を保持する変数
 
-		//ステートマシーン
+		// ステートマシン
 		unique_ptr< StateMachine<OpeningCameraman> >  m_StateMachine;
 	public:
-		//構築と破棄
+		// 構築と破棄
 		OpeningCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
 			const Vec3& AtStartPos, const Vec3& AtEndPos, const Vec3& AtPos, float& TotalTime,
 			const Vec3& secondEndPos, const Vec3& secondAtEndPos);
 		virtual ~OpeningCameraman();
-		//初期化
+
+		// 初期化
 		virtual void OnCreate() override;
-		//操作
+
+		// 操作
 		virtual void OnUpdate() override;
 
-		//アクセサ
+		// アクセサ
 		const unique_ptr<StateMachine<OpeningCameraman>>& GetStateMachine() {
 			return m_StateMachine;
 		}
@@ -289,9 +184,17 @@ namespace basecross {
 		Vec3 GetEyePos() const {
 			return m_eyePos;
 		}
+
+		// ゴールエンタービヘイビア
 		void ToGoalEnterBehavior();
+
+		// スタートエンタービヘイビア
 		void ToStartEnterBehavior();
+
+		// 行動を実行する
 		bool ExcuteBehavior(float totaltime);
+
+		// 終了状態エンタービヘイビア
 		void EndStateEnterBehavior();
 	};
 
@@ -357,4 +260,84 @@ namespace basecross {
 		virtual void OnCreate()override;
 		virtual void OnUpdate()override;
 	};
+
+	//ステージクリア時のカメラ
+	class EndingCameraman : public GameObject {
+		Vec3 m_startPos;
+		Vec3 m_endPos;
+		Vec3 m_atStartPos;
+		Vec3 m_atEndPos;
+		Vec3 m_eyePos;
+		Vec3 m_atPos;
+		float m_totalTime;
+
+		//ステートマシーン
+		unique_ptr< StateMachine<EndingCameraman> >  m_StateMachine;
+	public:
+		//構築と破棄
+		EndingCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
+			const Vec3& AtStartPos, const Vec3& AtEndPos, const float& TotalTime);
+		virtual ~EndingCameraman();
+		//初期化
+		virtual void OnCreate() override;
+		//操作
+		virtual void OnUpdate() override;
+
+		//アクセサ
+		const unique_ptr<StateMachine<EndingCameraman>>& GetStateMachine() {
+			return m_StateMachine;
+		}
+
+		Vec3 GetAtPos() const {
+			return m_atPos;
+		}
+
+		Vec3 GetEyePos() const {
+			return m_eyePos;
+		}
+
+		void ExcuteBehavior(float totaltime);
+		void BasicStateEnterBehavior();
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class EndingCameramanBasicState : public ObjState<EndingCameraman>;
+	//--------------------------------------------------------------------------------------
+	class EndingCameramanBasicState : public ObjState<EndingCameraman>
+	{
+		EndingCameramanBasicState() {}
+	public:
+		static shared_ptr<EndingCameramanBasicState> Instance() {
+			static shared_ptr<EndingCameramanBasicState> instance(new EndingCameramanBasicState);
+			return instance;
+		};
+		virtual void Enter(const shared_ptr<EndingCameraman>& Obj)override;
+		virtual void Execute(const shared_ptr<EndingCameraman>& Obj)override;
+		virtual void Exit(const shared_ptr<EndingCameraman>& Obj)override;
+	};
+
+	class EndingCamera : public Camera {
+	public:
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		*/
+		//--------------------------------------------------------------------------------------
+		EndingCamera();
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	デストラクタ
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual ~EndingCamera();
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief 更新処理
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void OnUpdate()override;
+	};
+
 }
+

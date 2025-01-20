@@ -16,6 +16,9 @@ namespace basecross {
 		m_OpeningCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
 		auto ptrOpeningCamera = ObjectFactory::Create<OpeningCamera>();
 		m_OpeningCameraView->SetCamera(ptrOpeningCamera);
+		m_EndingCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
+		auto ptrEndingCamera = ObjectFactory::Create<EndingCamera>();
+		m_EndingCameraView->SetCamera(ptrEndingCamera);
 		// カメラの設定
 		m_MyCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
 		auto camera = ObjectFactory::Create<MainCamera>();
@@ -448,6 +451,7 @@ namespace basecross {
 		try {
 			//エフェクト作成
 			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
+			m_titleSprite = GetStage()->AddGameObject<BlinkingSprite>(L"TITLETEXT", true, Vec2(640.0f, 410.0f), Vec3(0.0f, -250.0f, 0.1f), 3.5f);
 
 			auto& app = App::GetApp();
 			auto scene = app->GetScene<Scene>();
@@ -481,16 +485,27 @@ namespace basecross {
 		auto scene = app->GetScene<Scene>();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
 
 		switch (m_nowGameStatus) {
 		case GameStatus::TITLE:
+			m_titleSprite->SetDrawActive(true);
 			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
 			{
+				m_startFlag = true;
 				PlaySE(L"DecisionSE", 0, 1.0f);
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+			}
+			if (m_startFlag)
+			{
+				m_updateTime += ElapsedTime;
+				if (m_updateTime > 0.5f)
+				{
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+				}
 			}
 			break;
 		case GameStatus::SELECT:
+			m_titleSprite->SetDrawActive(false);
 			if (scene->m_select == 0)
 			{
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
@@ -537,8 +552,23 @@ namespace basecross {
 						shObj->SetUpdateActive(true);
 					}
 				}
+				UImake();
 				GoalJudge();
 				GameOverJudge();
+			}
+			if (m_CameraSelect == CameraSelect::endingCamera)
+			{
+				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+				auto& vec = group->GetGroupVector();
+				for (auto v : vec)
+				{
+					auto shObj = v.lock();
+					if (shObj->GetUpdateActive() == true)
+					{
+						shObj->SetUpdateActive(false);
+					}
+				}
+				GoalJudge();
 			}
 			break;
 
@@ -568,6 +598,7 @@ namespace basecross {
 						shObj->SetUpdateActive(true);
 					}
 				}
+				UImake();
 				GoalJudge();
 				GameOverJudge();
 				OnDraw();
@@ -586,6 +617,7 @@ namespace basecross {
 
 	void StageManager::CreateSprite()
 	{
+
 		m_TextDraw = GetStage()->AddGameObject<Sprite>(L"GameClearTEXT", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
 		m_TextDraw->SetDrawLayer(3);
 
@@ -594,6 +626,9 @@ namespace basecross {
 
 		m_StageUI = GetStage()->AddGameObject<Sprite>(L"GameStageUI", true, Vec2(640.0f, 400.0f), Vec3(10, 0, 0.0f));
 		m_StageUI->SetDrawLayer(3);
+
+		m_kakaeruUI = GetStage()->AddGameObject<Sprite>(L"Kakaeru", true, Vec2(100.0f, 15.0f), Vec3(200, 0, 0.0f));
+		m_kakaeruUI->SetDrawLayer(3);
 
 		m_nextStageUI = GetStage()->AddGameObject<Sprite>(L"NextStage", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
 		m_nextStageUI->SetDrawLayer(3);
@@ -613,6 +648,7 @@ namespace basecross {
 		m_TitleCharge = GetStage()->AddGameObject<SelectCharge>(L"PauseTitleCharge", false, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
 		m_TitleCharge->SetDrawLayer(4);
 
+		m_titleSprite->SetDrawActive(false);
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
 		m_nextStageUI->SetDrawActive(false);
@@ -621,12 +657,14 @@ namespace basecross {
 		m_overSelectStage->SetDrawActive(false);
 		m_SelectCharge->SetDrawActive(false);
 		m_TitleCharge->SetDrawActive(false);
+		m_kakaeruUI->SetDrawActive(false);
 
 		ToOpeningCamera();
 	}
 
 	void StageManager::GoalJudge()
 	{
+
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
@@ -641,13 +679,17 @@ namespace basecross {
 		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
 		{
+			if (m_CameraSelect != CameraSelect::endingCamera) {
+				ToEndingCamera();
+			}
+
 			if (m_select == 0)
 			{
 				if (m_Flag)
 				{
 					PlaySE(L"GameClearSE", 0, 1.0f);
-					m_BGfade = GetStage()->AddGameObject<FadeOut>();
-					m_BGfade->SetDrawLayer(3);
+					//m_BGfade = GetStage()->AddGameObject<FadeOut>();
+					//m_BGfade->SetDrawLayer(3);
 					m_Flag = false;
 				}
 
@@ -837,9 +879,9 @@ namespace basecross {
 	{
 		GetStage()->AddGameObject<FadeIn>();
 		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
-		auto PlayPos =  PtrPlayer->AddComponent<Transform>()->GetPosition();
+		auto PlayPos = PtrPlayer->AddComponent<Transform>()->GetPosition();
 		Vec3 CameraPos = Vec3(PlayPos.x + 10.0f, PlayPos.y + 5.0f, PlayPos.z);
-		Vec3 CameraStartEndPos = Vec3(PlayPos.x -5.0f, PlayPos.y + 5.0f, PlayPos.z);
+		Vec3 CameraStartEndPos = Vec3(PlayPos.x - 5.0f, PlayPos.y + 5.0f, PlayPos.z);
 		Vec3 CameraEndPos = Vec3(PlayPos.x + 15.0f, PlayPos.y + 10.0f, PlayPos.z);
 		Vec3 PlayEndpos = Vec3(PlayPos.x - 5.0f, PlayPos.y, PlayPos.z);
 		Vec3 PlayStartpos = Vec3(PlayPos.x, PlayPos.y + 3.0f, PlayPos.z);
@@ -861,9 +903,71 @@ namespace basecross {
 		}
 	}
 
+	void StageManager::ToEndingCamera()
+	{
+		auto PtrPlayer = GetStage()->GetSharedGameObject<Player>(L"Player");
+		auto PlayPos = PtrPlayer->AddComponent<Transform>()->GetPosition();
+		Vec3 fwd = PtrPlayer->GetComponent<Transform>()->GetForward();
+		float face = atan2f(fwd.z, fwd.x);
+		//位置(eye, at)の決定
+		Vec3 pos = Vec3(12.0f, -3.0f, -9.0f);
+		Vec3 addpos = Vec3((pos.x * cosf(face)) - (pos.z * sinf(face)), pos.y, (pos.z * cosf(face)) + (pos.x * sinf(face)));
+		Vec3 CameraStartPos = PlayPos + addpos;
+		pos = Vec3(15.0f, -1.0f, -3.0f);
+		addpos = Vec3((pos.x * cosf(face)) - (pos.z * sinf(face)), pos.y, (pos.z * cosf(face)) + (pos.x * sinf(face)));
+		Vec3 CameraEndPos = PlayPos + addpos;
+		pos = Vec3(-6.0f, 2.5f, 0);
+		addpos = Vec3((pos.x * cosf(face)) - (pos.z * sinf(face)), pos.y, (pos.z * cosf(face)) + (pos.x * sinf(face)));
+		Vec3 AtStartPos = PlayPos + addpos;
+		Vec3 AtEndPos = PlayPos + addpos;
+		//カメラのオープニングの移動(最初のカメラの位置、最後のカメラの位置、
+// 　　　　　　　　　　　　　最初に見てる所、最後に見てる所、かかる時間)
+		auto ptrEndingCameraman = GetStage()->AddGameObject<EndingCameraman>(CameraStartPos, CameraEndPos,
+			AtStartPos, AtEndPos,
+			0.0f);
+		//シェア配列に追加
+		GetStage()->SetSharedGameObject(L"EndingCameraman", ptrEndingCameraman);
+
+		auto ptrEndingCamera = dynamic_pointer_cast<EndingCamera>(m_EndingCameraView->GetCamera());
+		if (ptrEndingCamera) {
+			ptrEndingCamera->SetCameraObject(ptrEndingCameraman);
+			GetStage()->SetView(m_EndingCameraView);
+			m_CameraSelect = CameraSelect::endingCamera;
+		}
+	}
+
 	void StageManager::PlaySE(wstring path, float loopcnt, float volume) {
 		auto playSE = App::GetApp()->GetXAudio2Manager();
 		playSE->Start(path, loopcnt, volume);
+	}
+
+	void StageManager::UImake()
+	{
+		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+		auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
+		auto& vec = group->GetGroupVector();
+		for (auto& v : vec)
+		{
+			auto shObj = v.lock();
+			auto pos = player->GetComponent<Transform>()->GetPosition();
+			auto enemy = dynamic_pointer_cast<Enemy>(shObj);
+			Vec3 enemypos = enemy->GetPos();
+			bool overheat = enemy->GetOverHeat();
+			if (overheat)
+			{
+				if (length(pos - enemypos) < 8.0f) {
+					m_kakaeruUI->SetDrawActive(true);
+				}
+				else {
+					m_kakaeruUI->SetDrawActive(false);
+				}
+			}
+			else {
+				if (length(pos - enemypos) < 8.0f) {
+					m_kakaeruUI->SetDrawActive(false);
+				}
+			}
+		}
 	}
 }
 //end basecross

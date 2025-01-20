@@ -50,12 +50,26 @@ namespace basecross {
 		void SetColor(Col4 color);
 	};
 	class FadeIn : public GameObject {
-	private :
+	private:
 		float m_time;
 		shared_ptr<GameSprite> m_sprite;
 	public:
 		FadeIn(const shared_ptr<Stage>& stage);
 		virtual ~FadeIn() {};
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+
+	};
+	//ゴール時のフェードアウト/フェードイン(Playerから呼び出す？)
+	class GoalFade : public GameObject {
+	private:
+		float m_time;
+		const float m_fadeinTime = 1.5f;
+		const float m_endTime = m_fadeinTime + 1.0f;
+		shared_ptr<GameSprite> m_sprite;
+	public:
+		GoalFade(const shared_ptr<Stage>& stage);
+		virtual ~GoalFade() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 

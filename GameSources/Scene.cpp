@@ -93,6 +93,9 @@ namespace basecross{
 
 		//セレクトステージテクスチャ
 		app->RegisterTexture(L"SelectStageBack", texPath + L"SelectStageBack.png");
+		app->RegisterTexture(L"SelectStageBack2", texPath + L"SelectStageBack2.png");
+		app->RegisterTexture(L"SelectStageBack3", texPath + L"SelectStageBack3.png");
+		app->RegisterTexture(L"SelectStageEffect", texPath + L"SelectStageEffect.png");
 		app->RegisterTexture(L"SelectFram", texPath + L"SelectFram.png");
 		app->RegisterTexture(L"SelectText", texPath + L"SelectText.png");
 		app->RegisterTexture(L"SelectNumber", texPath + L"SelectNumber.png");
@@ -102,6 +105,7 @@ namespace basecross{
 
 		//GameStageUI
 		app->RegisterTexture(L"GameStageUI", texPath + L"UIGameStage.png");
+		app->RegisterTexture(L"Kakaeru", texPath + L"kakaeru.png");
 		app->RegisterTexture(L"PauseBG", texPath + L"PauseBackGround.png");
 		app->RegisterTexture(L"PauseSelect", texPath + L"PauseSelect.png");
 		app->RegisterTexture(L"PauseTitle", texPath + L"PauseTitle.png");
@@ -140,6 +144,8 @@ namespace basecross{
 		soundWav = sdPath + L"Confirm.wav";
 		App::GetApp()->RegisterWav(L"Confirm", soundWav);
 
+		soundWav = sdPath + L"RevCymbal.wav";
+		App::GetApp()->RegisterWav(L"RevCymbal", soundWav);
 		soundWav = sdPath + L"GameClear.wav";
 		App::GetApp()->RegisterWav(L"GameClearSE", soundWav);
 		soundWav = sdPath + L"Door.wav";
