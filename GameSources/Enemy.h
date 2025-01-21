@@ -274,6 +274,7 @@ namespace basecross {
 	class TrackingBullet : public EnemyBullet {
 	private:
 		float m_speed;
+		float m_range;
 		Vec3 m_pos;
 		Vec3 m_dic;
 		Vec3 m_enemyPos;
