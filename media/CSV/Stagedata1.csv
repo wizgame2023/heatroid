@@ -26,3 +26,5 @@ Enemy,35,4,24,0,0,0,3,3,3,Enemy::rightMove,Enemy::stay,
 Enemy,-60,4,20,0,0,0,3,3,3,Enemy::bulletMove,Enemy::stay,Z
 Enemy,-25,4,0,0,0,0,3,3,3,Enemy::slide,Enemy::stay,
 Enemy,35,4,-25,0,0,0,3,3,3,Enemy::bulletMove,Enemy::stay,X
+DoorGimmick,23,15,10.5,0,1,1,5,5,5,0,Blue,
+DoorGimmick,-37,15,44.5,1,1,0,5,5,5,1,Black,

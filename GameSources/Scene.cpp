@@ -112,11 +112,23 @@ namespace basecross{
 		app->RegisterTexture(L"PauseBack", texPath + L"PauseBack.png");
 		app->RegisterTexture(L"PauseSelectCharge", texPath + L"PauseSelectCharge.png");
 		app->RegisterTexture(L"PauseTitleCharge", texPath + L"PauseTitleCharge.png");
-		app->RegisterTexture(L"DoorGimmick", texPath + L"0.2.png");
-		app->RegisterTexture(L"DoorGimmick1", texPath + L"1.2.png");
-		app->RegisterTexture(L"DoorGimmick2", texPath + L"2.2.png");
-		app->RegisterTexture(L"DoorGimmick3", texPath + L"0.1.png");
-		app->RegisterTexture(L"DoorGimmick4", texPath + L"1.1.png");
+		app->RegisterTexture(L"BlackDoorGimmick", texPath + L"Black0.2.png");
+		app->RegisterTexture(L"BlackDoorGimmick1", texPath + L"Black1.2.png");
+		app->RegisterTexture(L"BlackDoorGimmick2", texPath + L"Black2.2.png");
+		app->RegisterTexture(L"BlackDoorGimmick3", texPath + L"Black0.1.png");
+		app->RegisterTexture(L"BlackDoorGimmick4", texPath + L"Black1.1.png");
+
+		app->RegisterTexture(L"RedDoorGimmick", texPath + L"Red0.2.png");
+		app->RegisterTexture(L"RedDoorGimmick1", texPath + L"Red1.2.png");
+		app->RegisterTexture(L"RedDoorGimmick2", texPath + L"Red2.2.png");
+		app->RegisterTexture(L"RedDoorGimmick3", texPath + L"Red0.1.png");
+		app->RegisterTexture(L"RedDoorGimmick4", texPath + L"Red1.1.png");
+
+		app->RegisterTexture(L"BlueDoorGimmick", texPath +  L"Blue0.2.png");
+		app->RegisterTexture(L"BlueDoorGimmick1", texPath + L"Blue1.2.png");
+		app->RegisterTexture(L"BlueDoorGimmick2", texPath + L"Blue2.2.png");
+		app->RegisterTexture(L"BlueDoorGimmick3", texPath + L"Blue0.1.png");
+		app->RegisterTexture(L"BlueDoorGimmick4", texPath + L"Blue1.1.png");
 
 		//サウンド
 		//SE
