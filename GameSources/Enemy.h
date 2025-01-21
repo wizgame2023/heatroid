@@ -110,7 +110,7 @@ namespace basecross {
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<FixedBox> m_box;
-		shared_ptr<CollisionObb> m_collision;
+		shared_ptr<CollisionCapsule> m_collision;
 		weak_ptr<TilingFixedBox> m_fixedBox;
 		weak_ptr<PlayerGrab> m_playerGrab;
 		//エフェクト
@@ -220,6 +220,7 @@ namespace basecross {
 	private:
 		float m_speed;   //弾の速さ
 		float m_Range;   //射程
+		float m_height;  //弾を発射時の高さ
 		Vec3 m_pos;
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
@@ -228,6 +229,7 @@ namespace basecross {
 		weak_ptr<Enemy> m_enemy;
 	public:
 		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
+		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy,const float height);
 		virtual ~StraightBullet() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
