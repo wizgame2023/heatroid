@@ -270,6 +270,7 @@ namespace basecross {
 				{
 					if (m_number == 1)
 					{
+						State = 1;
 						for (int i = 0; i < 1; i++)
 						{
 							if (m_Flag == false)
@@ -298,6 +299,7 @@ namespace basecross {
 								m_open2 = Switchs2->GetButton();
 								if (m_open2)
 								{
+									State = 2;
 									for (int i = 0; i < 1; i++)
 									{
 										if (m_Flag == false)
@@ -319,6 +321,7 @@ namespace basecross {
 								{
 									ptrTransform->SetPosition(m_Position);
 									m_Flag == false;
+									State = 1;
 								}									
 							}
 						}
@@ -329,10 +332,26 @@ namespace basecross {
 				{
 					ptrTransform->SetPosition(m_Position);
 					m_Flag == false;
+					State = 0;
 				}
 
 			}
 		}
+	}
+
+	void GimmickDoor::PlaySE(wstring path, float loopcnt, float volume) {
+		auto SE = App::GetApp()->GetXAudio2Manager();
+		SE->Start(path, loopcnt, volume);
+	}
+
+	int GimmickDoor::GetState()
+	{
+		return State;
+	}
+
+	int GimmickDoor::GetNumber()
+	{
+		return m_OpenSwitch;
 	}
 
 	GimmickUp::GimmickUp(
@@ -488,10 +507,6 @@ namespace basecross {
 	}
 
 
-	void GimmickDoor::PlaySE(wstring path, float loopcnt, float volume) {
-			auto SE = App::GetApp()->GetXAudio2Manager();
-			SE->Start(path, loopcnt, volume);
-	}
 
 
 	Door::Door(const shared_ptr<Stage>& StagePtr,
@@ -559,5 +574,62 @@ namespace basecross {
 		//ˆÚ“®ŠÖ˜A
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
+	}
+	DoorGimmick::DoorGimmick(const shared_ptr<Stage>& stage, const Vec3& position, const Vec3& rotation, const Vec3& scale, const float& number):
+		GameObject(stage),
+		m_Position(position),
+		m_Rotation(rotation),
+		m_Scale(scale),
+		m_number(number)
+	{
+	}
+	void DoorGimmick::OnCreate()
+	{
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Position);
+		Trans->SetRotation(m_Rotation);
+		Trans->SetScale(m_Scale);
+		auto ptrColl = AddComponent<CollisionRect>();
+		ptrColl->SetDrawActive(true);
+		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
+		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		ptrDraw->SetTextureResource(L"DoorGimmick");
+	}
+	void DoorGimmick::OnUpdate()
+	{
+		auto group = GetStage()->GetSharedObjectGroup(L"Door");
+		auto& vec = group->GetGroupVector();
+		for (auto& v : vec) {
+			auto shObj = v.lock();
+			auto Doors = dynamic_pointer_cast<GimmickDoor>(shObj);
+			int state = Doors->GetState();
+			float number = Doors->GetNumber();
+			int Switch = Doors->m_number;
+			if (number == m_number)
+			{
+				auto ptrDraw = GetComponent<BcPNTStaticDraw>();
+				if (Switch == 1)
+				{
+					if (state == 0) {
+						ptrDraw->SetTextureResource(L"DoorGimmick3");
+					}
+					if (state == 1) {
+						ptrDraw->SetTextureResource(L"DoorGimmick4");
+					}
+				}
+				if (Switch == 2)
+				{
+					if (state == 0) {
+						ptrDraw->SetTextureResource(L"DoorGimmick");
+					}
+					if (state == 1) {
+						ptrDraw->SetTextureResource(L"DoorGimmick1");
+					}
+					if (state == 2) {
+						ptrDraw->SetTextureResource(L"DoorGimmick2");
+					}
+				}
+			}
+		}
 	}
 }

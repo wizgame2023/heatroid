@@ -91,15 +91,6 @@ namespace basecross {
 		auto group2 = GetSharedObjectGroup(L"Door");
 
 		if (m_Diedtrue){
-			auto& vec = group->GetGroupVector();
-			for (auto v : vec)
-			{
-				auto shObj = v.lock();
-				if (shObj)
-				{
-					shObj->SetUpdateActive(false);
-				}
-			}
 			auto& vec2 = group2->GetGroupVector();
 			for (auto v : vec2)
 			{
@@ -111,15 +102,6 @@ namespace basecross {
 			}
 		}
 		else if (m_Goaltrue) {
-			auto& vec = group->GetGroupVector();
-			for (auto v : vec)
-			{
-				auto shObj = v.lock();
-				if (shObj)
-				{
-					shObj->SetUpdateActive(false);
-				}
-			}
 			auto& vec2 = group2->GetGroupVector();
 			for (auto v : vec2)
 			{
