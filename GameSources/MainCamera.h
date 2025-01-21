@@ -260,4 +260,84 @@ namespace basecross {
 		virtual void OnCreate()override;
 		virtual void OnUpdate()override;
 	};
+
+	//ステージクリア時のカメラ
+	class EndingCameraman : public GameObject {
+		Vec3 m_startPos;
+		Vec3 m_endPos;
+		Vec3 m_atStartPos;
+		Vec3 m_atEndPos;
+		Vec3 m_eyePos;
+		Vec3 m_atPos;
+		float m_totalTime;
+
+		//ステートマシーン
+		unique_ptr< StateMachine<EndingCameraman> >  m_StateMachine;
+	public:
+		//構築と破棄
+		EndingCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
+			const Vec3& AtStartPos, const Vec3& AtEndPos, const float& TotalTime);
+		virtual ~EndingCameraman();
+		//初期化
+		virtual void OnCreate() override;
+		//操作
+		virtual void OnUpdate() override;
+
+		//アクセサ
+		const unique_ptr<StateMachine<EndingCameraman>>& GetStateMachine() {
+			return m_StateMachine;
+		}
+
+		Vec3 GetAtPos() const {
+			return m_atPos;
+		}
+
+		Vec3 GetEyePos() const {
+			return m_eyePos;
+		}
+
+		void ExcuteBehavior(float totaltime);
+		void BasicStateEnterBehavior();
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class EndingCameramanBasicState : public ObjState<EndingCameraman>;
+	//--------------------------------------------------------------------------------------
+	class EndingCameramanBasicState : public ObjState<EndingCameraman>
+	{
+		EndingCameramanBasicState() {}
+	public:
+		static shared_ptr<EndingCameramanBasicState> Instance() {
+			static shared_ptr<EndingCameramanBasicState> instance(new EndingCameramanBasicState);
+			return instance;
+		};
+		virtual void Enter(const shared_ptr<EndingCameraman>& Obj)override;
+		virtual void Execute(const shared_ptr<EndingCameraman>& Obj)override;
+		virtual void Exit(const shared_ptr<EndingCameraman>& Obj)override;
+	};
+
+	class EndingCamera : public Camera {
+	public:
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		*/
+		//--------------------------------------------------------------------------------------
+		EndingCamera();
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	デストラクタ
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual ~EndingCamera();
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief 更新処理
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void OnUpdate()override;
+	};
+
 }
+

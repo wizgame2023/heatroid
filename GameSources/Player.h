@@ -74,13 +74,22 @@ namespace basecross {
 			release,	//発射
 			start,		//ゲーム開始演出
 			died,		//死亡
-			died_air,		//死亡空中
+			died_air,	//死亡空中
+			goalstandby,//ゴール演出待機	
 			goal		//ステージクリア
 		};
 		//プレイヤーの状態
 		Stats m_stateType = start;
 		//演出アニメ制御用の時間計測変数
 		float m_animTime = 0;
+		//ゴール床
+		shared_ptr<GameObject> m_goal = nullptr;
+		bool m_goalPosMoved = false;
+		//ゴール演出にてゴールから離れる距離
+		const float m_distToGoal = 15.0f;
+		//ゴール演出で振り向く処理用
+		Quat m_goalRotate = Quat(0);
+		Vec3 pos1, addpos1;
 
 		//ステージマネージャ
 		shared_ptr<StageManager> m_stageMgr;
@@ -105,7 +114,7 @@ namespace basecross {
 		const float m_grabTimeMax = .2f;
 		//何かを持っているか否か
 		bool m_isCarrying;
-		//歩行音用
+		//歩行音の間隔計測用
 		float m_walkSndTime;
 
 		//HP
@@ -114,6 +123,13 @@ namespace basecross {
 		
 		float _delta = App::GetApp()->GetElapsedTime();
 
+		//q:最初の回転 v:回転軸 rad:回転量
+		Quat RotateQuat(const Quat q, const Vec3 v,const float rad) {
+			Quat r = Quat(cos(rad / 2), v.x * sin(rad / 2), v.y * sin(rad / 2), v.z * sin(rad / 2));
+			Quat r2 = Quat(cos(rad / 2), -v.x * sin(rad / 2), -v.y * sin(rad / 2), -v.z * sin(rad / 2));
+			return q * r * r2;
+
+		}
 
 	public:
 		//構築と破棄

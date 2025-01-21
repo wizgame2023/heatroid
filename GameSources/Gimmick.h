@@ -1,7 +1,7 @@
 /*!
 @file Gimmick.h
-@brief Gimmick‚È‚Ç
-Š™“c
+@brief Gimmickãªã©
+éŒç”°
 */
 
 #pragma once
@@ -9,17 +9,17 @@
 
 namespace basecross {
 //--------------------------------------------------------------------------------------
-//@ƒ^ƒCƒŠƒ“ƒO‚·‚éŒÅ’è‚Ìƒ{ƒbƒNƒX
+//ã€€ã‚¿ã‚¤ãƒªãƒ³ã‚°ã™ã‚‹å›ºå®šã®ãƒœãƒƒã‚¯ã‚¹
 //--------------------------------------------------------------------------------------
 	class TilingFixedBox : public GameObject {
-		Vec3 m_Scale;         // ƒ{ƒbƒNƒX‚ÌƒXƒP[ƒ‹iƒTƒCƒYj‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Rotation;      // ƒ{ƒbƒNƒX‚Ì‰ñ“]î•ñ‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Position;      // ƒ{ƒbƒNƒX‚ÌˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		float m_UPic;         // ƒeƒNƒXƒ`ƒƒ‚ÌU²•ûŒü‚ÌƒsƒNƒ`ƒƒƒTƒCƒY
-		float m_VPic;         // ƒeƒNƒXƒ`ƒƒ‚ÌV²•ûŒü‚ÌƒsƒNƒ`ƒƒƒTƒCƒY
-		wstring m_Texname;    // ƒeƒNƒXƒ`ƒƒ‚Ì–¼‘O
+		Vec3 m_Scale;         // ãƒœãƒƒã‚¯ã‚¹ã®ã‚¹ã‚±ãƒ¼ãƒ«ï¼ˆã‚µã‚¤ã‚ºï¼‰ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_Rotation;      // ãƒœãƒƒã‚¯ã‚¹ã®å›è»¢æƒ…å ±ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_Position;      // ãƒœãƒƒã‚¯ã‚¹ã®ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		float m_UPic;         // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®Uè»¸æ–¹å‘ã®ãƒ”ã‚¯ãƒãƒ£ã‚µã‚¤ã‚º
+		float m_VPic;         // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®Vè»¸æ–¹å‘ã®ãƒ”ã‚¯ãƒãƒ£ã‚µã‚¤ã‚º
+		wstring m_Texname;    // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®åå‰
 	public:
-		// \’z‚Æ”jŠü
+		// æ§‹ç¯‰ã¨ç ´æ£„
 		TilingFixedBox(const shared_ptr<Stage>& StagePtr,
 			const Vec3& position,
 			const Vec3& rotation,
@@ -30,29 +30,28 @@ namespace basecross {
 		);
 		virtual ~TilingFixedBox();
 
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		virtual void OnCreate() override;
 	};
 
 	class GimmickButton;
 	class GimmickDoor : public GameObject {
-		Vec3 m_Position;                       // ƒhƒA‚ÌˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Rotation;                      // ƒhƒA‚Ì‰ñ“]î•ñ‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Scale;                         // ƒhƒA‚ÌƒXƒP[ƒ‹iƒTƒCƒYj‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		bool m_open;                          // ƒhƒA‚ªŠJ‚¢‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
-		bool m_open2;                         // ‚à‚¤ˆê‚Â‚ÌƒhƒAŠJ•Âƒtƒ‰ƒO
-		float m_UPic;                         // ƒeƒNƒXƒ`ƒƒ‚ÌU²•ûŒü‚ÌƒsƒNƒ`ƒƒƒTƒCƒY
-		float m_VPic;                         // ƒeƒNƒXƒ`ƒƒ‚ÌV²•ûŒü‚ÌƒsƒNƒ`ƒƒƒTƒCƒY
-		shared_ptr<GimmickButton> GDoor;      // ŠÖ˜A‚·‚éƒMƒ~ƒbƒNƒ{ƒ^ƒ“
-		int kazu = 1;                         // ”—Ê‚ğ•\‚·•Ï”
-		bool m_Flag;                          // ƒtƒ‰ƒO
+		Vec3 m_Position;                       // ï¿½hï¿½Aï¿½ÌˆÊ’uï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		Vec3 m_Rotation;                      // ï¿½hï¿½Aï¿½Ì‰ï¿½]ï¿½ï¿½ï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		Vec3 m_Scale;                         // ï¿½hï¿½Aï¿½ÌƒXï¿½Pï¿½[ï¿½ï¿½ï¿½iï¿½Tï¿½Cï¿½Yï¿½jï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		bool m_open;                          // ï¿½hï¿½Aï¿½ï¿½ï¿½Jï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½Ìƒtï¿½ï¿½ï¿½O
+		bool m_open2;                         // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â‚Ìƒhï¿½Aï¿½Jï¿½Âƒtï¿½ï¿½ï¿½O
+		float m_UPic;                         // ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìƒsï¿½Nï¿½`ï¿½ï¿½ï¿½Tï¿½Cï¿½Y
+		float m_VPic;                         // ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìƒsï¿½Nï¿½`ï¿½ï¿½ï¿½Tï¿½Cï¿½Y
+		shared_ptr<GimmickButton> GDoor;      // ï¿½Ö˜Aï¿½ï¿½ï¿½ï¿½Mï¿½~ï¿½bï¿½Nï¿½{ï¿½^ï¿½ï¿½
+		int kazu = 1;                         // ï¿½ï¿½ï¿½Ê‚ï¿½\ï¿½ï¿½ï¿½Ïï¿½
+		bool m_Flag;                          // ï¿½tï¿½ï¿½ï¿½O
 	public:
-		float m_OpenSwitch;                   // ƒhƒA‚ÌŠJ•ÂƒXƒCƒbƒ`
-		wstring m_Texname;                    // ƒeƒNƒXƒ`ƒƒ‚Ì–¼‘O
+		float m_OpenSwitch;                   // ï¿½hï¿½Aï¿½ÌŠJï¿½ÂƒXï¿½Cï¿½bï¿½`
+		wstring m_Texname;                    // ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½Ì–ï¿½ï¿½O
 		int State;
-		int m_number;                         // ƒhƒA‚Ì¯•Ê”Ô†
+		int m_number;                         // ï¿½hï¿½Aï¿½Ìï¿½ï¿½Ê”Ôï¿½
 
-		// \’z‚Æ”jŠü
 		GimmickDoor(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
@@ -65,16 +64,16 @@ namespace basecross {
 		);
 		virtual ~GimmickDoor();
 
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		virtual void OnCreate() override;
 
-		// XVˆ—
+		// æ›´æ–°å‡¦ç†
 		virtual void OnUpdate() override;
 
-		// ƒhƒA‚ğŠJ‚­
+		// ãƒ‰ã‚¢ã‚’é–‹ã
 		void OpenDoor();
 
-		// ƒTƒEƒ“ƒhƒGƒtƒFƒNƒg‚ğÄ¶‚·‚é
+		// ã‚µã‚¦ãƒ³ãƒ‰ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å†ç”Ÿã™ã‚‹
 		void PlaySE(wstring path, float loopcnt, float volume);
 
 		int GetState();
@@ -83,24 +82,24 @@ namespace basecross {
 	};
 
 	class GimmickUp : public GameObject {
-		Vec3 m_Position;                       // ƒMƒ~ƒbƒN‚ÌˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Rotation;                      // ƒMƒ~ƒbƒN‚Ì‰ñ“]î•ñ‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Scale;                         // ƒMƒ~ƒbƒN‚ÌƒXƒP[ƒ‹iƒTƒCƒYj‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		bool m_open;                          // ƒMƒ~ƒbƒN‚ªŠJ‚¢‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
-		bool m_open2;                         // ‚à‚¤ˆê‚Â‚ÌƒMƒ~ƒbƒNŠJ•Âƒtƒ‰ƒO
-		float m_UPic;                         // ƒeƒNƒXƒ`ƒƒ‚ÌU²•ûŒü‚ÌƒsƒNƒ`ƒƒƒTƒCƒY
-		float m_VPic;                         // ƒeƒNƒXƒ`ƒƒ‚ÌV²•ûŒü‚ÌƒsƒNƒ`ƒƒƒTƒCƒY
-		shared_ptr<GimmickButton> GDoor;      // ŠÖ˜A‚·‚éƒMƒ~ƒbƒNƒ{ƒ^ƒ“
-		int kazu = 1;                         // ”—Ê‚ğ•\‚·•Ï”
-		int ido = 0;                          // ˆÚ“®—Ê‚ğ•\‚·•Ï”
-		bool m_Flag;                          // ƒtƒ‰ƒO
+		Vec3 m_Position;                       // ï¿½Mï¿½~ï¿½bï¿½Nï¿½ÌˆÊ’uï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		Vec3 m_Rotation;                      // ï¿½Mï¿½~ï¿½bï¿½Nï¿½Ì‰ï¿½]ï¿½ï¿½ï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		Vec3 m_Scale;                         // ï¿½Mï¿½~ï¿½bï¿½Nï¿½ÌƒXï¿½Pï¿½[ï¿½ï¿½ï¿½iï¿½Tï¿½Cï¿½Yï¿½jï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		bool m_open;                          // ï¿½Mï¿½~ï¿½bï¿½Nï¿½ï¿½ï¿½Jï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½Ìƒtï¿½ï¿½ï¿½O
+		bool m_open2;                         // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ÌƒMï¿½~ï¿½bï¿½Nï¿½Jï¿½Âƒtï¿½ï¿½ï¿½O
+		float m_UPic;                         // ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìƒsï¿½Nï¿½`ï¿½ï¿½ï¿½Tï¿½Cï¿½Y
+		float m_VPic;                         // ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìƒsï¿½Nï¿½`ï¿½ï¿½ï¿½Tï¿½Cï¿½Y
+		shared_ptr<GimmickButton> GDoor;      // ï¿½Ö˜Aï¿½ï¿½ï¿½ï¿½Mï¿½~ï¿½bï¿½Nï¿½{ï¿½^ï¿½ï¿½
+		int kazu = 1;                         // ï¿½ï¿½ï¿½Ê‚ï¿½\ï¿½ï¿½ï¿½Ïï¿½
+		int ido = 0;                          // ï¿½Ú“ï¿½ï¿½Ê‚ï¿½\ï¿½ï¿½ï¿½Ïï¿½
+		bool m_Flag;                          // ï¿½tï¿½ï¿½ï¿½O
 	public:
-		float m_Max;                          // ƒMƒ~ƒbƒN‚ÌÅ‘å’l
-		float m_OpenSwitch;                   // ƒMƒ~ƒbƒN‚ÌŠJ•ÂƒXƒCƒbƒ`
-		wstring m_Texname;                    // ƒeƒNƒXƒ`ƒƒ‚Ì–¼‘O
-		int m_number;                         // ƒMƒ~ƒbƒN‚Ì¯•Ê”Ô†
+		float m_Max;                          // ï¿½Mï¿½~ï¿½bï¿½Nï¿½ÌÅ‘ï¿½l
+		float m_OpenSwitch;                   // ï¿½Mï¿½~ï¿½bï¿½Nï¿½ÌŠJï¿½ÂƒXï¿½Cï¿½bï¿½`
+		wstring m_Texname;                    // ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½Ì–ï¿½ï¿½O
+		int m_number;                         // ï¿½Mï¿½~ï¿½bï¿½Nï¿½Ìï¿½ï¿½Ê”Ôï¿½
 
-		// \’z‚Æ”jŠü
+		// æ§‹ç¯‰ã¨ç ´æ£„
 		GimmickUp(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
@@ -114,40 +113,40 @@ namespace basecross {
 		);
 		virtual ~GimmickUp();
 
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		virtual void OnCreate() override;
 
-		// XVˆ—
+		// æ›´æ–°å‡¦ç†
 		virtual void OnUpdate() override;
 
-		// ƒhƒA‚ğŠJ‚­
+		// ãƒ‰ã‚¢ã‚’é–‹ã
 		void OpenDoor();
 
-		// ƒTƒEƒ“ƒhƒGƒtƒFƒNƒg‚ğÄ¶‚·‚é
+		// ã‚µã‚¦ãƒ³ãƒ‰ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å†ç”Ÿã™ã‚‹
 		void PlaySE(wstring path, float loopcnt, float volume);
 	};
 
 	class GimmickButton : public GameObject
 	{
 	public:
-		// ƒGƒtƒFƒNƒg
-		shared_ptr<EfkEffect> m_EfkEffect;           // ƒGƒtƒFƒNƒgƒIƒuƒWƒFƒNƒg
-		shared_ptr<EfkEffect> m_EfkEffectLoop;       // ƒ‹[ƒvƒGƒtƒFƒNƒgƒIƒuƒWƒFƒNƒg
-		// ƒGƒtƒFƒNƒgÀsƒIƒuƒWƒFƒNƒg
-		shared_ptr<EfkPlay> m_EfkPlay;               // ƒGƒtƒFƒNƒgÀsƒIƒuƒWƒFƒNƒg
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+		shared_ptr<EfkEffect> m_EfkEffect;           // ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+		shared_ptr<EfkEffect> m_EfkEffectLoop;       // ãƒ«ãƒ¼ãƒ—ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆå®Ÿè¡Œã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+		shared_ptr<EfkPlay> m_EfkPlay;               // ã‚¨ãƒ•ã‚§ã‚¯ãƒˆå®Ÿè¡Œã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 
-		Vec3 m_Position;                             // ƒMƒ~ƒbƒNƒ{ƒ^ƒ“‚ÌˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Rotation;                            // ƒMƒ~ƒbƒNƒ{ƒ^ƒ“‚Ì‰ñ“]î•ñ‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Scale;                               // ƒMƒ~ƒbƒNƒ{ƒ^ƒ“‚ÌƒXƒP[ƒ‹iƒTƒCƒYj‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		int m_switch;                               // ƒXƒCƒbƒ`¯•Ê”Ô†
-		int m_number;                               // ƒ{ƒ^ƒ“‚Ì¯•Ê”Ô†
-		wstring m_Texname;                          // ƒeƒNƒXƒ`ƒƒ‚Ì–¼‘O
+		Vec3 m_Position;                             // ã‚®ãƒŸãƒƒã‚¯ãƒœã‚¿ãƒ³ã®ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_Rotation;                            // ã‚®ãƒŸãƒƒã‚¯ãƒœã‚¿ãƒ³ã®å›è»¢æƒ…å ±ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_Scale;                               // ã‚®ãƒŸãƒƒã‚¯ãƒœã‚¿ãƒ³ã®ã‚¹ã‚±ãƒ¼ãƒ«ï¼ˆã‚µã‚¤ã‚ºï¼‰ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		int m_switch;                               // ã‚¹ã‚¤ãƒƒãƒè­˜åˆ¥ç•ªå·
+		int m_number;                               // ãƒœã‚¿ãƒ³ã®è­˜åˆ¥ç•ªå·
+		wstring m_Texname;                          // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®åå‰
 
-		bool m_open;                                // ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
-		bool m_flag = false;                        // ƒtƒ‰ƒO
-		float time = 0;                             // ŠÔ‚ğŒv‘ª‚·‚é•Ï”
+		bool m_open;                                // ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‹ã®ãƒ•ãƒ©ã‚°
+		bool m_flag = false;                        // ãƒ•ãƒ©ã‚°
+		float time = 0;                             // æ™‚é–“ã‚’è¨ˆæ¸¬ã™ã‚‹å¤‰æ•°
 
-		// \’z‚Æ”jŠü
+		// æ§‹ç¯‰ã¨ç ´æ£„
 		GimmickButton(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
@@ -158,34 +157,34 @@ namespace basecross {
 		);
 		virtual ~GimmickButton();
 
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		virtual void OnCreate() override;
 
-		// XVˆ—
+		// æ›´æ–°å‡¦ç†
 		virtual void OnUpdate() override;
 
-		// ƒTƒEƒ“ƒhƒGƒtƒFƒNƒg‚ğÄ¶‚·‚é
+		// ã‚µã‚¦ãƒ³ãƒ‰ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å†ç”Ÿã™ã‚‹
 		void PlaySE(wstring path, float volume, float loopcnt);
 
-		// ƒGƒtƒFƒNƒg‚ğÄ¶‚·‚é
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å†ç”Ÿã™ã‚‹
 		void EfectPlay();
 
-		// ƒ‹[ƒvƒGƒtƒFƒNƒg‚ğÄ¶‚·‚é
+		// ãƒ«ãƒ¼ãƒ—ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å†ç”Ÿã™ã‚‹
 		void EfectLoopPlay();
 
-		// ‰Ÿ‚³‚ê‚Ä‚¢‚é‚Ì‚©‚Ì”»’è
+		// æŠ¼ã•ã‚Œã¦ã„ã‚‹ã®ã‹ã®åˆ¤å®š
 		bool GetButton()
 		{
 			return m_open;
 		}
 
-		// ƒ{ƒ^ƒ“‚Ìó‘Ô‚ğİ’è‚·‚é
+		// ãƒœã‚¿ãƒ³ã®çŠ¶æ…‹ã‚’è¨­å®šã™ã‚‹
 		void SetButton(const bool& open)
 		{
 			m_open = open;
 		}
 
-		// ƒXƒCƒbƒ`‚ğ”»•Ê‚·‚é
+		// ã‚¹ã‚¤ãƒƒãƒã‚’åˆ¤åˆ¥ã™ã‚‹
 		int GetSwitch()
 		{
 			return m_switch;
@@ -194,15 +193,17 @@ namespace basecross {
 
 	class Door : public GameObject
 	{
-		Vec3 m_Position;                       // ƒhƒA‚ÌˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Rotation;                      // ƒhƒA‚Ì‰ñ“]î•ñ‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Scale;                         // ƒhƒA‚ÌƒXƒP[ƒ‹iƒTƒCƒYj‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		bool m_open;                          // ƒhƒA‚ªŠJ‚¢‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
-		bool m_Goaltrue;                      // ƒS[ƒ‹‚É’B‚µ‚½‚©‚Ìƒtƒ‰ƒO
-		wstring m_Texname;                    // ƒeƒNƒXƒ`ƒƒ‚Ì–¼‘O
-		float _delta = App::GetApp()->GetElapsedTime(); // Œo‰ßŠÔ‚ğ•Û‚·‚é•Ï”
+		Vec3 m_Position;                       // ãƒ‰ã‚¢ã®ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_Rotation;                      // ãƒ‰ã‚¢ã®å›è»¢æƒ…å ±ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_Scale;                         // ãƒ‰ã‚¢ã®ã‚¹ã‚±ãƒ¼ãƒ«ï¼ˆã‚µã‚¤ã‚ºï¼‰ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		bool m_open;                          // ãƒ‰ã‚¢ãŒé–‹ã„ã¦ã„ã‚‹ã‹ã®ãƒ•ãƒ©ã‚°
+		bool m_Goaltrue;                      // ã‚´ãƒ¼ãƒ«ã«é”ã—ãŸã‹ã®ãƒ•ãƒ©ã‚°
+		wstring m_Texname;                    // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®åå‰
+		float _delta = App::GetApp()->GetElapsedTime(); // çµŒéæ™‚é–“ã‚’ä¿æŒã™ã‚‹å¤‰æ•°
+		//ã‚´ãƒ¼ãƒ«æ¼”å‡ºç”¨æ™‚é–“è¨ˆæ¸¬
+		float m_animTime = 0;
 	public:
-		// \’z‚Æ”jŠü
+		// æ§‹ç¯‰ã¨ç ´æ£„
 		Door(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
@@ -211,23 +212,23 @@ namespace basecross {
 		);
 		virtual ~Door();
 
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		virtual void OnCreate() override;
 
-		// XVˆ—
+		// æ›´æ–°å‡¦ç†
 		virtual void OnUpdate() override;
 
-		// ƒAƒjƒ[ƒVƒ‡ƒ“‚ğ’Ç‰Á‚·‚é
+		// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’è¿½åŠ ã™ã‚‹
 		void AddAnim();
 
-		// ƒAƒjƒ[ƒVƒ‡ƒ“‚ğ•ÏX‚·‚é(Šù‚É‚»‚ÌƒAƒjƒ‚ğÄ¶’†‚È‚ç‰½‚à‚µ‚È‚¢)
+		// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å¤‰æ›´ã™ã‚‹(æ—¢ã«ãã®ã‚¢ãƒ‹ãƒ¡ã‚’å†ç”Ÿä¸­ãªã‚‰ä½•ã‚‚ã—ãªã„)
 		const void SetAnim(wstring animname, float time = 0.0f) {
 			auto draw = GetComponent<PNTBoneModelDraw>();
 			if (draw->GetCurrentAnimation() != animname)
 				draw->ChangeCurrentAnimation(animname, time);
 		}
 
-		// ƒ{ƒ^ƒ“‚Ìó‘Ô‚ğİ’è‚·‚é
+		// ãƒœã‚¿ãƒ³ã®çŠ¶æ…‹ã‚’è¨­å®šã™ã‚‹
 		void SetButton(const bool& open)
 		{
 			m_open = open;
@@ -236,10 +237,10 @@ namespace basecross {
 
 	class DoorGimmick : public GameObject
 	{
-		Vec3 m_Position;                       // ƒhƒA‚ÌˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Rotation;                      // ƒhƒA‚Ì‰ñ“]î•ñ‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_Scale;                         // ƒhƒA‚ÌƒXƒP[ƒ‹iƒTƒCƒYj‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		wstring m_Texname;                    // ƒeƒNƒXƒ`ƒƒ‚Ì–¼‘O
+		Vec3 m_Position;                       // ï¿½hï¿½Aï¿½ÌˆÊ’uï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		Vec3 m_Rotation;                      // ï¿½hï¿½Aï¿½Ì‰ï¿½]ï¿½ï¿½ï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		Vec3 m_Scale;                         // ï¿½hï¿½Aï¿½ÌƒXï¿½Pï¿½[ï¿½ï¿½ï¿½iï¿½Tï¿½Cï¿½Yï¿½jï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
+		wstring m_Texname;                    // ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½Ì–ï¿½ï¿½O
 		float m_number;
 	public:
 		DoorGimmick(const shared_ptr<Stage>& stage,
@@ -249,10 +250,10 @@ namespace basecross {
 			const float& number
 		);
 		~DoorGimmick() {};
-		// ‰Šú‰»
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		virtual void OnCreate() override;
 
-		// XVˆ—
+		// ï¿½Xï¿½Vï¿½ï¿½ï¿½ï¿½
 		virtual void OnUpdate() override;
 	};
 }

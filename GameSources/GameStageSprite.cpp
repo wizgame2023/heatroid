@@ -83,6 +83,26 @@ namespace basecross {
 		m_sprite->SetColor(color);
 	}
 
+	GoalFade::GoalFade(const shared_ptr<Stage>& stage
+	) :
+		GameObject(stage),
+		m_time(0.0f)
+	{}
+	void GoalFade::OnCreate() {
+		auto stage = GetStage();
+		m_sprite = stage->AddGameObject<GameSprite>(1280, 800,
+			L"White", Vec3(0.0f), Col4(1.0f));
+
+	}
+	void GoalFade::OnUpdate() {
+		float delta = App::GetApp()->GetElapsedTime();
+		m_time += m_time >= m_fadeinTime ? delta * 2.0f : delta;
+
+		float trans = m_time >= m_fadeinTime ? m_endTime - m_time : m_time;
+
+		m_sprite->SetColor(Col4(1.0f, 1.0f, 1.0f, trans));
+	}
+
 	FadeIn::FadeIn(const shared_ptr<Stage>& stage
 	) :
 		GameObject(stage),

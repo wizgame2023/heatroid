@@ -1,6 +1,6 @@
 /*!
 @file StageManager.h
-@brief ƒXƒe[ƒWƒ}ƒl[ƒWƒƒ[ƒNƒ‰ƒX
+@brief ã‚¹ãƒ†ãƒ¼ã‚¸ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã‚¯ãƒ©ã‚¹
 */
 
 #pragma once
@@ -10,118 +10,125 @@ namespace basecross {
     class StageManager : public GameObject
     {
     public:
-        // ƒJƒƒ‰‚Ì‘I‘ğ
+        // ã‚«ãƒ¡ãƒ©ã®é¸æŠ
         enum CameraSelect {
-            openingCamera,    // ƒI[ƒvƒjƒ“ƒOƒJƒƒ‰
-            myCamera,         // ƒQ[ƒ€ƒvƒŒƒCƒJƒƒ‰
+            openingCamera,    // ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ã‚«ãƒ¡ãƒ©
+	      	endingCamera,     // ã‚¯ãƒªã‚¢æ¼”å‡ºã‚«ãƒ¡ãƒ©
+            myCamera,         // ã‚²ãƒ¼ãƒ ãƒ—ãƒ¬ã‚¤ã‚«ãƒ¡ãƒ©
         };
 
-        // ƒQ[ƒ€ƒXƒe[ƒ^ƒX‚Ì‘I‘ğ
+        // ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®é¸æŠ
         enum GameStatus {
-            TITLE,            // ƒ^ƒCƒgƒ‹ƒV[ƒ“•\¦
-            SELECT,           // ƒXƒe[ƒWƒZƒŒƒNƒgƒV[ƒ“•\¦
-            GAME_PLAYING,     // ƒQ[ƒ€ƒvƒŒƒC’†
-            TEST_PLAY         // ƒeƒXƒgƒvƒŒƒC’†
+            TITLE,            // ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³è¡¨ç¤ºæ™‚
+            SELECT,           // ã‚¹ãƒ†ãƒ¼ã‚¸ã‚»ãƒ¬ã‚¯ãƒˆã‚·ãƒ¼ãƒ³è¡¨ç¤ºæ™‚
+            GAME_PLAYING,     // ã‚²ãƒ¼ãƒ ãƒ—ãƒ¬ã‚¤ä¸­
+            TEST_PLAY         // ãƒ†ã‚¹ãƒˆãƒ—ãƒ¬ã‚¤ä¸­
         };
 
-        // ƒGƒtƒFƒNƒg‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX
+        // ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
         shared_ptr<EfkInterface> m_EfkInterface;
 
-        CameraSelect m_CameraSelect;                 // Œ»İ‚ÌƒJƒƒ‰‚ğ•Û‚·‚é•Ï”
-        shared_ptr<SingleView> m_OpeningCameraView;  // ƒI[ƒvƒjƒ“ƒOƒJƒƒ‰ƒrƒ…[
-        shared_ptr<SingleView> m_MyCameraView;       // ƒQ[ƒ€ƒvƒŒƒCƒJƒƒ‰ƒrƒ…[
-        int m_nowGameStatus;                         // Œ»İ‚ÌƒQ[ƒ€ƒXƒe[ƒ^ƒX
-        wstring m_StageName;                         // ƒXƒe[ƒW‚Ì–¼‘O
-        CsvFile m_GameStage;                         // ƒQ[ƒ€ƒXƒe[ƒW‚ÌCSVƒtƒ@ƒCƒ‹
+        CameraSelect m_CameraSelect;                 // ç¾åœ¨ã®ã‚«ãƒ¡ãƒ©ã‚’ä¿æŒã™ã‚‹å¤‰æ•°
+        shared_ptr<SingleView> m_OpeningCameraView;  // ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ã‚«ãƒ¡ãƒ©ãƒ“ãƒ¥ãƒ¼
+		shared_ptr<SingleView> m_EndingCameraView;   // ã‚¯ãƒªã‚¢æ¼”å‡ºã‚«ãƒ¡ãƒ©ãƒ“ãƒ¥ãƒ¼
+        shared_ptr<SingleView> m_MyCameraView;       // ã‚²ãƒ¼ãƒ ãƒ—ãƒ¬ã‚¤ã‚«ãƒ¡ãƒ©ãƒ“ãƒ¥ãƒ¼
+        int m_nowGameStatus;                         // ç¾åœ¨ã®ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹
+        wstring m_StageName;                         // ã‚¹ãƒ†ãƒ¼ã‚¸ã®åå‰
+        CsvFile m_GameStage;                         // ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®CSVãƒ•ã‚¡ã‚¤ãƒ«
 
-        // ƒXƒvƒ‰ƒCƒg
-        shared_ptr<GameObject> m_titleSprite;        // ƒ^ƒCƒgƒ‹‚ÌƒXƒvƒ‰ƒCƒg
-        shared_ptr<Transform> m_PlayerObject;        // ƒvƒŒƒCƒ„[ƒIƒuƒWƒFƒNƒg‚Ìƒgƒ‰ƒ“ƒXƒtƒH[ƒ€
-        shared_ptr<GameObject> m_SpriteDraw;         // ƒXƒvƒ‰ƒCƒg•`‰æƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_TextDraw;           // ƒeƒLƒXƒg•`‰æƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_StageUI;            // ƒXƒe[ƒWUIƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_kakaeruUI;            // ƒXƒe[ƒWUIƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_nextStageUI;        // Ÿ‚ÌƒXƒe[ƒWUIƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_clearSelectStage;   // ƒNƒŠƒAƒXƒe[ƒW‘I‘ğUIƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_retryStageUI;       // ƒŠƒgƒ‰ƒCƒXƒe[ƒWUIƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_overSelectStage;    // ƒQ[ƒ€ƒI[ƒo[‚ÌƒXƒe[ƒW‘I‘ğUIƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_SelectCharge;       // ‘I‘ğ‰æ–Ê‚Ìƒ`ƒƒ[ƒWƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_TitleCharge;        // ƒ^ƒCƒgƒ‹‰æ–Ê‚Ìƒ`ƒƒ[ƒWƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_BGfade;             // ”wŒiƒtƒF[ƒhƒIƒuƒWƒFƒNƒg
+        // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+        shared_ptr<GameObject> m_titleSprite;        // ã‚¿ã‚¤ãƒˆãƒ«ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+        shared_ptr<Transform> m_PlayerObject;        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ 
+        shared_ptr<GameObject> m_SpriteDraw;         // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_TextDraw;           // ãƒ†ã‚­ã‚¹ãƒˆæç”»ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_StageUI;            // ã‚¹ãƒ†ãƒ¼ã‚¸UIã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_kakaeruUI;            // ã‚¹ãƒ†ãƒ¼ã‚¸UIã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_nextStageUI;        // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ã‚¸UIã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_clearSelectStage;   // ã‚¯ãƒªã‚¢ã‚¹ãƒ†ãƒ¼ã‚¸é¸æŠUIã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_retryStageUI;       // ãƒªãƒˆãƒ©ã‚¤ã‚¹ãƒ†ãƒ¼ã‚¸UIã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_overSelectStage;    // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ™‚ã®ã‚¹ãƒ†ãƒ¼ã‚¸é¸æŠUIã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_SelectCharge;       // é¸æŠç”»é¢ã®ãƒãƒ£ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_TitleCharge;        // ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®ãƒãƒ£ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_BGfade;             // èƒŒæ™¯ãƒ•ã‚§ãƒ¼ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 
-        float m_totalTime = 0.0f;                    // ‡ŒvŠÔ‚ğŒv‘ª‚·‚é•Ï”
-        int m_select = 0;                            // ‘I‘ğ‚³‚ê‚½€–Ú‚ÌƒCƒ“ƒfƒbƒNƒX
+        float m_totalTime = 0.0f;                    // åˆè¨ˆæ™‚é–“ã‚’è¨ˆæ¸¬ã™ã‚‹å¤‰æ•°
+        float m_clearTotalTime = 0.0f;               // ã‚¯ãƒªã‚¢å¾Œã®æ¼”å‡ºç”¨
+        int m_select = 0;                            // é¸æŠã•ã‚ŒãŸé …ç›®ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 
-        bool m_Goaltrue = false;                     // ƒS[ƒ‹‚É’B‚µ‚½‚©‚Ìƒtƒ‰ƒO
-        bool m_Diedtrue = false;                     // €–S‚µ‚½‚©‚Ìƒtƒ‰ƒO
-        bool m_pause = false;                        // ƒ|[ƒY’†‚©‚Ìƒtƒ‰ƒO
-        bool m_Flag = true;                          // ƒtƒ‰ƒO
-        bool m_startFlag = false;                    // ƒ^ƒCƒgƒ‹‚Ìƒtƒ‰ƒO
-        int m_PushState = 0;                         // ƒ{ƒ^ƒ“‚Ì‰Ÿ‰ºó‘Ô
-        float m_updateTime;                           //@Œv‘ªŠÔ
-        // ƒrƒ…[‚Ìì¬
+        bool m_Goaltrue = false;                     // ã‚´ãƒ¼ãƒ«ã«é”ã—ãŸã‹ã®ãƒ•ãƒ©ã‚°
+        bool m_Diedtrue = false;                     // æ­»äº¡ã—ãŸã‹ã®ãƒ•ãƒ©ã‚°
+        bool m_pause = false;                        // ãƒãƒ¼ã‚ºä¸­ã‹ã®ãƒ•ãƒ©ã‚°
+        bool m_Flag = true;                          // ãƒ•ãƒ©ã‚°
+        bool m_fadeoutFlag = true;                   // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆãƒ•ãƒ©ã‚°
+        bool m_startFlag = false;                    // ã‚¿ã‚¤ãƒˆãƒ«ã®ãƒ•ãƒ©ã‚°
+        int m_PushState = 0;                         // ãƒœã‚¿ãƒ³ã®æŠ¼ä¸‹çŠ¶æ…‹
+        float m_updateTime;                          //ã€€è¨ˆæ¸¬æ™‚é–“
+        // ãƒ“ãƒ¥ãƒ¼ã®ä½œæˆ
         void CreateViewLight();
 
-        // ƒvƒŒƒCƒ„[‚Ì¶¬
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç”Ÿæˆ
         void CreatePlayer();
 
-        // ŒÅ’èƒ{ƒbƒNƒX‚Ìì¬
+        // å›ºå®šãƒœãƒƒã‚¯ã‚¹ã®ä½œæˆ
         void CreateFixedBox();
 
-        // ƒMƒ~ƒbƒN‚Ìì¬
+        // ã‚®ãƒŸãƒƒã‚¯ã®ä½œæˆ
         void CreateGimmick();
 
-        // “G‚Ìì¬
+        // æ•µã®ä½œæˆ
         void CreateEnemy();
 
-        // ƒXƒvƒ‰ƒCƒg‚Ìì¬
+        // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ä½œæˆ
         void CreateSprite();
 
-        // ƒS[ƒ‹”»’è
+        // ã‚´ãƒ¼ãƒ«åˆ¤å®š
         void GoalJudge();
 
-        // ƒQ[ƒ€ƒI[ƒo[”»’è
+        // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼åˆ¤å®š
         void GameOverJudge();
 
-        // ƒ{ƒ^ƒ“‚Ì‰Ÿ‰ºó‘Ô‚ğİ’è‚·‚é
+        // ãƒœã‚¿ãƒ³ã®æŠ¼ä¸‹çŠ¶æ…‹ã‚’è¨­å®šã™ã‚‹
         void SetPushState(const int PushState);
 
-        // ƒ{ƒ^ƒ“‚Ì‰Ÿ‰ºó‘Ô‚ğæ“¾‚·‚é
+        // ãƒœã‚¿ãƒ³ã®æŠ¼ä¸‹çŠ¶æ…‹ã‚’å–å¾—ã™ã‚‹
         int GetPushState();
 
-        // ƒQ[ƒ€ƒXƒe[ƒW‚ğİ’è‚·‚é
+        // ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã‚’è¨­å®šã™ã‚‹
         void SetGameStageSelect(const wstring& m_csvFail);
 
-        // ƒXƒvƒ‰ƒCƒg‚ğˆÚ“®‚·‚é
+        // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ç§»å‹•ã™ã‚‹
         void MoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStage);
 
-        // ‘I‘ğ‰æ–Ê‚ÌƒXƒvƒ‰ƒCƒg‚ğˆÚ“®‚·‚é
+        // é¸æŠç”»é¢ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ç§»å‹•ã™ã‚‹
         void SelectMoveSprite(const shared_ptr<GameObject> nextStageUI, const shared_ptr<GameObject> SelectStage);
 
-        // ƒQ[ƒ€ƒXƒe[ƒW‚Ì‘I‘ğ‚ğæ“¾‚·‚é
+        // ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®é¸æŠã‚’å–å¾—ã™ã‚‹
         wstring GetGameStageSelect();
 
-        // Œ»İ‚ÌƒQ[ƒ€ƒXƒe[ƒ^ƒX‚ğæ“¾‚·‚é
+        // ç¾åœ¨ã®ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚’å–å¾—ã™ã‚‹
         int GetNowGameStatus();
 
-        // Œ»İ‚ÌƒQ[ƒ€ƒXƒe[ƒ^ƒX‚ğİ’è‚·‚é
+        // ç¾åœ¨ã®ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚’è¨­å®šã™ã‚‹
         void SetNowGameStatus(int afterGameStatus);
 
-        // Œ»İ‚ÌƒJƒƒ‰ƒXƒe[ƒ^ƒX‚ğæ“¾‚·‚é
+        // ç¾åœ¨ã®ã‚«ãƒ¡ãƒ©ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚’å–å¾—ã™ã‚‹
         int GetNowCameraStatus();
 
-        // ƒƒCƒ“ƒJƒƒ‰‚ÉØ‚è‘Ö‚¦‚é
+        // ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ã«åˆ‡ã‚Šæ›¿ãˆã‚‹
         void ToMainCamera();
 
-        // ƒI[ƒvƒjƒ“ƒOƒJƒƒ‰‚ÉØ‚è‘Ö‚¦‚é
+        // ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ã‚«ãƒ¡ãƒ©ã«åˆ‡ã‚Šæ›¿ãˆã‚‹
         void ToOpeningCamera();
 
-        // ƒTƒEƒ“ƒhƒGƒtƒFƒNƒg‚ğÄ¶‚·‚é
+        // ã‚¯ãƒªã‚¢æ¼”å‡ºã‚«ãƒ¡ãƒ©ã«åˆ‡ã‚Šæ›¿ãˆã‚‹
+		void ToEndingCamera();
+        
+        // ã‚µã‚¦ãƒ³ãƒ‰ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å†ç”Ÿã™ã‚‹
         void PlaySE(wstring path, float loopcnt, float volume);
 
         void UImake();
 
-        // \’z‚Æ”jŠü
+        // æ§‹ç¯‰ã¨ç ´æ£„
         StageManager(const shared_ptr<Stage>& stage) :
             GameObject(stage)
         {
@@ -129,16 +136,16 @@ namespace basecross {
 
         virtual ~StageManager() {}
 
-        // ‰Šú‰»
+        // åˆæœŸåŒ–
         virtual void OnCreate() override;
 
-        // XVˆ—
+        // æ›´æ–°å‡¦ç†
         virtual void OnUpdate() override;
 
-        // •`‰æˆ—
+        // æç”»å‡¦ç†
         virtual void OnDraw() override;
 
-        // ƒGƒtƒFƒNƒgƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğæ“¾‚·‚é
+        // ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’å–å¾—ã™ã‚‹
         shared_ptr<EfkInterface> GetEfkInterface() const {
             return m_EfkInterface;
         }

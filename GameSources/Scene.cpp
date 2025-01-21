@@ -149,6 +149,8 @@ namespace basecross{
 		soundWav = sdPath + L"Confirm.wav";
 		App::GetApp()->RegisterWav(L"Confirm", soundWav);
 
+		soundWav = sdPath + L"RevCymbal.wav";
+		App::GetApp()->RegisterWav(L"RevCymbal", soundWav);
 		soundWav = sdPath + L"GameClear.wav";
 		App::GetApp()->RegisterWav(L"GameClearSE", soundWav);
 		soundWav = sdPath + L"Door.wav";
