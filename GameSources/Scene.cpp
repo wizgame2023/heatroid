@@ -112,6 +112,11 @@ namespace basecross{
 		app->RegisterTexture(L"PauseBack", texPath + L"PauseBack.png");
 		app->RegisterTexture(L"PauseSelectCharge", texPath + L"PauseSelectCharge.png");
 		app->RegisterTexture(L"PauseTitleCharge", texPath + L"PauseTitleCharge.png");
+		app->RegisterTexture(L"DoorGimmick", texPath + L"0.2.png");
+		app->RegisterTexture(L"DoorGimmick1", texPath + L"1.2.png");
+		app->RegisterTexture(L"DoorGimmick2", texPath + L"2.2.png");
+		app->RegisterTexture(L"DoorGimmick3", texPath + L"0.1.png");
+		app->RegisterTexture(L"DoorGimmick4", texPath + L"1.1.png");
 
 		//サウンド
 		//SE
