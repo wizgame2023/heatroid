@@ -45,11 +45,13 @@ namespace basecross {
 		float m_VPic;                         // テクスチャのV軸方向のピクチャサイズ
 		shared_ptr<GimmickButton> GDoor;      // 関連するギミックボタン
 		int kazu = 1;                         // 数量を表す変数
-		int m_number;                         // ドアの識別番号
 		bool m_Flag;                          // フラグ
 	public:
 		float m_OpenSwitch;                   // ドアの開閉スイッチ
 		wstring m_Texname;                    // テクスチャの名前
+		int State;
+		int m_number;                         // ドアの識別番号
+
 		// 構築と破棄
 		GimmickDoor(const shared_ptr<Stage>& stage,
 			const Vec3& position,
@@ -74,6 +76,10 @@ namespace basecross {
 
 		// サウンドエフェクトを再生する
 		void PlaySE(wstring path, float loopcnt, float volume);
+
+		int GetState();
+
+		int GetNumber();
 	};
 
 	class GimmickUp : public GameObject {
@@ -87,12 +93,12 @@ namespace basecross {
 		shared_ptr<GimmickButton> GDoor;      // 関連するギミックボタン
 		int kazu = 1;                         // 数量を表す変数
 		int ido = 0;                          // 移動量を表す変数
-		int m_number;                         // ギミックの識別番号
 		bool m_Flag;                          // フラグ
 	public:
 		float m_Max;                          // ギミックの最大値
 		float m_OpenSwitch;                   // ギミックの開閉スイッチ
 		wstring m_Texname;                    // テクスチャの名前
+		int m_number;                         // ギミックの識別番号
 
 		// 構築と破棄
 		GimmickUp(const shared_ptr<Stage>& stage,
@@ -228,4 +234,25 @@ namespace basecross {
 		}
 	};
 
+	class DoorGimmick : public GameObject
+	{
+		Vec3 m_Position;                       // ドアの位置を保持するベクトル
+		Vec3 m_Rotation;                      // ドアの回転情報を保持するベクトル
+		Vec3 m_Scale;                         // ドアのスケール（サイズ）を保持するベクトル
+		wstring m_Texname;                    // テクスチャの名前
+		float m_number;
+	public:
+		DoorGimmick(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale,
+			const float& number
+		);
+		~DoorGimmick() {};
+		// 初期化
+		virtual void OnCreate() override;
+
+		// 更新処理
+		virtual void OnUpdate() override;
+	};
 }

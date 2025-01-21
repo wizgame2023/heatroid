@@ -334,6 +334,33 @@ namespace basecross {
 			//各値がそろったのでオブジェクト作成
 			auto door = GetStage()->AddGameObject<GimmickUp>(Pos, Rot, Scale, Scale.x, Scale.y, Switch, number, Tokens[12], max);
 		}
+		m_GameStage.GetSelect(LineVec, 0, L"DoorGimmick");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 Rot;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
+			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
+			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+			float number = (float)_wtof(Tokens[10].c_str());
+			//各値がそろったのでオブジェクト作成
+			auto doorgimmick = GetStage()->AddGameObject<DoorGimmick>(Pos, Rot, Scale, number);
+		}
 	}
 
 	void StageManager::CreateEnemy() {
@@ -672,6 +699,7 @@ namespace basecross {
 				}
 
 				GetTypeStage<GameStage>()->OnDestroy();
+				m_kakaeruUI->SetDrawActive(false);
 
 				m_StageUI->SetDrawActive(false);
 				m_TextDraw->SetDrawActive(true);
@@ -722,6 +750,7 @@ namespace basecross {
 				m_StageUI->SetDrawActive(false);
 				m_retryStageUI->SetDrawActive(true);
 				m_overSelectStage->SetDrawActive(true);
+				m_kakaeruUI->SetDrawActive(false);
 				GetStage()->AddGameObject<GameOverSprite>();
 				m_Flag = false;
 			}
