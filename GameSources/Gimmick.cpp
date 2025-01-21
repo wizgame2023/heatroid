@@ -575,25 +575,65 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
 	}
-	DoorGimmick::DoorGimmick(const shared_ptr<Stage>& stage, const Vec3& position, const Vec3& rotation, const Vec3& scale, const float& number):
+	DoorGimmick::DoorGimmick(const shared_ptr<Stage>& stage, const Vec3& position, const Vec3& UV, const Vec3& scale, const float& number, const wstring& color):
 		GameObject(stage),
 		m_Position(position),
-		m_Rotation(rotation),
+		m_UV(UV),
 		m_Scale(scale),
-		m_number(number)
+		m_number(number),
+		color(color)
 	{
 	}
 	void DoorGimmick::OnCreate()
 	{
-		auto Trans = AddComponent<Transform>();
-		Trans->SetPosition(m_Position);
-		Trans->SetRotation(m_Rotation);
-		Trans->SetScale(m_Scale);
-		auto ptrColl = AddComponent<CollisionRect>();
-		ptrColl->SetDrawActive(true);
-		auto ptrDraw = AddComponent<BcPNTStaticDraw>();
-		ptrDraw->SetMeshResource(L"DEFAULT_CUBE");
-		ptrDraw->SetTextureResource(L"DoorGimmick");
+
+		if (color == L"Black")
+		{
+			m_colorSwitch = 0;
+		}
+		if (color == L"Red")
+		{
+			m_colorSwitch = 1;
+		}
+		if (color == L"Blue")
+		{
+			m_colorSwitch = 2;
+		}
+
+		float helfSize = 1.0f;
+		//頂点配列(縦横5個ずつ表示)
+		m_vertices = {
+			{Vec3(-m_UV.x * 0.5f, m_UV.y * 0.5f,-m_UV.z * 0.5f), bsm::Vec3(1.0f, 1.0f, 1.0f),Vec2(0.0f,0.0f)},
+			{Vec3(m_UV.x * 0.5f, m_UV.y * 0.5f,m_UV.z * 0.5f), bsm::Vec3(1.0f, 1.0f, 1.0f),Vec2(1.0f,0.0f)},
+			{Vec3(-m_UV.x * 0.5f,-m_UV.y * 0.5f,-m_UV.z * 0.5f), bsm::Vec3(1.0f, 1.0f, 1.0f),Vec2(0.0f,1.0f)},
+			{Vec3(m_UV.x * 0.5f,-m_UV.y * 0.5f,m_UV.z* 0.5f), bsm::Vec3(1.0f, 1.0f, 1.0f),Vec2(1.0f,1.0f)}
+		};
+		//インデックス配列
+	    m_indices = { 0, 1, 2, 1, 3, 2 };
+		SetAlphaActive(true);
+		auto ptrTrans = GetComponent<Transform>();
+		ptrTrans->SetScale(m_Scale);
+		ptrTrans ->SetRotation(Vec3(0.0f, 0.0f, 0.0f));
+		ptrTrans->SetPosition(m_Position);
+		m_squareMesh = MeshResource::CreateMeshResource<VertexPositionColorTexture>(m_vertices, m_indices, true);
+
+		//頂点とインデックスを指定してスプライト作成
+		auto ptrDraw = AddComponent<PCTStaticDraw>();
+		ptrDraw->SetMeshResource(m_squareMesh);
+		ptrDraw->SetOriginalMeshResource(m_squareMesh);
+
+		if (m_colorSwitch == 0)
+		{
+			ptrDraw->SetTextureResource(L"BlackDoorGimmick");
+		}
+		else if (m_colorSwitch == 1)
+		{
+			ptrDraw->SetTextureResource(L"RedDoorGimmick");
+		}
+		else if (m_colorSwitch == 1)
+		{
+			ptrDraw->SetTextureResource(L"BlueDoorGimmick");
+		}
 	}
 	void DoorGimmick::OnUpdate()
 	{
@@ -607,26 +647,75 @@ namespace basecross {
 			int Switch = Doors->m_number;
 			if (number == m_number)
 			{
-				auto ptrDraw = GetComponent<BcPNTStaticDraw>();
+				auto ptrDraw = GetComponent<PCTStaticDraw>();
 				if (Switch == 1)
 				{
-					if (state == 0) {
-						ptrDraw->SetTextureResource(L"DoorGimmick3");
+					if (m_colorSwitch == 0)
+					{
+						if (state == 0) {
+							ptrDraw->SetTextureResource(L"BlackDoorGimmick3");
+						}
+						if (state == 1) {
+							ptrDraw->SetTextureResource(L"BlackDoorGimmick4");
+						}
 					}
-					if (state == 1) {
-						ptrDraw->SetTextureResource(L"DoorGimmick4");
+					else if (m_colorSwitch == 1)
+					{
+						if (state == 0) {
+							ptrDraw->SetTextureResource(L"RedDoorGimmick3");
+						}
+						if (state == 1) {
+							ptrDraw->SetTextureResource(L"RedDoorGimmick4");
+						}
 					}
+					else if (m_colorSwitch == 2)
+					{
+						if (state == 0) {
+							ptrDraw->SetTextureResource(L"BlueDoorGimmick3");
+						}
+						if (state == 1) {
+							ptrDraw->SetTextureResource(L"BlueDoorGimmick4");
+						}
+					}
+
 				}
 				if (Switch == 2)
 				{
-					if (state == 0) {
-						ptrDraw->SetTextureResource(L"DoorGimmick");
+					if (m_colorSwitch == 0)
+					{
+						if (state == 0) {
+							ptrDraw->SetTextureResource(L"BlackDoorGimmick");
+						}
+						if (state == 1) {
+							ptrDraw->SetTextureResource(L"BlackDoorGimmick1");
+						}
+						if (state == 2) {
+							ptrDraw->SetTextureResource(L"BlackDoorGimmick2");
+						}
 					}
-					if (state == 1) {
-						ptrDraw->SetTextureResource(L"DoorGimmick1");
+					else if (m_colorSwitch == 1)
+					{
+						if (state == 0) {
+							ptrDraw->SetTextureResource(L"RedDoorGimmick");
+						}
+						if (state == 1) {
+							ptrDraw->SetTextureResource(L"RedDoorGimmick1");
+						}
+						if (state == 2) {
+							ptrDraw->SetTextureResource(L"RedDoorGimmick2");
+						}
 					}
-					if (state == 2) {
-						ptrDraw->SetTextureResource(L"DoorGimmick2");
+					else if (m_colorSwitch == 2)
+					{
+						if (state == 0) {
+							ptrDraw->SetTextureResource(L"BlueDoorGimmick");
+						}
+						if (state == 1) {
+							ptrDraw->SetTextureResource(L"BlueDoorGimmick1");
+						}
+						if (state == 2) {
+							ptrDraw->SetTextureResource(L"BlueDoorGimmick2");
+						}
 					}
 				}
 			}
