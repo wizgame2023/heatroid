@@ -1163,9 +1163,10 @@ namespace basecross {
 		EnemyBullet(stage),
 		m_enemy(enemy),
 		m_player(player),
+		m_speed(0.7f),
+		m_range(50.0f),
 		m_pos(Vec3(0.0f)),
-		m_enemyPos(Vec3(0.0f)),
-		m_speed(0.7f)
+		m_enemyPos(Vec3(0.0f))
 	{};
 	void TrackingBullet::OnCreate() {
 		EnemyBullet::OnCreate();
@@ -1191,10 +1192,10 @@ namespace basecross {
 		m_pos = m_trans->GetPosition();
 		m_pos += m_dic * m_speed * elapsed;
 
-		Vec3 range = m_enemyPos - m_pos;
+		Vec3 pos = m_enemyPos - m_pos;
 		m_trans->SetPosition(m_pos);
 
-		if (range.length() >= 30.0f) {
+		if (pos.length() >= m_range) {
 			ThisDestroy();
 		}
 	}
