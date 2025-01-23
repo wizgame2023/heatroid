@@ -455,7 +455,7 @@ namespace basecross {
 	}
 
 	void Player::OnPushA() {
-		if (m_stateType == goal) return;	//立ち状態以外ではジャンプしない
+		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
 		if (m_isCarrying == true) return;	//敵を持った状態でもジャンプしない
 		m_moveVel.y = m_jumpHeight;
 		m_stateType = air;
