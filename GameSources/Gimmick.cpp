@@ -60,6 +60,10 @@ namespace basecross {
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
 		PtrDraw->CreateOriginalMesh(vertices, indices);
 		PtrDraw->SetOriginalMeshUse(true);
+		auto Shadow = AddComponent<Shadowmap>();
+		Shadow->SetLightHeight(100.0f);
+		Shadow->SetViewWidth(128.0f);
+		Shadow->SetViewHeight(128.0f);
 		//PtrDraw->SetFogEnabled(true);
 		//自分に影が映りこむようにする
 		//PtrDraw->SetOwnShadowActive(true);
@@ -117,6 +121,7 @@ namespace basecross {
 
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		group->IntoGroup(GetThis<GameObject>());
+		auto Shadowm = AddComponent<Shadowmap>();
 		//エフェクトの初期化
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
@@ -246,6 +251,8 @@ namespace basecross {
 
 		auto group = GetStage()->GetSharedObjectGroup(L"Door");
 		group->IntoGroup(GetThis<GameObject>());
+
+		auto Shadowm = AddComponent<Shadowmap>();
 	}
 
 	void GimmickDoor::OnUpdate()
@@ -420,6 +427,8 @@ namespace basecross {
 
 		auto group = GetStage()->GetSharedObjectGroup(L"GimmickUp");
 		group->IntoGroup(GetThis<GameObject>());
+
+		auto Shadow = AddComponent<Shadowmap>();
 	}
 
 	void GimmickUp::OnUpdate()
