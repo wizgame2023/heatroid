@@ -172,7 +172,7 @@ namespace basecross {
 				Vec3(1.0f, 1.0f*2.0f, 1.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(0.0f, rad, 0.0f),
-				Vec3(0.0f, -1.0f, 0.0f)
+				Vec3(0.0f, -1.5f, 0.0f)
 			);
 			m_draw->SetMeshToTransformMatrix(meshMat);
 		}
@@ -629,7 +629,7 @@ namespace basecross {
 			//	m_floorFlag = true;
 			//}
 			Vec3 worldPos = GetWorldPos();
-			if (worldPos.y - m_scal.y / 2.0f <= (fixPos.y + fixScal.y / 2.0f)+2.0f) {
+			if (worldPos.y - m_scal.y / 2.0f <= (fixPos.y + fixScal.y / 2.0f)) {
 				m_floorFlag = true;
 				//m_pos.y = fixPos.y - fixScal.y / 2 - m_scal.y / 2;
 			}
