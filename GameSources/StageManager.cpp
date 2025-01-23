@@ -126,7 +126,7 @@ namespace basecross {
 			//各値がそろったのでオブジェクト作成
 			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x / 1, Scale.z / 1, Tokens[10]);
 			ptrFloor->AddTag(L"Floor");
-			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(false);
+			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
 		}
 		m_GameStage.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -155,6 +155,8 @@ namespace basecross {
 			//各値がそろったのでオブジェクト作成
 			auto PtrWall = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x, Scale.y, Tokens[10]);
 			PtrWall->AddTag(L"Wall");
+			PtrWall->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
+
 		}
 		m_GameStage.GetSelect(LineVec, 0, L"GoalFloor");
 		for (auto& v : LineVec) {
@@ -336,6 +338,33 @@ namespace basecross {
 
 			//各値がそろったのでオブジェクト作成
 			auto door = GetStage()->AddGameObject<GimmickUp>(Pos, Rot, Scale, Scale.x, Scale.y, Switch, number, Tokens[12], max);
+		}
+		m_GameStage.GetSelect(LineVec, 0, L"DoorGimmick");
+		for (auto& v : LineVec) {
+			//トークン（カラム）の配列
+			vector<wstring> Tokens;
+			//トークン（カラム）単位で文字列を抽出(L','をデリミタとして区分け)
+			Util::WStrToTokenVector(Tokens, v, L',');
+			//各トークン（カラム）をスケール、回転、位置に読み込む
+			Vec3 Scale(
+				(float)_wtof(Tokens[7].c_str()),
+				(float)_wtof(Tokens[8].c_str()),
+				(float)_wtof(Tokens[9].c_str())
+			);
+			Vec3 UV;
+			//回転は「XM_PIDIV2」の文字列になっている場合がある
+			UV.x = (float)_wtof(Tokens[4].c_str());
+			UV.y = (float)_wtof(Tokens[5].c_str());
+			UV.z = (float)_wtof(Tokens[6].c_str());
+
+			Vec3 Pos(
+				(float)_wtof(Tokens[1].c_str()),
+				(float)_wtof(Tokens[2].c_str()),
+				(float)_wtof(Tokens[3].c_str())
+			);
+			float number = (float)_wtof(Tokens[10].c_str());
+			//各値がそろったのでオブジェクト作成
+			auto doorgimmick = GetStage()->AddGameObject<DoorGimmick>(Pos, UV, Scale, number, Tokens[11]);
 		}
 	}
 
@@ -675,6 +704,7 @@ namespace basecross {
 		float totaltime = 1.0f;
 		Easing<Vec3> easing;
 
+
 		auto playerSh = GetStage()->GetSharedGameObject<Player>(L"Player");
 		m_Goaltrue = playerSh->GetArrivedGoal();
 		if (m_Goaltrue)
@@ -688,12 +718,19 @@ namespace basecross {
 				if (m_Flag)
 				{
 					PlaySE(L"GameClearSE", 0, 1.0f);
-					//m_BGfade = GetStage()->AddGameObject<FadeOut>();
-					//m_BGfade->SetDrawLayer(3);
 					m_Flag = false;
+				}
+				else {
+					m_clearTotalTime += ElapsedTime;
+				}
+				if (m_fadeoutFlag && m_clearTotalTime >= 6.0f) {
+					m_BGfade = GetStage()->AddGameObject<FadeOut>();
+					m_BGfade->SetDrawLayer(3);
+					m_fadeoutFlag = false;
 				}
 
 				GetTypeStage<GameStage>()->OnDestroy();
+				m_kakaeruUI->SetDrawActive(false);
 
 				m_StageUI->SetDrawActive(false);
 				m_TextDraw->SetDrawActive(true);
@@ -744,6 +781,7 @@ namespace basecross {
 				m_StageUI->SetDrawActive(false);
 				m_retryStageUI->SetDrawActive(true);
 				m_overSelectStage->SetDrawActive(true);
+				m_kakaeruUI->SetDrawActive(false);
 				GetStage()->AddGameObject<GameOverSprite>();
 				m_Flag = false;
 			}

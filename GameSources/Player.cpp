@@ -364,19 +364,23 @@ namespace basecross {
 			Friction();
 
 			//Goal床を参照してその手前にワープ
-			if (m_animTime > 1.5f) {
+			if (m_animTime > 1.5f && !m_goalPosMoved) {
+				m_goalPosMoved = true;
 				shared_ptr<Transform> trans = m_goal->GetComponent<Transform>();
 
 				m_moveVel = Vec3(0);
-				Vec3 fwd = trans->GetForward();
-				float face = atan2f(fwd.z, fwd.x) + XM_PIDIV2;
-				Vec3 addpos = Vec3((m_distToGoal * cosf(face)), GetComponent<Transform>()->GetPosition().y, (m_distToGoal * sinf(face)));
-				GetComponent<Transform>()->SetPosition(trans->GetPosition() + addpos);
-				m_goalRotate = trans->GetRotation();
-				m_goalRotate.y += XM_PIDIV2;
-				GetComponent<Transform>()->SetRotation(m_goalRotate);
+				m_goalRotate = trans->GetQuaternion();
+				m_goalRotate = RotateQuat(m_goalRotate, Vec3(0, 1, 0), XM_PIDIV2);
+				GetComponent<Transform>()->SetQuaternion(m_goalRotate);
 
-				m_animTime = 0.0f; 
+				Vec3 fwd = GetComponent<Transform>()->GetForward();
+				float face = atan2(fwd.z, fwd.x);
+				addpos1 = Vec3((m_distToGoal * cosf(face)), 0, (m_distToGoal * sinf(face)));
+				pos1 = Vec3(trans->GetPosition().x, GetComponent<Transform>()->GetPosition().y, trans->GetPosition().z);
+				GetComponent<Transform>()->SetPosition(addpos1 + pos1);	
+			}
+			if (m_goalPosMoved) {
+				m_animTime = 0.0f;
 				m_stateType = goal;
 			}
 
@@ -391,13 +395,16 @@ namespace basecross {
 			}
 			else if (m_animTime > 3.0f && m_animTime <= 3.5f) {
 				SetAnim(L"Idle");
-				Easing<Vec3> rot;
 
-				GetComponent<Transform>()->SetRotation(rot.EaseInOut(EasingType::Cubic, m_goalRotate, m_goalRotate + Vec3(0, XM_PI, 0), m_animTime - 3.0f, .5f));
+				Easing<float> rot;
+				float start = 0;
+				float end = XM_PIDIV2;
+
+				GetComponent<Transform>()->SetQuaternion(RotateQuat(m_goalRotate, Vec3(0, 1, 0), rot.EaseInOut(EasingType::Cubic, start, end, m_animTime - 3.0f, .5f)));
 			}
 			else if (m_animTime > 4.0f) {
 				 SetAnim(L"Idle");
-			 }
+			}
 			FrictionMovie();
 			SpeedLimit();
 
@@ -416,7 +423,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		ShowDebug();
+		//ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -428,7 +435,7 @@ namespace basecross {
 		wss << "stateType : " << m_stateType << endl;
 		wss << "move : " << m_moveVel.x << " / " << m_moveVel.y << " / " << m_moveVel.z << endl;
 		wss << "pos : " << pos.x << " / " << pos.y << " / " << pos.z << endl;
-		wss << "rotate : " << rot.x << " / " << rot.y << " / " << rot.z << endl;
+		wss << "rotate : " << rot.w << " / " << rot.x << " / " << rot.y << " / " << rot.z << endl;
 		wss << "anim : " << GetDrawPtr()->GetCurrentAnimation() << " animtime : " << GetDrawPtr()->GetCurrentAnimationTime() << endl;
 		wss << "fire : " << m_isCharging << " " << m_chargePerc << endl;
 		wss << "carry : " << m_isCarrying << endl;
@@ -438,9 +445,9 @@ namespace basecross {
 
 		if (m_goal) {
 			auto gpos = m_goal->GetComponent<Transform>()->GetPosition();
-			auto grot = m_goal->GetComponent<Transform>()->GetRotation();
+			auto grot = m_goal->GetComponent<Transform>()->GetQuaternion();
 			wss << "goal : " << gpos.x << " / " << gpos.y << " / " << gpos.z << endl;
-			wss << "goalrot : " << grot.x << " / " << grot.y << " / " << grot.z << endl;
+			wss << "goalrot : " << grot.w << " / " << grot.x << " / " << grot.y << " / " << grot.z << endl;
 		}
 
 		auto scene = App::GetApp()->GetScene<Scene>();
@@ -448,8 +455,7 @@ namespace basecross {
 	}
 
 	void Player::OnPushA() {
-		if (m_stateType == goal) return;	//立ち状態以外ではジャンプしない
-		//if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
+		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
 		if (m_isCarrying == true) return;	//敵を持った状態でもジャンプしない
 		m_moveVel.y = m_jumpHeight;
 		m_stateType = air;
@@ -970,7 +976,7 @@ namespace basecross {
 		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
 		m_DrawComp->SetDiffuse(Col4(1, 1, 1, 1));
 		m_DrawComp->SetTextureResource(m_resKey);
-		m_DrawComp->SetDrawActive(false);
+		m_DrawComp->SetDrawActive(true);
 		SetDrawLayer(m_layer);
 		SetAlphaActive(true);
 
@@ -1009,7 +1015,7 @@ namespace basecross {
 		m_DrawComp = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
 		m_DrawComp->SetDiffuse(color);
 		m_DrawComp->SetTextureResource(ResKey);
-		m_DrawComp->SetDrawActive(false);
+		m_DrawComp->SetDrawActive(true);
 		SetDrawLayer(2);
 		SetAlphaActive(true);
 

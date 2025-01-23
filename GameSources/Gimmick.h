@@ -36,21 +36,22 @@ namespace basecross {
 
 	class GimmickButton;
 	class GimmickDoor : public GameObject {
-		Vec3 m_Position;                       // ドアの位置を保持するベクトル
-		Vec3 m_Rotation;                      // ドアの回転情報を保持するベクトル
-		Vec3 m_Scale;                         // ドアのスケール（サイズ）を保持するベクトル
-		bool m_open;                          // ドアが開いているかのフラグ
-		bool m_open2;                         // もう一つのドア開閉フラグ
-		float m_UPic;                         // テクスチャのU軸方向のピクチャサイズ
-		float m_VPic;                         // テクスチャのV軸方向のピクチャサイズ
-		shared_ptr<GimmickButton> GDoor;      // 関連するギミックボタン
-		int kazu = 1;                         // 数量を表す変数
-		int m_number;                         // ドアの識別番号
-		bool m_Flag;                          // フラグ
+		Vec3 m_Position;                       // �h�A�̈ʒu��ێ�����x�N�g��
+		Vec3 m_Rotation;                      // �h�A�̉�]����ێ�����x�N�g��
+		Vec3 m_Scale;                         // �h�A�̃X�P�[���i�T�C�Y�j��ێ�����x�N�g��
+		bool m_open;                          // �h�A���J���Ă��邩�̃t���O
+		bool m_open2;                         // ������̃h�A�J�t���O
+		float m_UPic;                         // �e�N�X�`����U�������̃s�N�`���T�C�Y
+		float m_VPic;                         // �e�N�X�`����V�������̃s�N�`���T�C�Y
+		shared_ptr<GimmickButton> GDoor;      // �֘A����M�~�b�N�{�^��
+		int kazu = 1;                         // ���ʂ�\���ϐ�
+		bool m_Flag;                          // �t���O
 	public:
-		float m_OpenSwitch;                   // ドアの開閉スイッチ
-		wstring m_Texname;                    // テクスチャの名前
-		// 構築と破棄
+		float m_OpenSwitch;                   // �h�A�̊J�X�C�b�`
+		wstring m_Texname;                    // �e�N�X�`���̖��O
+		int State;
+		int m_number;                         // �h�A�̎��ʔԍ�
+
 		GimmickDoor(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
@@ -74,25 +75,29 @@ namespace basecross {
 
 		// サウンドエフェクトを再生する
 		void PlaySE(wstring path, float loopcnt, float volume);
+
+		int GetState();
+
+		int GetNumber();
 	};
 
 	class GimmickUp : public GameObject {
-		Vec3 m_Position;                       // ギミックの位置を保持するベクトル
-		Vec3 m_Rotation;                      // ギミックの回転情報を保持するベクトル
-		Vec3 m_Scale;                         // ギミックのスケール（サイズ）を保持するベクトル
-		bool m_open;                          // ギミックが開いているかのフラグ
-		bool m_open2;                         // もう一つのギミック開閉フラグ
-		float m_UPic;                         // テクスチャのU軸方向のピクチャサイズ
-		float m_VPic;                         // テクスチャのV軸方向のピクチャサイズ
-		shared_ptr<GimmickButton> GDoor;      // 関連するギミックボタン
-		int kazu = 1;                         // 数量を表す変数
-		int ido = 0;                          // 移動量を表す変数
-		int m_number;                         // ギミックの識別番号
-		bool m_Flag;                          // フラグ
+		Vec3 m_Position;                       // �M�~�b�N�̈ʒu��ێ�����x�N�g��
+		Vec3 m_Rotation;                      // �M�~�b�N�̉�]����ێ�����x�N�g��
+		Vec3 m_Scale;                         // �M�~�b�N�̃X�P�[���i�T�C�Y�j��ێ�����x�N�g��
+		bool m_open;                          // �M�~�b�N���J���Ă��邩�̃t���O
+		bool m_open2;                         // ������̃M�~�b�N�J�t���O
+		float m_UPic;                         // �e�N�X�`����U�������̃s�N�`���T�C�Y
+		float m_VPic;                         // �e�N�X�`����V�������̃s�N�`���T�C�Y
+		shared_ptr<GimmickButton> GDoor;      // �֘A����M�~�b�N�{�^��
+		int kazu = 1;                         // ���ʂ�\���ϐ�
+		int ido = 0;                          // �ړ��ʂ�\���ϐ�
+		bool m_Flag;                          // �t���O
 	public:
-		float m_Max;                          // ギミックの最大値
-		float m_OpenSwitch;                   // ギミックの開閉スイッチ
-		wstring m_Texname;                    // テクスチャの名前
+		float m_Max;                          // �M�~�b�N�̍ő�l
+		float m_OpenSwitch;                   // �M�~�b�N�̊J�X�C�b�`
+		wstring m_Texname;                    // �e�N�X�`���̖��O
+		int m_number;                         // �M�~�b�N�̎��ʔԍ�
 
 		// 構築と破棄
 		GimmickUp(const shared_ptr<Stage>& stage,
@@ -230,4 +235,31 @@ namespace basecross {
 		}
 	};
 
+	class DoorGimmick : public GameObject
+	{
+		Vec3 m_Position;                       // �h�A�̈ʒu��ێ�����x�N�g��
+		Vec3 m_UV;                      // �h�A�̉�]����ێ�����x�N�g��
+		Vec3 m_Scale;                         // �h�A�̃X�P�[���i�T�C�Y�j��ێ�����x�N�g��
+		wstring m_Texname;                    // �e�N�X�`���̖��O
+		float m_number;
+	public:
+		vector<VertexPositionColorTexture> m_vertices;
+		vector<uint16_t> m_indices;
+		shared_ptr<MeshResource> m_squareMesh;
+		wstring color;
+		int m_colorSwitch;
+		DoorGimmick(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& UV,
+			const Vec3& scale,
+			const float& number,
+			const wstring& color
+		);
+		~DoorGimmick() {};
+		// ������
+		virtual void OnCreate() override;
+
+		// �X�V����
+		virtual void OnUpdate() override;
+	};
 }

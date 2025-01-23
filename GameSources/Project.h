@@ -10,6 +10,7 @@
 #include "ProjectShader.h"
 #include "ProjectBehavior.h"
 #include "Scene.h"
+#include "Raycast.h"
 #include "LoadScreen.h"
 #include "TitleStage.h"
 #include "GameStage.h"
