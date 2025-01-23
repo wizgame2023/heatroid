@@ -110,7 +110,7 @@ namespace basecross {
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<FixedBox> m_box;
-		shared_ptr<CollisionObb> m_collision;
+		shared_ptr<CollisionCapsule> m_collision;
 		weak_ptr<TilingFixedBox> m_fixedBox;
 		weak_ptr<PlayerGrab> m_playerGrab;
 		//ƒGƒtƒFƒNƒg
@@ -176,7 +176,7 @@ namespace basecross {
 		void SetState(State state);
 		Vec3 GetDirec();
 		Vec3 GetPos();
-		Vec3 GetChangePos();
+		Vec3 GetWorldPos();
 		bool GetFloorFlag();
 		float GetHeatRatio();
 		bool GetOverHeat();
@@ -214,12 +214,13 @@ namespace basecross {
 
 	};
 	//--------------------------------------------------------------------------------------
-	//	class StraightXBullet : public GameObject; //’¼ü‚É’µ‚Ô’e
+	//	class StraightBullet : public EnemyBullet; //’¼ü‚É’µ‚Ô’e
 	//--------------------------------------------------------------------------------------
 	class StraightBullet : public EnemyBullet {
 	private:
 		float m_speed;   //’e‚Ì‘¬‚³
-		float m_Range;   //Ë’ö
+		float m_range;   //Ë’ö
+		float m_height;  //’e‚ğ”­Ë‚Ì‚‚³
 		Vec3 m_pos;
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
@@ -228,6 +229,7 @@ namespace basecross {
 		weak_ptr<Enemy> m_enemy;
 	public:
 		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
+		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy,const float height);
 		virtual ~StraightBullet() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
@@ -235,7 +237,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class ParabolaBullet : public GameObject; //•ú•¨üó‚É’µ‚Ô’e
+	//	class ParabolaBullet : public EnemyBullet; //•ú•¨üó‚É’µ‚Ô’e
 	//--------------------------------------------------------------------------------------
 	class ParabolaBullet : public EnemyBullet {
 	private:
@@ -265,6 +267,25 @@ namespace basecross {
 		void Debug();
 		void Grav();
 
+	};
+	//--------------------------------------------------------------------------------------
+	//	class TrackingBullet : public EnemyBullet; //ƒvƒŒƒCƒ„[‚ğ‚ß‚ª‚¯‚Ä’µ‚Ô’e
+	//--------------------------------------------------------------------------------------
+	class TrackingBullet : public EnemyBullet {
+	private:
+		float m_speed;
+		float m_range;
+		Vec3 m_pos;
+		Vec3 m_dic;
+		Vec3 m_enemyPos;
+		shared_ptr<Transform> m_trans;
+		weak_ptr<Enemy> m_enemy;
+		weak_ptr<Player> m_player;
+	public:
+		TrackingBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy, const shared_ptr<Player>& player);
+		virtual ~TrackingBullet() {};
+		virtual void OnCreate();
+		virtual void OnUpdate();
 	};
 
 	//--------------------------------------------------------------------------------------

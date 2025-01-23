@@ -126,7 +126,7 @@ namespace basecross {
 			//各値がそろったのでオブジェクト作成
 			auto ptrFloor = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x / 1, Scale.z / 1, Tokens[10]);
 			ptrFloor->AddTag(L"Floor");
-			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(false);
+			ptrFloor->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
 		}
 		m_GameStage.GetSelect(LineVec, 0, L"Wall");
 		for (auto& v : LineVec) {
@@ -155,6 +155,8 @@ namespace basecross {
 			//各値がそろったのでオブジェクト作成
 			auto PtrWall = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x, Scale.y, Tokens[10]);
 			PtrWall->AddTag(L"Wall");
+			PtrWall->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
+
 		}
 		m_GameStage.GetSelect(LineVec, 0, L"GoalFloor");
 		for (auto& v : LineVec) {
@@ -349,11 +351,11 @@ namespace basecross {
 				(float)_wtof(Tokens[8].c_str()),
 				(float)_wtof(Tokens[9].c_str())
 			);
-			Vec3 Rot;
+			Vec3 UV;
 			//回転は「XM_PIDIV2」の文字列になっている場合がある
-			Rot.x = (Tokens[4] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[4].c_str());
-			Rot.y = (Tokens[5] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[5].c_str());
-			Rot.z = (Tokens[6] == L"XM_PIDIV2") ? XM_PIDIV2 : (float)_wtof(Tokens[6].c_str());
+			UV.x = (float)_wtof(Tokens[4].c_str());
+			UV.y = (float)_wtof(Tokens[5].c_str());
+			UV.z = (float)_wtof(Tokens[6].c_str());
 
 			Vec3 Pos(
 				(float)_wtof(Tokens[1].c_str()),
@@ -362,7 +364,7 @@ namespace basecross {
 			);
 			float number = (float)_wtof(Tokens[10].c_str());
 			//各値がそろったのでオブジェクト作成
-			auto doorgimmick = GetStage()->AddGameObject<DoorGimmick>(Pos, Rot, Scale, number);
+			auto doorgimmick = GetStage()->AddGameObject<DoorGimmick>(Pos, UV, Scale, number, Tokens[11]);
 		}
 	}
 

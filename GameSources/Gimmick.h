@@ -238,16 +238,22 @@ namespace basecross {
 	class DoorGimmick : public GameObject
 	{
 		Vec3 m_Position;                       // �h�A�̈ʒu��ێ�����x�N�g��
-		Vec3 m_Rotation;                      // �h�A�̉�]����ێ�����x�N�g��
+		Vec3 m_UV;                      // �h�A�̉�]����ێ�����x�N�g��
 		Vec3 m_Scale;                         // �h�A�̃X�P�[���i�T�C�Y�j��ێ�����x�N�g��
 		wstring m_Texname;                    // �e�N�X�`���̖��O
 		float m_number;
 	public:
+		vector<VertexPositionColorTexture> m_vertices;
+		vector<uint16_t> m_indices;
+		shared_ptr<MeshResource> m_squareMesh;
+		wstring color;
+		int m_colorSwitch;
 		DoorGimmick(const shared_ptr<Stage>& stage,
 			const Vec3& position,
-			const Vec3& rotation,
+			const Vec3& UV,
 			const Vec3& scale,
-			const float& number
+			const float& number,
+			const wstring& color
 		);
 		~DoorGimmick() {};
 		// ������
