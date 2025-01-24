@@ -398,7 +398,7 @@ namespace basecross {
 		OverHeat();
 		//アニメーションの実装
 		m_draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ

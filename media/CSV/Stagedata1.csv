@@ -20,7 +20,7 @@ Door,17,15,-0.5,0,0,0,5,30,10,0,1,AreaDoorBLUE
 StageDoor,-32,-0.8,86,0,0,0,5,5,5,DOOR,,
 StageDoor,85,-0.8,0,0,1.570796327,0,5,5,5,DOOR,,
 GoalBeforeFloor,-30,0,71.5,0,0,0,100,1,40,Floor,,
-GoalFloor,-32.5,0,100,0,0,0,15,1,15,Floor,,
+GoalFloor,-32.5,0.1,100,0,0,0,15,1,15,Floor,,
 Enemy,-50,4,-20,0,0,0,3,3,3,Enemy::rightMove,Enemy::stay,
 Enemy,35,4,24,0,0,0,3,3,3,Enemy::rightMove,Enemy::stay,
 Enemy,-60,4,20,0,0,0,3,3,3,Enemy::bulletMove,Enemy::stay,Z
