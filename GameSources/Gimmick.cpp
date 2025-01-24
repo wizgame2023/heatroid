@@ -270,6 +270,7 @@ namespace basecross {
 			auto shObj = v.lock();
 			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
 			auto Switch = Switchs->GetSwitch();
+			float refugePos = 0;
 			if (Switch == m_OpenSwitch)
 			{
 				m_open = Switchs->GetButton();
@@ -287,11 +288,19 @@ namespace basecross {
 							}
 							if (m_Scale.x < m_Scale.z)
 							{
-								ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
+								refugePos = pos.z;
+								if (refugePos < 20.0f)
+								{
+									ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
+								}
 							}
 							else
 							{
-								ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
+								refugePos = pos.x;
+								if (refugePos > pos.x)
+								{
+									ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
+								}
 							}
 						}
 					}
@@ -314,13 +323,21 @@ namespace basecross {
 											PlaySE(L"DoorSE", 0, 0.5f);
 											m_Flag = true;
 										}
-										if (m_Scale.x < m_Scale.z)
+										if (m_Scale.x < m_Scale.z )
 										{
-											ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
+											refugePos = pos.z;
+											if (refugePos < 20.0f)
+											{
+												ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
+											}
 										}
 										else
 										{
-											ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
+											refugePos = pos.x + 10.0f;
+											if (refugePos > pos.x)
+											{
+												ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
+											}
 										}
 									}
 								}
@@ -595,7 +612,6 @@ namespace basecross {
 	}
 	void DoorGimmick::OnCreate()
 	{
-
 		if (color == L"Black")
 		{
 			m_colorSwitch = 0;
@@ -644,6 +660,7 @@ namespace basecross {
 			ptrDraw->SetTextureResource(L"BlueDoorGimmick");
 		}
 	}
+
 	void DoorGimmick::OnUpdate()
 	{
 		auto group = GetStage()->GetSharedObjectGroup(L"Door");
