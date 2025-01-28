@@ -296,11 +296,7 @@ namespace basecross {
 							}
 							else
 							{
-								refugePos = pos.x;
-								if (refugePos > pos.x)
-								{
 									ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
-								}
 							}
 						}
 					}
@@ -333,11 +329,7 @@ namespace basecross {
 										}
 										else
 										{
-											refugePos = pos.x + 10.0f;
-											if (refugePos > pos.x)
-											{
 												ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
-											}
 										}
 									}
 								}
@@ -350,7 +342,6 @@ namespace basecross {
 							}
 						}
 					}
-
 				}
 				else
 				{
