@@ -493,12 +493,12 @@ namespace basecross {
 			m_plungeSE = true;
 		}
 		if (m_spareTime <= 0.0f) {
-			if (!m_plungeFlag) {
-				m_firstDirec = m_playerPos - GetWorldPos();
-				m_plungeFlag = true;
-				PlaySE(L"EnemyDash");
-			}
 			if (m_direc.length() <= m_trackingRange) {
+				if (!m_plungeFlag) {
+					m_firstDirec = m_playerPos - GetWorldPos();
+					m_plungeFlag = true;
+					PlaySE(L"EnemyDash");
+				}
 				m_pos += Vec3(m_firstDirec.x, 0.0f, m_firstDirec.z) * m_speed * 0.2f * elapsed;
 			}
 			m_spareTime = 0.0f;
@@ -513,15 +513,15 @@ namespace basecross {
 		}
 		m_spareTime -= elapsed;
 		if (m_spareTime <= 0.0f) {
-			if (!m_jumpMoveFlag) {
-				PlayerDic();
-				EnemyAngle();
-				EnemyJump();
-				PlaySE(L"EnemyDash");
-				m_jumpMoveFlag = true;
-				m_speed = m_maxSpeed * 6;
-			}
 			if (m_direc.length() <= m_trackingRange * 2) {
+				if (!m_jumpMoveFlag) {
+					PlayerDic();
+					EnemyAngle();
+					EnemyJump();
+					PlaySE(L"EnemyDash");
+					m_jumpMoveFlag = true;
+					m_speed = m_maxSpeed * 6;
+				}
 				m_pos += m_speed * m_direcNorm * elapsed;
 			}
 			if (m_floorFlag) {
@@ -717,7 +717,17 @@ namespace basecross {
 	void Enemy::Grab() {
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
+
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (cntlVec[0].bConnected) {
+			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+				m_pGrabFlag = false;
+			}
+		}
+		else if (keyState.m_bUpKeyTbl['Q'] == true) {
+
 		if (!(dynamic_pointer_cast<PlayerGrab>(GetComponent<Transform>()->GetParent()))) {
+
 			m_pGrabFlag = false;
 		}
 		if (m_pGrabFlag) {
