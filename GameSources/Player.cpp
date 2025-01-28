@@ -322,7 +322,8 @@ namespace basecross {
 			}
 			else if(m_animTime > 1.0f && m_animTime <= 3.0f) {
 				SetAnim(L"Walk");
-				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .5f * _delta;
+				Vec3 fwd = ForwardConvert(Vec3(1, 0, 0));
+				m_moveVel += fwd * m_accel * .0035;
 			}
 			else if (m_animTime > 3.0f) {
 				SetAnim(L"Idle");
@@ -392,7 +393,8 @@ namespace basecross {
 			//しばらく歩いてからエレベータに入ったところで180°振り向く
 			if (m_animTime > 0.0f && m_animTime <= 3.0f) {
 				SetAnim(L"Walk");
-				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .3f * _delta;
+				Vec3 fwd = ForwardConvert(Vec3(1, 0 ,0));
+				m_moveVel += fwd * m_accel * .003f;
 			}
 			else if (m_animTime > 3.0f && m_animTime <= 3.5f) {
 				SetAnim(L"Idle");
@@ -425,7 +427,7 @@ namespace basecross {
 	}
 
 	void Player::OnUpdate2() {
-		//ShowDebug();
+		ShowDebug();
 	}
 
 	void Player::ShowDebug() {
@@ -457,7 +459,7 @@ namespace basecross {
 	}
 
 	void Player::OnPushA() {
-		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
+		if (m_stateType == goal) return;	//立ち状態以外ではジャンプしない
 		if (m_isCarrying == true) return;	//敵を持った状態でもジャンプしない
 		m_moveVel.y = m_jumpHeight;
 		m_stateType = air;
@@ -697,13 +699,9 @@ namespace basecross {
 		auto pos = trans->GetPosition();
 		auto fwd = -1 * trans->GetForward();
 		auto face = atan2f(fwd.z,fwd.x);
-		auto scale = trans->GetScale();
 
-		Vec3 firepos;
-		firepos.x = (cosf(face) * m_firePos.x) - (sinf(face) * m_firePos.z);
-		firepos.y = m_firePos.y;
-		firepos.z = (cosf(face) * m_firePos.z) + (sinf(face) * m_firePos.x);
-		firepos = firepos * scale;
+		Vec3 firepos = ForwardConvert(m_firePos);
+		firepos = firepos * trans->GetScale();
 
 		//エフェクトのプレイ
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
@@ -809,8 +807,9 @@ namespace basecross {
 
 	void PlayerGrab::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		if (Other->FindTag(L"Enemy") && !m_target) {
-			m_target = dynamic_pointer_cast<Enemy>(Other);
-			if (m_target->GetOverHeat() == true && !m_isHit) {
+			auto enemy = dynamic_pointer_cast<Enemy>(Other);
+			if (enemy->GetOverHeat() == true && !m_isHit) {
+				m_target = enemy;
 				m_isHit = true;
 				return;
 			}

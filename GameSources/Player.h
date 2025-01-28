@@ -222,6 +222,22 @@ namespace basecross {
 			return m_chargePerc;
 		}
 
+		//GetForwardから向きに応じたベクトルを返す
+		Vec3 ForwardConvert(Vec3 v) {
+			Vec3 ret;
+
+			auto trans = GetComponent<Transform>();
+			auto fwd = -1 * trans->GetForward();
+			auto face = atan2f(fwd.z, fwd.x);
+			auto scale = trans->GetScale();
+
+			ret.x = (cosf(face) * v.x) - (sinf(face) * v.z);
+			ret.y = v.y;
+			ret.z = (cosf(face) * v.z) + (sinf(face) * v.x);
+
+			return ret;
+		}
+
 		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
 		const void SetAnim(wstring animname, float time = 0.0f) {
 			auto draw = GetComponent<PNTBoneModelDraw>();
