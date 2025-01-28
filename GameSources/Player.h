@@ -59,7 +59,7 @@ namespace basecross {
 		Vec3 m_moveVel = Vec3(0, 0, 0);
 		//CollisionExitの空中判定用カウント
 		int m_collideCount;
-		const int m_collideCountInit = 10;
+		const int m_collideCountInit = 15;
 
 		float m_landSEcooltime = 0.0f;
 
@@ -220,6 +220,22 @@ namespace basecross {
 		//ゲージの溜まり具合のゲッタ
 		const float GetChargePerc() {
 			return m_chargePerc;
+		}
+
+		//GetForwardから向きに応じたベクトルを返す
+		Vec3 ForwardConvert(Vec3 v) {
+			Vec3 ret;
+
+			auto trans = GetComponent<Transform>();
+			auto fwd = -1 * trans->GetForward();
+			auto face = atan2f(fwd.z, fwd.x);
+			auto scale = trans->GetScale();
+
+			ret.x = (cosf(face) * v.x) - (sinf(face) * v.z);
+			ret.y = v.y;
+			ret.z = (cosf(face) * v.z) + (sinf(face) * v.x);
+
+			return ret;
 		}
 
 		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
