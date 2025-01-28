@@ -54,6 +54,8 @@ namespace basecross {
 		bool m_hitDoorFlag;
 		bool m_hitFloorFlag;
 		shared_ptr<Transform> m_trans;
+		shared_ptr< PNTBoneModelDraw> m_enemyDraw;
+
 	public:
 		RayMark(const shared_ptr<Stage>& stage);
 		virtual ~RayMark() {};

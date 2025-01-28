@@ -129,28 +129,46 @@ namespace basecross {
 	}
 	void RayMark::OnUpdate() {
 		auto stage = GetStage();
-		//“G
-		auto target = stage->GetSharedGameObject<Enemy>(L"Enemys");
-		auto enemyDraw = target->GetComponent<PNTBoneModelDraw>();
-		//•Ç
-		//auto wall = stage->GetSharedGameObject<TilingFixedBox>(L"Wall");
-		//auto wallDraw = wall->GetComponent<PNTStaticDraw>();
-		////°
-		//auto floor = stage->GetSharedGameObject<TilingFixedBox>(L"Floor");
-		//auto floorDraw = floor->GetComponent<PNTStaticDraw>();
-
 		//•\Ž¦‚·‚éü
-		auto line = stage->GetSharedGameObject<LineObject>(L"Line");
+		//auto line = stage->GetSharedGameObject<LineObject>(L"Line");
+
 
 		Vec3 pos = Vec3(0.0f);
-		Vec3 rayStart = line->GetStartPos();
-		Vec3 rayEnd = line->GetEndPos();
+		Vec3 rayStart;
+		Vec3 rayEnd;
 		Vec3 crossPos;
+		//TRIANGLE triangle;
+		//size_t triangleIndex;
 
-		TRIANGLE triangle;
-		size_t triangleIndex;
+		auto lineGroup = GetStage()->GetSharedObjectGroup(L"Line");
+		auto& lineVec = lineGroup->GetGroupVector();
+		for (auto v : lineVec) {
+			auto shObj = v.lock();
+			auto lineDraw = shObj->GetComponent<PCStaticDraw>();
+			auto line = dynamic_pointer_cast<LineObject>(shObj);
+			TRIANGLE triangle;
+			size_t triangleIndex;
 
-		m_hitEnemyFlag = enemyDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
+			rayStart = line->GetStartPos();
+			rayEnd = line->GetEndPos();
+		}
+
+
+		//“G
+		//auto target = stage->GetSharedGameObject<Enemy>(L"Enemys");
+		//auto enemyDraw = target->GetComponent<PNTBoneModelDraw>();
+		//•Ç
+		auto enemyGroup = GetStage()->GetSharedObjectGroup(L"Enemy");
+		auto& enemyVec = enemyGroup->GetGroupVector();
+		for (auto v : enemyVec) {
+			auto shObj = v.lock();
+			auto m_enemyDraw = shObj->GetComponent<PNTBoneModelDraw>();
+			TRIANGLE triangle;
+			size_t triangleIndex;
+			m_hitEnemyFlag = m_enemyDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
+		}
+
+
 		//m_hitWallFlag = wallDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
 		//m_hitDoorFlag = floorDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
 
