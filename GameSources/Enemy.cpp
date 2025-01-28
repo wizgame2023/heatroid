@@ -725,11 +725,12 @@ namespace basecross {
 			}
 		}
 		else if (keyState.m_bUpKeyTbl['Q'] == true) {
-
-		if (!(dynamic_pointer_cast<PlayerGrab>(GetComponent<Transform>()->GetParent()))) {
-
 			m_pGrabFlag = false;
 		}
+		//if (!(dynamic_pointer_cast<PlayerGrab>(GetComponent<Transform>()->GetParent()))) {
+
+		//	m_pGrabFlag = false;
+		//}
 		if (m_pGrabFlag) {
 			m_floorFlag = false;
 			auto pGrab = m_playerGrab.lock();
