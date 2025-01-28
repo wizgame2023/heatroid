@@ -22,6 +22,8 @@ namespace basecross {
 		m_player(player),
 		m_enemy(enemy),
 		m_direc(0.0f),
+		m_startPos(Vec3(0.0f)),
+		m_endPos(Vec3(0.0f)),
 		m_startColor(Col4(1.0f)),
 		m_endColor(Col4(1.0f))
 	{}
@@ -49,8 +51,23 @@ namespace basecross {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 
-		SetLinePosition(player->GetComponent<Transform>()->GetPosition(), enemy->GetWorldPos());
+
+
+		SetLinePosition(player->GetComponent<Transform>()->GetPosition(), LinePos(Vec3(0.0f,3.0f,0.0f)));
 		
+	}
+	Vec3 LineObject::LinePos(Vec3 pos) {
+		auto enemy = m_enemy.lock();
+		if (enemy) {
+			Vec3 enemyPos = enemy->GetWorldPos();
+			Vec3 forward = enemy->GetComponent<Transform>()->GetForward();
+			float face = atan2f(forward.z, forward.x);
+			Vec3 linePos;
+			linePos.x = (cosf(face) * pos.x) - (sinf(face) * pos.z);
+			linePos.y = pos.y;
+			linePos.z = (cosf(face) * pos.z) + (sinf(face) * pos.x);
+			return enemyPos +linePos;
+		}
 	}
 
 	//頂点の更新
@@ -90,16 +107,20 @@ namespace basecross {
 	Vec3 LineObject::GetDirec() {
 		return m_direc;
 	}
+	//--------------------------------------------------------------------------------------
+	//	class RayMark : public GameObject; //衝突したときの表示されるオブジェクト
+	//--------------------------------------------------------------------------------------
 
 	RayMark::RayMark(const shared_ptr<Stage>& stage
 	):
 		GameObject(stage)
 	{}
 	void RayMark::OnCreate() {
-		auto draw = AddComponent<PCStaticDraw>();
+		auto draw = AddComponent<PNTStaticDraw>();
 		draw->SetMeshResource(L"DEFAULT_SPHERE");
 		Col4 color(0.0f, 0.0f, 1.0f, 0.4f);
 		draw->SetDiffuse(color);
+		draw->SetEmissive(color);
 		
 		SetAlphaActive(true);
 
@@ -108,10 +129,20 @@ namespace basecross {
 	}
 	void RayMark::OnUpdate() {
 		auto stage = GetStage();
-		Vec3 pos = Vec3(0.0f);
-		auto target = stage->GetSharedGameObject<Player>(L"Player");
+		//敵
+		auto target = stage->GetSharedGameObject<Enemy>(L"Enemys");
+		auto enemyDraw = target->GetComponent<PNTBoneModelDraw>();
+		//壁
+		//auto wall = stage->GetSharedGameObject<TilingFixedBox>(L"Wall");
+		//auto wallDraw = wall->GetComponent<PNTStaticDraw>();
+		////床
+		//auto floor = stage->GetSharedGameObject<TilingFixedBox>(L"Floor");
+		//auto floorDraw = floor->GetComponent<PNTStaticDraw>();
+
+		//表示する線
 		auto line = stage->GetSharedGameObject<LineObject>(L"Line");
 
+		Vec3 pos = Vec3(0.0f);
 		Vec3 rayStart = line->GetStartPos();
 		Vec3 rayEnd = line->GetEndPos();
 		Vec3 crossPos;
@@ -119,17 +150,21 @@ namespace basecross {
 		TRIANGLE triangle;
 		size_t triangleIndex;
 
-		auto draw = target->GetComponent<PNTStaticDraw>();
-		m_hitFlag = draw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
+		m_hitEnemyFlag = enemyDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
+		//m_hitWallFlag = wallDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
+		//m_hitDoorFlag = floorDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
 
-		if (m_hitFlag) {
+		if (m_hitEnemyFlag) {
 			pos = crossPos;
 		}
 		m_trans->SetPosition(pos);
 	}
 	void RayMark::OnDraw() {
-		if (m_hitFlag) {
+		if (m_hitEnemyFlag) {
 			GameObject::OnDraw();
+			if (!m_hitWallFlag && !m_hitFloorFlag && !m_hitDoorFlag) {
+				
+			}
 		}
 	}
 }

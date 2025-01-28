@@ -41,6 +41,7 @@ namespace basecross {
 		Vec3 GetStartPos();
 		Vec3 GetEndPos();
 		Vec3 GetDirec();
+		Vec3 LinePos(Vec3 pos);
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -48,7 +49,10 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class RayMark : public GameObject {
 	private : 
-		bool m_hitFlag;
+		bool m_hitEnemyFlag;
+		bool m_hitWallFlag;
+		bool m_hitDoorFlag;
+		bool m_hitFloorFlag;
 		shared_ptr<Transform> m_trans;
 	public:
 		RayMark(const shared_ptr<Stage>& stage);
@@ -57,6 +61,7 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		virtual void OnDraw() override;
+
 	};
 
 
