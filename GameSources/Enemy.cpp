@@ -72,7 +72,8 @@ namespace basecross {
 		m_pGrabFlag(false),
 		m_playerFlag(false),
 		m_overHeatSE(false),
-		m_plungeSE(false)
+		m_plungeSE(false),
+		m_updateFlag(true)
 	{}
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
@@ -134,7 +135,8 @@ namespace basecross {
 		m_pGrabFlag(false),
 		m_playerFlag(false),
 		m_overHeatSE(false),
-		m_plungeSE(false)
+		m_plungeSE(false),
+		m_updateFlag(true)
 	{}
 
 	void Enemy::OnCreate() {
@@ -159,13 +161,13 @@ namespace basecross {
 				Vec3(1.0f, 1.0f, 1.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(0.0f, rad, 0.0f),
-				Vec3(0.0f, -0.9f, 0.0f)
+				Vec3(0.0f, -1.0f, 0.0f)
 			);
 			m_draw->SetMeshToTransformMatrix(meshMat);
 		}
 		else {
-			m_scal.y = m_scal.y/2;
-			m_pos.y = m_pos.y + m_scal.y/2;
+			m_scal.y = m_scal.y*0.5;
+			m_pos.y = m_pos.y + m_scal.y*0.5;
 
 			Mat4x4 meshMat;
 			meshMat.affineTransformation(
@@ -208,7 +210,7 @@ namespace basecross {
 		m_collision = AddComponent<CollisionCapsule>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(false);
+		m_collision->SetDrawActive(true);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
 		//m_collision->SetSleepActive(false);
@@ -256,6 +258,16 @@ namespace basecross {
 			m_plungeSE = false;
 			m_overHeatSE = false;
 		}
+
+		//範囲外かどうかのフラグ
+		if (m_direc.length() <= m_trackingRange * 2) {
+			m_updateFlag = true;
+		}
+		else {
+			m_updateFlag = false;
+		}
+
+
 		//行動パターン
 		switch (m_stateType)
 		{
@@ -373,7 +385,9 @@ namespace basecross {
 				m_rad = 0;
 			}
 
-			m_pos += shaft.normalize() * sinf(m_rad) * 10.0f * elapsed;
+			if (m_direc.length() <= m_trackingRange * 2) {
+				m_pos += shaft.normalize() * sinf(m_rad) * m_speed * 2.0f * elapsed;
+			}
 			break;
 		default:
 			break;
@@ -436,7 +450,7 @@ namespace basecross {
 			front.normalize();
 			m_angle = atan2(front.z, front.x);
 			float rad = XMConvertToRadians(90.0f);
-			m_trans->SetRotation(Vec3(0.0f, -m_angle+rad, 0.0f));
+			m_trans->SetRotation(Vec3(0.0f, -m_angle + rad, 0.0f));
 		}
 	}
 	Vec3 Enemy::GetEyePos(const Vec3& eye) {
@@ -673,6 +687,45 @@ namespace basecross {
 		m_floorCol->ThisDestroy();
 	}
 
+	//持つときの処理
+	void Enemy::Grab() {
+		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
+
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (cntlVec[0].bConnected) {
+			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+				m_pGrabFlag = false;
+			}
+		}
+		else if (keyState.m_bUpKeyTbl['Q'] == true) {
+			m_pGrabFlag = false;
+		}
+		//if (!(dynamic_pointer_cast<PlayerGrab>(GetComponent<Transform>()->GetParent()))) {
+
+		//	m_pGrabFlag = false;
+		//}
+		if (m_pGrabFlag) {
+			m_floorFlag = false;
+			auto pGrab = m_playerGrab.lock();
+			if(!pGrab) return;
+			auto grabTrans = pGrab->GetComponent<Transform>();
+			//m_trans->SetParent(pGrab);
+			//m_pos = Vec3(0.0f, 0.0f, 0.0f);
+			//m_trans->SetPosition(m_pos);
+			if (m_EfkPlayer[2]) {
+				m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
+			}
+
+		}
+		else {
+			if (m_EfkPlayer[2]) {
+				m_EfkPlayer[2]->SetLocation(GetWorldPos());
+			}
+
+			//m_trans->ClearParent();
+		}
+	}
 	//衝突判定
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
@@ -712,45 +765,6 @@ namespace basecross {
 			}
 		}
 
-	}
-	//持つときの処理
-	void Enemy::Grab() {
-		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
-
-		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (cntlVec[0].bConnected) {
-			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-				m_pGrabFlag = false;
-			}
-		}
-		else if (keyState.m_bUpKeyTbl['Q'] == true) {
-			m_pGrabFlag = false;
-		}
-		//if (!(dynamic_pointer_cast<PlayerGrab>(GetComponent<Transform>()->GetParent()))) {
-
-		//	m_pGrabFlag = false;
-		//}
-		if (m_pGrabFlag) {
-			m_floorFlag = false;
-			auto pGrab = m_playerGrab.lock();
-			if(!pGrab) return;
-			auto grabTrans = pGrab->GetComponent<Transform>();
-			//m_trans->SetParent(pGrab);
-			//m_pos = Vec3(0.0f, 0.0f, 0.0f);
-			//m_trans->SetPosition(m_pos);
-			if (m_EfkPlayer[2]) {
-				m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
-			}
-
-		}
-		else {
-			if (m_EfkPlayer[2]) {
-				m_EfkPlayer[2]->SetLocation(GetWorldPos());
-			}
-
-			//m_trans->ClearParent();
-		}
 	}
 	void Enemy::OnCollisionExit(shared_ptr<GameObject>& other)
 	{

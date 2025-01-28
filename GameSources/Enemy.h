@@ -81,6 +81,8 @@ namespace basecross {
 		bool m_overHeatSE;
 		bool m_plungeSE;
 
+		bool m_updateFlag;
+
 		wstring m_meshName;
 
 		//èdóÕ
@@ -182,6 +184,7 @@ namespace basecross {
 		bool GetOverHeat();
 		void SetPlungeFlag(bool flag);
 		void SetBulletDirec(Vec2 direc);
+		bool GetUpdateFlag();
 
 	protected:
 		//èdóÕÇ…ä÷Ç∑ÇÈä÷êî
