@@ -59,7 +59,7 @@ namespace basecross {
 		Vec3 m_moveVel = Vec3(0, 0, 0);
 		//CollisionExitの空中判定用カウント
 		int m_collideCount;
-		const int m_collideCountInit = 10;
+		const int m_collideCountInit = 15;
 
 		float m_landSEcooltime = 0.0f;
 

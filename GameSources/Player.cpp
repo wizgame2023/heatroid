@@ -322,7 +322,7 @@ namespace basecross {
 			}
 			else if(m_animTime > 1.0f && m_animTime <= 3.0f) {
 				SetAnim(L"Walk");
-				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .003f;
+				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .5f * _delta;
 			}
 			else if (m_animTime > 3.0f) {
 				SetAnim(L"Idle");
@@ -388,10 +388,11 @@ namespace basecross {
 			//---------------------------------------ゴール
 		case goal:
 			m_animTime += _delta;
+			GetComponent<CollisionCapsule>()->SetUpdateActive(false);
 			//しばらく歩いてからエレベータに入ったところで180°振り向く
 			if (m_animTime > 0.0f && m_animTime <= 3.0f) {
 				SetAnim(L"Walk");
-				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .003f;
+				m_moveVel += -(GetComponent<Transform>()->GetForward()) * m_accel * .3f * _delta;
 			}
 			else if (m_animTime > 3.0f && m_animTime <= 3.5f) {
 				SetAnim(L"Idle");
@@ -407,6 +408,7 @@ namespace basecross {
 			}
 			FrictionMovie();
 			SpeedLimit();
+
 
 			break;
 		}
