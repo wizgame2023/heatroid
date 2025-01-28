@@ -982,28 +982,28 @@ namespace basecross {
 	void StageManager::UImake()
 	{
 		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
-		auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
 		auto& vec = group->GetGroupVector();
 		for (auto& v : vec)
 		{
 			auto shObj = v.lock();
+			auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
 			auto pos = player->GetComponent<Transform>()->GetPosition();
-			auto enemy = dynamic_pointer_cast<Enemy>(shObj);
-			Vec3 enemypos = enemy->GetPos();
-			bool overheat = enemy->GetOverHeat();
-			if (overheat)
-			{
-				if (length(pos - enemypos) < 8.0f) {
+			Vec3 enemypos = shObj->GetComponent<Transform>()->GetWorldPosition();
+			float lenth = length(enemypos - pos);
+			if (lenth < 9.0f) {
+				auto enemy = dynamic_pointer_cast<Enemy>(shObj);
+				bool overheat = enemy->GetOverHeat();
+				if (overheat){
 					m_kakaeruUI->SetDrawActive(true);
+					break;
 				}
 				else {
 					m_kakaeruUI->SetDrawActive(false);
+					break;
 				}
 			}
 			else {
-				if (length(pos - enemypos) < 8.0f) {
-					m_kakaeruUI->SetDrawActive(false);
-				}
+				m_kakaeruUI->SetDrawActive(false);
 			}
 		}
 	}
