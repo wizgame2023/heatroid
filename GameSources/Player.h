@@ -267,6 +267,8 @@ namespace basecross {
 		shared_ptr<Enemy> m_target;
 		//敵に当たっているかどうか
 		bool m_isHit;
+
+		shared_ptr<CollisionSphere> m_collPtr;
 	public:
 		PlayerGrab(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player) :
 			GameObject(StagePtr),
@@ -288,6 +290,9 @@ namespace basecross {
 		bool IsHit() {
 			return m_isHit;
 		}
+
+		//掴み状態を解除
+		void ClearTarget();
 
 		//何かに接触している判定
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;

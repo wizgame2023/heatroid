@@ -753,12 +753,12 @@ namespace basecross {
 		trans->SetScale(m_scale);
 		trans->SetRotation(0.0f, 0.0f, 0.0f);
 
-		auto coll = AddComponent<CollisionSphere>();
-		coll->SetAfterCollision(AfterCollision::None);
-		coll->SetDrawActive(false);//debug
-		coll->AddExcludeCollisionTag(L"Player");
-		coll->AddExcludeCollisionTag(L"Attack");
-		coll->AddExcludeCollisionTag(L"EnemyFloor");
+		m_collPtr = AddComponent<CollisionSphere>();
+		m_collPtr->SetAfterCollision(AfterCollision::None);
+		m_collPtr->SetDrawActive(false);//debug
+		m_collPtr->AddExcludeCollisionTag(L"Player");
+		m_collPtr->AddExcludeCollisionTag(L"Attack");
+		m_collPtr->AddExcludeCollisionTag(L"EnemyFloor");
 
 		AddTag(L"PlayerGrab");
 	}
@@ -768,14 +768,22 @@ namespace basecross {
 
 		//debug
 		if (false) {
-			bool update = GetComponent<CollisionSphere>()->GetUpdateActive();
-			GetComponent<CollisionSphere>()->SetDrawActive(update);
+			bool update = m_collPtr->GetUpdateActive();
+			m_collPtr->SetDrawActive(update);
 		}
 
 		//判定を出さないときはヒット判定も消す
 		if (m_isHit && GetComponent<CollisionSphere>()->GetUpdateActive() == false) {
-			m_isHit = false;
-			m_target = nullptr;
+			ClearTarget();
+		}
+
+		if (m_target) {
+			m_target->GetComponent<Transform>()->SetParent(dynamic_pointer_cast<GameObject>(GetThis<PlayerGrab>()));
+			Vec3 pos = Vec3(0.0f, 0.0f, 0.0f);
+			m_target->GetComponent<Transform>()->SetPosition(pos);
+			if (!m_target->GetOverHeat()) {
+				ClearTarget();
+			}
 		}
 
 		if (plPtr) {
@@ -798,13 +806,21 @@ namespace basecross {
 	}
 
 	void PlayerGrab::OnCollisionEnter(shared_ptr<GameObject>& Other) {
-		if (Other->FindTag(L"Enemy")) {
+		if (Other->FindTag(L"Enemy") && !m_target) {
 			m_target = dynamic_pointer_cast<Enemy>(Other);
 			if (m_target->GetOverHeat() == true && !m_isHit) {
 				m_isHit = true;
 				return;
 			}
 		}
+	}
+
+	void PlayerGrab::ClearTarget() {
+		m_isHit = false;
+		m_target->GetComponent<Transform>()->ClearParent();
+
+		//最後にターゲットを解放
+		m_target = nullptr;
 	}
 
 	//====================================================================
@@ -825,7 +841,7 @@ namespace basecross {
 		m_angle(angle),
 		m_power(power),
 		m_speed(18.0f),
-		m_speedBase(4.5f),
+		m_speedBase(9.0f),
 		m_rangeMax(.8f),
 		m_stopped(false)
 	{}
@@ -872,7 +888,9 @@ namespace basecross {
 
 		AddTag(L"Attack");
 
+		//速度×倍率+基底速度
 		m_speed = (m_speed * m_power) + m_speedBase;
+		//持続時間
 		m_range = m_rangeMax;
 
 	}
