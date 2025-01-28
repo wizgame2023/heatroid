@@ -398,7 +398,7 @@ namespace basecross {
 		OverHeat();
 		//アニメーションの実装
 		m_draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ
@@ -717,6 +717,7 @@ namespace basecross {
 	void Enemy::Grab() {
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
+
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (cntlVec[0].bConnected) {
 			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
@@ -724,6 +725,9 @@ namespace basecross {
 			}
 		}
 		else if (keyState.m_bUpKeyTbl['Q'] == true) {
+
+		if (!(dynamic_pointer_cast<PlayerGrab>(GetComponent<Transform>()->GetParent()))) {
+
 			m_pGrabFlag = false;
 		}
 		if (m_pGrabFlag) {
@@ -731,25 +735,20 @@ namespace basecross {
 			auto pGrab = m_playerGrab.lock();
 			if(!pGrab) return;
 			auto grabTrans = pGrab->GetComponent<Transform>();
-			if (pGrab) {
-				m_trans->SetParent(pGrab);
-				m_pos = Vec3(0.0f, 0.0f, 0.0f);
-				m_trans->SetPosition(m_pos);
-				if (m_EfkPlayer[2]) {
-					m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
-				}
+			//m_trans->SetParent(pGrab);
+			//m_pos = Vec3(0.0f, 0.0f, 0.0f);
+			//m_trans->SetPosition(m_pos);
+			if (m_EfkPlayer[2]) {
+				m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
+			}
 
-			}
-			else {
-				return;
-			}
 		}
 		else {
 			if (m_EfkPlayer[2]) {
 				m_EfkPlayer[2]->SetLocation(GetWorldPos());
 			}
 
-			m_trans->ClearParent();
+			//m_trans->ClearParent();
 		}
 	}
 	void Enemy::OnCollisionExit(shared_ptr<GameObject>& other)

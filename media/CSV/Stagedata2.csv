@@ -21,8 +21,8 @@ Switch,-75,1.5,-65,0,0,0,10,0.5,10,1,3,BLUESWITCH
 Switch,-75,1.5,65,0,0,0,10,0.5,10,1,3,BLUESWITCH
 Switch,75,1.5,65,0,0,0,10,0.5,10,2,1,REDSWITCH
 StageDoor,-69.5,0.5,-0.9,0,-1.570796327,0,5,5,5,DOOR,,
-StageDoor,78.3,0.5,0,0,1.570796327,0,5,5,5,DOOR,,
-GoalFloor,-81,0,-1.1,0,-1.570796327,0,15,1,15,Floor,,
+StageDoor,84,0.5,0,0,1.570796327,0,5,5,5,DOOR,,
+GoalFloor,-81,0.1,-1.1,0,-1.570796327,0,15,1,15,Floor,,
 Enemy,-30,2,1.5,0,0,0,3,3,3,Enemy::rightMove,Enemy::stay,
 Enemy,-45,2,65,0,0,0,3,3,3,Enemy::bulletMove,Enemy::stay,
 Enemy,-50,2,-65,0,0,0,3,3,3,Enemy::rightMove,Enemy::stay,
