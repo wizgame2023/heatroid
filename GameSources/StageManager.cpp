@@ -656,8 +656,11 @@ namespace basecross {
 		m_StageUI = GetStage()->AddGameObject<Sprite>(L"GameStageUI", true, Vec2(640.0f, 400.0f), Vec3(10, 0, 0.0f));
 		m_StageUI->SetDrawLayer(3);
 
-		m_kakaeruUI = GetStage()->AddGameObject<Sprite>(L"Kakaeru", true, Vec2(100.0f, 15.0f), Vec3(200, 0, 0.0f));
+		m_kakaeruUI = GetStage()->AddGameObject<Sprite>(L"Kakaeru", true, Vec2(125.0f, 20.0f), Vec3(250, 0, 0.0f));
 		m_kakaeruUI->SetDrawLayer(3);
+
+		m_blowUI = GetStage()->AddGameObject<Sprite>(L"blowUI", true, Vec2(175.0f, 25.0f), Vec3(300, 0, 0.0f));
+		m_blowUI->SetDrawLayer(3);
 
 		m_nextStageUI = GetStage()->AddGameObject<Sprite>(L"NextStage", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
 		m_nextStageUI->SetDrawLayer(3);
@@ -687,6 +690,7 @@ namespace basecross {
 		m_SelectCharge->SetDrawActive(false);
 		m_TitleCharge->SetDrawActive(false);
 		m_kakaeruUI->SetDrawActive(false);
+		m_blowUI->SetDrawActive(false);
 
 		ToOpeningCamera();
 	}
@@ -979,6 +983,11 @@ namespace basecross {
 		playSE->Start(path, loopcnt, volume);
 	}
 
+	void StageManager::PlayBGM(const wstring& StageBGM)
+	{
+		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
+	}
+
 	void StageManager::UImake()
 	{
 		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
@@ -988,6 +997,7 @@ namespace basecross {
 			auto shObj = v.lock();
 			auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
 			auto pos = player->GetComponent<Transform>()->GetPosition();
+			
 			Vec3 enemypos = shObj->GetComponent<Transform>()->GetWorldPosition();
 			float lenth = length(enemypos - pos);
 			if (lenth < 9.0f) {
@@ -995,6 +1005,12 @@ namespace basecross {
 				bool overheat = enemy->GetOverHeat();
 				if (overheat){
 					m_kakaeruUI->SetDrawActive(true);
+					m_blowUI->SetDrawActive(false);
+					if (player->IsCarryingEnemy())
+					{
+						m_blowUI->SetDrawActive(true);
+						m_kakaeruUI->SetDrawActive(false);
+					}
 					break;
 				}
 				else {

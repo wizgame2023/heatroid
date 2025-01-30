@@ -27,6 +27,8 @@ namespace basecross {
 
         // エフェクトのインターフェイス
         shared_ptr<EfkInterface> m_EfkInterface;
+        shared_ptr<SoundItem> m_BGM;                   // バックグラウンドミュージックのサウンドアイテム
+        std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
 
         CameraSelect m_CameraSelect;                 // 現在のカメラを保持する変数
         shared_ptr<SingleView> m_OpeningCameraView;  // オープニングカメラビュー
@@ -43,6 +45,7 @@ namespace basecross {
         shared_ptr<GameObject> m_TextDraw;           // テキスト描画オブジェクト
         shared_ptr<GameObject> m_StageUI;            // ステージUIオブジェクト
         shared_ptr<GameObject> m_kakaeruUI;            // ステージUIオブジェクト
+        shared_ptr<GameObject> m_blowUI;            // ステージUIオブジェクト
         shared_ptr<GameObject> m_nextStageUI;        // 次のステージUIオブジェクト
         shared_ptr<GameObject> m_clearSelectStage;   // クリアステージ選択UIオブジェクト
         shared_ptr<GameObject> m_retryStageUI;       // リトライステージUIオブジェクト
@@ -125,6 +128,9 @@ namespace basecross {
         
         // サウンドエフェクトを再生する
         void PlaySE(wstring path, float loopcnt, float volume);
+
+        // バックグラウンドミュージックを再生する
+        void PlayBGM(const wstring& StageBGM);
 
         void UImake();
 
