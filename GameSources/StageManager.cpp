@@ -656,10 +656,10 @@ namespace basecross {
 		m_StageUI = GetStage()->AddGameObject<Sprite>(L"GameStageUI", true, Vec2(640.0f, 400.0f), Vec3(10, 0, 0.0f));
 		m_StageUI->SetDrawLayer(3);
 
-		m_kakaeruUI = GetStage()->AddGameObject<Sprite>(L"Kakaeru", true, Vec2(150.0f, 22.5f), Vec3(300, 0, 0.0f));
+		m_kakaeruUI = GetStage()->AddGameObject<Sprite>(L"Kakaeru", true, Vec2(125.0f, 20.0f), Vec3(250, 0, 0.0f));
 		m_kakaeruUI->SetDrawLayer(3);
 
-		m_blowUI = GetStage()->AddGameObject<Sprite>(L"blowUI", true, Vec2(150.0f, 22.5f), Vec3(300, 0, 0.0f));
+		m_blowUI = GetStage()->AddGameObject<Sprite>(L"blowUI", true, Vec2(175.0f, 25.0f), Vec3(300, 0, 0.0f));
 		m_blowUI->SetDrawLayer(3);
 
 		m_nextStageUI = GetStage()->AddGameObject<Sprite>(L"NextStage", true, Vec2(400.0f, 300.0f), Vec3(1000.0f, -275.0f, 0.0f));
@@ -1005,7 +1005,12 @@ namespace basecross {
 				bool overheat = enemy->GetOverHeat();
 				if (overheat){
 					m_kakaeruUI->SetDrawActive(true);
-					m_blowUI->SetDrawActive(true);
+					m_blowUI->SetDrawActive(false);
+					if (player->IsCarryingEnemy())
+					{
+						m_blowUI->SetDrawActive(true);
+						m_kakaeruUI->SetDrawActive(false);
+					}
 					break;
 				}
 				else {
