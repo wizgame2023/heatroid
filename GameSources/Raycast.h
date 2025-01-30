@@ -54,15 +54,21 @@ namespace basecross {
 		bool m_hitDoorFlag;
 		bool m_hitFloorFlag;
 		shared_ptr<Transform> m_trans;
-		shared_ptr< PNTBoneModelDraw> m_enemyDraw;
+		shared_ptr<PNTStaticDraw> m_draw;
+		weak_ptr<Player> m_player;
+		weak_ptr<Enemy> m_enemy;
+
 
 	public:
 		RayMark(const shared_ptr<Stage>& stage);
+		RayMark(const shared_ptr<Stage>& stage, const shared_ptr <Player>& player,const shared_ptr<Enemy>& enemy);
 		virtual ~RayMark() {};
 
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		virtual void OnDraw() override;
+		void Debug();
+		Vec3 enemyPos(Vec3 pos);
 
 	};
 

@@ -115,12 +115,21 @@ namespace basecross {
 	):
 		GameObject(stage)
 	{}
+	RayMark::RayMark(const shared_ptr<Stage>& stage,
+		const shared_ptr<Player>& player,
+		const shared_ptr<Enemy>& enemy
+	) :
+		GameObject(stage),
+		m_player(player),
+		m_enemy(enemy)
+	{}
+
 	void RayMark::OnCreate() {
-		auto draw = AddComponent<PNTStaticDraw>();
-		draw->SetMeshResource(L"DEFAULT_SPHERE");
+		m_draw = AddComponent<PNTStaticDraw>();
+		m_draw->SetMeshResource(L"DEFAULT_SPHERE");
 		Col4 color(0.0f, 0.0f, 1.0f, 0.4f);
-		draw->SetDiffuse(color);
-		draw->SetEmissive(color);
+		m_draw->SetDiffuse(color);
+		m_draw->SetEmissive(color);
 		
 		SetAlphaActive(true);
 
@@ -136,36 +145,50 @@ namespace basecross {
 		Vec3 pos = Vec3(0.0f);
 		Vec3 rayStart;
 		Vec3 rayEnd;
-		Vec3 crossPos;
-		//TRIANGLE triangle;
-		//size_t triangleIndex;
-
-		auto lineGroup = GetStage()->GetSharedObjectGroup(L"Line");
-		auto& lineVec = lineGroup->GetGroupVector();
-		for (auto v : lineVec) {
-			auto shObj = v.lock();
-			auto lineDraw = shObj->GetComponent<PCStaticDraw>();
-			auto line = dynamic_pointer_cast<LineObject>(shObj);
-			TRIANGLE triangle;
-			size_t triangleIndex;
-
-			rayStart = line->GetStartPos();
-			rayEnd = line->GetEndPos();
-		}
+		Vec3 enemyCrossPos;
+		Vec3 objCrossPos;
+		TRIANGLE triangle;
+		size_t triangleIndex;
 
 
-		//“G
-		//auto target = stage->GetSharedGameObject<Enemy>(L"Enemys");
-		//auto enemyDraw = target->GetComponent<PNTBoneModelDraw>();
+
+		//auto lineGroup = GetStage()->GetSharedObjectGroup(L"Line");
+		//auto& lineVec = lineGroup->GetGroupVector();
+		//for (auto v : lineVec) {
+		//	auto shObj = v.lock();
+		//	auto lineDraw = shObj->GetComponent<PCStaticDraw>();
+		//	auto line = dynamic_pointer_cast<LineObject>(shObj);
+
+		//	//rayStart = line->GetStartPos();
+		//	//rayEnd = line->GetEndPos();
+		//}
+
+		auto player = m_player.lock();
+		if (!player) return;
+		rayStart = player->GetComponent<Transform>()->GetPosition();
+
+		//“G‚Ö‚ÌƒŒƒC
+		//auto enemyGroup = GetStage()->GetSharedObjectGroup(L"Enemy");
+		//auto& enemyVec = enemyGroup->GetGroupVector();
+		//for (auto v : enemyVec) {
+		//	auto shObj = v.lock();
+		//	rayEnd = shObj->GetComponent<Transform>()->GetWorldPosition();
+		//	auto enemyDraw = shObj->GetComponent<PNTBoneModelDraw>();
+		//	m_hitEnemyFlag = enemyDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
+		//}
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
+		auto enemyDraw = enemy->GetComponent<PNTBoneModelDraw>();
+		rayEnd = enemyPos(Vec3(0.0f,3.0f,0.0f));		
+		m_hitEnemyFlag = enemyDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, enemyCrossPos, triangle, triangleIndex);
+
 		//•Ç
-		auto enemyGroup = GetStage()->GetSharedObjectGroup(L"Enemy");
-		auto& enemyVec = enemyGroup->GetGroupVector();
-		for (auto v : enemyVec) {
+		auto wallGroup = GetStage()->GetSharedObjectGroup(L"Wall");
+		auto& wallVec = wallGroup->GetGroupVector();
+		for (auto v : wallVec) {
 			auto shObj = v.lock();
-			auto m_enemyDraw = shObj->GetComponent<PNTBoneModelDraw>();
-			TRIANGLE triangle;
-			size_t triangleIndex;
-			m_hitEnemyFlag = m_enemyDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
+			auto wallDraw = shObj->GetComponent<PNTStaticDraw>();
+			m_hitWallFlag = wallDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, objCrossPos, triangle, triangleIndex);
 		}
 
 
@@ -173,17 +196,52 @@ namespace basecross {
 		//m_hitDoorFlag = floorDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
 
 		if (m_hitEnemyFlag) {
-			pos = crossPos;
+			pos = enemyCrossPos;
 		}
 		m_trans->SetPosition(pos);
-	}
-	void RayMark::OnDraw() {
+		Debug();
+
 		if (m_hitEnemyFlag) {
-			GameObject::OnDraw();
-			if (!m_hitWallFlag && !m_hitFloorFlag && !m_hitDoorFlag) {
-				
+			if (!m_hitWallFlag) {
+				m_draw->SetDrawActive(true);
+			} 
+			else {
+				m_draw->SetDrawActive(false);
 			}
 		}
+		//if (m_hitWallFlag) {
+		//	m_draw->SetDrawActive(true);
+		//}
+		//else {
+		//	m_draw->SetDrawActive(false);
+		//}
+	}
+
+	Vec3 RayMark::enemyPos(Vec3 pos) {
+		auto enemy = m_enemy.lock();
+		if (enemy) {
+			Vec3 enemyPos = enemy->GetWorldPos();
+			Vec3 forward = enemy->GetComponent<Transform>()->GetForward();
+			float face = atan2f(forward.z, forward.x);
+			Vec3 linePos;
+			linePos.x = (cosf(face) * pos.x) - (sinf(face) * pos.z);
+			linePos.y = pos.y;
+			linePos.z = (cosf(face) * pos.z) + (sinf(face) * pos.x);
+			return enemyPos + linePos;
+		}
+	}
+
+	void RayMark::OnDraw() {
+		GameObject::OnDraw();
+	}
+	void RayMark::Debug() {
+		auto scene = App::GetApp()->GetScene<Scene>();
+		wstringstream wss(L"");
+		wss << L"Wall : "
+			<<m_hitEnemyFlag
+			<< endl;
+		scene->SetDebugString(wss.str());
+
 	}
 }
 
