@@ -24,8 +24,6 @@ namespace basecross {
 			m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
 
 			auto player = GetSharedGameObject<Player>(L"Player");
-			//AddGameObject<FadeIn>();
-			PlayBGM(L"StageBGM");
 
 			m_pauseBackGround = AddGameObject<Sprite>(L"PauseBG", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
 			m_pauseBackGround->SetDrawLayer(3);
@@ -43,6 +41,7 @@ namespace basecross {
 			m_PauseSelect->SetDrawActive(false);
 			m_PauseTitle->SetDrawActive(false);
 			m_PauseBack->SetDrawActive(false);
+			PlayBGM(L"StageBGM");
 
 		}
 		catch (...) {

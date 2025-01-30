@@ -979,6 +979,11 @@ namespace basecross {
 		playSE->Start(path, loopcnt, volume);
 	}
 
+	void StageManager::PlayBGM(const wstring& StageBGM)
+	{
+		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
+	}
+
 	void StageManager::UImake()
 	{
 		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
