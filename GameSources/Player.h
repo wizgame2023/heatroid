@@ -37,7 +37,7 @@ namespace basecross {
 		//入力ハンドラー
 		InputHandler<Player> m_InputHandler;
 		//スピード(最高速)
-		const float m_speed = 72.0f;
+		const float m_speed = 80.0f;
 		const float m_airSpeedPerc = .35f;
 		//加速度
 		const float m_accel = 200.0f;
@@ -206,6 +206,9 @@ namespace basecross {
 			return GetComponent<PNTBoneModelDraw>();
 		}
 
+		//敵を持っているか否か(持っていればtrueを返す)
+		const bool Player::IsCarryingEnemy();
+
 		//SEの再生
 		void Player::PlaySnd(wstring sndname, float volume, float loopcount) {
 			auto audio = App::GetApp()->GetXAudio2Manager();
@@ -315,21 +318,7 @@ namespace basecross {
 
 	};
 
-	//====================================================================
-	// class ChargeAura
-	// プレイヤーがチャージ中に足元に出る筒
-	//====================================================================
-	class ChargeAura : public GameObject {
-	public:
-		ChargeAura(const shared_ptr<Stage>& StagePtr) :
-			GameObject(StagePtr)
-		{};
-		~ChargeAura() {};
 
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-
-	};
 	//====================================================================
 	// class FireProjectile
 	// プレイヤーの火炎放射
@@ -340,9 +329,10 @@ namespace basecross {
 		shared_ptr<StageManager> m_stageMgr;
 
 		//エフェクト
-		shared_ptr<EfkEffect> m_EfkEffect;
+		shared_ptr<EfkEffect> m_EfkProj;
+		shared_ptr<EfkEffect> m_EfkProjEnd;
 		//エフェクト実行オブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay;
+		shared_ptr<EfkPlay> m_EfkPlay[2];
 
 		float m_playTime = 0;
 
@@ -353,7 +343,7 @@ namespace basecross {
 		Vec3 m_angle;
 		//射程
 		float m_range = 0, m_rangeMax;
-		bool m_stopped;
+		bool m_stopped, m_lifeEnded;
 
 	public:
 		//構築と破棄

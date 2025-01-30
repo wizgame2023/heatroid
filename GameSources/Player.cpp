@@ -436,7 +436,7 @@ namespace basecross {
 		auto rot = GetComponent<Transform>()->GetQuaternion();
 
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
-		wss << "stateType : " << m_stateType << endl;
+		wss << endl << endl << endl << "stateType : " << m_stateType << endl;
 		wss << "move : " << m_moveVel.x << " / " << m_moveVel.y << " / " << m_moveVel.z << endl;
 		wss << "pos : " << pos.x << " / " << pos.y << " / " << pos.z << endl;
 		wss << "rotate : " << rot.w << " / " << rot.x << " / " << rot.y << " / " << rot.z << endl;
@@ -744,6 +744,15 @@ namespace basecross {
 		}
 	}
 
+	const bool Player::IsCarryingEnemy() {
+		if (m_pGrab.lock()) {
+			return m_pGrab.lock()->IsHit();
+		}
+		else {
+			return false;
+		}
+	}
+
 	//====================================================================
 	// class PlayerGrab
 	// プレイヤーの掴み判定
@@ -841,10 +850,11 @@ namespace basecross {
 		m_dist(dist),
 		m_angle(angle),
 		m_power(power),
-		m_speed(18.0f),
-		m_speedBase(9.0f),
-		m_rangeMax(.8f),
-		m_stopped(false)
+		m_speed(24.0f),
+		m_speedBase(24.0f),
+		m_rangeMax(.4f),
+		m_stopped(false),
+		m_lifeEnded(false)
 	{}
 
 	void FireProjectile::OnCreate() {
@@ -855,9 +865,11 @@ namespace basecross {
 		//エフェクト読み込み
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
-		wstring TestEffectStr = DataDir + L"Effects\\playerproj.efk";
+		wstring ProjEffectStr = DataDir + L"Effects\\playerproj.efk";
+		wstring EndEffectStr = DataDir + L"Effects\\playerprojend.efk";
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
+		m_EfkProj = ObjectFactory::Create<EfkEffect>(ShEfkInterface, ProjEffectStr);
+		m_EfkProjEnd = ObjectFactory::Create<EfkEffect>(ShEfkInterface, EndEffectStr);
 
 		auto trans = GetComponent<Transform>();
 		trans->SetScale(Vec3(8.0f));
@@ -900,21 +912,21 @@ namespace basecross {
 		auto trans = GetComponent<Transform>();
 
 		//エフェクトのプレイ
-		if(m_playTime <= 0.0f)
+		if(m_playTime <= 0.0f && !m_lifeEnded)
 		{
 			auto fwd = -1 * trans->GetForward();
 			auto face = atan2f(fwd.z, fwd.x);
 
 			auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-			m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, trans->GetPosition(), 0.0f);
-			m_EfkPlay->SetRotation(Vec3(0, 1, 0), -face);
-			m_EfkPlay->SetScale(Vec3(.8f));
+			m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkProj, trans->GetPosition(), 0.0f);
+			m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
+			m_EfkPlay[0]->SetScale(Vec3(.8f));
 		}
 
 		auto delta = App::GetApp()->GetElapsedTime();
 		m_playTime += delta;
 
-		m_EfkPlay->SetLocation(trans->GetPosition());
+		m_EfkPlay[0]->SetLocation(trans->GetPosition());
 
 		if (!m_stopped) {
 			trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
@@ -923,8 +935,23 @@ namespace basecross {
 		m_range -= delta;
 		GetComponent<PNTStaticDraw>()->SetDiffuse(Col4(1, 1, 1, m_range * 2 / m_rangeMax));
 
-		if (m_range <= 0) {
-			GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
+		if (m_range <= 0 && !m_lifeEnded) {
+			m_lifeEnded = true;
+			m_playTime = 0;
+			auto fwd = -1 * trans->GetForward();
+			auto face = atan2f(fwd.z, fwd.x);
+
+			m_EfkPlay[0]->StopEffect();
+			m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkProjEnd, trans->GetPosition(), 0.0f);
+			m_EfkPlay[1]->SetRotation(Vec3(0, 1, 0), -face);
+			m_EfkPlay[1]->SetScale(Vec3(.8f));
+		}
+
+		if (m_lifeEnded) {
+			m_EfkPlay[1]->SetLocation(trans->GetPosition());
+			if (m_range <= -.25f) {
+				GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
+			}
 		}
 	}
 
