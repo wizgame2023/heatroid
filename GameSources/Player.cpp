@@ -707,7 +707,7 @@ namespace basecross {
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
 		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkMuzzle, pos + firepos, 0.0f);
 		m_EfkPlay->SetRotation(Vec3(0, 1, 0), -face);
-		m_EfkPlay->SetScale(Vec3(.35f));
+		m_EfkPlay->SetScale(Vec3(.25f));
 
 		//飛び道具発射
 		GetStage()->AddGameObject<FireProjectile>(pos + firepos, fwd, m_chargePerc);
@@ -741,6 +741,15 @@ namespace basecross {
 					return;
 				}
 			}
+		}
+	}
+
+	const bool Player::IsCarryingEnemy() {
+		if (m_pGrab.lock()) {
+			return m_pGrab.lock()->IsHit();
+		}
+		else {
+			return false;
 		}
 	}
 

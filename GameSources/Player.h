@@ -37,7 +37,7 @@ namespace basecross {
 		//入力ハンドラー
 		InputHandler<Player> m_InputHandler;
 		//スピード(最高速)
-		const float m_speed = 72.0f;
+		const float m_speed = 80.0f;
 		const float m_airSpeedPerc = .35f;
 		//加速度
 		const float m_accel = 200.0f;
@@ -205,6 +205,9 @@ namespace basecross {
 		const shared_ptr<PNTBoneModelDraw> GetDrawPtr() {
 			return GetComponent<PNTBoneModelDraw>();
 		}
+
+		//敵を持っているか否か(持っていればtrueを返す)
+		const bool Player::IsCarryingEnemy();
 
 		//SEの再生
 		void Player::PlaySnd(wstring sndname, float volume, float loopcount) {
