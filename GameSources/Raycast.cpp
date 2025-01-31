@@ -51,8 +51,6 @@ namespace basecross {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 
-
-
 		SetLinePosition(player->GetComponent<Transform>()->GetPosition(), LinePos(Vec3(0.0f,3.0f,0.0f)));
 		
 	}
@@ -121,7 +119,9 @@ namespace basecross {
 	) :
 		GameObject(stage),
 		m_player(player),
-		m_enemy(enemy)
+		m_enemy(enemy),
+		m_wallCnt(0),
+		m_drawFlag(false)
 	{}
 
 	void RayMark::OnCreate() {
@@ -188,9 +188,11 @@ namespace basecross {
 		for (auto v : wallVec) {
 			auto shObj = v.lock();
 			auto wallDraw = shObj->GetComponent<PNTStaticDraw>();
-			m_hitWallFlag = wallDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, objCrossPos, triangle, triangleIndex);
+			m_hitwallFlag.push_back(wallDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, objCrossPos, triangle, triangleIndex));
 		}
-
+		auto walls = GetStage()->GetSharedGameObject<FixedBox>(L"walls");
+		auto wallsDraw = walls->GetComponent<BcPNTStaticDraw>();
+		m_hitWallFlag = wallsDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, objCrossPos, triangle, triangleIndex);
 
 		//m_hitWallFlag = wallDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
 		//m_hitDoorFlag = floorDraw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
@@ -199,21 +201,40 @@ namespace basecross {
 			pos = enemyCrossPos;
 		}
 		m_trans->SetPosition(pos);
-		Debug();
 
-		if (m_hitEnemyFlag) {
-			if (!m_hitWallFlag) {
-				m_draw->SetDrawActive(true);
-			} 
-			else {
-				m_draw->SetDrawActive(false);
+		for (int i = 0; i < m_hitwallFlag.size(); i++) {
+			if (!m_hitwallFlag[i]) {
+				m_wallCnt++;
 			}
+		}
+		if (m_wallCnt == m_hitwallFlag.size()) {
+			m_drawFlag = true;
+			m_wallCnt = 0;
+			m_hitwallFlag.clear();
+		}
+		else {
+			m_drawFlag = false;
+			m_wallCnt = 0;
+			m_hitwallFlag.clear();
+		}
+
+		if (m_drawFlag) {
+			m_draw->SetDrawActive(true);
+		}
+		else {
+			m_draw->SetDrawActive(false);
 		}
 		//if (m_hitWallFlag) {
 		//	m_draw->SetDrawActive(true);
 		//}
 		//else {
 		//	m_draw->SetDrawActive(false);
+		//}
+		
+
+		//auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
+		//if (keyState.m_bPushKeyTbl['Q']) {
+		//	Debug();
 		//}
 	}
 
@@ -231,14 +252,10 @@ namespace basecross {
 		}
 	}
 
-	void RayMark::OnDraw() {
-		GameObject::OnDraw();
-	}
 	void RayMark::Debug() {
 		auto scene = App::GetApp()->GetScene<Scene>();
 		wstringstream wss(L"");
 		wss << L"Wall : "
-			<<m_hitEnemyFlag
 			<< endl;
 		scene->SetDebugString(wss.str());
 

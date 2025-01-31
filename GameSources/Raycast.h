@@ -53,6 +53,10 @@ namespace basecross {
 		bool m_hitWallFlag;
 		bool m_hitDoorFlag;
 		bool m_hitFloorFlag;
+		bool m_drawFlag;
+		int m_wallCnt;
+
+		vector<bool> m_hitwallFlag;
 		shared_ptr<Transform> m_trans;
 		shared_ptr<PNTStaticDraw> m_draw;
 		weak_ptr<Player> m_player;
@@ -66,9 +70,9 @@ namespace basecross {
 
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
-		virtual void OnDraw() override;
 		void Debug();
 		Vec3 enemyPos(Vec3 pos);
+		bool GetDrawActive();
 
 	};
 
