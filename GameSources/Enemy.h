@@ -29,7 +29,8 @@ namespace basecross {
 			bullet,    //’e‚ğŒ‚‚Á‚Ä‚­‚é
 			bulletMove,//‰¡‚Ì“®‚«‚¾‚¯‚Â‚¢‚Ä‚«‚Ä’e‚ğŒ‚‚Â
 			wait,      //—§‚¿ã‚ª‚é
-			slide
+			slide,     //¶‰E‚ÉˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Â
+			throwAway, //“Š‚°‚ç‚ê‚é
 		};
 
 		
@@ -81,7 +82,7 @@ namespace basecross {
 		bool m_overHeatSE;
 		bool m_plungeSE;
 
-		bool m_updateFlag;
+		bool m_activeFlag;
 
 		wstring m_meshName;
 
@@ -184,7 +185,8 @@ namespace basecross {
 		bool GetOverHeat();
 		void SetPlungeFlag(bool flag);
 		void SetBulletDirec(Vec2 direc);
-		bool GetUpdateFlag();
+		bool GetActiveFlag();
+		void SetActiveFlag(bool flag);
 
 	protected:
 		//d—Í‚ÉŠÖ‚·‚éŠÖ”

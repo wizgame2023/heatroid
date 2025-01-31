@@ -73,7 +73,7 @@ namespace basecross {
 		m_playerFlag(false),
 		m_overHeatSE(false),
 		m_plungeSE(false),
-		m_updateFlag(true)
+		m_activeFlag(true)
 	{}
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
@@ -136,7 +136,7 @@ namespace basecross {
 		m_playerFlag(false),
 		m_overHeatSE(false),
 		m_plungeSE(false),
-		m_updateFlag(true)
+		m_activeFlag(true)
 	{}
 
 	void Enemy::OnCreate() {
@@ -266,15 +266,6 @@ namespace basecross {
 			m_overHeatSE = false;
 		}
 
-		//範囲外かどうかのフラグ
-		if (m_direc.length() <= m_trackingRange * 2) {
-			m_updateFlag = true;
-		}
-		else {
-			m_updateFlag = false;
-		}
-
-
 		//行動パターン
 		switch (m_stateType)
 		{
@@ -291,13 +282,13 @@ namespace basecross {
 		//追従の左右移動
 		case rightMove:
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			EnemyAnime(L"walk");
 			m_speed = m_maxSpeed;
 			PlayerDic();
 			if (!m_floorCol->GetPlayerFlag()) {
 				EnemyAngle();
 			}
 			if (m_direc.length() <= m_trackingRange * 2) {
+				EnemyAnime(L"walk");
 				m_pos += m_speed * m_direcNorm * elapsed;
 			}
 			break;
@@ -342,21 +333,28 @@ namespace basecross {
 		case plunge:
 			//EnemyAnime(L"spare");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			Plunge();
+			if (m_direc.length() <= m_trackingRange * 2) {
+				Plunge();
+			}
 			break;
 		//放物線の弾を撃ってくる
 		case bullet:
-			EnemyAnime(L"walk");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			FallBullet();
 			EnemyAngle();
+			if (m_direc.length() <= m_trackingRange * 2) {
+				EnemyAnime(L"walk");
+				FallBullet();
+				m_pos += shaft.normalize() * sinf(m_rad) * m_speed * 2.0f * elapsed;
+			}
+
 			break;
 		//横についてきながら弾を撃つ
 		case bulletMove:
 			PlayerDic();
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			RapidFireBullet(3);
 			if (m_direc.length() <= m_trackingRange * 2) {
+				EnemyAnime(L"walk");
+				RapidFireBullet(3);
 				m_pos += m_speed * m_direcNorm * elapsed;
 			}
 
@@ -384,7 +382,6 @@ namespace basecross {
 			break;
 		//左右移動しながら弾を撃つ
 		case slide:
-			EnemyAnime(L"kaihi");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			PlayerDic();
 			EnemyAngle();
@@ -396,8 +393,11 @@ namespace basecross {
 			}
 
 			if (m_direc.length() <= m_trackingRange * 2) {
+				EnemyAnime(L"kaihi");
 				m_pos += shaft.normalize() * sinf(m_rad) * m_speed * 2.0f * elapsed;
 			}
+		case throwAway:
+
 			break;
 		default:
 			break;
@@ -420,6 +420,7 @@ namespace basecross {
 			Grab();
 		}
 		OverHeat();
+
 		//アニメーションの実装
 		m_draw->UpdateAnimation(elapsed);
 		//Debug();
@@ -463,6 +464,7 @@ namespace basecross {
 			m_trans->SetRotation(Vec3(0.0f, -m_angle + rad, 0.0f));
 		}
 	}
+	//敵の目の場所を設定
 	Vec3 Enemy::GetEyePos(const Vec3& eye) {
 		Vec3 pos = GetWorldPos();
 		Vec3 forward = m_trans->GetForward();
@@ -509,6 +511,7 @@ namespace basecross {
 		}
 
 	}
+	//プレイヤーに突っ込む
 	void Enemy::Plunge() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		m_spareTime -= elapsed;
@@ -528,6 +531,7 @@ namespace basecross {
 			m_spareTime = 0.0f;
 		}
 	}
+	//プレイヤーに跳びかかる
 	void Enemy::JumpMove() {
 		float elapsed = App::GetApp()->GetElapsedTime();
 		EnemyAnime(L"spare");
@@ -776,6 +780,7 @@ namespace basecross {
 		}
 
 	}
+	//衝突判定
 	void Enemy::OnCollisionExit(shared_ptr<GameObject>& other)
 	{
 		if ((other->FindTag(L"GimmickButton")))
@@ -794,7 +799,6 @@ namespace basecross {
 			m_playerFlag = false;
 		}
 	}
-
 	void Enemy::OnCollisionExcute(shared_ptr<GameObject>& other)
 	{
 		if (other->FindTag(L"Floor")) {
@@ -971,6 +975,12 @@ namespace basecross {
 	}
 	void Enemy::SetBulletDirec(Vec2 direc) {
 		m_bulletDic = direc;
+	}
+	bool Enemy::GetActiveFlag() {
+		return m_activeFlag;
+	}
+	void Enemy::SetActiveFlag(bool flag) {
+		m_activeFlag = flag;
 	}
 
 	//--------------------------------------------------------------------------------------
