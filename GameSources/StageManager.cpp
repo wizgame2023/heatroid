@@ -96,6 +96,8 @@ namespace basecross {
 
 	void StageManager::CreateFixedBox()
 	{
+		GetStage()->CreateSharedObjectGroup(L"Wall");
+
 		//CSVの行単位の配列
 		vector<wstring> LineVec;
 		//0番目のカラムがL"FixedBox"である行を抜き出す
@@ -156,7 +158,8 @@ namespace basecross {
 			auto PtrWall = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x, Scale.y, Tokens[10]);
 			PtrWall->AddTag(L"Wall");
 			PtrWall->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
-
+			auto group = GetStage()->GetSharedObjectGroup(L"Wall");
+			group->IntoGroup(PtrWall);
 		}
 		m_GameStage.GetSelect(LineVec, 0, L"GoalFloor");
 		for (auto& v : LineVec) {
@@ -1005,6 +1008,24 @@ namespace basecross {
 			else {
 				m_kakaeruUI->SetDrawActive(false);
 			}
+		}
+	}
+	void StageManager::EnemyRay() {
+		auto stage = GetStage();
+		auto player = stage->GetSharedGameObject<Player>(L"Player");
+		auto enemyGroup = stage->GetSharedObjectGroup(L"Enemy");
+		auto& enemyVec = enemyGroup->GetGroupVector();
+
+		stage->CreateSharedObjectGroup(L"Line");
+		for (auto v : enemyVec) {
+			auto shObj = v.lock();
+			auto enemyObj = dynamic_pointer_cast<Enemy>(shObj);
+			stage->AddGameObject<RayMark>(player, enemyObj);
+			//デバック用
+			//auto line = AddGameObject<LineObject>(player, enemyObj);
+			//line->SetLineColor(Col4(1.0f, 0.0f, 0.0f, 1.0f), Col4(0.0f, 0.0f, 1.0f, 1.0f));
+			//auto group = GetSharedObjectGroup(L"Line");
+			//group->IntoGroup(line);
 		}
 	}
 }
