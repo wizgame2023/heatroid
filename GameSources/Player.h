@@ -19,8 +19,9 @@ namespace basecross {
 		//エフェクト
 		shared_ptr<EfkEffect> m_EfkMuzzle;
 		shared_ptr<EfkEffect> m_EfkHit;
+		shared_ptr<EfkEffect> m_EfkJump;
 		//エフェクト実行オブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay;
+		shared_ptr<EfkPlay> m_EfkPlay[3];
 
 		//Transformの初期化
 		Vec3 m_initPos;
@@ -37,22 +38,22 @@ namespace basecross {
 		//入力ハンドラー
 		InputHandler<Player> m_InputHandler;
 		//スピード(最高速)
-		const float m_speed = 80.0f;
-		const float m_airSpeedPerc = .35f;
+		const float m_speed = 90.0f;
+		const float m_airSpeedPerc = .3f;
 		//加速度
-		const float m_accel = 200.0f;
+		const float m_accel = 240.0f;
 		//摩擦係数(静/動/完全停止)
 		const float m_friction = .75f;
 		const float m_frictionDynamic = .5f;
 		const float m_frictionThreshold = .5f;
 		//ジャンプ高度
-		const float m_jumpHeight = 12.0f;
+		const float m_jumpHeight = 18.0f;
 		//操作方向の向き
 		float m_moveAngle = 0;
 		//重力
-		const float m_gravity = -20.0f;
+		const float m_gravity = -32.0f;
 		//落下時の終端速度
-		const float m_fallTerminal = -50.0f;
+		const float m_fallTerminal = -120.0f;
 		//飛び道具が出る場所
 		const Vec3 m_firePos = Vec3(1.0f, .8f, -.75f);
 		//移動方向

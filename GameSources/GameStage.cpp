@@ -303,6 +303,7 @@ namespace basecross {
 			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateSprite();
 			ptrStageManager->CreateGimmick();
+			ptrStageManager->EnemyRay();
 		}
 	}
 

@@ -134,6 +134,9 @@ namespace basecross {
 
         void UImake();
 
+        //プレイヤーから敵に飛ばすレイ
+        void EnemyRay();
+
         // 構築と破棄
         StageManager(const shared_ptr<Stage>& stage) :
             GameObject(stage)
