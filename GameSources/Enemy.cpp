@@ -225,7 +225,7 @@ namespace basecross {
 		m_collision = AddComponent<CollisionCapsule>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(true);
+		m_collision->SetDrawActive(false);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
 		//m_collision->SetSleepActive(false);
