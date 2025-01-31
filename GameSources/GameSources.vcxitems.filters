@@ -143,9 +143,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)StageManager.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SelectStage.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)LoadScreen.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
@@ -159,6 +156,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)Raycast.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)SelectStage.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
