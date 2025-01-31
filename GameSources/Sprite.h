@@ -40,12 +40,15 @@ namespace basecross {
 		wstring m_TextureKey;
 		float UVCharge;
 
+		const float windowWidth = App::GetApp()->GetGameWidth();
+		const float windowHeight = App::GetApp()->GetGameHeight();
+
 		SelectCharge(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
 			const Vec2& StartScale, const Vec3& StartPos);
 		virtual ~SelectCharge() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
-		void ChargeUV();
+		void ChargeUV(const float& time);
 		void UpdateProgress(float load);
 		void SetPushState(const bool PushState);
 	};
@@ -67,4 +70,5 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
+
 }

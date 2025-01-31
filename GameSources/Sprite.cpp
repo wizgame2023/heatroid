@@ -21,10 +21,10 @@ namespace basecross {
 		float helfSize = 1.0f;
 		//頂点配列(縦横5個ずつ表示)
 		vector<VertexPositionColorTexture> vertices = {
-			{ VertexPositionColorTexture(Vec3(-helfSize, helfSize, 0),Col4(1.0f,1.0f,1.0f,1.0f), Vec2(0.0f, 0.0f)) },
-			{ VertexPositionColorTexture(Vec3(helfSize, helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, 0.0f)) },
+			{ VertexPositionColorTexture(Vec3(-helfSize, helfSize,  0),Col4(1.0f,1.0f,1.0f,1.0f),      Vec2(0.0f, 0.0f)) },
+			{ VertexPositionColorTexture(Vec3(helfSize, helfSize,   0), Col4(1.0f, 1.0f, 1.0f, 1.0f),   Vec2(1.0f, 0.0f)) },
 			{ VertexPositionColorTexture(Vec3(-helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(0.0f, 1.0f)) },
-			{ VertexPositionColorTexture(Vec3(helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, 1.0f)) },
+			{ VertexPositionColorTexture(Vec3(helfSize, -helfSize,  0), Col4(1.0f, 1.0f, 1.0f, 1.0f),  Vec2(1.0f, 1.0f)) },
 		};
 		//インデックス配列
 		vector<uint16_t> indices = { 0, 1, 2, 1, 3, 2 };
@@ -50,13 +50,17 @@ namespace basecross {
 
 	void SelectCharge::OnCreate() {
 		UVCharge = 1.0f;
-		float helfSize = 1.0f;
+
+		Col4 color(1, 1, 1, 1);
+
+		float halfW = 1.0f;
+		float halfH = 1.0f;
 		//頂点配列(縦横5個ずつ表示)
 		m_Vertices = {
-			{ VertexPositionColorTexture(Vec3(-helfSize, helfSize, 0),Col4(1.0f,1.0f,1.0f,1.0f), Vec2(0.0f, 0.0f)) },
-			{ VertexPositionColorTexture(Vec3(helfSize, helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, 0.0f)) },
-			{ VertexPositionColorTexture(Vec3(-helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(0.0f, UVCharge)) },
-			{ VertexPositionColorTexture(Vec3(helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, UVCharge)) },
+			{Vec3(-halfW, halfH, 0.0f), color,Vec2(0.0f, 0.0f)},
+			{Vec3(halfW, halfH,   0.0f), color, Vec2(1.0f, 0.0f)},
+			{Vec3(-halfW, -halfH, 0.0f), color, Vec2(0.0f, 1.0f)},
+			{Vec3(halfW, -halfH, 0.0f), color,	Vec2(1.0f, 1.0f)},
 		};
 		//インデックス配列
 		vector<uint16_t> indices = { 0, 1, 2, 1, 3, 2 };
@@ -67,59 +71,35 @@ namespace basecross {
 		ptrTrans->SetPosition(m_StartPos);
 		//頂点とインデックスを指定してスプライト作成
 		auto ptrDraw = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
-		ptrDraw->SetBlendState(BlendState::AlphaBlend);
 		ptrDraw->SetTextureResource(m_TextureKey);
 
+		auto group = GetStage()->GetSharedObjectGroup(L"Sprite");
+		group->IntoGroup(GetThis<GameObject>());
 	}
 	void SelectCharge::OnUpdate()
 	{
-		ChargeUV();
 	}
-	void SelectCharge::ChargeUV()
+	void SelectCharge::ChargeUV(const float& time)
 	{
-		auto time = App::GetApp()->GetElapsedTime();
-		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
-		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-		m_SelectCharge = stageMane->m_SelectCharge;
-		m_TitleCharge = stageMane->m_TitleCharge;
-		m_PushState = stageMane->GetPushState();
-
-		if (m_PushState == 0) {
-			m_fade -= time * m_fadeSpeed;
-			for (auto& vtx : m_Vertices) {
-				vtx.color = Col4(0.0f, 0.0f, 0.0f, 1.0f);
-			}
-		}
-		else{
-			m_fade += time * m_fadeSpeed;
-			for (auto& vtx : m_Vertices) {
-				vtx.color = Col4(1.0f, 1.0f, 1.0f, 1.0f);
-			}
+		float alpha = 1.0f;
+		if (time < 1.0f) {
+			//float load = Lerp::CalculateLerp(0.0f,1.0f, 0.0f, 1.0f, time, Lerp::Linear);
+			UpdateProgress(time);
 		}
 
-		if (m_fade > 1.0f) m_fade = 1.0f;
-		if (m_fade < 0.0f) m_fade = 0.0f;
-		if (m_PushState == 1)
-		{
-			m_SelectCharge->GetComponent<PCTSpriteDraw>()->SetDiffuse(Col4(1.0f, 1.0f, 1.0f, m_fade));
-			m_SelectCharge->GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
-		}
-		if (m_PushState == 2)
-		{
-			m_TitleCharge->GetComponent<PCTSpriteDraw>()->SetDiffuse(Col4(1.0f, 1.0f, 1.0f, m_fade));
-			m_TitleCharge->GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
-		}
+		//for (auto& v : m_Vertices) {
+		//	v.color.z = alpha;
+		//}
 	}
 
 	void SelectCharge::UpdateProgress(float load) {
-		//float progress = load;
-		//m_Vertices[1].position.x = windowWidth * (progress - .5f);
-		//m_Vertices[3].position.x = windowWidth * (progress - .5f);
-		//m_Vertices[1].textureCoordinate.x = progress;
-		//m_Vertices[3].textureCoordinate.x = progress;
+		float progress =  load;
+		m_Vertices[1].position.x = (progress * 2) - 1.0f;
+		m_Vertices[3].position.x = (progress * 2) - 1.0f;
+		m_Vertices[1].textureCoordinate.x = progress;
+		m_Vertices[3].textureCoordinate.x = progress;
 
-		//GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
+		GetComponent<PCTSpriteDraw>()->UpdateVertices(m_Vertices);
 	}
 
 
@@ -187,5 +167,4 @@ namespace basecross {
 		PtrDraw->SetDiffuse(col);
 
 	}
-
 }

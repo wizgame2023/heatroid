@@ -141,12 +141,15 @@ namespace basecross {
 			PlaySE(L"SwitchSE", 0, 1.0);
 			EfectPlay();
 			m_flag = true;
-			time += ElapsedTime;
 		}
-		if (time > 5.0f || m_open == false)
+		if (m_flag == true && m_open != true)
 		{
-			m_flag = false;
-			time = 0.0f;
+			time += ElapsedTime;
+			if (time > 1.0f)
+			{
+				m_flag = false;
+				time = 0.0f;
+			}
 		}
 	}
 

@@ -19,8 +19,9 @@ namespace basecross {
 		//エフェクト
 		shared_ptr<EfkEffect> m_EfkMuzzle;
 		shared_ptr<EfkEffect> m_EfkHit;
+		shared_ptr<EfkEffect> m_EfkJump;
 		//エフェクト実行オブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay;
+		shared_ptr<EfkPlay> m_EfkPlay[3];
 
 		//Transformの初期化
 		Vec3 m_initPos;
@@ -37,29 +38,29 @@ namespace basecross {
 		//入力ハンドラー
 		InputHandler<Player> m_InputHandler;
 		//スピード(最高速)
-		const float m_speed = 72.0f;
-		const float m_airSpeedPerc = .35f;
+		const float m_speed = 90.0f;
+		const float m_airSpeedPerc = .3f;
 		//加速度
-		const float m_accel = 200.0f;
+		const float m_accel = 240.0f;
 		//摩擦係数(静/動/完全停止)
 		const float m_friction = .75f;
 		const float m_frictionDynamic = .5f;
 		const float m_frictionThreshold = .5f;
 		//ジャンプ高度
-		const float m_jumpHeight = 12.0f;
+		const float m_jumpHeight = 18.0f;
 		//操作方向の向き
 		float m_moveAngle = 0;
 		//重力
-		const float m_gravity = -20.0f;
+		const float m_gravity = -32.0f;
 		//落下時の終端速度
-		const float m_fallTerminal = -50.0f;
+		const float m_fallTerminal = -120.0f;
 		//飛び道具が出る場所
 		const Vec3 m_firePos = Vec3(1.0f, .8f, -.75f);
 		//移動方向
 		Vec3 m_moveVel = Vec3(0, 0, 0);
 		//CollisionExitの空中判定用カウント
 		int m_collideCount;
-		const int m_collideCountInit = 10;
+		const int m_collideCountInit = 15;
 
 		float m_landSEcooltime = 0.0f;
 
@@ -206,6 +207,9 @@ namespace basecross {
 			return GetComponent<PNTBoneModelDraw>();
 		}
 
+		//敵を持っているか否か(持っていればtrueを返す)
+		const bool Player::IsCarryingEnemy();
+
 		//SEの再生
 		void Player::PlaySnd(wstring sndname, float volume, float loopcount) {
 			auto audio = App::GetApp()->GetXAudio2Manager();
@@ -220,6 +224,22 @@ namespace basecross {
 		//ゲージの溜まり具合のゲッタ
 		const float GetChargePerc() {
 			return m_chargePerc;
+		}
+
+		//GetForwardから向きに応じたベクトルを返す
+		Vec3 ForwardConvert(Vec3 v) {
+			Vec3 ret;
+
+			auto trans = GetComponent<Transform>();
+			auto fwd = -1 * trans->GetForward();
+			auto face = atan2f(fwd.z, fwd.x);
+			auto scale = trans->GetScale();
+
+			ret.x = (cosf(face) * v.x) - (sinf(face) * v.z);
+			ret.y = v.y;
+			ret.z = (cosf(face) * v.z) + (sinf(face) * v.x);
+
+			return ret;
 		}
 
 		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
@@ -299,21 +319,7 @@ namespace basecross {
 
 	};
 
-	//====================================================================
-	// class ChargeAura
-	// プレイヤーがチャージ中に足元に出る筒
-	//====================================================================
-	class ChargeAura : public GameObject {
-	public:
-		ChargeAura(const shared_ptr<Stage>& StagePtr) :
-			GameObject(StagePtr)
-		{};
-		~ChargeAura() {};
 
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-
-	};
 	//====================================================================
 	// class FireProjectile
 	// プレイヤーの火炎放射
@@ -324,9 +330,10 @@ namespace basecross {
 		shared_ptr<StageManager> m_stageMgr;
 
 		//エフェクト
-		shared_ptr<EfkEffect> m_EfkEffect;
+		shared_ptr<EfkEffect> m_EfkProj;
+		shared_ptr<EfkEffect> m_EfkProjEnd;
 		//エフェクト実行オブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay;
+		shared_ptr<EfkPlay> m_EfkPlay[2];
 
 		float m_playTime = 0;
 
@@ -337,7 +344,7 @@ namespace basecross {
 		Vec3 m_angle;
 		//射程
 		float m_range = 0, m_rangeMax;
-		bool m_stopped;
+		bool m_stopped, m_lifeEnded;
 
 	public:
 		//構築と破棄
