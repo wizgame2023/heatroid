@@ -50,13 +50,12 @@ namespace basecross {
 	class RayMark : public GameObject {
 	private : 
 		bool m_hitEnemyFlag;
-		bool m_hitWallFlag;
-		bool m_hitDoorFlag;
-		bool m_hitFloorFlag;
-		bool m_drawFlag;
+		bool m_activeFlag;
 		int m_wallCnt;
+		int m_doorCnt;
 
-		vector<bool> m_hitwallFlag;
+		vector<bool> m_hitWallFlag;
+		vector<bool> m_hitDoorFlag;
 		shared_ptr<Transform> m_trans;
 		shared_ptr<PNTStaticDraw> m_draw;
 		weak_ptr<Player> m_player;
@@ -72,7 +71,7 @@ namespace basecross {
 		virtual void OnUpdate() override;
 		void Debug();
 		Vec3 enemyPos(Vec3 pos);
-		bool GetDrawActive();
+		bool GetActiveFlag();
 
 	};
 
