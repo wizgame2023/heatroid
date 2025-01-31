@@ -81,6 +81,8 @@ namespace basecross {
 		bool m_overHeatSE;
 		bool m_plungeSE;
 
+		bool m_updateFlag;
+
 		wstring m_meshName;
 
 		//èdóÕ
@@ -182,6 +184,7 @@ namespace basecross {
 		bool GetOverHeat();
 		void SetPlungeFlag(bool flag);
 		void SetBulletDirec(Vec2 direc);
+		bool GetUpdateFlag();
 
 	protected:
 		//èdóÕÇ…ä÷Ç∑ÇÈä÷êî
@@ -293,6 +296,8 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class EnemyFloorCol : public GameObject {
 	private:
+		float m_posHight;
+		float m_plusScale;
 		Vec3 m_pos;
 		Vec3 m_enemyPos;
 		Vec3 m_enemyScal;
@@ -312,6 +317,7 @@ namespace basecross {
 		virtual void OnCollisionExit(shared_ptr<GameObject>& other);
 		void ThisDestroy();
 		bool GetPlayerFlag();
+		void SetPosHight(float hight);
 	};
 
 }
