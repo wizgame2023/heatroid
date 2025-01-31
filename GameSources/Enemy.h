@@ -296,6 +296,8 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class EnemyFloorCol : public GameObject {
 	private:
+		float m_posHight;
+		float m_plusScale;
 		Vec3 m_pos;
 		Vec3 m_enemyPos;
 		Vec3 m_enemyScal;
@@ -315,6 +317,7 @@ namespace basecross {
 		virtual void OnCollisionExit(shared_ptr<GameObject>& other);
 		void ThisDestroy();
 		bool GetPlayerFlag();
+		void SetPosHight(float hight);
 	};
 
 }

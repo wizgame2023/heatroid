@@ -151,19 +151,32 @@ namespace basecross {
 		float rad = XMConvertToRadians(180.0f);
 		m_draw = AddComponent<PNTBoneModelDraw>();
 
+		//オーバーヒートゲージの追加
+		auto gauge = GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
+			Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
+		auto gaugeFram = GetStage()->AddGameObject<Square>(4.0f, 2.0f, L"OverHeatFram",
+			Col4(1.0f, 1.0f, 1.0f, 1.0f), GetThis<Enemy>());
+		//足場コリジョンの追加
+		m_floorCol = GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
+		m_floorCol->SetDrawActive(false);
+
+		//左右に動く敵の場合モデルの変更と位置の調整
 		if (m_stateType == slide) {
 			m_meshName = L"ENEMYYOKO";
-			m_scal.y = m_scal.y;
+			m_scal.y = m_scal.y*0.5;
 			m_pos.y = m_pos.y + m_scal.y;
 
 			Mat4x4 meshMat;
 			meshMat.affineTransformation(
-				Vec3(1.0f, 1.0f, 1.0f),
+				Vec3(1.0f, 1.0f*2, 1.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(0.0f, rad, 0.0f),
-				Vec3(0.0f, -1.0f, 0.0f)
+				Vec3(0.0f, -1.5f, 0.0f)
 			);
 			m_draw->SetMeshToTransformMatrix(meshMat);
+			gauge->SetPosHight(6.0f);
+			gaugeFram->SetPosHight(6.0f);
+			m_floorCol->SetPosHight(4.0f);
 		}
 		else {
 			m_scal.y = m_scal.y*0.5;
@@ -177,14 +190,16 @@ namespace basecross {
 				Vec3(0.0f, -1.5f, 0.0f)
 			);
 			m_draw->SetMeshToTransformMatrix(meshMat);
+			m_floorCol->SetPosHight(1.5f);
 		}
+
 		m_trans->SetScale(m_scal);
 		m_trans->SetPosition(m_pos);
 		//描画
-
 		m_draw->SetMeshResource(m_meshName);
 		m_draw->SetOwnShadowActive(true);
 
+		//アニメーションの設定
 		m_draw->AddAnimation(L"walk", 10, 30, true, 30);    //歩き
 		m_draw->AddAnimation(L"speedWalk", 10, 30, true, 60);    //歩き
 
@@ -218,14 +233,6 @@ namespace basecross {
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(m_meshName);
 
-		//足場コリジョンの追加
-		m_floorCol = GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
-		m_floorCol->SetDrawActive(false);
-		//オーバーヒートゲージの追加
-		GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
-			Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
-		GetStage()->AddGameObject<Square>(4.0f, 2.0f, L"OverHeatFram",
-			Col4(1.0f, 1.0f, 1.0f, 1.0f), GetThis<Enemy>());
 		AddTag(L"Enemy");
 
 		//エフェクトの設定
@@ -289,7 +296,6 @@ namespace basecross {
 			PlayerDic();
 			if (!m_floorCol->GetPlayerFlag()) {
 				EnemyAngle();
-
 			}
 			if (m_direc.length() <= m_trackingRange * 2) {
 				m_pos += m_speed * m_direcNorm * elapsed;
@@ -338,7 +344,7 @@ namespace basecross {
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			Plunge();
 			break;
-		//弾を撃ってくる
+		//放物線の弾を撃ってくる
 		case bullet:
 			EnemyAnime(L"walk");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
@@ -350,6 +356,10 @@ namespace basecross {
 			PlayerDic();
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			RapidFireBullet(3);
+			if (m_direc.length() <= m_trackingRange * 2) {
+				m_pos += m_speed * m_direcNorm * elapsed;
+			}
+
 			break;
 		//オーバーヒートから復活までの時間
 		case wait:
@@ -1225,6 +1235,8 @@ namespace basecross {
 	):
 		GameObject(stage),
 		m_enemy(enemy),
+		m_posHight(0.0f),
+		m_plusScale(2.5f),
 		m_playerFlag(false)
 	{}
 	void EnemyFloorCol::OnCreate() {
@@ -1235,7 +1247,7 @@ namespace basecross {
 		m_enemyScal = enemyTrans->GetScale();
 		m_trans = GetComponent<Transform>();
 		m_trans->SetPosition(Vec3(m_enemyPos.x, m_enemyPos.y + m_enemyScal.y / 2, m_enemyPos.z));
-		m_trans->SetScale(Vec3(m_enemyScal.x, m_enemyScal.y / 5, m_enemyScal.z));
+		m_trans->SetScale(Vec3(m_enemyScal.x * m_plusScale, m_enemyScal.y / 5, m_enemyScal.z * m_plusScale));
 		m_trans->SetParent(enemy);
 
 		auto ptrColl = AddComponent<CollisionObb>();
@@ -1252,7 +1264,7 @@ namespace basecross {
 		if (enemy) {
 			auto enemyTrans = enemy->GetComponent<Transform>();
 			m_enemyPos = enemyTrans->GetPosition();
-			m_trans->SetPosition(Vec3(0.0f, m_enemyScal.y / 2.0f, 0.0f));
+			m_trans->SetPosition(Vec3(0.0f, m_enemyScal.y / 2.0f + m_posHight, 0.0f));
 		}
 		else {
 			ThisDestroy();
@@ -1274,5 +1286,8 @@ namespace basecross {
 	}
 	bool EnemyFloorCol::GetPlayerFlag() {
 		return m_playerFlag;
+	}
+	void EnemyFloorCol::SetPosHight(float hight) {
+		m_posHight = hight;
 	}
 }
