@@ -145,7 +145,7 @@ namespace basecross {
 		if (m_flag == true && m_open != true)
 		{
 			time += ElapsedTime;
-			if (time > .0f)
+			if (time > 1.0f)
 			{
 				m_flag = false;
 				time = 0.0f;
