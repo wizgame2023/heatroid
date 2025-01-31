@@ -147,9 +147,11 @@ namespace basecross {
 		App::GetApp()->GetDataDirectory(DataDir);
 		wstring MuzzleDir = DataDir + L"Effects\\Muzzle.efk";
 		wstring HitDir = DataDir + L"Effects\\Hit.efk";
+		wstring JumpDir = DataDir + L"Effects\\PlayerJump.efk";
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
 		m_EfkMuzzle = ObjectFactory::Create<EfkEffect>(ShEfkInterface, MuzzleDir);
 		m_EfkHit = ObjectFactory::Create<EfkEffect>(ShEfkInterface, HitDir);
+		m_EfkJump = ObjectFactory::Create<EfkEffect>(ShEfkInterface, JumpDir);
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
@@ -389,7 +391,6 @@ namespace basecross {
 			//---------------------------------------ゴール
 		case goal:
 			m_animTime += _delta;
-			GetComponent<CollisionCapsule>()->SetUpdateActive(false);
 			//しばらく歩いてからエレベータに入ったところで180°振り向く
 			if (m_animTime > 0.0f && m_animTime <= 3.0f) {
 				SetAnim(L"Walk");
@@ -461,6 +462,18 @@ namespace basecross {
 	void Player::OnPushA() {
 		if (m_stateType == goal) return;	//立ち状態以外ではジャンプしない
 		if (m_isCarrying == true) return;	//敵を持った状態でもジャンプしない
+
+		//ジャンプ時のエフェクト
+		auto plPos = GetComponent<Transform>()->GetPosition();
+		plPos.y -= 4;
+		plPos.x += m_moveVel.x * _delta;
+		plPos.z += m_moveVel.z * _delta;
+		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+		m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkJump, plPos, 1);
+		m_EfkPlay[2]->SetScale(Vec3(.35f));
+
+		PlaySnd(L"PlayerJump", 1, 0);
+
 		m_moveVel.y = m_jumpHeight;
 		m_stateType = air;
 	}
@@ -661,7 +674,7 @@ namespace basecross {
 		auto plPos = GetComponent<Transform>()->GetPosition();
 		auto shPos = target->GetComponent<Transform>()->GetPosition();
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
+		m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
 
 		if (m_stateType == stand) {
 			m_stateType = hit_stand;
@@ -705,9 +718,9 @@ namespace basecross {
 
 		//エフェクトのプレイ
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkMuzzle, pos + firepos, 0.0f);
-		m_EfkPlay->SetRotation(Vec3(0, 1, 0), -face);
-		m_EfkPlay->SetScale(Vec3(.25f));
+		m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkMuzzle, pos + firepos, 0.0f);
+		m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
+		m_EfkPlay[0]->SetScale(Vec3(.25f));
 
 		//飛び道具発射
 		GetStage()->AddGameObject<FireProjectile>(pos + firepos, fwd, m_chargePerc);
