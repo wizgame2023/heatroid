@@ -37,11 +37,24 @@ namespace basecross {
 			m_PauseBack = AddGameObject<Sprite>(L"PauseBack", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
 			m_PauseBack->SetDrawLayer(3);
 
+			auto group = CreateSharedObjectGroup(L"Sprite");
+
+			m_SelectCharge = AddGameObject<SelectCharge>(L"PauseSelectCharge", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
+			m_SelectCharge->SetDrawLayer(4);
+			m_SelectCharge->AddTag(L"SelectCharge");
+
+			m_TitleCharge = AddGameObject<SelectCharge>(L"PauseTitleCharge", true, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
+			m_TitleCharge->SetDrawLayer(4);
+			m_TitleCharge->AddTag(L"TitleCharge");
+
 			m_pauseBackGround->SetDrawActive(false);
 			m_PauseSelect->SetDrawActive(false);
 			m_PauseTitle->SetDrawActive(false);
 			m_PauseBack->SetDrawActive(false);
+			m_SelectCharge->SetDrawActive(false);
+			m_TitleCharge->SetDrawActive(false);
 			PlayBGM(L"StageBGM");
+			m_soundFlg = true;
 
 		}
 		catch (...) {
@@ -118,8 +131,8 @@ namespace basecross {
 				m_PauseSelect->SetDrawActive(true);
 				m_PauseTitle->SetDrawActive(true);
 				m_PauseBack->SetDrawActive(true);
-				stageMane->m_SelectCharge->SetDrawActive(false);
-				stageMane->m_TitleCharge->SetDrawActive(false);
+				m_SelectCharge->SetDrawActive(false);
+				m_TitleCharge->SetDrawActive(false);
 				auto time = App::GetApp()->GetElapsedTime();
 				stageMane->SetPushState(0);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
@@ -133,24 +146,80 @@ namespace basecross {
 				}
 				if (cntlVec[0].wButtons & XINPUT_GAMEPAD_A || KeyState.m_bPushKeyTbl[VK_RETURN])
 				{
+					m_SelectCharge->SetDrawActive(true);
 					totaltime += time;
 					stageMane->SetPushState(1);
-					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
-					OnDestroy();
+					auto group = GetSharedObjectGroup(L"Sprite");
+					auto& vec = group->GetGroupVector();
+					if (m_soundFlg)
+					{
+						//PlaySE(L"ChargeSelect", 0, 1.0f);
+						m_soundFlg = false;
+					}
+
+					for (auto v : vec)
+					{
+						auto select = v.lock();
+						if (select->FindTag(L"SelectCharge"))
+						{
+							auto obj = dynamic_pointer_cast<SelectCharge>(select);
+							obj->ChargeUV(totaltime);
+						}
+					}
+
+					if (totaltime > 1.2f)
+					{
+
+						OnDestroy();
+						PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+					}
 				}
 				if (cntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_A || KeyState.m_bUpKeyTbl[VK_RETURN])
 				{
+					m_soundFlg = true;
+					totaltime = 0;
 					stageMane->SetPushState(0);
 				}
 				if (cntlVec[0].wButtons & XINPUT_GAMEPAD_B || KeyState.m_bPushKeyTbl[VK_SPACE])
 				{
-					stageMane->SetPushState(2);
+					m_TitleCharge->SetDrawActive(true);
 					totaltime += time;
-					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
-					OnDestroy();
+					stageMane->SetPushState(1);
+					auto group = GetSharedObjectGroup(L"Sprite");
+					auto& vec = group->GetGroupVector();
+
+					if (m_soundFlg)
+					{
+						//PlaySE(L"ChargeSelect", 0, 1.0f);
+						m_soundFlg = false;
+					}
+					m_soundFlg = false;
+
+					for (auto v : vec)
+					{
+						auto select = v.lock();
+						if (select->FindTag(L"TitleCharge"))
+						{
+							auto obj = dynamic_pointer_cast<SelectCharge>(select);
+							obj->ChargeUV(totaltime);
+						}
+					}
+					if (totaltime > 1.2f)
+					{
+						PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+						OnDestroy();
+					}
+				}
+				else if (cntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_B || KeyState.m_bUpKeyTbl[VK_SPACE])
+				{
+					m_soundFlg = true;
+					totaltime = 0;
+					stageMane->SetPushState(0);
 				}
 				if (cntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_B || KeyState.m_bUpKeyTbl[VK_BACK])
 				{
+
+					totaltime = 0;
 					stageMane->SetPushState(0);
 				}
 
@@ -160,14 +229,17 @@ namespace basecross {
 				m_PauseSelect->SetDrawActive(false);
 				m_PauseTitle->SetDrawActive(false);
 				m_PauseBack->SetDrawActive(false);
-				stageMane->m_SelectCharge->SetDrawActive(false);
-				stageMane->m_TitleCharge->SetDrawActive(false);
+				m_SelectCharge->SetDrawActive(false);
+				m_TitleCharge->SetDrawActive(false);
 				if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
 				{
 					auto obj = GetGameObjectVec();
 					for (auto object : obj)
 					{
-						object->SetUpdateActive(false);
+						if (!object->FindTag(L"SelectCharge") && !object->FindTag(L"TitleCharge"))
+						{
+							object->SetUpdateActive(false);
+						}
 					}
 					m_pause = true;
 				}
@@ -185,9 +257,18 @@ namespace basecross {
 		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
 	}
 
+	void GameStage::PauseEffect()
+	{
+
+	}
+
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{
 		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
+	}
+
+	void GameStage::PlaySE(wstring path, float loopcnt, float volume) {
+		m_ptrXA->Start(path, loopcnt, volume);
 	}
 
 	void GameStage::OnDestroy() {

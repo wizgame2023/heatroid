@@ -29,6 +29,7 @@ namespace basecross {
 
     public:
         bool m_pause = false;                          // ポーズ状態かどうかのフラグ
+        bool m_soundFlg = false;
         shared_ptr<EfkEffect> m_EfkEffect;             // エフェクトオブジェクト
         shared_ptr<EfkPlay> m_EfkPlay;                 // エフェクト実行オブジェクト
 
@@ -51,6 +52,9 @@ namespace basecross {
         // バックグラウンドミュージックを再生する
         void PlayBGM(const wstring& StageBGM);
 
+        // SEミュージックを再生する
+        void  PlaySE(wstring path, float loopcnt, float volume);
+
         // ゲームステージの破棄処理
         void OnDestroy();
 
@@ -62,6 +66,8 @@ namespace basecross {
 
         // エフェクトを再生する
         void EffectPlay();
+
+        void PauseEffect();
     };
 
 }

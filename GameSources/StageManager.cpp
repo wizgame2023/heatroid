@@ -9,8 +9,6 @@
 #include "StageManager.h"
 
 namespace basecross {
-
-
 	void StageManager::CreateViewLight()
 	{
 		m_OpeningCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
@@ -489,7 +487,7 @@ namespace basecross {
 			auto scene = app->GetScene<Scene>();
 			// mediaパスを取得
 			auto path = app->GetDataDirWString();
-			// texturesパスを取得
+			// CSVパスを取得
 			auto csvPath = path + L"CSV/";
 			m_StageName = scene->GetSelectedMap();
 			//CSVパスを取得
@@ -677,12 +675,6 @@ namespace basecross {
 		m_overSelectStage = GetStage()->AddGameObject<Sprite>(L"OverSelectStage", true, Vec2(400.0f, 300.0f), Vec3(-1000.0f, -200.0f, 0.0f));
 		m_overSelectStage->SetDrawLayer(4);
 
-		m_SelectCharge = GetStage()->AddGameObject<SelectCharge>(L"PauseSelectCharge", false, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
-		m_SelectCharge->SetDrawLayer(4);
-
-		m_TitleCharge = GetStage()->AddGameObject<SelectCharge>(L"PauseTitleCharge", false, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
-		m_TitleCharge->SetDrawLayer(4);
-
 		m_titleSprite->SetDrawActive(false);
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
@@ -690,8 +682,6 @@ namespace basecross {
 		m_clearSelectStage->SetDrawActive(false);
 		m_retryStageUI->SetDrawActive(false);
 		m_overSelectStage->SetDrawActive(false);
-		m_SelectCharge->SetDrawActive(false);
-		m_TitleCharge->SetDrawActive(false);
 		m_kakaeruUI->SetDrawActive(false);
 		m_blowUI->SetDrawActive(false);
 
