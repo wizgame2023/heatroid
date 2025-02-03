@@ -52,7 +52,7 @@ namespace basecross {
 		float elapsed = App::GetApp()->GetApp()->GetElapsedTime();
 		m_plungeTime -= elapsed;
 
-		if (!GetOverHeat() && m_stateType != wait) {
+		if (!GetOverHeat() && m_stateType != wait && m_stateType != throwAway) {
 			if (m_plungeTime >= 0.0f) {
 				EnemyAnime(L"spare");
 				SetState(m_attackState);

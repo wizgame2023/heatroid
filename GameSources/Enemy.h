@@ -69,6 +69,7 @@ namespace basecross {
 		Vec2 m_bulletDic;
 		//テスト用
 		float m_test;
+		float m_test2;
 
 		bool m_bulletFlag;   
 		bool m_jumpFlag;
@@ -162,6 +163,7 @@ namespace basecross {
 		void FallBullet();
 		void StraightXBullet();
 		void RapidFireBullet(int bulletNum);
+		void Throw();
 		void EnemyAnime(wstring anime);
 		void OverHeat();
 		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);

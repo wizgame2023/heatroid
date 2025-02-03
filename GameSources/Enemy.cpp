@@ -73,7 +73,9 @@ namespace basecross {
 		m_playerFlag(false),
 		m_overHeatSE(false),
 		m_plungeSE(false),
-		m_activeFlag(true)
+		m_activeFlag(true),
+		m_test(1.0f),
+		m_test2(0.5f)
 	{}
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
@@ -136,7 +138,9 @@ namespace basecross {
 		m_playerFlag(false),
 		m_overHeatSE(false),
 		m_plungeSE(false),
-		m_activeFlag(true)
+		m_activeFlag(true),
+		m_test(1.0f),
+		m_test2(0.5f)
 	{}
 
 	void Enemy::OnCreate() {
@@ -396,8 +400,17 @@ namespace basecross {
 				EnemyAnime(L"kaihi");
 				m_pos += shaft.normalize() * sinf(m_rad) * m_speed * 2.0f * elapsed;
 			}
+		//投げる
 		case throwAway:
-
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
+			PlayerDic();
+			m_pos.y += 0.25f;
+			m_pos -= m_speed * m_direcNorm * elapsed * 12.0f;
+			m_test2 -= elapsed;
+			if (m_test2 < 0.0f) {
+				SetState(m_overHeatState);
+				m_test2 = 0.5f;
+			}
 			break;
 		default:
 			break;
@@ -423,7 +436,7 @@ namespace basecross {
 
 		//アニメーションの実装
 		m_draw->UpdateAnimation(elapsed);
-		//Debug();
+		Debug();
 	}
 
 	//ジャンプ
@@ -464,41 +477,6 @@ namespace basecross {
 			m_trans->SetRotation(Vec3(0.0f, -m_angle + rad, 0.0f));
 		}
 	}
-	//敵の目の場所を設定
-	Vec3 Enemy::GetEyePos(const Vec3& eye) {
-		Vec3 pos = GetWorldPos();
-		Vec3 forward = m_trans->GetForward();
-		float face = atan2f(forward.z, forward.x);
-		Vec3 eyePos;
-		eyePos.x = (cosf(face) * eye.x) - (sinf(face) * eye.z);
-		eyePos.y = eye.y;
-		eyePos.z = (cosf(face) * eye.z) + (sinf(face) * eye.x);
-		eyePos = eyePos * m_scal / 2;
-		pos += eyePos;
-		return pos;
-	}
-	//オーバーヒート
-	void Enemy::OverHeat() {
-		float elapsed = App::GetApp()->GetElapsedTime();
-		if (m_heat >= m_maxHeat) {
-			m_stateType = m_overHeatState;
-			EffectPlay(m_heatEffect,m_pos,3);
-		}
-		if (m_heat > 0.0f) {
-			m_heat -= elapsed * 5;
-			m_efcTime -= elapsed;
-			//EffectPlay(m_heatEffect, m_pos, 3);
-			//if (m_efcTime <= 0.0f && m_heat >= 20.0f) {
-			//	EffectPlay(m_heatEffect, m_pos, 3);
-			//	m_efcTime = 2.0f;
-			//}
-			
-		}
-		else if (GetOverHeat()&&m_heat <= 0.0f) {
-			m_heat = 0.0f;
-			m_stateType = wait;
-		}
-	}
 
 	//ジャンプ
 	void Enemy::OneJump(float jumpHight) {
@@ -511,6 +489,34 @@ namespace basecross {
 		}
 
 	}
+	//ヒップドロップ
+	void Enemy::HitDrop() {
+		auto fixed = m_fixedBox.lock();
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		//ヒップドロップ中
+		if (m_hitDropFlag) {
+			if (fixed) {
+				Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
+				Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
+				//床に衝突した時
+				m_hitDropTime -= elapsed;
+				if (m_floorFlag) {
+					m_hitDropTime = m_maxHitDropTime;
+					m_hitDropFlag = false;
+					AddGrav(Vec3(0.0f, -m_jumpPower, 0.0f));
+					m_speed = m_maxSpeed;
+
+				}
+				if (m_hitDropTime <= 0) {
+					if (m_pos.y - m_scal.y / 2 + fixPos.y >= fixPos.y + fixScal.y / 2 + 0.01f) {
+						m_pos.y += -m_maxSpeed * 5 * elapsed;
+						m_speed = m_maxSpeed * 5;
+					}
+				}
+			}
+		}
+	}
+
 	//プレイヤーに突っ込む
 	void Enemy::Plunge() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
@@ -560,6 +566,76 @@ namespace basecross {
 			}
 
 		}
+	}
+	//オーバーヒート
+	void Enemy::OverHeat() {
+		float elapsed = App::GetApp()->GetElapsedTime();
+		if (m_heat >= m_maxHeat) {
+			m_stateType = m_overHeatState;
+			EffectPlay(m_heatEffect, m_pos, 3);
+		}
+		if (m_heat > 0.0f) {
+			m_heat -= elapsed * 5;
+			m_efcTime -= elapsed;
+			//EffectPlay(m_heatEffect, m_pos, 3);
+			//if (m_efcTime <= 0.0f && m_heat >= 20.0f) {
+			//	EffectPlay(m_heatEffect, m_pos, 3);
+			//	m_efcTime = 2.0f;
+			//}
+
+		}
+		else if (GetOverHeat() && m_heat <= 0.0f) {
+			m_heat = 0.0f;
+			m_stateType = wait;
+		}
+	}
+	//持つときの処理
+	void Enemy::Grab() {
+		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
+		auto elapsed = App::GetApp()->GetElapsedTime();
+
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (cntlVec[0].bConnected) {
+			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+				m_pGrabFlag = false;
+			}
+		}
+		else if (keyState.m_bUpKeyTbl['Q'] == true) {
+			m_pGrabFlag = false;
+		}
+		//if (!(dynamic_pointer_cast<PlayerGrab>(GetComponent<Transform>()->GetParent()))) {
+
+		//	m_pGrabFlag = false;
+		//}
+		if (m_pGrabFlag) {
+			m_floorFlag = false;
+			auto pGrab = m_playerGrab.lock();
+			if (!pGrab) return;
+			auto grabTrans = pGrab->GetComponent<Transform>();
+			//m_trans->SetParent(pGrab);
+			//m_pos = Vec3(0.0f, 0.0f, 0.0f);
+			//m_trans->SetPosition(m_pos);
+			if (m_EfkPlayer[2]) {
+				m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
+			}
+			m_test -= elapsed;
+			if (m_test < 0.0f) {
+				SetState(throwAway);
+				m_test = 1.0f;
+				m_pGrabFlag = false;
+			}
+		}
+		else {
+			if (m_EfkPlayer[2]) {
+				m_EfkPlayer[2]->SetLocation(GetWorldPos());
+			}
+
+			//m_trans->ClearParent();
+		}
+	}
+
+	void Enemy::Throw() {
 
 	}
 	//弾の発射
@@ -620,33 +696,6 @@ namespace basecross {
 
 	}
 
-	//ヒップドロップ
-	void Enemy::HitDrop() {
-		auto fixed = m_fixedBox.lock();
-		auto elapsed = App::GetApp()->GetElapsedTime();
-		//ヒップドロップ中
-		if (m_hitDropFlag) {
-			if (fixed) {
-				Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
-				Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
-				//床に衝突した時
-				m_hitDropTime -= elapsed;
-				if (m_floorFlag) {
-					m_hitDropTime = m_maxHitDropTime;
-					m_hitDropFlag = false;
-					AddGrav(Vec3(0.0f, -m_jumpPower, 0.0f));
-					m_speed = m_maxSpeed;
-
-				}
-				if (m_hitDropTime <= 0) {
-					if (m_pos.y - m_scal.y / 2 + fixPos.y >= fixPos.y + fixScal.y / 2 + 0.01f) {
-						m_pos.y += -m_maxSpeed * 5 * elapsed;
-						m_speed = m_maxSpeed * 5;
-					}
-				}
-			}
-		}
-	}
 	//床に触れたら取得
 	void Enemy::FindFixed() {
 		auto fixed = m_fixedBox.lock();
@@ -701,45 +750,6 @@ namespace basecross {
 		m_floorCol->ThisDestroy();
 	}
 
-	//持つときの処理
-	void Enemy::Grab() {
-		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
-
-		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (cntlVec[0].bConnected) {
-			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-				m_pGrabFlag = false;
-			}
-		}
-		else if (keyState.m_bUpKeyTbl['Q'] == true) {
-			m_pGrabFlag = false;
-		}
-		//if (!(dynamic_pointer_cast<PlayerGrab>(GetComponent<Transform>()->GetParent()))) {
-
-		//	m_pGrabFlag = false;
-		//}
-		if (m_pGrabFlag) {
-			m_floorFlag = false;
-			auto pGrab = m_playerGrab.lock();
-			if(!pGrab) return;
-			auto grabTrans = pGrab->GetComponent<Transform>();
-			//m_trans->SetParent(pGrab);
-			//m_pos = Vec3(0.0f, 0.0f, 0.0f);
-			//m_trans->SetPosition(m_pos);
-			if (m_EfkPlayer[2]) {
-				m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
-			}
-
-		}
-		else {
-			if (m_EfkPlayer[2]) {
-				m_EfkPlayer[2]->SetLocation(GetWorldPos());
-			}
-
-			//m_trans->ClearParent();
-		}
-	}
 	//衝突判定
 	void Enemy::OnCollisionEnter(shared_ptr<GameObject>& other) {
 		if (other->FindTag(L"Player")) {
@@ -846,6 +856,20 @@ namespace basecross {
 		m_EfkPlayer[num - 1]->SetScale(scale);
 		m_EfkPlayer[num - 1]->SetAllColor(Col4(1.0f));
 	}
+	//敵の目の場所を設定
+	Vec3 Enemy::GetEyePos(const Vec3& eye) {
+		Vec3 pos = GetWorldPos();
+		Vec3 forward = m_trans->GetForward();
+		float face = atan2f(forward.z, forward.x);
+		Vec3 eyePos;
+		eyePos.x = (cosf(face) * eye.x) - (sinf(face) * eye.z);
+		eyePos.y = eye.y;
+		eyePos.z = (cosf(face) * eye.z) + (sinf(face) * eye.x);
+		eyePos = eyePos * m_scal / 2;
+		pos += eyePos;
+		return pos;
+	}
+
 	//デバック
 	void Enemy::Debug() {
 		auto& keyState = App::GetApp()->GetInputDevice().GetKeyState();
@@ -861,9 +885,7 @@ namespace basecross {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		auto scene = App::GetApp()->GetScene<Scene>();
 		wstringstream wss(L"");
-		wss << L"damage : "
-			<< m_heat
-			<< L"\nfps : "
+		wss	<< L"\nfps : "
 			<< fps
 			<< L"\nstate : "
 			<< m_stateType
@@ -876,20 +898,6 @@ namespace basecross {
 			<<m_pos.z
 			<< L"\nfloor : "
 			<< m_floorFlag
-			<< L"\nhipDrop : "
-			<< m_hitDropFlag
-			<< L"\ntest : "
-			<< m_test
-			<<L"\n changePos : "
-			<<GetWorldPos().y
-			<<L"\ngrav : "
-			<<m_grav.y
-			<<L"\nOverHeat : "
-			<< GetOverHeat()
-			<<L"\nheat"
-			<< m_heat
-			<<L"\n"
-			<< m_beforePos.length()
 			<< endl;
 		scene->SetDebugString(wss.str());
 
