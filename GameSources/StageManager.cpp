@@ -645,6 +645,17 @@ namespace basecross {
 	{
 	}
 
+	void StageManager::EnemyUpdate()
+	{
+		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+		auto& vec = group->GetGroupVector();
+		for (auto v : vec)
+		{
+			auto shObj = v.lock();
+			auto Ray = dynamic_pointer_cast<Enemy>(shObj);
+		}
+	}
+
 	void StageManager::CreateSprite()
 	{
 
@@ -1022,11 +1033,12 @@ namespace basecross {
 		auto enemyGroup = stage->GetSharedObjectGroup(L"Enemy");
 		auto& enemyVec = enemyGroup->GetGroupVector();
 
-		stage->CreateSharedObjectGroup(L"Line");
+		auto gruop = stage->CreateSharedObjectGroup(L"Line");
 		for (auto v : enemyVec) {
 			auto shObj = v.lock();
 			auto enemyObj = dynamic_pointer_cast<Enemy>(shObj);
-			stage->AddGameObject<RayMark>(player, enemyObj);
+			auto Ray = stage->AddGameObject<RayMark>(player, enemyObj);
+			gruop->IntoGroup(Ray);
 			//デバック用
 			//auto line = AddGameObject<LineObject>(player, enemyObj);
 			//line->SetLineColor(Col4(1.0f, 0.0f, 0.0f, 1.0f), Col4(0.0f, 0.0f, 1.0f, 1.0f));
