@@ -29,7 +29,8 @@ namespace basecross {
 			bullet,    //’e‚ğŒ‚‚Á‚Ä‚­‚é
 			bulletMove,//‰¡‚Ì“®‚«‚¾‚¯‚Â‚¢‚Ä‚«‚Ä’e‚ğŒ‚‚Â
 			wait,      //—§‚¿ã‚ª‚é
-			slide
+			slide,     //¶‰E‚ÉˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Â
+			throwAway, //“Š‚°‚ç‚ê‚é
 		};
 
 		
@@ -80,6 +81,8 @@ namespace basecross {
 		bool m_playerFlag;
 		bool m_overHeatSE;
 		bool m_plungeSE;
+
+		bool m_activeFlag;
 
 		wstring m_meshName;
 
@@ -182,6 +185,8 @@ namespace basecross {
 		bool GetOverHeat();
 		void SetPlungeFlag(bool flag);
 		void SetBulletDirec(Vec2 direc);
+		bool GetActiveFlag();
+		void SetActiveFlag(bool flag);
 
 	protected:
 		//d—Í‚ÉŠÖ‚·‚éŠÖ”
@@ -293,6 +298,8 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class EnemyFloorCol : public GameObject {
 	private:
+		float m_posHight;
+		float m_plusScale;
 		Vec3 m_pos;
 		Vec3 m_enemyPos;
 		Vec3 m_enemyScal;
@@ -312,6 +319,7 @@ namespace basecross {
 		virtual void OnCollisionExit(shared_ptr<GameObject>& other);
 		void ThisDestroy();
 		bool GetPlayerFlag();
+		void SetPosHight(float hight);
 	};
 
 }

@@ -9,8 +9,6 @@
 #include "StageManager.h"
 
 namespace basecross {
-
-
 	void StageManager::CreateViewLight()
 	{
 		m_OpeningCameraView = ObjectFactory::Create<SingleView>(GetTypeStage<GameStage>());
@@ -96,6 +94,8 @@ namespace basecross {
 
 	void StageManager::CreateFixedBox()
 	{
+		GetStage()->CreateSharedObjectGroup(L"Wall");
+
 		//CSVの行単位の配列
 		vector<wstring> LineVec;
 		//0番目のカラムがL"FixedBox"である行を抜き出す
@@ -156,7 +156,8 @@ namespace basecross {
 			auto PtrWall = GetStage()->AddGameObject<TilingFixedBox>(Pos, Rot, Scale, Scale.x, Scale.y, Tokens[10]);
 			PtrWall->AddTag(L"Wall");
 			PtrWall->GetComponent<PNTStaticDraw>()->SetOwnShadowActive(true);
-
+			auto group = GetStage()->GetSharedObjectGroup(L"Wall");
+			group->IntoGroup(PtrWall);
 		}
 		m_GameStage.GetSelect(LineVec, 0, L"GoalFloor");
 		for (auto& v : LineVec) {
@@ -486,7 +487,7 @@ namespace basecross {
 			auto scene = app->GetScene<Scene>();
 			// mediaパスを取得
 			auto path = app->GetDataDirWString();
-			// texturesパスを取得
+			// CSVパスを取得
 			auto csvPath = path + L"CSV/";
 			m_StageName = scene->GetSelectedMap();
 			//CSVパスを取得
@@ -571,16 +572,7 @@ namespace basecross {
 			}
 			if (m_CameraSelect == CameraSelect::myCamera)
 			{
-				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
-				auto& vec = group->GetGroupVector();
-				for (auto v : vec)
-				{
-					auto shObj = v.lock();
-					if (shObj->GetUpdateActive() == false)
-					{
-						shObj->SetUpdateActive(true);
-					}
-				}
+				EnemyUpdate();
 				UImake();
 				GoalJudge();
 				GameOverJudge();
@@ -617,16 +609,7 @@ namespace basecross {
 			}
 			if (m_CameraSelect == CameraSelect::myCamera)
 			{
-				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
-				auto& vec = group->GetGroupVector();
-				for (auto v : vec)
-				{
-					auto shObj = v.lock();
-					if (shObj->GetUpdateActive() == false)
-					{
-						shObj->SetUpdateActive(true);
-					}
-				}
+				EnemyUpdate();
 				UImake();
 				GoalJudge();
 				GameOverJudge();
@@ -642,6 +625,24 @@ namespace basecross {
 
 	void StageManager::OnDraw()
 	{
+	}
+
+	void StageManager::EnemyUpdate()
+	{
+		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
+		auto& vec = group->GetGroupVector();
+		for (auto v : vec)
+		{
+			auto shObj = v.lock();
+			auto Ray = dynamic_pointer_cast<Enemy>(shObj);
+			if (Ray->GetActiveFlag() == false)
+			{
+				Ray->SetUpdateActive(false);
+			}
+			else {
+				Ray->SetUpdateActive(true);
+			}
+		}
 	}
 
 	void StageManager::CreateSprite()
@@ -674,12 +675,6 @@ namespace basecross {
 		m_overSelectStage = GetStage()->AddGameObject<Sprite>(L"OverSelectStage", true, Vec2(400.0f, 300.0f), Vec3(-1000.0f, -200.0f, 0.0f));
 		m_overSelectStage->SetDrawLayer(4);
 
-		m_SelectCharge = GetStage()->AddGameObject<SelectCharge>(L"PauseSelectCharge", false, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
-		m_SelectCharge->SetDrawLayer(4);
-
-		m_TitleCharge = GetStage()->AddGameObject<SelectCharge>(L"PauseTitleCharge", false, Vec2(640.0f, 400.0f), Vec3(0.0f, 0.0f, 0.0f));
-		m_TitleCharge->SetDrawLayer(4);
-
 		m_titleSprite->SetDrawActive(false);
 		m_TextDraw->SetDrawActive(false);
 		m_SpriteDraw->SetDrawActive(false);
@@ -687,8 +682,6 @@ namespace basecross {
 		m_clearSelectStage->SetDrawActive(false);
 		m_retryStageUI->SetDrawActive(false);
 		m_overSelectStage->SetDrawActive(false);
-		m_SelectCharge->SetDrawActive(false);
-		m_TitleCharge->SetDrawActive(false);
 		m_kakaeruUI->SetDrawActive(false);
 		m_blowUI->SetDrawActive(false);
 
@@ -1021,6 +1014,25 @@ namespace basecross {
 			else {
 				m_kakaeruUI->SetDrawActive(false);
 			}
+		}
+	}
+	void StageManager::EnemyRay() {
+		auto stage = GetStage();
+		auto player = stage->GetSharedGameObject<Player>(L"Player");
+		auto enemyGroup = stage->GetSharedObjectGroup(L"Enemy");
+		auto& enemyVec = enemyGroup->GetGroupVector();
+
+		auto gruop = stage->CreateSharedObjectGroup(L"Line");
+		for (auto v : enemyVec) {
+			auto shObj = v.lock();
+			auto enemyObj = dynamic_pointer_cast<Enemy>(shObj);
+			auto Ray = stage->AddGameObject<RayMark>(player, enemyObj);
+			gruop->IntoGroup(Ray);
+			//デバック用
+			//auto line = AddGameObject<LineObject>(player, enemyObj);
+			//line->SetLineColor(Col4(1.0f, 0.0f, 0.0f, 1.0f), Col4(0.0f, 0.0f, 1.0f, 1.0f));
+			//auto group = GetSharedObjectGroup(L"Line");
+			//group->IntoGroup(line);
 		}
 	}
 }

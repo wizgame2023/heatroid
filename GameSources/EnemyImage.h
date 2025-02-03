@@ -11,9 +11,9 @@ namespace basecross {
 	class Square : public GameObject{
 
 	protected:
-		float m_width;
-		float m_height;
-		float m_ratio;
+		float m_width;    //表示スクエアの横幅
+		float m_height;   //　　　　〃　　縦幅
+		float m_posHight; //表示の高さ
 
 		float m_test;
 		Vec3 m_pos;
@@ -42,6 +42,7 @@ namespace basecross {
 		void ThisDestroy();
 		Quat RotCorrection(const Vec3& Line);
 		void Debug();
+		void SetPosHight(float hight);
 	};
 
 

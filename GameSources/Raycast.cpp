@@ -22,6 +22,8 @@ namespace basecross {
 		m_player(player),
 		m_enemy(enemy),
 		m_direc(0.0f),
+		m_startPos(Vec3(0.0f)),
+		m_endPos(Vec3(0.0f)),
 		m_startColor(Col4(1.0f)),
 		m_endColor(Col4(1.0f))
 	{}
@@ -49,8 +51,21 @@ namespace basecross {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 
-		SetLinePosition(player->GetComponent<Transform>()->GetPosition(), enemy->GetWorldPos());
+		SetLinePosition(player->GetComponent<Transform>()->GetPosition(), LinePos(Vec3(0.0f,3.0f,0.0f)));
 		
+	}
+	Vec3 LineObject::LinePos(Vec3 pos) {
+		auto enemy = m_enemy.lock();
+		if (enemy) {
+			Vec3 enemyPos = enemy->GetWorldPos();
+			Vec3 forward = enemy->GetComponent<Transform>()->GetForward();
+			float face = atan2f(forward.z, forward.x);
+			Vec3 linePos;
+			linePos.x = (cosf(face) * pos.x) - (sinf(face) * pos.z);
+			linePos.y = pos.y;
+			linePos.z = (cosf(face) * pos.z) + (sinf(face) * pos.x);
+			return enemyPos +linePos;
+		}
 	}
 
 	//頂点の更新
@@ -90,17 +105,32 @@ namespace basecross {
 	Vec3 LineObject::GetDirec() {
 		return m_direc;
 	}
+	//--------------------------------------------------------------------------------------
+	//	class RayMark : public GameObject; //衝突したときの表示されるオブジェクト
+	//--------------------------------------------------------------------------------------
 
 	RayMark::RayMark(const shared_ptr<Stage>& stage
 	):
 		GameObject(stage)
 	{}
+	RayMark::RayMark(const shared_ptr<Stage>& stage,
+		const shared_ptr<Player>& player,
+		const shared_ptr<Enemy>& enemy
+	) :
+		GameObject(stage),
+		m_player(player),
+		m_enemy(enemy),
+		m_wallCnt(0),
+		m_activeFlag(false)
+	{}
+
 	void RayMark::OnCreate() {
-		auto draw = AddComponent<PCStaticDraw>();
-		draw->SetMeshResource(L"DEFAULT_SPHERE");
+		m_draw = AddComponent<PNTStaticDraw>();
+		m_draw->SetMeshResource(L"DEFAULT_SPHERE");
 		Col4 color(0.0f, 0.0f, 1.0f, 0.4f);
-		draw->SetDiffuse(color);
-		
+		m_draw->SetDiffuse(color);
+		m_draw->SetEmissive(color);
+		m_draw->SetDrawActive(false);
 		SetAlphaActive(true);
 
 		m_trans = GetComponent<Transform>();
@@ -108,29 +138,114 @@ namespace basecross {
 	}
 	void RayMark::OnUpdate() {
 		auto stage = GetStage();
+
+		//必要な変数の宣言
 		Vec3 pos = Vec3(0.0f);
-		auto target = stage->GetSharedGameObject<Player>(L"Player");
-		auto line = stage->GetSharedGameObject<LineObject>(L"Line");
-
-		Vec3 rayStart = line->GetStartPos();
-		Vec3 rayEnd = line->GetEndPos();
-		Vec3 crossPos;
-
+		Vec3 rayStart;
+		Vec3 rayEnd;
+		Vec3 enemyCrossPos;
+		Vec3 objCrossPos;
 		TRIANGLE triangle;
 		size_t triangleIndex;
 
-		auto draw = target->GetComponent<PNTStaticDraw>();
-		m_hitFlag = draw->HitTestStaticMeshSegmentTriangles(rayStart, rayEnd, crossPos, triangle, triangleIndex);
+		//プレイヤー
+		auto player = m_player.lock();
+		if (!player) return;
+		rayStart = player->GetComponent<Transform>()->GetPosition(); //レイを飛ばす始点
 
-		if (m_hitFlag) {
-			pos = crossPos;
+		//レイを飛ばす
+		//敵
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
+		auto enemyDraw = enemy->GetComponent<PNTBoneModelDraw>();
+		rayEnd = enemyPos(Vec3(0.0f,3.0f,0.0f));		             //レイを飛ばす終点
+		//当たっているかのフラグ
+		m_hitEnemyFlag = enemyDraw->HitTestStaticMeshSegmentTriangles
+		(rayStart, rayEnd, enemyCrossPos, triangle, triangleIndex);
+
+		//壁
+		auto wallGroup = GetStage()->GetSharedObjectGroup(L"Wall");
+		auto& wallVec = wallGroup->GetGroupVector();
+		for (auto v : wallVec) {
+			auto walls = v.lock();
+			auto wallDraw = walls->GetComponent<PNTStaticDraw>();
+			//すべての壁をチェック、レイがあったていたらtrue
+			m_hitWallFlag.push_back(wallDraw->HitTestStaticMeshSegmentTriangles
+			(rayStart, rayEnd, objCrossPos, triangle, triangleIndex));
+		}
+		for (int i = 0; i < m_hitWallFlag.size(); i++) {
+			if (!m_hitWallFlag[i]) {
+				m_wallCnt++;
+			}
+		}
+
+		//ドア
+		auto doorGroup = GetStage()->GetSharedObjectGroup(L"Door");
+		auto& doorVec = doorGroup->GetGroupVector();
+		for (auto v : doorVec) {
+			auto doors = v.lock();
+			auto doorDraw = doors->GetComponent<PNTStaticDraw>();
+			m_hitDoorFlag.push_back(doorDraw->HitTestStaticMeshSegmentTriangles
+			(rayStart, rayEnd, objCrossPos, triangle, triangleIndex));
+		}
+		for (int i = 0; i < doorVec.size(); i++) {
+			if (!m_hitDoorFlag[i]) {
+				m_doorCnt++;
+			}
+		}
+
+
+		//壁かドアにあたっているか
+		if (m_wallCnt == m_hitWallFlag.size() && m_doorCnt == m_hitDoorFlag.size()) {
+			m_activeFlag = true;
+			m_wallCnt = 0;
+			m_doorCnt = 0;
+			m_hitWallFlag.clear();
+			m_hitDoorFlag.clear();
+		}
+		else {
+			m_activeFlag = false;
+			m_wallCnt = 0;
+			m_doorCnt = 0;
+			m_hitWallFlag.clear();
+			m_hitDoorFlag.clear();
+		}
+		enemy->SetActiveFlag(m_activeFlag);
+
+		//デバック用
+		//当たっている場所の描画
+		if (m_hitEnemyFlag) {
+			pos = enemyCrossPos;
 		}
 		m_trans->SetPosition(pos);
+		//m_draw->SetDrawActive(m_activeFlag);
 	}
-	void RayMark::OnDraw() {
-		if (m_hitFlag) {
-			GameObject::OnDraw();
+
+	//レイを飛ばす位置の調整
+	Vec3 RayMark::enemyPos(Vec3 pos) {
+		auto enemy = m_enemy.lock();
+		if (enemy) {
+			Vec3 enemyPos = enemy->GetWorldPos();
+			Vec3 forward = enemy->GetComponent<Transform>()->GetForward();
+			float face = atan2f(forward.z, forward.x);
+			Vec3 linePos;
+			linePos.x = (cosf(face) * pos.x) - (sinf(face) * pos.z);
+			linePos.y = pos.y;
+			linePos.z = (cosf(face) * pos.z) + (sinf(face) * pos.x);
+			return enemyPos + linePos;
 		}
+	}
+	bool RayMark::GetActiveFlag() {
+		return m_activeFlag;
+	}
+
+	void RayMark::Debug() {
+		auto scene = App::GetApp()->GetScene<Scene>();
+		wstringstream wss(L"");
+		wss << L"Wall : "
+			<< endl;
+		scene->SetDebugString(wss.str());
+
 	}
 }
 

@@ -21,7 +21,8 @@ namespace basecross {
 		m_meshName(meshName),
 		m_color(color),
 		m_enemy(enemy),
-		m_pos(pos)
+		m_pos(pos),
+		m_posHight(0.0f)
 	{}
 	
 	void Square::OnCreate() {
@@ -71,14 +72,14 @@ namespace basecross {
 			m_draw->SetDrawActive(false);
 
 		}
-	
+		m_posHight = enemy->GetComponent<Transform>()->GetScale().y * 2.0f;
 	}
 	void Square::OnUpdate() {
 		auto enemy = m_enemy.lock();
 		if (enemy) {
 			Vec3 enemyScal = enemy->GetComponent<Transform>()->GetScale();
 			m_pos = enemy->GetWorldPos();
-			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + enemyScal.y * 1.5, m_pos.z));
+			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + m_posHight, m_pos.z));
 			
 			//オーバーヒートの時のみ表示
 			if (enemy->GetOverHeat()) {
@@ -117,6 +118,9 @@ namespace basecross {
 	void Square::ThisDestroy() {
 		auto stage = GetStage();
 		stage->RemoveGameObject<Square>(GetThis<Square>());
+	}
+	void Square::SetPosHight(float hight) {
+		m_posHight = hight;
 	}
 	//デバック用
 	void Square::Debug() {

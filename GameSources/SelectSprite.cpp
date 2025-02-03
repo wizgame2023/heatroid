@@ -35,6 +35,7 @@ namespace basecross{
 	{}
 	void SelectSprite::OnCreate() {
 		auto stage = GetStage();
+		m_selectNum = App::GetApp()->GetScene<Scene>()->m_select;
 		PosSetting();
 		m_maxPos = Vec2(m_pos.x + (m_widthNum - 1) * -m_widthSpace,
 			m_pos.y + (m_heightNum - 1) * m_heightSpace);
@@ -56,15 +57,16 @@ namespace basecross{
 				}
 			}
 		}
+		m_selectPos = Vec3(m_pos.x, m_pos.y + m_heightSpace * m_selectNum, 0.0f);
 		m_selectSprite = stage->AddGameObject<GameSprite>
-			(m_wSize, m_hSize, L"SelectFram", Vec3(m_pos), Col4(0.0f, 1.0f, 1.0f, 0.5f));
+			(m_wSize, m_hSize, L"SelectFram", m_selectPos, Col4(0.0f, 1.0f, 1.0f, 0.5f));
 		m_selectSprite->SetDrawLayer(2);
-		m_selectPos = Vec3(m_pos.x, m_pos.y+m_heightSpace, 0.0f);
 		m_titleText = stage->AddGameObject<GameSprite>(800, 150, L"SelectTitle", Vec3(m_pos.x+70,m_pos.y,m_pos.z));
 		m_titleText->SetDrawLayer(3);
-		
+		//m_selectSprite->SetDrawActive(false);
 	}
 	void SelectSprite::OnUpdate() {
+		//m_selectNum = App::GetApp()->GetScene<Scene>()->m_select + 1;
 		auto selectTrans = m_selectSprite->GetComponent<Transform>();
 		Decision();
 		StickSelect();

@@ -134,6 +134,9 @@ namespace basecross {
 
         void UImake();
 
+        //プレイヤーから敵に飛ばすレイ
+        void EnemyRay();
+
         // 構築と破棄
         StageManager(const shared_ptr<Stage>& stage) :
             GameObject(stage)
@@ -150,6 +153,8 @@ namespace basecross {
 
         // 描画処理
         virtual void OnDraw() override;
+
+        void EnemyUpdate();
 
         // エフェクトインターフェイスを取得する
         shared_ptr<EfkInterface> GetEfkInterface() const {
