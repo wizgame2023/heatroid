@@ -572,16 +572,7 @@ namespace basecross {
 			}
 			if (m_CameraSelect == CameraSelect::myCamera)
 			{
-				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
-				auto& vec = group->GetGroupVector();
-				for (auto v : vec)
-				{
-					auto shObj = v.lock();
-					if (shObj->GetUpdateActive() == false)
-					{
-						shObj->SetUpdateActive(true);
-					}
-				}
+				EnemyUpdate();
 				UImake();
 				GoalJudge();
 				GameOverJudge();
@@ -618,16 +609,7 @@ namespace basecross {
 			}
 			if (m_CameraSelect == CameraSelect::myCamera)
 			{
-				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
-				auto& vec = group->GetGroupVector();
-				for (auto v : vec)
-				{
-					auto shObj = v.lock();
-					if (shObj->GetUpdateActive() == false)
-					{
-						shObj->SetUpdateActive(true);
-					}
-				}
+				EnemyUpdate();
 				UImake();
 				GoalJudge();
 				GameOverJudge();
@@ -653,6 +635,13 @@ namespace basecross {
 		{
 			auto shObj = v.lock();
 			auto Ray = dynamic_pointer_cast<Enemy>(shObj);
+			if (Ray->GetActiveFlag() == false)
+			{
+				Ray->SetUpdateActive(false);
+			}
+			else {
+				Ray->SetUpdateActive(true);
+			}
 		}
 	}
 
