@@ -82,6 +82,7 @@ namespace basecross {
 		bool m_playerFlag;
 		bool m_overHeatSE;
 		bool m_plungeSE;
+		bool m_throwFlag;
 
 		bool m_activeFlag;
 
@@ -163,7 +164,7 @@ namespace basecross {
 		void FallBullet();
 		void StraightXBullet();
 		void RapidFireBullet(int bulletNum);
-		void Throw();
+		void AroundOverHeat();
 		void EnemyAnime(wstring anime);
 		void OverHeat();
 		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
@@ -189,6 +190,8 @@ namespace basecross {
 		void SetBulletDirec(Vec2 direc);
 		bool GetActiveFlag();
 		void SetActiveFlag(bool flag);
+		void PlayOverHeat();
+		void SetThrowFlag(bool flag);
 
 	protected:
 		//èdóÕÇ…ä÷Ç∑ÇÈä÷êî

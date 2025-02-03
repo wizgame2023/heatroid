@@ -74,6 +74,7 @@ namespace basecross {
 		m_overHeatSE(false),
 		m_plungeSE(false),
 		m_activeFlag(true),
+		m_throwFlag(false),
 		m_test(1.0f),
 		m_test2(0.5f)
 	{}
@@ -139,6 +140,7 @@ namespace basecross {
 		m_overHeatSE(false),
 		m_plungeSE(false),
 		m_activeFlag(true),
+		m_throwFlag(false),
 		m_test(1.0f),
 		m_test2(0.5f)
 	{}
@@ -411,6 +413,7 @@ namespace basecross {
 				SetState(m_overHeatState);
 				m_test2 = 0.5f;
 			}
+			AroundOverHeat();
 			break;
 		default:
 			break;
@@ -573,6 +576,10 @@ namespace basecross {
 		if (m_heat >= m_maxHeat) {
 			m_stateType = m_overHeatState;
 			EffectPlay(m_heatEffect, m_pos, 3);
+			if (!m_overHeatSE) {
+				PlaySE(L"OverHeatSE",5.0f);
+				m_overHeatSE = true;
+			}
 		}
 		if (m_heat > 0.0f) {
 			m_heat -= elapsed * 5;
@@ -619,11 +626,18 @@ namespace basecross {
 			if (m_EfkPlayer[2]) {
 				m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
 			}
-			m_test -= elapsed;
-			if (m_test < 0.0f) {
-				SetState(throwAway);
-				m_test = 1.0f;
-				m_pGrabFlag = false;
+			//m_test -= elapsed;
+			//if (m_test < 0.0f) {
+			//	SetState(throwAway);
+			//	m_test = 1.0f;
+			//	m_pGrabFlag = false;
+			//}
+			if (cntlVec[0].bConnected) {
+				if (pad[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && pad[0].wButtons & XINPUT_GAMEPAD_B) {
+					SetState(throwAway);
+					m_test = 1.0f;
+					m_pGrabFlag = false;
+				}
 			}
 		}
 		else {
@@ -634,8 +648,22 @@ namespace basecross {
 			//m_trans->ClearParent();
 		}
 	}
+	//周りもオーバーヒートする
+	void Enemy::AroundOverHeat() {
+		auto stage = GetStage();
+		auto enemyGroup = stage->GetSharedObjectGroup(L"Enemy");
+		auto& enemyVec = enemyGroup->GetGroupVector();
 
-	void Enemy::Throw() {
+		for (auto v : enemyVec) {
+			auto shObj = v.lock();
+			auto enemyObj = dynamic_pointer_cast<Enemy>(shObj);
+			auto shEnemyPos = enemyObj->GetWorldPos();
+			auto dic = GetWorldPos() - shEnemyPos;
+			if (dic.length() < 10 && enemyObj != GetThis<Enemy>()) {
+				enemyObj->PlayOverHeat();
+				enemyObj->SetState(m_overHeatState);
+			}
+		}
 
 	}
 	//弾の発射
@@ -770,12 +798,13 @@ namespace basecross {
 					Switchs->SetButton(true);
 				}
 			}
+			m_activeFlag = true;
 		}
 		if (other->FindTag(L"Attack")) {
 			m_deathPos = m_pos;
-			m_heat = m_maxHeat;
+			PlayOverHeat();
 			if (!m_overHeatSE) {
-				PlaySE(L"OverHeatSE",5.0f);
+				//PlaySE(L"OverHeatSE",5.0f);
 				m_overHeatSE = true;
 			}
 		}
@@ -804,6 +833,7 @@ namespace basecross {
 					Switchs->SetButton(false);
 				}
 			}
+			m_activeFlag = false;
 		}
 		if (other->FindTag(L"Player")) {
 			m_playerFlag = false;
@@ -828,6 +858,7 @@ namespace basecross {
 					Switchs->SetButton(true);
 				}
 			}
+			m_activeFlag = true;
 		}
 
 		if (other->FindTag(L"Player")) {
@@ -885,7 +916,7 @@ namespace basecross {
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		auto scene = App::GetApp()->GetScene<Scene>();
 		wstringstream wss(L"");
-		wss	<< L"\nfps : "
+		wss << L"\nfps : "
 			<< fps
 			<< L"\nstate : "
 			<< m_stateType
@@ -893,11 +924,13 @@ namespace basecross {
 			<< L"x "
 			<< m_pos.x
 			<< L"\n y "
-			<<m_pos.y
-			<<L"\n z "
-			<<m_pos.z
+			<< m_pos.y
+			<< L"\n z "
+			<< m_pos.z
 			<< L"\nfloor : "
 			<< m_floorFlag
+			<< L"\nActive"
+			<< m_activeFlag
 			<< endl;
 		scene->SetDebugString(wss.str());
 
@@ -989,6 +1022,12 @@ namespace basecross {
 	}
 	void Enemy::SetActiveFlag(bool flag) {
 		m_activeFlag = flag;
+	}
+	void Enemy::PlayOverHeat() {
+		m_heat = m_maxHeat;
+	}
+	void Enemy::SetThrowFlag(bool flag) {
+		m_throwFlag = flag;
 	}
 
 	//--------------------------------------------------------------------------------------
