@@ -723,9 +723,13 @@ namespace basecross {
 
 	//飛び道具を発射
 	void Player::Projectile() {
-		//敵運搬中は無効
-		if (m_isCarrying == true) return;
 		Charging(false);
+		//敵運搬中の処理
+		if (m_isCarrying == true) {
+			m_pGrab.lock()->ThrowTarget(m_chargePerc);
+			ResetCharge();
+			return;
+		}
 
 		//位置・回転周りの処理
 		auto trans = GetComponent<Transform>();
@@ -742,12 +746,10 @@ namespace basecross {
 		m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
 		m_EfkPlay[0]->SetScale(Vec3(.25f));
 
+		ResetCharge();
+
 		//飛び道具発射
 		GetStage()->AddGameObject<FireProjectile>(pos + firepos, fwd, m_chargePerc);
-		m_chargePerc = 0.0f;
-		m_isOverCharge = false;
-		m_stateType = release;
-
 		PlaySnd(L"PlayerProj", .6f, 0);
 	}
 
@@ -860,6 +862,15 @@ namespace basecross {
 
 	void PlayerGrab::ClearTarget() {
 		m_isHit = false;
+		m_target->GetComponent<Transform>()->ClearParent();
+
+		//最後にターゲットを解放
+		m_target = nullptr;
+	}
+
+	void PlayerGrab::ThrowTarget(float charge) {
+		m_isHit = false;
+		m_target->SetThrowFlag(true);
 		m_target->GetComponent<Transform>()->ClearParent();
 
 		//最後にターゲットを解放

@@ -267,6 +267,12 @@ namespace basecross {
 			if (m_chargePerc > 1.0f) m_isOverCharge = true;
 		}
 
+		void ResetCharge() {
+			m_chargePerc = 0;
+			m_isOverCharge = false;
+			m_stateType = release;
+		}
+
 		const wstring AddPrefix() {
 			if (m_isCharging) return L"Fire_";
 			if (m_isCarrying) return L"Grab_";
@@ -314,6 +320,9 @@ namespace basecross {
 
 		//掴み状態を解除
 		void ClearTarget();
+
+		//敵を投げる処理
+		void ThrowTarget(float charge);
 
 		//何かに接触している判定
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
