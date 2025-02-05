@@ -154,6 +154,8 @@ namespace basecross {
         // 描画処理
         virtual void OnDraw() override;
 
+        void EnemyUpdate();
+
         // エフェクトインターフェイスを取得する
         shared_ptr<EfkInterface> GetEfkInterface() const {
             return m_EfkInterface;
