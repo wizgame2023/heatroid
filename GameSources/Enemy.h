@@ -50,6 +50,7 @@ namespace basecross {
 		float m_pBulletTime;
 		float m_maxPbulletTime;
 		int m_bulletCnt;
+		float m_throwLength;   //投げる長さをチャージ量によって変える変数
 		float m_bulletRangeTime;//弾の発射クールタイム
 		float m_maxBulletRangeTime;//↑の最大値
 		float m_trackingRange; //弾を発射する距離
@@ -192,6 +193,7 @@ namespace basecross {
 		void SetActiveFlag(bool flag);
 		void PlayOverHeat();
 		void SetThrowFlag(bool flag);
+		void SetThorwLenght(float length);
 
 	protected:
 		//重力に関する関数
