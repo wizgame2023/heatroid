@@ -34,9 +34,12 @@ namespace basecross {
 		//当たり判定
 		auto ptrTarget = ptrCamera->GetTargetObject();
 		auto m_camera = AddComponent<CollisionSphere>();
+		auto draw = AddComponent<BcPNTStaticDraw>();
+		draw->SetMeshResource(L"DEFAULT_CUBE");
 		ptrCamera->SetCameraObject(GetThis<GameObject>());
 		m_camera->SetAfterCollision(AfterCollision::Auto);
 		m_camera->AddExcludeCollisionGameObject(ptrTarget);
+
 	}
 
 	void CameraCollision::OnUpdate() {
@@ -45,7 +48,6 @@ namespace basecross {
 		//wstringstream wss;
 		//wss << GetPos.x << " : " << GetPos.y << " : " << GetPos.z << " : " << endl;
 		//scene->SetDebugString(L"Camera\n" + wss.str());
-
 		auto Ptr = GetComponent<Transform>();
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		if (!ptrCamera) {
@@ -115,11 +117,10 @@ namespace basecross {
 
 		Vec3 posXZ = Mat.transInMatrix();
 		//XZの値がわかったので腕角度に代入
-		armVec.x = posXZ.x;
-		armVec.z = posXZ.z;
+		armVec.x = posXZ.x ;
+		armVec.z = posXZ.z ;
 		//腕角度を正規化
 		armVec.normalize();
-
 		if (ptrTarget) {
 			//目指したい場所
 			Vec3 toAt = ptrTarget->GetComponent<Transform>()->GetWorldMatrix().transInMatrix();
@@ -131,7 +132,10 @@ namespace basecross {
 		UpdateArmLengh();
 		Vec3 toEye = newAt + armVec * m_ArmLen;
 		GetPos = Lerp::CalculateLerp(newEye, toEye, 0, 1.0f, m_ToTargetLerp, Lerp::Linear);
-
+		//if (Afterpos != Vec3(0))
+		//{
+		//	GetPos = Afterpos;
+		//}
 		//追尾システム
 		GetComponent<Transform>()->SetPosition(GetPos);
 		GetComponent<Transform>()->SetRotation(TargetPos);
@@ -148,17 +152,21 @@ namespace basecross {
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		auto ptrTarget = ptrCamera->GetTargetObject();
 		Vec3 toAt = ptrTarget->GetComponent<Transform>()->GetWorldMatrix().transInMatrix();
-
-		Vec3 vec =toAt - Pos;
-		m_ArmLen = length(vec);
+		auto ray = GetStage()->GetSharedGameObject<RayCameraMark>(L"Ray");
+		Vec3 Afterpos = ray->GetActivePos();
+		if (Afterpos != Vec3(0))
+		{
+			Vec3 vec2 = toAt - Afterpos;
+			m_ArmLen = length(vec2);
+		}
+		else {
+			Vec3 vec = toAt - Pos;
+			m_ArmLen = length(vec);
+		}
 
 		if (m_ArmLen >= ptrCamera->m_MaxArm) {
 			//m_MaxArm以上離れないようにする
 			m_ArmLen = ptrCamera->m_MaxArm;
-		}
-		if (m_ArmLen <= ptrCamera->m_MinArm) {
-			//m_MinArm以上離れないようにする
-			m_ArmLen = ptrCamera->m_MinArm;
 		}
 	}
 
@@ -330,8 +338,152 @@ namespace basecross {
 			toAt += m_TargetToAt;
 			newAt = Lerp::CalculateLerp(GetAt(), toAt, 0, 1.0f, 1.0, Lerp::Linear);
 		}
+		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		auto keyData = App::GetApp()->GetInputDevice().GetKeyState();
+		if (cntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+		{
+			Vec3 Pos = Vec3(0, 100, 0);
+			SetEye(Pos);
+		}
 		SetAt(newAt);
 	}
+
+	//--------------------------------------------------------------------------------------
+//	class RayMark : public GameObject; //衝突したときの表示されるオブジェクト
+//--------------------------------------------------------------------------------------
+
+	RayCameraMark::RayCameraMark(const shared_ptr<Stage>& stage
+	) :
+		GameObject(stage)
+	{
+	}
+	RayCameraMark::RayCameraMark(const shared_ptr<Stage>& stage,
+		const shared_ptr<Player>& player,
+		const shared_ptr<Camera>& camera
+	) :
+		GameObject(stage),
+		m_player(player),
+		m_camera(camera),
+		m_wallCnt(0),
+		m_activeFlag(false)
+	{
+	}
+
+	void RayCameraMark::OnCreate() {
+		m_draw = AddComponent<PNTStaticDraw>();
+		m_draw->SetMeshResource(L"DEFAULT_SPHERE");
+		Col4 color(0.0f, 0.0f, 1.0f, 0.4f);
+		m_draw->SetDiffuse(color);
+		m_draw->SetEmissive(color);
+		m_draw->SetDrawActive(false);
+		SetAlphaActive(true);
+
+		m_trans = GetComponent<Transform>();
+		m_trans->SetScale(Vec3(1.0f));
+	}
+	void RayCameraMark::OnUpdate() {
+		auto stage = GetStage();
+
+		//必要な変数の宣言
+		Vec3 pos = Vec3(0.0f);
+		Vec3 rayStart;
+		Vec3 rayEnd;
+		Vec3 enemyCrossPos;
+		Vec3 objCrossPos;
+		TRIANGLE triangle;
+		size_t triangleIndex;
+
+		//プレイヤー
+		auto player = m_player.lock();
+		if (!player) return;
+		rayStart = player->GetComponent<Transform>()->GetPosition(); //レイを飛ばす始点
+
+		//レイを飛ばす
+		//敵
+		auto camera = m_camera.lock();
+		if (!camera) return;
+		auto cameraObj = camera->GetCameraObject();
+		auto cameraDraw = cameraObj->GetComponent<BcPNTStaticDraw>();
+		rayEnd = camera->GetEye();		             //レイを飛ばす終点
+		//当たっているかのフラグ
+		m_hitEnemyFlag = cameraDraw->HitTestStaticMeshSegmentTriangles
+		(rayStart, rayEnd, enemyCrossPos, triangle, triangleIndex);
+
+		//壁
+		auto wallGroup = GetStage()->GetSharedObjectGroup(L"Wall");
+		auto& wallVec = wallGroup->GetGroupVector();
+		for (auto v : wallVec) {
+			auto walls = v.lock();
+			auto wallDraw = walls->GetComponent<PNTStaticDraw>();
+			//すべての壁をチェック、レイがあったていたらtrue
+			m_hitWallFlag.push_back(wallDraw->HitTestStaticMeshSegmentTriangles
+			(rayStart, rayEnd, objCrossPos, triangle, triangleIndex));
+		}
+		for (int i = 0; i < m_hitWallFlag.size(); i++) {
+			if (!m_hitWallFlag[i]) {
+				m_wallCnt++;
+			}
+		}
+
+		//ドア
+		auto doorGroup = GetStage()->GetSharedObjectGroup(L"Door");
+		auto& doorVec = doorGroup->GetGroupVector();
+		for (auto v : doorVec) {
+			auto doors = v.lock();
+			auto doorDraw = doors->GetComponent<PNTStaticDraw>();
+			m_hitDoorFlag.push_back(doorDraw->HitTestStaticMeshSegmentTriangles
+			(rayStart, rayEnd, objCrossPos, triangle, triangleIndex));
+		}
+		for (int i = 0; i < doorVec.size(); i++) {
+			if (!m_hitDoorFlag[i]) {
+				m_doorCnt++;
+			}
+		}
+
+
+		//壁かドアにあたっているか
+		if (m_wallCnt == m_hitWallFlag.size() && m_doorCnt == m_hitDoorFlag.size()) {
+			m_activeFlag = true;
+			m_wallCnt = 0;
+			m_doorCnt = 0;
+			m_hitWallFlag.clear();
+			m_hitDoorFlag.clear();
+		}
+		else {
+			m_activeFlag = false;
+			m_wallCnt = 0;
+			m_doorCnt = 0;
+			m_hitWallFlag.clear();
+			m_hitDoorFlag.clear();
+		}
+
+		//デバック用
+		//当たっている場所の描画
+		if (m_hitEnemyFlag) {
+			pos = enemyCrossPos;
+			m_pos = objCrossPos;
+		}
+		m_trans->SetPosition(pos);
+	}
+
+	bool RayCameraMark::GetActiveFlag() {
+		return m_activeFlag;
+	}
+
+	Vec3 RayCameraMark::GetActivePos()
+	{
+		return m_pos;
+	}
+
+	void RayCameraMark::Debug() {
+		auto scene = App::GetApp()->GetScene<Scene>();
+		wstringstream wss(L"");
+		wss << L"Wall : "
+			<< endl;
+		scene->SetDebugString(wss.str());
+
+	}
+
 
 	OpeningCameraman::OpeningCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
 		const Vec3& AtStartPos, const Vec3& AtEndPos, const Vec3& AtPos, float& TotalTime,
@@ -529,7 +681,7 @@ namespace basecross {
 
 	void EndingCameraman::BasicStateEnterBehavior() {
 		auto ptrStageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
-		ptrStageMgr->ToMainCamera();
+		//ptrStageMgr->ToMainCamera();
 	}
 
 	//--------------------------------------------------------------------------------------
