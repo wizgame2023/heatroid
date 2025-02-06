@@ -9,6 +9,8 @@
 
 namespace basecross {
 
+
+
 	class CameraCollision : public GameObject
 	{
 		Vec3 GetPos;                            // カメラの現在位置を保持するベクトル
@@ -138,6 +140,41 @@ namespace basecross {
 		// 更新処理
 		virtual void OnUpdate() override;
 	};
+
+//--------------------------------------------------------------------------------------
+//	class RayMark : public GameObject; //オブジェクトに触れているかどうか
+//--------------------------------------------------------------------------------------
+	class RayCameraMark : public GameObject {
+	private:
+		bool m_hitEnemyFlag;
+		bool m_hitCameraFlag;
+		bool m_activeFlag;
+		int m_wallCnt;
+		int m_doorCnt;
+		Vec3 m_pos;
+
+		vector<bool> m_hitWallFlag;
+		vector<bool> m_hitDoorFlag;
+		shared_ptr<Transform> m_trans;
+		shared_ptr<PNTStaticDraw> m_draw;
+		weak_ptr<Player> m_player;
+		weak_ptr<Camera> m_camera;
+
+
+	public:
+		RayCameraMark(const shared_ptr<Stage>& stage);
+		RayCameraMark(const shared_ptr<Stage>& stage, const shared_ptr <Player>& player, const shared_ptr<Camera>& enemy);
+		virtual ~RayCameraMark() {};
+
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+		void Debug();
+		Vec3 enemyPos(Vec3 pos);
+		bool GetActiveFlag();
+		Vec3 GetActivePos();
+
+	};
+
 
 	class OpeningCameraman : public GameObject {
 		Vec3 m_startPos;                          // カメラの開始位置を保持するベクトル
