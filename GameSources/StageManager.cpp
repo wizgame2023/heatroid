@@ -903,6 +903,9 @@ namespace basecross {
 		Vec3 CameraEndPos = Vec3(90.0f, 15.0f, 0);
 		if (ptrCamera) {
 			GetStage()->SetView(m_MyCameraView);
+			auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
+			auto Ray = GetStage()->AddGameObject<RayCameraMark>(player, ptrCamera);
+			GetStage()->SetSharedGameObject(L"Ray", Ray);
 			auto cameraObject = GetStage()->AddGameObject<CameraCollision>();
 			ptrCamera->SetTargetObject(PtrPlayer);
 			ptrCamera->SetTargetToAt(Vec3(0, 3.0f, 0));

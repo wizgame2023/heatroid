@@ -404,6 +404,7 @@ namespace basecross {
 				EnemyAnime(L"kaihi");
 				m_pos += shaft.normalize() * sinf(m_rad) * m_speed * 2.0f * elapsed;
 			}
+			break;
 		//投げる
 		case throwAway:
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
