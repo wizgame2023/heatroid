@@ -56,6 +56,7 @@ namespace basecross {
 		m_maxBulletRangeTime(m_bulletRangeTime),
 		m_trackingRange(30.0f),
 		m_efcTime(0.0f),
+		m_throwLength(1.0f),
 		m_firstDirec(Vec3(0.0f)),
 		m_bulletDic(Vec2(0.0f, 1.0f)),
 		m_gravity(-9.8f),
@@ -122,6 +123,7 @@ namespace basecross {
 		m_maxBulletRangeTime(m_bulletRangeTime),
 		m_trackingRange(30.0f),
 		m_efcTime(2.0f),
+		m_throwLength(1.0f),
 		m_firstDirec(Vec3(0.0f)),
 		m_bulletDic(Vec2(0.0f, 1.0f)),
 		m_gravity(-9.8f),
@@ -402,12 +404,13 @@ namespace basecross {
 				EnemyAnime(L"kaihi");
 				m_pos += shaft.normalize() * sinf(m_rad) * m_speed * 2.0f * elapsed;
 			}
+			break;
 		//投げる
 		case throwAway:
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			PlayerDic();
-			m_pos.y += 0.25f;
-			m_pos -= m_speed * m_direcNorm * elapsed * 12.0f;
+			m_pos.y += 0.4f * m_throwLength;
+			m_pos -= m_speed * m_direcNorm * elapsed * m_throwLength * 20.0f;
 			m_test2 -= elapsed;
 			if (m_test2 < 0.0f) {
 				SetState(m_overHeatState);
@@ -633,10 +636,11 @@ namespace basecross {
 			//	m_pGrabFlag = false;
 			//}
 			if (cntlVec[0].bConnected) {
-				if (pad[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && pad[0].wButtons & XINPUT_GAMEPAD_B) {
+				if (m_throwFlag) {
 					SetState(throwAway);
 					m_test = 1.0f;
 					m_pGrabFlag = false;
+					m_throwFlag = false;
 				}
 			}
 		}
@@ -1028,6 +1032,9 @@ namespace basecross {
 	}
 	void Enemy::SetThrowFlag(bool flag) {
 		m_throwFlag = flag;
+	}
+	void Enemy::SetThorwLenght(float lenght) {
+		m_throwLength = lenght;
 	}
 
 	//--------------------------------------------------------------------------------------

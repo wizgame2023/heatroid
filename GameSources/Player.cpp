@@ -148,10 +148,12 @@ namespace basecross {
 		wstring MuzzleDir = DataDir + L"Effects\\Muzzle.efk";
 		wstring HitDir = DataDir + L"Effects\\Hit.efk";
 		wstring JumpDir = DataDir + L"Effects\\PlayerJump.efk";
+		wstring LandDir = DataDir + L"Effects\\PlayerLand.efk";
 		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
 		m_EfkMuzzle = ObjectFactory::Create<EfkEffect>(ShEfkInterface, MuzzleDir);
 		m_EfkHit = ObjectFactory::Create<EfkEffect>(ShEfkInterface, HitDir);
 		m_EfkJump = ObjectFactory::Create<EfkEffect>(ShEfkInterface, JumpDir);
+		m_EfkLand = ObjectFactory::Create<EfkEffect>(ShEfkInterface, LandDir);
 
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
@@ -419,7 +421,7 @@ namespace basecross {
 		if (m_grabTime > 0) m_grabTime -= _delta;
 		if (m_grabTime < 0) m_grabTime = 0;
 
-		SwitchAnim(GetDrawPtr()->GetCurrentAnimationTime(), m_isCharging, L"Fire");
+		SwitchAnim(GetDrawPtr()->GetCurrentAnimationTime(), m_isCharging & !m_isCarrying, L"Fire");
 		SwitchAnim(GetDrawPtr()->GetCurrentAnimationTime(), m_isCarrying, L"Grab");
 
 		GetComponent<Transform>()->SetPosition((m_moveVel * _delta) + GetComponent<Transform>()->GetPosition());
@@ -505,6 +507,15 @@ namespace basecross {
 			if (m_stateType == died_air) {
 				PlaySnd(L"PlayerLand", 1.0f, 0);
 				m_stateType = stand;
+
+				//着地時のエフェクト
+				auto plPos = GetComponent<Transform>()->GetPosition();
+				plPos.y -= 4;
+				plPos.x += m_moveVel.x * _delta;
+				plPos.z += m_moveVel.z * _delta;
+				auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+				m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkLand, plPos, 1);
+				m_EfkPlay[2]->SetScale(Vec3(.25f));
 				return;
 			}
 
@@ -512,6 +523,15 @@ namespace basecross {
 				SetAnim(L"Land");
 				PlaySnd(L"PlayerLand", 1.0f, 0);
 				m_stateType = stand;
+
+				//着地時のエフェクト
+				auto plPos = GetComponent<Transform>()->GetPosition();
+				plPos.y -= 4;
+				plPos.x += m_moveVel.x * _delta;
+				plPos.z += m_moveVel.z * _delta;
+				auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+				m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkLand, plPos, 1);
+				m_EfkPlay[2]->SetScale(Vec3(.25f));
 			}
 		}
 	}
@@ -703,9 +723,13 @@ namespace basecross {
 
 	//飛び道具を発射
 	void Player::Projectile() {
-		//敵運搬中は無効
-		if (m_isCarrying == true) return;
 		Charging(false);
+		//敵運搬中の処理
+		if (m_isCarrying == true) {
+			m_pGrab.lock()->ThrowTarget(m_chargePerc);
+			ResetCharge();
+			return;
+		}
 
 		//位置・回転周りの処理
 		auto trans = GetComponent<Transform>();
@@ -722,12 +746,10 @@ namespace basecross {
 		m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
 		m_EfkPlay[0]->SetScale(Vec3(.25f));
 
+		ResetCharge();
+
 		//飛び道具発射
 		GetStage()->AddGameObject<FireProjectile>(pos + firepos, fwd, m_chargePerc);
-		m_chargePerc = 0.0f;
-		m_isOverCharge = false;
-		m_stateType = release;
-
 		PlaySnd(L"PlayerProj", .6f, 0);
 	}
 
@@ -840,6 +862,18 @@ namespace basecross {
 
 	void PlayerGrab::ClearTarget() {
 		m_isHit = false;
+		m_target->GetComponent<Transform>()->ClearParent();
+
+		//最後にターゲットを解放
+		m_target = nullptr;
+	}
+
+	void PlayerGrab::ThrowTarget(float charge) {
+		m_isHit = false;
+		if (!m_target) return;
+		m_target->SetThorwLenght(charge);
+		m_target->SetThrowFlag(true);
+		m_target->SetState(Enemy::State::throwAway);
 		m_target->GetComponent<Transform>()->ClearParent();
 
 		//最後にターゲットを解放

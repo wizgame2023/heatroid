@@ -20,6 +20,7 @@ namespace basecross {
 		shared_ptr<EfkEffect> m_EfkMuzzle;
 		shared_ptr<EfkEffect> m_EfkHit;
 		shared_ptr<EfkEffect> m_EfkJump;
+		shared_ptr<EfkEffect> m_EfkLand;
 		//エフェクト実行オブジェクト
 		shared_ptr<EfkPlay> m_EfkPlay[3];
 
@@ -249,10 +250,10 @@ namespace basecross {
 				draw->ChangeCurrentAnimation(animname, time);
 		}
 
+		//通常時・チャージ中、敵運搬中でアニメーションを切り替える
 		void SwitchAnim(const float time, const float condition, const wstring prefix);
 
 		void Charging(bool charge) {
-			if (m_isCarrying == true) return;
 			m_isCharging = charge;
 			if (charge == false) return;
 			
@@ -264,6 +265,12 @@ namespace basecross {
 			}
 
 			if (m_chargePerc > 1.0f) m_isOverCharge = true;
+		}
+
+		void ResetCharge() {
+			m_chargePerc = 0;
+			m_isOverCharge = false;
+			m_stateType = release;
 		}
 
 		const wstring AddPrefix() {
@@ -313,6 +320,9 @@ namespace basecross {
 
 		//掴み状態を解除
 		void ClearTarget();
+
+		//敵を投げる処理
+		void ThrowTarget(float charge);
 
 		//何かに接触している判定
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
