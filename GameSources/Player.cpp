@@ -462,7 +462,7 @@ namespace basecross {
 	}
 
 	void Player::OnPushA() {
-		if (m_stateType == goal) return;	//立ち状態以外ではジャンプしない
+		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
 		if (m_isCarrying == true) return;	//敵を持った状態でもジャンプしない
 
 		//ジャンプ時のエフェクト
@@ -724,18 +724,12 @@ namespace basecross {
 	//飛び道具を発射
 	void Player::Projectile() {
 		Charging(false);
-		//敵運搬中の処理
-		if (m_isCarrying == true) {
-			m_pGrab.lock()->ThrowTarget(m_chargePerc);
-			ResetCharge();
-			return;
-		}
 
 		//位置・回転周りの処理
 		auto trans = GetComponent<Transform>();
 		auto pos = trans->GetPosition();
 		auto fwd = -1 * trans->GetForward();
-		auto face = atan2f(fwd.z,fwd.x);
+		auto face = atan2f(fwd.z, fwd.x);
 
 		Vec3 firepos = ForwardConvert(m_firePos);
 		firepos = firepos * trans->GetScale();
@@ -745,12 +739,18 @@ namespace basecross {
 		m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkMuzzle, pos + firepos, 0.0f);
 		m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
 		m_EfkPlay[0]->SetScale(Vec3(.25f));
+		PlaySnd(L"PlayerProj", .6f, 0);
 
-		ResetCharge();
+		//敵運搬中の処理
+		if (m_isCarrying == true) {
+			m_pGrab.lock()->ThrowTarget(m_chargePerc);
+			ResetCharge();
+			return;
+		}
 
 		//飛び道具発射
 		GetStage()->AddGameObject<FireProjectile>(pos + firepos, fwd, m_chargePerc);
-		PlaySnd(L"PlayerProj", .6f, 0);
+		ResetCharge();
 	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え

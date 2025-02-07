@@ -248,10 +248,12 @@ namespace basecross {
 		App::GetApp()->GetAssetsDirectory(DataDir);
 		wstring effectSmoke = DataDir + L"Effects\\smoke.efk";
 		wstring effectEye = DataDir + L"Effects\\EnemyEye.efk";
+		wstring effectBurst = DataDir + L"Effects\\EnemyBurst.efk";
 		auto stageManager = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
 		auto efkInterface = stageManager->GetEfkInterface();
 		m_heatEffect = ObjectFactory::Create<EfkEffect>(efkInterface, effectSmoke);
 		m_eyeEffect = ObjectFactory::Create<EfkEffect>(efkInterface, effectEye);
+		m_burstEffect = ObjectFactory::Create<EfkEffect>(efkInterface, effectBurst);
 	}
 
 	void Enemy::OnUpdate() {
@@ -413,9 +415,13 @@ namespace basecross {
 			m_pos -= m_speed * m_direcNorm * elapsed * m_throwLength * 20.0f;
 			m_test2 -= elapsed;
 			if (m_test2 < 0.0f) {
+
+				EffectPlay(m_burstEffect, GetEyePos(Vec3(0, 0, 0)), 4, Vec3(0.5f));
+				PlaySE(L"EnemyBurst", 2.0f);
 				SetState(m_overHeatState);
 				m_test2 = 0.5f;
 			}
+
 			AroundOverHeat();
 			break;
 		default:
