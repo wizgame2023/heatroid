@@ -580,6 +580,7 @@ namespace basecross {
 	{
 	}
 
+	//歩行音
 	void Player::WalkSound() {
 		m_walkSndTime += _delta;
 		if (GetDrawPtr()->GetCurrentAnimation() == AddPrefix() + L"Run" &&
@@ -596,6 +597,7 @@ namespace basecross {
 		}
 	}
 
+	//操作中のアニメーションを切り替える(特殊なもの以外)
 	void Player::Animate() {
 		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .13f) {
 			SetAnim(AddPrefix() + L"Idle");
