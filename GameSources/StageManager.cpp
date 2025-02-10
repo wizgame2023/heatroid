@@ -1016,6 +1016,7 @@ namespace basecross {
 			}
 			else {
 				m_kakaeruUI->SetDrawActive(false);
+				m_blowUI->SetDrawActive(false);
 			}
 		}
 	}

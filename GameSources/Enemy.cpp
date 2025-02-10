@@ -448,7 +448,7 @@ namespace basecross {
 
 		//アニメーションの実装
 		m_draw->UpdateAnimation(elapsed);
-		Debug();
+		//Debug();
 	}
 
 	//ジャンプ
