@@ -273,9 +273,9 @@ namespace basecross {
 			m_stateType = release;
 		}
 
-		const wstring AddPrefix() {
-			if (m_isCharging) return L"Fire_";
+		const wstring AddPrefix() {	
 			if (m_isCarrying) return L"Grab_";
+			if (m_isCharging) return L"Fire_";
 			else return L"";
 		}
 	};
