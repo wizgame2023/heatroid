@@ -122,7 +122,8 @@ namespace basecross {
 		//エフェクト
 		shared_ptr<EfkEffect> m_heatEffect;
 		shared_ptr<EfkEffect> m_eyeEffect;
-		shared_ptr<EfkPlay> m_EfkPlayer[3];
+		shared_ptr<EfkEffect> m_burstEffect;
+		shared_ptr<EfkPlay> m_EfkPlayer[4];
 
 
 	public:

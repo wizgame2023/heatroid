@@ -143,6 +143,8 @@ namespace basecross{
 		App::GetApp()->RegisterWav(L"EnemyDash", soundWav);
 		soundWav = sdPath + L"EnemyRevival.wav";
 		App::GetApp()->RegisterWav(L"EnemyRevival", soundWav);
+		soundWav = sdPath + L"EnemyBurst.wav";
+		App::GetApp()->RegisterWav(L"EnemyBurst", soundWav);
 		
 		soundWav = sdPath + L"PlayerJump.wav";
 		App::GetApp()->RegisterWav(L"PlayerJump", soundWav);
