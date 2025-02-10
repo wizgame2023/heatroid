@@ -43,6 +43,6 @@ Enemy,49.72,20,-32.2,0,0,0,3,3,3,Enemy::bullet,Enemy::stay,,,,,
 Enemy,40,2,26.2,0,0,0,3,3,3,Enemy::bulletMove,Enemy::stay,X,,,,
 Enemy,-31.8,20,-35.9,0,0,0,3,3,3,Enemy::bullet,Enemy::stay,,,,,
 Enemy,-33,20,35.7,0,0,0,3,3,3,Enemy::bullet,Enemy::stay,,,,,
-,,,,,,,,,,,,,,,,
+Enemy,-45,2,0,0,0,0,3,3,3,Enemy::slide,Enemy::stay,,,,,
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,s
