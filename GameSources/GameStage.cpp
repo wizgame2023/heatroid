@@ -167,7 +167,7 @@ namespace basecross {
 						}
 					}
 
-					if (totaltime > 1.2f)
+					if (totaltime > 1.0f)
 					{
 
 						OnDestroy();

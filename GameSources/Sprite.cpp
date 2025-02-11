@@ -92,8 +92,8 @@ namespace basecross {
 		//}
 	}
 
-	void SelectCharge::UpdateProgress(float load) {
-		float progress =  load;
+	void SelectCharge::UpdateProgress(float time) {
+		float progress =  time;
 		m_Vertices[1].position.x = (progress * 2) - 1.0f;
 		m_Vertices[3].position.x = (progress * 2) - 1.0f;
 		m_Vertices[1].textureCoordinate.x = progress;
