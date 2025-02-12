@@ -20,6 +20,7 @@ Switch,-35,0.4,35,0,0,0,10,0.5,10,1,2,BLUCKSWITCH
 Enemy,30,2,0,0,0,0,3,3,3,Enemy::rightMove,Enemy::stay,
 Enemy,-35,2,15,0,0,0,3,3,3,Enemy::rightMove,Enemy::stay,
 Enemy,-35,2,-15,0,0,0,3,3,3,Enemy::rightMove,Enemy::stay,
+Enemy,-35,2,0,0,0,0,3,3,3,Enemy::bulletMove,Enemy::stay,Z
 Floor,85,0,0,0,0,0,15,1,10,Floor,,
 GoalBeforeFloor,-65,0,0,0,0,0,35,1,85,Floor,,
 GoalFloor,-85,0.1,0,0,-1.570796327,0,15,1,15,Floor,,

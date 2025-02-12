@@ -276,8 +276,8 @@ namespace basecross {
 
 		//状態に応じてアニメーションを変える
 		const wstring AddPrefix() {
-			if (m_isCharging) return L"Fire_";
 			if (m_isCarrying) return L"Grab_";
+			if (m_isCharging) return L"Fire_";
 			else return L"";
 		}
 	};

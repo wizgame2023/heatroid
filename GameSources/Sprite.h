@@ -49,7 +49,7 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void ChargeUV(const float& time);
-		void UpdateProgress(float load);
+		void UpdateProgress(float time);
 		void SetPushState(const bool PushState);
 	};
 
