@@ -125,7 +125,7 @@ namespace basecross {
 		
 		float _delta = App::GetApp()->GetElapsedTime();
 
-		//q:最初の回転 v:回転軸 rad:回転量
+		//クォータニオン基準での回転処理 1q:最初の回転 v:回転軸 rad:回転量
 		Quat RotateQuat(const Quat q, const Vec3 v,const float rad) {
 			Quat r = Quat(cos(rad / 2), v.x * sin(rad / 2), v.y * sin(rad / 2), v.z * sin(rad / 2));
 			Quat r2 = Quat(cos(rad / 2), -v.x * sin(rad / 2), -v.y * sin(rad / 2), -v.z * sin(rad / 2));
@@ -267,13 +267,15 @@ namespace basecross {
 			if (m_chargePerc > 1.0f) m_isOverCharge = true;
 		}
 
+		//チャージ状態をリセットし、発射モーションに移行(chargePercが0になるので、オブジェクト生成後に呼ぶこと)
 		void ResetCharge() {
 			m_chargePerc = 0;
 			m_isOverCharge = false;
 			m_stateType = release;
 		}
 
-		const wstring AddPrefix() {	
+		//状態に応じてアニメーションを変える
+		const wstring AddPrefix() {
 			if (m_isCarrying) return L"Grab_";
 			if (m_isCharging) return L"Fire_";
 			else return L"";

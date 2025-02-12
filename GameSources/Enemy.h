@@ -33,7 +33,7 @@ namespace basecross {
 			throwAway, //投げられる
 		};
 
-		
+
 	protected:
 		float m_heat;          //オーバーヒート値
 		float m_maxHeat;       //最大オーバーヒート
@@ -70,9 +70,9 @@ namespace basecross {
 		Vec2 m_bulletDic;
 		//テスト用
 		float m_test;
-		float m_test2;
+		float m_throwTime;
 
-		bool m_bulletFlag;   
+		bool m_bulletFlag;
 		bool m_jumpFlag;
 		bool m_jumpMoveFlag;
 		bool m_flyFlag;
@@ -128,9 +128,9 @@ namespace basecross {
 
 	public:
 		// 構築と破棄
-		Enemy(const shared_ptr<Stage>& stage, 
-			const Vec3& position, 
-			const Vec3& rotatoin, 
+		Enemy(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotatoin,
 			const Vec3& scale,
 			const State& state,
 			const State& overHeatState,
@@ -144,7 +144,7 @@ namespace basecross {
 			const wstring& meshName,
 			const shared_ptr<Player>& player);
 
-		virtual ~Enemy(){}
+		virtual ~Enemy() {}
 		virtual void OnCreate() override; // 初期化
 		virtual void OnUpdate() override; // 更新
 
@@ -171,7 +171,7 @@ namespace basecross {
 		void OverHeat();
 		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
 		void EffectPlay(const shared_ptr<EfkEffect>& efk,
-			const Vec3& pos,const int num,const Vec3& scale=Vec3(1.0f));
+			const Vec3& pos, const int num, const Vec3& scale = Vec3(1.0f));
 		Vec3 GetEyePos(const Vec3& eye);
 		void Debug();
 	public:
@@ -179,7 +179,7 @@ namespace basecross {
 		float GetAngle();
 		void SetEnemyFlayFlag(bool flag);
 		void SetSpeed(float speed);
-		void SetUpMove(float speed,float height);
+		void SetUpMove(float speed, float height);
 		void SetFlyPower(float power);
 		void SetState(State state);
 		Vec3 GetDirec();
@@ -242,7 +242,7 @@ namespace basecross {
 		weak_ptr<Enemy> m_enemy;
 	public:
 		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
-		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy,const float height);
+		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy, const float height);
 		virtual ~StraightBullet() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
@@ -254,7 +254,7 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class ParabolaBullet : public EnemyBullet {
 	private:
-		
+
 		float m_speed;   //弾の速さ
 		Vec3 m_pos;
 		Vec3 m_rot;
@@ -268,11 +268,11 @@ namespace basecross {
 
 		Vec3 m_grav;
 		Vec3 m_gravVel;
-		
 
-	public :
+
+	public:
 		ParabolaBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
-		virtual ~ParabolaBullet(){}
+		virtual ~ParabolaBullet() {}
 		virtual void OnCreate();
 		virtual void OnUpdate();
 
@@ -320,7 +320,7 @@ namespace basecross {
 
 	public:
 		EnemyFloorCol(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
-		virtual ~EnemyFloorCol(){}
+		virtual ~EnemyFloorCol() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);
