@@ -77,7 +77,7 @@ namespace basecross {
 		m_activeFlag(true),
 		m_throwFlag(false),
 		m_test(1.0f),
-		m_test2(0.5f)
+		m_throwTime(0.5f)
 	{}
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
@@ -144,7 +144,7 @@ namespace basecross {
 		m_activeFlag(true),
 		m_throwFlag(false),
 		m_test(1.0f),
-		m_test2(0.5f)
+		m_throwTime(0.5f)
 	{}
 
 	void Enemy::OnCreate() {
@@ -411,15 +411,15 @@ namespace basecross {
 		case throwAway:
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			PlayerDic();
-			m_pos.y += 0.4f * m_throwLength;
+			m_pos.y += 0.25f * m_throwLength;
 			m_pos -= m_speed * m_direcNorm * elapsed * m_throwLength * 20.0f;
-			m_test2 -= elapsed;
-			if (m_test2 < 0.0f) {
+			m_throwTime -= elapsed;
+			if (m_throwTime < 0.0f) {
 
 				EffectPlay(m_burstEffect, GetEyePos(Vec3(0, 0, 0)), 4, Vec3(0.5f));
 				PlaySE(L"EnemyBurst", 2.0f);
 				SetState(m_overHeatState);
-				m_test2 = 0.5f;
+				m_throwTime = 0.5f;
 			}
 
 			AroundOverHeat();
@@ -591,7 +591,13 @@ namespace basecross {
 			}
 		}
 		if (m_heat > 0.0f) {
-			m_heat -= elapsed * 5;
+			if (m_fastState == slide) {
+				m_heat -= elapsed * 5.0f;
+			}
+			else {
+				m_heat -= elapsed * 2.5f;
+
+			}
 			m_efcTime -= elapsed;
 			//EffectPlay(m_heatEffect, m_pos, 3);
 			//if (m_efcTime <= 0.0f && m_heat >= 20.0f) {
@@ -703,7 +709,7 @@ namespace basecross {
 		}
 		if (!m_bulletFlag) {
 			m_bulletCnt++;
-			if (m_stateType == slide) {
+			if (m_fastState == slide) {
 				//プレイヤーをめがける弾
 				stage->AddGameObject<TrackingBullet>(GetThis<Enemy>(),m_player.lock());
 			}
@@ -1014,7 +1020,7 @@ namespace basecross {
 		return m_trans->GetWorldPosition();
 	}
 	bool Enemy::GetOverHeat() {
-		if (m_stateType == m_overHeatState) {
+		if (m_stateType == m_overHeatState || m_stateType == throwAway) {
 			return true;
 		}
 		else {
