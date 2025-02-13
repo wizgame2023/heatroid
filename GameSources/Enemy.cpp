@@ -47,7 +47,7 @@ namespace basecross {
 		m_maxHitDropTime(m_hitDropTime),
 		m_spareTime(0.75f),
 		m_maxSpareTime(m_spareTime),
-		m_bulletTime(0.1f),
+		m_bulletTime(3.0f),
 		m_maxBulletTime(m_bulletTime),
 		m_pBulletTime(3.0f),
 		m_maxPbulletTime(m_pBulletTime),
@@ -114,7 +114,7 @@ namespace basecross {
 		m_maxHitDropTime(m_hitDropTime),
 		m_spareTime(0.75f),
 		m_maxSpareTime(m_spareTime),
-		m_bulletTime(0.1f),
+		m_bulletTime(3.0f),
 		m_maxBulletTime(m_bulletTime),
 		m_pBulletTime(3.0f),
 		m_maxPbulletTime(m_pBulletTime),
@@ -169,14 +169,14 @@ namespace basecross {
 		m_floorCol->SetDrawActive(false);
 
 		//左右に動く敵の場合モデルの変更と位置の調整
-		if (m_stateType == slide) {
+		if (m_fastState == slide) {
 			m_meshName = L"ENEMYYOKO";
-			m_scal.y = m_scal.y*0.5;
+			m_scal.y = m_scal.y * 0.5f;
 			m_pos.y = m_pos.y + m_scal.y;
 
 			Mat4x4 meshMat;
 			meshMat.affineTransformation(
-				Vec3(1.0f, 1.0f*2, 1.0f),
+				Vec3(1.0f, 1.0f * 2.0f, 1.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(0.0f, rad, 0.0f),
 				Vec3(0.0f, -1.5f, 0.0f)
@@ -184,15 +184,15 @@ namespace basecross {
 			m_draw->SetMeshToTransformMatrix(meshMat);
 			gauge->SetPosHight(6.0f);
 			gaugeFram->SetPosHight(6.0f);
-			m_floorCol->SetPosHight(4.0f);
+			m_floorCol->SetPosHight(3.0f);
 		}
 		else {
-			m_scal.y = m_scal.y*0.5;
-			m_pos.y = m_pos.y + m_scal.y*0.5;
+			m_scal.y = m_scal.y * 0.5;
+			m_pos.y = m_pos.y + m_scal.y * 0.5;
 
 			Mat4x4 meshMat;
 			meshMat.affineTransformation(
-				Vec3(1.0f, 1.0f*2.0f, 1.0f),
+				Vec3(1.0f, 1.0f * 2.0f, 1.0f),
 				Vec3(0.0f, 0.0f, 0.0f),
 				Vec3(0.0f, rad, 0.0f),
 				Vec3(0.0f, -1.5f, 0.0f)
@@ -702,6 +702,9 @@ namespace basecross {
 	void Enemy::StraightXBullet() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto stage = GetStage();
+		auto player = m_player.lock();
+		if (!player) return;
+
 		m_bulletTime -= elapsed;
 		if (m_bulletTime <= 0.0f) {
 			m_bulletFlag = false;
@@ -711,7 +714,7 @@ namespace basecross {
 			m_bulletCnt++;
 			if (m_fastState == slide) {
 				//プレイヤーをめがける弾
-				stage->AddGameObject<TrackingBullet>(GetThis<Enemy>(),m_player.lock());
+				stage->AddGameObject<TrackingBullet>(GetThis<Enemy>(), player);
 			}
 			else {
 				//一方に跳ぶ弾
