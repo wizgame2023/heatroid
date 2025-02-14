@@ -123,7 +123,7 @@ namespace basecross {
 			break;
 		case 5:
 			scene->SetSelectedMap(5);
-      break;
+			break;
 		default:
 			break;
 		}
