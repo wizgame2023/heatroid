@@ -26,11 +26,11 @@ namespace basecross {
 	{
 	public:
 
-		bool m_PushState = false;
+		bool m_pushState = false;
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
 		vector<VertexPositionColorTexture> m_Vertices;
-		shared_ptr<GameObject> m_SelectCharge;
-		shared_ptr<GameObject> m_TitleCharge;
+		shared_ptr<GameObject> m_selectCharge;
+		shared_ptr<GameObject> m_titleCharge;
 		float m_fade = 1.0f;
 
 		const float m_fadeSpeed = 2.0f;

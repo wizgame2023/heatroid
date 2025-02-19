@@ -14,7 +14,7 @@ namespace basecross {
 	class GameStageTsuboi : public Stage {
 		CsvFile m_GameStage1;
 		shared_ptr<SoundItem> m_BGM;
-		std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager();
+		std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager();
 
 		void PlayBGM(const wstring& StageBGM);
 

@@ -19,7 +19,6 @@
 #include "Enemy.h"
 #include "EnemyImage.h"
 #include "Enemyobj.h"
-#include "GameStageHemmi.h"
 #include "GameStageTuboi.h"
 #include "FixedBox.h"
 #include "Gimmick.h"
