@@ -252,6 +252,9 @@ namespace basecross{
 			m_SelectedMap = L"Stagedata4.csv";
 			m_select = select;
 			break;
+		case 6:
+			m_select = 0;
+			break;
 		}
 	}
 	wstring Scene::GetSelectedMap() {

@@ -859,10 +859,18 @@ namespace basecross {
 			m_totalTime += ElapsedTime;
 			Vec3 m_nxsttPos = easing.EaseInOut(EasingType::Exponential, Vec3(150.0f, -275.0f, 0.0f), Vec3(1000.0f, -275.0f, 0.0f), m_totalTime, totaltime);
 			nextStage->SetPosition(m_nxsttPos);
+			int stage = scene->m_select;
 			if (m_totalTime > 1.0f)
 			{
-				scene->SetSelectedMap(scene->m_select + 1);
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
+				if (stage != 5)
+				{
+					scene->SetSelectedMap(scene->m_select + 1);
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
+				}
+				else {
+					scene->SetSelectedMap(scene->m_select + 1);
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+				}
 			}
 		}
 		else if (m_select == 3) {
