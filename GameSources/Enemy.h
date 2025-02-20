@@ -99,7 +99,6 @@ namespace basecross {
 		State m_beforeState;
 		State m_overHeatState;
 
-		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
 		Vec3 m_beforePos;

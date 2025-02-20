@@ -80,20 +80,60 @@ namespace basecross {
 			<< endl;
 		scene->SetDebugString(wss.str());
 	}
-	EnemyBulletChase::EnemyBulletChase(const shared_ptr<Stage>& stage,
+
+	ChasingEnemy::ChasingEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
-		const Vec3& rotatoin,
+		const Vec3& rotation,
 		const Vec3& scale,
-		const State& state,
-		const State& overHeatState,
+		const State& defaultState,
+		const State& overheatState,
 		const shared_ptr<Player>& player
 	):
-		Enemy(stage, position, rotatoin, scale, state, overHeatState,player)
+		Enemy(stage, position, rotation, scale, defaultState, overheatState, player),
+		m_defaultState(rightMove),
+		m_overheatState(stay)
 	{}
-	void EnemyBulletChase::OnCreate() {
-		m_meshName = L"ENEMYTOBU";
-		Enemy::OnCreate();
+	void ChasingEnemy::OnUpdate() {
+		auto elapsed = App::GetApp()->GetElapsedTime();
+		auto pos = m_trans->GetPosition();
+		
 
+		switch (m_stateType)
+		{
+		case basecross::Enemy::stay:
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
+			EnemyAnime(L"wait");
+			break;
+		case basecross::Enemy::wait:
+			EnemyAnime(L"stand");
+			if (!m_overHeatSE) {
+				//起動時のエフェクト,SE
+				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, 0.5f)), 1, Vec3(0.5f));
+				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, -0.5f)), 2, Vec3(0.5f));
+				PlaySE(L"EnemyRevival", 2.0f);
+				m_overHeatSE = true;
+			}
+			m_spareTime -= elapsed;
+			if (m_spareTime <= 0.0f) {
+
+				m_stateType = m_fastState;
+			}
+			break;
+		case basecross::Enemy::rightMove:
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
+			m_speed = m_maxSpeed;
+			PlayerDic();
+			if (!m_floorCol->GetPlayerFlag()) {
+				EnemyAngle();
+			}
+			if (m_direc.length() <= m_trackingRange * 2) {
+				EnemyAnime(L"walk");
+				pos += m_speed * m_direcNorm * elapsed;
+			}
+			break;
+		default:
+			break;
+		}
+		m_trans->SetPosition(pos);
 	}
-
 }

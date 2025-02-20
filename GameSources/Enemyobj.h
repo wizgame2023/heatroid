@@ -38,16 +38,20 @@ namespace basecross {
 		float m_maxPlungeRargeTime;
 	};
 
-	class EnemyBulletChase :public Enemy {
+	class ChasingEnemy : public Enemy {
+	private:
+		State m_defaultState;
+		State m_overheatState;
+
 	public:
-		EnemyBulletChase(const shared_ptr<Stage>& stage,
+		ChasingEnemy(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const State& state,
 			const State& overHeatState,
 			const shared_ptr<Player>& player);
-		virtual ~EnemyBulletChase() {};
-		virtual void OnCreate();
+		virtual ~ChasingEnemy() {};
+		virtual void OnUpdate() override;
 	};
 }
