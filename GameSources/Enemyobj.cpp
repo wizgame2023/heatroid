@@ -96,7 +96,8 @@ namespace basecross {
 	void ChasingEnemy::OnUpdate() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto pos = m_trans->GetPosition();
-		
+
+		pos = Grav();
 
 		switch (m_stateType)
 		{
@@ -131,9 +132,33 @@ namespace basecross {
 				pos += m_speed * m_direcNorm * elapsed;
 			}
 			break;
+			//投げる
+		case throwAway:
+			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
+			PlayerDic();
+			pos.y += 0.25f * m_throwLength;
+			pos -= m_speed * m_direcNorm * elapsed * m_throwLength * 20.0f;
+			m_throwTime -= elapsed;
+			if (m_throwTime < 0.0f) {
+
+				EffectPlay(m_burstEffect, GetEyePos(Vec3(0, 0, 0)), 4, Vec3(0.5f));
+				PlaySE(L"EnemyBurst", 2.0f);
+				SetState(m_overHeatState);
+				m_throwTime = 0.5f;
+			}
+			AroundOverHeat();
+			break;
 		default:
 			break;
 		}
 		m_trans->SetPosition(pos);
+
+		if (GetOverHeat()) {
+			Grab();
+		}
+		OverHeat();
+
+		//アニメーションの実装
+		m_draw->UpdateAnimation(elapsed);
 	}
 }

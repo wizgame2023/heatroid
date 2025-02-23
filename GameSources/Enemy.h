@@ -157,7 +157,7 @@ namespace basecross {
 		void PlayerDic();
 		void OneJump(float jumpHight);
 		void HitDrop();
-		void Plunge();
+		Vec3 Plunge();
 		void JumpMove();
 		void FindFixed();
 		void EnemyAngle();
@@ -197,7 +197,7 @@ namespace basecross {
 
 	protected:
 		//èdóÕÇ…ä÷Ç∑ÇÈä÷êî
-		void Grav();
+		Vec3 Grav();
 		void SetGrav(Vec3 grav);
 		void AddGrav(Vec3 grav);
 		void GravZero();

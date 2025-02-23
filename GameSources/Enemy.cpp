@@ -233,7 +233,7 @@ namespace basecross {
 		m_collision = AddComponent<CollisionCapsule>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(false);
+		m_collision->SetDrawActive(true);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
 		//m_collision->SetSleepActive(false);
@@ -276,6 +276,7 @@ namespace basecross {
 			m_overHeatSE = false;
 		}
 
+		pos.y = Grav().y;
 
 		//行動パターン
 		switch (m_stateType)
@@ -345,7 +346,7 @@ namespace basecross {
 			//EnemyAnime(L"spare");
 			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
 			if (m_direc.length() <= m_trackingRange * 2) {
-				Plunge();
+				pos = Plunge();
 			}
 			break;
 		//放物線の弾を撃ってくる
@@ -431,11 +432,11 @@ namespace basecross {
 		}
 
 		//重力の処理
-		m_gravVel += m_grav * elapsed;
-		pos += m_gravVel * elapsed;
-		if (m_gravVel.y < m_grav.y) {
-			m_gravVel.y = m_grav.y;
-		}
+		//m_gravVel += m_grav * elapsed;
+		//pos += m_gravVel * elapsed;
+		//if (m_gravVel.y < m_grav.y) {
+		//	m_gravVel.y = m_grav.y;
+		//}
 
 		m_trans->SetPosition(pos);
 		m_beforeState = m_stateType;
@@ -535,7 +536,7 @@ namespace basecross {
 	}
 
 	//プレイヤーに突っ込む
-	void Enemy::Plunge() {
+	Vec3 Enemy::Plunge() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto pos = m_trans->GetPosition();
 
@@ -547,7 +548,7 @@ namespace basecross {
 		if (m_spareTime <= 0.0f) {
 			if (m_direc.length() <= m_trackingRange) {
 				if (!m_plungeFlag) {
-					m_firstDirec = m_playerPos - GetWorldPos();
+					m_firstDirec = m_playerPos - pos;
 					m_plungeFlag = true;
 					PlaySE(L"EnemyDash");
 				}
@@ -555,6 +556,7 @@ namespace basecross {
 			}
 			m_spareTime = 0.0f;
 		}
+		return pos;
 	}
 	//プレイヤーに跳びかかる
 	void Enemy::JumpMove() {
@@ -964,7 +966,7 @@ namespace basecross {
 
 	}
 	//重力
-	void Enemy::Grav() {
+	Vec3 Enemy::Grav() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
 		auto pos = m_trans->GetPosition();
 		m_gravVel += m_grav * elapsed;
@@ -972,7 +974,7 @@ namespace basecross {
 		if (m_gravVel.y < m_grav.y) {
 			m_gravVel.y = m_grav.y;
 		}
-		m_trans->SetPosition(pos);
+		return pos;
 	}
 	void Enemy::GravZero() {
 		m_grav = Vec3(0.0f);
