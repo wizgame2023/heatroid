@@ -16,6 +16,7 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	//	class Enemy : public GameObject;
 	//--------------------------------------------------------------------------------------
+	static const int MAX_EFFECT_NUM = 4; //エフェクトの数
 	class Enemy : public GameObject
 	{
 	public:
@@ -35,6 +36,7 @@ namespace basecross {
 			throwAway, //投げられる
 		};
 
+		
 
 	public:
 		float m_heat;          //オーバーヒート値
@@ -124,7 +126,7 @@ namespace basecross {
 		shared_ptr<EfkEffect> m_heatEffect;
 		shared_ptr<EfkEffect> m_eyeEffect;
 		shared_ptr<EfkEffect> m_burstEffect;
-		shared_ptr<EfkPlay> m_EfkPlayer[4];
+		shared_ptr<EfkPlay> m_EfkPlayer[MAX_EFFECT_NUM];
 
 		unique_ptr<EnemyState> m_currentState;  //現在のステート
 		unique_ptr<EnemyState> m_nextState;     //次のステート
@@ -177,6 +179,7 @@ namespace basecross {
 		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
 		void EffectPlay(const shared_ptr<EfkEffect>& efk,
 			const Vec3& pos, const int num, const Vec3& scale = Vec3(1.0f));
+		void EffectStop(int num);
 		Vec3 GetEyePos(const Vec3& eye);
 		void Debug();
 	public:

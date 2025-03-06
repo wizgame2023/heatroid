@@ -9,59 +9,76 @@
 
 namespace basecross {
 	void ChaseState::Enter() {
-		m_enemy->SetGrav(Vec3(0.0f, m_enemy->m_gravity, 0.0f));
-		m_enemy->m_speed = m_enemy->m_maxSpeed;
+		auto enemy = m_enemy.lock();
+		if (!enemy) { return; }
+		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
+		enemy->m_speed = enemy->m_maxSpeed;
 	}
 	void ChaseState::Execute() {
+		auto enemy = m_enemy.lock();
+		if (!enemy) { return; }
+
 		auto elapsed = App::GetApp()->GetElapsedTime();
-		auto pos = m_enemy->GetPos();
+		auto pos = enemy->GetPos();
 
-		m_enemy->PlayerDic();
-		if (!m_enemy->m_floorCol->GetPlayerFlag()) {
-			m_enemy->EnemyAngle();
+		enemy->PlayerDic();
+		if (!enemy->m_floorCol->GetPlayerFlag()) {
+			enemy->EnemyAngle();
 		}
-		if (m_enemy->m_direc.length() <= m_enemy->m_trackingRange * 2) {
-			m_enemy->EnemyAnime(L"walk");
-			pos += m_enemy->m_speed * m_enemy->m_direcNorm * elapsed;
+		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {
+			enemy->EnemyAnime(L"walk");
+			pos += enemy->m_speed * enemy->m_direcNorm * elapsed;
 		}
 
-		if (m_enemy->m_heat >= m_enemy->m_maxHeat) {
-			m_enemy->ChangeState<OverHeatState>();
+		if (enemy->m_heat >= enemy->m_maxHeat) {
+			enemy->ChangeState<OverHeatState>();
 		}
-		m_enemy->m_trans->SetPosition(pos);
-		m_enemy->m_draw->UpdateAnimation(elapsed);
+		enemy->m_trans->SetPosition(pos);
+		enemy->m_draw->UpdateAnimation(elapsed);
 	}
 
 	void OverHeatState::Enter() {
-		m_enemy->SetGrav(Vec3(0.0f, m_enemy->m_gravity, 0.0f));
-		m_enemy->PlaySE(L"OverHeatSE", 5.0f);
-		m_enemy->EffectPlay(m_enemy->m_heatEffect, m_enemy->GetPos(), 3);
+		auto enemy = m_enemy.lock();
+		if (!enemy) { return; }
+		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
+		enemy->PlaySE(L"OverHeatSE", 5.0f);
+		enemy->EffectPlay(enemy->m_heatEffect, enemy->GetPos(), 3);
 	}
 	void OverHeatState::Execute() {
+		auto enemy = m_enemy.lock();
+		if (!enemy) { return; }
+
 		auto elapsed = App::GetApp()->GetElapsedTime();
-		auto pos = m_enemy->GetPos();
+		auto pos = enemy->GetPos();
 
-		m_enemy->EnemyAnime(L"wait");
 
-		m_enemy->m_playerFlag = false;
-		if (m_enemy->m_heat > 0.0f) {
-			m_enemy->m_heat -= elapsed * 2.5f * 10;
+		enemy->m_playerFlag = false;
+		if (enemy->m_heat > 0.0f) {
+			enemy->m_heat -= elapsed * 2.5f * 10;
 		}
-		if (m_enemy->m_heat <= 0.0f) {
-			//m_enemy->EnemyAnime(L"stand");
-			if (m_enemy->m_draw->IsTargetAnimeEnd()) {
-				m_enemy->ChangeState<ChaseState>();
+		if (enemy->m_heat <= 0.0f) {
+			enemy->EnemyAnime(L"stand");
+			if (enemy->m_draw->IsTargetAnimeEnd()) {
+				enemy->EffectStop(3);
+				enemy->ChangeState<ChaseState>();
 
 			}
 		}
-		m_enemy->m_draw->UpdateAnimation(elapsed);
+		else {
+			enemy->EnemyAnime(L"wait");
+		}
+
+		enemy->m_draw->UpdateAnimation(elapsed);
 
 	}
 	void OverHeatState::Exit() {
-		m_enemy->EnemyAnime(L"stand");
-		m_enemy->EffectPlay(m_enemy->m_eyeEffect, m_enemy->GetEyePos(Vec3(2.0f, 0.5f, 0.5f)), 1, Vec3(0.5f));
-		m_enemy->EffectPlay(m_enemy->m_eyeEffect, m_enemy->GetEyePos(Vec3(2.0f, 0.5f, -0.5f)), 2, Vec3(0.5f));
-		m_enemy->PlaySE(L"EnemyRevival", 2.0f);
+		auto enemy = m_enemy.lock();
+		if (!enemy) { return; }
+
+		enemy->EnemyAnime(L"stand");
+		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, 0.5f)), 1, Vec3(0.5f));
+		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, -0.5f)), 2, Vec3(0.5f));
+		enemy->PlaySE(L"EnemyRevival", 2.0f);
 
 	}
 

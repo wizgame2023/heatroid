@@ -11,7 +11,7 @@
 namespace basecross {
 	class EnemyState {
 	protected:
-		shared_ptr<Enemy> m_enemy;
+		weak_ptr<Enemy> m_enemy;
 	public:
 		EnemyState(shared_ptr<Enemy>& enemy):
 			m_enemy(enemy)

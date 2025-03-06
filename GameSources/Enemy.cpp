@@ -920,6 +920,13 @@ namespace basecross {
 		m_EfkPlayer[num - 1]->SetScale(scale);
 		m_EfkPlayer[num - 1]->SetAllColor(Col4(1.0f));
 	}
+	//エフェクトを止める
+	void Enemy::EffectStop(int num) {
+		if (MAX_EFFECT_NUM <= num) return;
+		if (m_EfkPlayer[num - 1]) {
+			m_EfkPlayer[num - 1]->StopEffect();
+		}
+	}
 	//敵の目の場所を設定
 	Vec3 Enemy::GetEyePos(const Vec3& eye) {
 		Vec3 pos = GetWorldPos();
