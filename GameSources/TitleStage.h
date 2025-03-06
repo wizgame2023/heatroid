@@ -10,7 +10,10 @@ namespace basecross {
     class TitleStage : public Stage
     {
         shared_ptr<SoundItem> m_BGM;                   // バックグラウンドミュージックのサウンドアイテム
-        std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
+        std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
+
+        float m_updateTime;                          //　計測時間
+        bool m_startFlag = false;                    // タイトルのフラグ
         // ビューの作成
         void CreateViewLight();
 
@@ -36,6 +39,9 @@ namespace basecross {
 
         // バックグラウンドミュージックを再生する
         void PlayBGM(const wstring& StageBGM);
+
+        // サウンドエフェクトを再生する
+        void PlaySE(wstring path, float loopcnt, float volume);
 
         // ステージマネージャーの作成
         void CreateStageManager();

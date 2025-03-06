@@ -38,7 +38,7 @@ namespace basecross {
 
 	void SelectStage::OnCreate() {
 		try {
-			m_Flag = true;
+			m_flag = true;
 			m_maxSelect = 4;
 			CreateStageManager();
 			//ビューとライトの作成
@@ -73,28 +73,51 @@ namespace basecross {
 		//コントローラチェックして入力があればコマンド呼び出し
 		InputHandler<SelectStage> m_InputHandler;
 		m_InputHandler.PushHandle(GetThis<SelectStage>());
+		auto& app = App::GetApp();
+		auto scene = app->GetScene<Scene>();
+
 		auto time = App::GetApp()->GetElapsedTime();
+
 		//ShowDebug();
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
-		StageSelect();
 		auto selectSprite = GetSharedGameObject<SelectSprite>(L"selectSprite");
 		m_escapeSelect = m_select;
-		SetSelect(selectSprite->GetSelectNum());
 		int a = 0;
+
+		StageSelect();
+		SetSelect(selectSprite->GetSelectNum());
 		SelectEffect();
+
+		if (scene->m_select == 0)
+		{
+			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
+			{
+				PlaySE(L"DecisionSE", 0, 1.0f);
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTitleStage");
+			}
+			if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START || KeyState.m_bPressedKeyTbl[VK_TAB])
+			{
+				PlaySE(L"DecisionSE", 0, 1.0f);
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToTestStage");
+			}
+
+		}
+		else if (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || KeyState.m_bPressedKeyTbl[VK_SPACE])
+		{
+			PlaySE(L"DecisionSE", 0, 1.0f);
+			PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
+		}
 	}
 
 	void SelectStage::OnDestroy() {
 		//BGMのストップ
-		m_ptrXA->Stop(m_BGM);
+		m_PtrXA->Stop(m_BGM);
 	}
 
 	void SelectStage::CreateStageManager() {
-		auto ptrStageManager = AddGameObject<StageManager>();
+		auto ptrStageManager = AddGameObject<StageGenerator>();
 		SetSharedGameObject(L"StageManager", ptrStageManager);
-		auto Status = ptrStageManager->GameStatus::SELECT;
-		ptrStageManager->SetNowGameStatus(Status);
 	}
 
 	void SelectStage::StageSelect()
@@ -150,7 +173,13 @@ namespace basecross {
 
 	void SelectStage::PlayBGM(const wstring& StageBGM)
 	{
-		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
+		m_BGM = m_PtrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
+	}
+
+	void SelectStage::PlaySE(wstring path, float loopcnt, float volume)
+	{
+		auto playSE = App::GetApp()->GetXAudio2Manager();
+		playSE->Start(path, loopcnt, volume);
 	}
 
 }

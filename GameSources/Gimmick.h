@@ -8,10 +8,30 @@
 #include "stdafx.h"
 
 namespace basecross {
+	class GimmickObject : public GameObject
+	{
+	public:
+		// エフェクト
+		shared_ptr<EfkEffect> m_EfkEffect;           // エフェクトオブジェクト
+		shared_ptr<EfkEffect> m_EfkEffectLoop;       // ループエフェクトオブジェクト
+		// エフェクト実行オブジェクト
+		shared_ptr<EfkPlay> m_EfkPlay;               // エフェクト実行オブジェクト
+
+		GimmickObject(const shared_ptr<Stage>& StagePtr);
+		virtual ~GimmickObject();
+		// 初期化
+		virtual void OnCreate() override;
+
+		// サウンドエフェクトを再生する
+		void PlaySE(wstring path, float loopcnt, float volume);
+		void TilingBox(const Vec3& Scale, const float& UPic, const float& VPic, const wstring& m_Texname);
+	};
+
+
 //--------------------------------------------------------------------------------------
 //　タイリングする固定のボックス
 //--------------------------------------------------------------------------------------
-	class TilingFixedBox : public GameObject {
+	class TilingFixedBox : public GimmickObject {
 		Vec3 m_Scale;         // ボックスのスケール（サイズ）を保持するベクトル
 		Vec3 m_Rotation;      // ボックスの回転情報を保持するベクトル
 		Vec3 m_Position;      // ボックスの位置を保持するベクトル
@@ -35,7 +55,7 @@ namespace basecross {
 	};
 
 	class GimmickButton;
-	class GimmickDoor : public GameObject {
+	class GimmickDoor : public GimmickObject {
 		Vec3 m_Position;                       // �h�A�̈ʒu��ێ�����x�N�g��
 		Vec3 m_Rotation;                      // �h�A�̉�]����ێ�����x�N�g��
 		Vec3 m_Scale;                         // �h�A�̃X�P�[���i�T�C�Y�j��ێ�����x�N�g��
@@ -45,7 +65,7 @@ namespace basecross {
 		float m_VPic;                         // �e�N�X�`����V�������̃s�N�`���T�C�Y
 		shared_ptr<GimmickButton> GDoor;      // �֘A����M�~�b�N�{�^��
 		int kazu = 1;                         // ���ʂ�\���ϐ�
-		bool m_Flag;                          // �t���O
+		bool m_flag;                          // �t���O
 	public:
 		float m_OpenSwitch;                   // �h�A�̊J�X�C�b�`
 		wstring m_Texname;                    // �e�N�X�`���̖��O
@@ -81,7 +101,7 @@ namespace basecross {
 		int GetNumber();
 	};
 
-	class GimmickUp : public GameObject {
+	class GimmickUp : public GimmickObject {
 		Vec3 m_Position;                       // �M�~�b�N�̈ʒu��ێ�����x�N�g��
 		Vec3 m_Rotation;                      // �M�~�b�N�̉�]����ێ�����x�N�g��
 		Vec3 m_Scale;                         // �M�~�b�N�̃X�P�[���i�T�C�Y�j��ێ�����x�N�g��
@@ -92,7 +112,7 @@ namespace basecross {
 		shared_ptr<GimmickButton> GDoor;      // �֘A����M�~�b�N�{�^��
 		int kazu = 1;                         // ���ʂ�\���ϐ�
 		int ido = 0;                          // �ړ��ʂ�\���ϐ�
-		bool m_Flag;                          // �t���O
+		bool m_flag;                          // �t���O
 	public:
 		float m_Max;                          // �M�~�b�N�̍ő�l
 		float m_OpenSwitch;                   // �M�~�b�N�̊J�X�C�b�`
@@ -197,7 +217,7 @@ namespace basecross {
 		Vec3 m_Rotation;                      // ドアの回転情報を保持するベクトル
 		Vec3 m_Scale;                         // ドアのスケール（サイズ）を保持するベクトル
 		bool m_open;                          // ドアが開いているかのフラグ
-		bool m_Goaltrue;                      // ゴールに達したかのフラグ
+		bool m_goaltrue;                      // ゴールに達したかのフラグ
 		wstring m_Texname;                    // テクスチャの名前
 		float _delta = App::GetApp()->GetElapsedTime(); // 経過時間を保持する変数
 		//ゴール演出用時間計測

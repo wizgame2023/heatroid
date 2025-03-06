@@ -140,7 +140,7 @@ namespace basecross {
 		AddTag(L"Player");
 
 		//ステージマネージャ
-		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		//敵を掴む判定用オブジェクト
 		m_pGrab = GetStage()->AddGameObject<PlayerGrab>(GetThis<Player>());
 
@@ -342,7 +342,7 @@ namespace basecross {
 			SpeedLimit();
 
 			//ステージマネージャ取得、カメラ元に戻ったら操作可能に
-			if (m_stageMgr->m_CameraSelect != StageManager::CameraSelect::openingCamera) {
+			if (m_stageMgr->m_CameraSelect != StageGenerator::CameraSelect::OPENINGCAMERA) {
 				m_stateType = stand;
 			}
 
@@ -918,7 +918,7 @@ namespace basecross {
 	void FireProjectile::OnCreate() {
 
 		//ステージマネージャ
-		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 
 		//エフェクト読み込み
 		wstring DataDir;

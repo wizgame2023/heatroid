@@ -15,7 +15,7 @@ namespace basecross {
     class GameStage : public Stage {
         CsvFile m_GameStage1;                          // ゲームステージのCSVファイル
         shared_ptr<SoundItem> m_BGM;                   // バックグラウンドミュージックのサウンドアイテム
-        std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
+        std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
         shared_ptr<GameObject> m_fadeIn;               // フェードインエフェクト用オブジェクト
         shared_ptr<GameObject> m_fadeOut;              // フェードアウトエフェクト用オブジェクト
 
@@ -23,8 +23,8 @@ namespace basecross {
         shared_ptr<GameObject> m_PauseSelect;          // ポーズ選択オブジェクト
         shared_ptr<GameObject> m_PauseTitle;           // ポーズ時のタイトルオブジェクト
         shared_ptr<GameObject> m_PauseBack;            // ポーズ時の背景オブジェクト
-        shared_ptr<GameObject> m_SelectCharge;         // 選択画面のチャージオブジェクト
-        shared_ptr<GameObject> m_TitleCharge;          // タイトル画面のチャージオブジェクト
+        shared_ptr<GameObject> m_selectCharge;         // 選択画面のチャージオブジェクト
+        shared_ptr<GameObject> m_titleCharge;          // タイトル画面のチャージオブジェクト
         float totaltime = 0.0f;                        // 合計時間を計測する変数
 
     public:
@@ -67,7 +67,11 @@ namespace basecross {
         // エフェクトを再生する
         void EffectPlay();
 
-        void PauseEffect();
+        void EffectCreate();
+
+        void SpriteCreate();
+
+        void EnemyUpdateChange();
     };
 
 }

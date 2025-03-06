@@ -560,7 +560,7 @@ namespace basecross {
 		return false;
 	}
 	void OpeningCameraman::EndStateEnterBehavior() {
-		auto ptrGameStageManegeer = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto ptrGameStageManegeer = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		ptrGameStageManegeer->ToMainCamera();
 	}
 
@@ -680,7 +680,7 @@ namespace basecross {
 	}
 
 	void EndingCameraman::BasicStateEnterBehavior() {
-		auto ptrStageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto ptrStageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		//ptrStageMgr->ToMainCamera();
 	}
 
