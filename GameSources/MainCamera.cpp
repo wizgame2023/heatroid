@@ -528,7 +528,7 @@ namespace basecross {
 		m_StateMachine->Update();
 	}
 
-	void OpeningCameraman::ToGoalEnterBehavior() { //前半部
+	void OpeningCameraman::ToGoalEnterBehavior() { //後半部
 		m_startPos; //カメラの最初の位置
 		m_endPos; //カメラの最後の位置
 		m_atStartPos; //最初に見てる方角
@@ -537,7 +537,7 @@ namespace basecross {
 		m_totalTime;
 	}
 
-	void OpeningCameraman::ToStartEnterBehavior() { //後半部
+	void OpeningCameraman::ToStartEnterBehavior() { //前半部
 		m_startPos = m_tempEndPos; //カメラの最初の位置
 		m_endPos = m_secondEndPos; //カメラの最後の位置
 		m_atStartPos = m_tempAtEndPos; //最初に見てる方角

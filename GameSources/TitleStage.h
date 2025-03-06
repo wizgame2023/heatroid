@@ -28,7 +28,7 @@ namespace basecross {
         // 更新処理
         virtual void OnUpdate() override;
 
-        // 破棄処理
+        // BGM破棄処理
         void OnDestroy();
 
         // ボタンAが押された時の処理
@@ -42,9 +42,6 @@ namespace basecross {
 
         // サウンドエフェクトを再生する
         void PlaySE(wstring path, float loopcnt, float volume);
-
-        // ステージマネージャーの作成
-        void CreateStageManager();
     };
 
 }

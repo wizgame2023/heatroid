@@ -40,10 +40,8 @@ namespace basecross {
 		try {
 			m_flag = true;
 			m_maxSelect = 4;
-			CreateStageManager();
 			//ビューとライトの作成
 			CreateViewLight();
-			OnSelectSprite();
 			PlayBGM(L"TitleBGM");
 			auto backGround = AddGameObject<GameSprite>(1280, 800, L"SelectStageBack", Vec3(0.0f));
 			auto backGround2 = AddGameObject<GameSprite>(1280, 800, L"SelectStageBack2", Vec3(0.0f));
@@ -64,10 +62,6 @@ namespace basecross {
 		}
 	}
 
-
-	void SelectStage::OnSelectSprite()
-	{
-	}
 
 	void SelectStage::OnUpdate() {
 		//コントローラチェックして入力があればコマンド呼び出し
@@ -113,11 +107,6 @@ namespace basecross {
 	void SelectStage::OnDestroy() {
 		//BGMのストップ
 		m_PtrXA->Stop(m_BGM);
-	}
-
-	void SelectStage::CreateStageManager() {
-		auto ptrStageManager = AddGameObject<StageGenerator>();
-		SetSharedGameObject(L"StageManager", ptrStageManager);
 	}
 
 	void SelectStage::StageSelect()

@@ -12,9 +12,8 @@ namespace basecross {
 
 	void GameStage::OnCreate() {
 		try {
-			CreateStageManager();
+			CreateStagegenerator();
 			SpriteCreate();
-			EffectCreate();
 			PlayBGM(L"StageBGM");
 			EnemyUpdateChange();
 			m_soundFlg = true;
@@ -40,7 +39,7 @@ namespace basecross {
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::PLAYCAMERA)
 			{
 				stageMane->EnemyUpdate();
-				stageMane->UImake();
+				stageMane->OperationUIMake();
 				stageMane->GoalJudge();
 				stageMane->GameOverJudge();
 				GamePause();
@@ -62,7 +61,7 @@ namespace basecross {
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::PLAYCAMERA)
 			{
 				stageMane->EnemyUpdate();
-				stageMane->UImake();
+				stageMane->OperationUIMake();
 				stageMane->GoalJudge();
 				stageMane->GameOverJudge();
 				GamePause();
@@ -239,27 +238,6 @@ namespace basecross {
 
 		}
 	}
-	void GameStage::EffectPlay()
-	{
-		auto stageMane = GetSharedGameObject<StageGenerator>(L"StageManager");
-		auto ShEfkInterface = stageMane->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, Vec3(0, 1, 0),0.0f);
-		m_EfkPlay->SetRotation(Vec3(0, 0, XMConvertToRadians(90.0f)), 0.0f);
-
-		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
-	}
-
-	void GameStage::EffectCreate()
-	{
-		auto stMgr = GetSharedGameObject<StageGenerator>(L"StageManager");
-		//エフェクトの初期化
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring TestEffectStr = DataDir + L"Effects\\Laser01.efk";
-		auto ShEfkInterface = stMgr->GetEfkInterface();
-		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
-	}
-
 
 	void GameStage::SpriteCreate()
 	{
@@ -320,7 +298,7 @@ namespace basecross {
 		//BGMのストップ
 		m_PtrXA->Stop(m_BGM);
 	}
-	void GameStage::CreateStageManager() {
+	void GameStage::CreateStagegenerator() {
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
 		auto ptrStageManager = AddGameObject<StageGenerator>();

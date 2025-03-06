@@ -131,7 +131,7 @@ namespace basecross {
         // バックグラウンドミュージックを再生する
         void PlayBGM(const wstring& StageBGM);
 
-        void UImake();
+        void OperationUIMake();
 
         //プレイヤーから敵に飛ばすレイ
         void EnemyRay();

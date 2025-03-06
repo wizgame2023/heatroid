@@ -575,6 +575,7 @@ namespace basecross {
 			auto& vec = group->GetGroupVector();
 			for (auto& v : vec) {
 				auto shObj = v.lock();
+
 				if (shObj) {
 					auto Switchs = dynamic_pointer_cast<Door>(shObj);
 					Switchs->SetButton(true);

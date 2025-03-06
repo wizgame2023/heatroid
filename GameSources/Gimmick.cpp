@@ -98,7 +98,7 @@ namespace basecross {
 		int number,
 		const wstring& Texname
 	) :
-		GameObject(StagePtr),
+		GimmickObject(StagePtr),
 		m_Position(position),
 		m_Rotation(rotation),
 		m_Scale(scale),
@@ -349,11 +349,6 @@ namespace basecross {
 		}
 	}
 
-	void GimmickDoor::PlaySE(wstring path, float loopcnt, float volume) {
-		auto SE = App::GetApp()->GetXAudio2Manager();
-		SE->Start(path, loopcnt, volume);
-	}
-
 	int GimmickDoor::GetState()
 	{
 		return State;
@@ -415,10 +410,10 @@ namespace basecross {
 
 	void GimmickUp::OnUpdate()
 	{
-		OpenDoor();
+		UpDown();
 	}
 
-	void GimmickUp::OpenDoor()
+	void GimmickUp::UpDown()
 	{
 		auto ptrTransform = GetComponent<Transform>();
 		Vec3 pos = ptrTransform->GetPosition();
@@ -491,31 +486,22 @@ namespace basecross {
 		}
 	}
 
-
-	void GimmickUp::PlaySE(wstring path, float loopcnt, float volume) {
-		auto SE = App::GetApp()->GetXAudio2Manager();
-		SE->Start(path, loopcnt, volume);
-	}
-
-
-
-
-	Door::Door(const shared_ptr<Stage>& StagePtr,
+	Elevator::Elevator(const shared_ptr<Stage>& StagePtr,
 		const Vec3& position,
 		const Vec3& rotation,
 		const Vec3& scale,
 		const wstring& Texname
 	):
-		GameObject(StagePtr),
+		GimmickObject(StagePtr),
 		m_Position(position),
 		m_Rotation(rotation),
 		m_Scale(scale),
 		m_Texname(Texname)
 
 	{}
-	Door::~Door() {}
+	Elevator::~Elevator() {}
 
-	void Door::OnCreate()
+	void Elevator::OnCreate()
 	{
 		m_open = false;
 		m_goaltrue = false;
@@ -537,7 +523,7 @@ namespace basecross {
 		ptrDraw->SetMeshToTransformMatrix(meshMat);
 		AddAnim();
 	}
-	void Door::OnUpdate()
+	void Elevator::OnUpdate()
 	{
 		auto playerSh = GetStage()->GetSharedGameObject<Player>(L"Player");
 		m_goaltrue = playerSh->GetArrivedGoal();
@@ -558,7 +544,7 @@ namespace basecross {
 		_delta = App::GetApp()->GetElapsedTime();
 	}
 
-	void Door::AddAnim() {
+	void Elevator::AddAnim() {
 		auto ptrDraw = GetComponent<PNTBoneModelDraw>();
 		auto anim_fps = 30.0f;
 
@@ -566,8 +552,8 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
 	}
-	DoorGimmick::DoorGimmick(const shared_ptr<Stage>& stage, const Vec3& position, const Vec3& UV, const Vec3& scale, const float& number, const wstring& color):
-		GameObject(stage),
+	DoorGimmickNum::DoorGimmickNum(const shared_ptr<Stage>& stage, const Vec3& position, const Vec3& UV, const Vec3& scale, const float& number, const wstring& color):
+		GimmickObject(stage),
 		m_Position(position),
 		m_UV(UV),
 		m_Scale(scale),
@@ -575,7 +561,7 @@ namespace basecross {
 		color(color)
 	{
 	}
-	void DoorGimmick::OnCreate()
+	void DoorGimmickNum::OnCreate()
 	{
 		if (color == L"Black")
 		{
@@ -626,7 +612,12 @@ namespace basecross {
 		}
 	}
 
-	void DoorGimmick::OnUpdate()
+	void DoorGimmickNum::OnUpdate()
+	{
+		ChangeNum();
+	}
+
+	void DoorGimmickNum::ChangeNum()
 	{
 		auto group = GetStage()->GetSharedObjectGroup(L"Door");
 		auto& vec = group->GetGroupVector();
@@ -712,4 +703,6 @@ namespace basecross {
 			}
 		}
 	}
+
+
 }

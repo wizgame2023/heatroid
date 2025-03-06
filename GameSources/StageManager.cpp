@@ -304,7 +304,7 @@ namespace basecross {
 			);
 
 			//各値がそろったのでオブジェクト作成
-			auto ptrStageDoor = GetStage()->AddGameObject<Door>(Pos, Rot, Scale, Tokens[10]);
+			auto ptrStageDoor = GetStage()->AddGameObject<Elevator>(Pos, Rot, Scale, Tokens[10]);
 			ptrStageDoor->AddTag(L"StageDoor");
 			auto group = GetStage()->GetSharedObjectGroup(L"StageDoor");
 			group->IntoGroup(ptrStageDoor);
@@ -365,7 +365,7 @@ namespace basecross {
 			);
 			float number = (float)_wtof(Tokens[10].c_str());
 			//各値がそろったのでオブジェクト作成
-			auto doorgimmick = GetStage()->AddGameObject<DoorGimmick>(Pos, UV, Scale, number, Tokens[11]);
+			auto doorgimmick = GetStage()->AddGameObject<DoorGimmickNum>(Pos, UV, Scale, number, Tokens[11]);
 		}
 	}
 
@@ -872,7 +872,7 @@ namespace basecross {
 		m_BGM = m_PtrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
 	}
 
-	void StageGenerator::UImake()
+	void StageGenerator::OperationUIMake()
 	{
 		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 		auto& vec = group->GetGroupVector();

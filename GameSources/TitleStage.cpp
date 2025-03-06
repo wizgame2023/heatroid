@@ -24,7 +24,6 @@ namespace basecross {
 
 	void TitleStage::OnCreate() {
 		try {
-			CreateStageManager();
 			//ビューとライトの作成
 			CreateViewLight();
 			//OnDraw();
@@ -73,12 +72,8 @@ namespace basecross {
 		m_PtrXA->Stop(m_BGM);
 	}
 
-	void TitleStage::CreateStageManager() {
-		auto ptrStageManager = AddGameObject<StageGenerator>();
-		SetSharedGameObject(L"StageManager", ptrStageManager);
-	}
-
 	void TitleStage::OnPushA() {
+
 		OnDestroy();
 	}
 
