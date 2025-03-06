@@ -78,7 +78,8 @@ namespace basecross {
 		m_throwFlag(false),
 		m_test(1.0f),
 		m_throwTime(0.5f)
-	{}
+	{
+	}
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotatoin,
@@ -147,11 +148,14 @@ namespace basecross {
 		m_throwTime(0.5f)
 	{}
 
+
 	void Enemy::OnCreate() {
 		m_trans = GetComponent<Transform>();
 		m_trans->SetRotation(Vec3(m_rot.x,m_rot.y+XM_PIDIV2,m_rot.z));
 		m_fastState = m_stateType;
 		auto pos = m_beforePos;
+
+		m_currentState= make_unique<ChaseState>(GetThis<Enemy>());
 
 		auto player = m_player.lock();
 		if (!player) return;
@@ -903,7 +907,7 @@ namespace basecross {
 	//アニメーションの再生
 	void Enemy::EnemyAnime(wstring anime) {
 		auto draw = GetComponent<PNTBoneModelDraw>()->GetCurrentAnimation();
-		if ( draw!= anime) {
+		if (draw != anime) {
 			GetComponent<PNTBoneModelDraw>()->ChangeCurrentAnimation(anime);
 		}
 	}
@@ -1064,6 +1068,7 @@ namespace basecross {
 	void Enemy::SetThorwLenght(float lenght) {
 		m_throwLength = lenght;
 	}
+
 
 	//--------------------------------------------------------------------------------------
 	//	class EnemyBullet : public GameObject;  

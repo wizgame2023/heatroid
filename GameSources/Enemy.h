@@ -8,9 +8,11 @@
 #include "stdafx.h"
 #include "FixedBox.h"
 #include "Gimmick.h"
+#include "EnemyState.h"
 
 namespace basecross {
 	class EnemyFloorCol;
+	class EnemyBullet;
 	//--------------------------------------------------------------------------------------
 	//	class Enemy : public GameObject;
 	//--------------------------------------------------------------------------------------
@@ -34,7 +36,7 @@ namespace basecross {
 		};
 
 
-	protected:
+	public:
 		float m_heat;          //オーバーヒート値
 		float m_maxHeat;       //最大オーバーヒート
 		float m_angle;          //プレイヤーに向く角度
@@ -124,6 +126,9 @@ namespace basecross {
 		shared_ptr<EfkEffect> m_burstEffect;
 		shared_ptr<EfkPlay> m_EfkPlayer[4];
 
+		unique_ptr<EnemyState> m_currentState;  //現在のステート
+		unique_ptr<EnemyState> m_nextState;     //次のステート
+		unique_ptr<EnemyState> m_previousState; //一つ前のステート
 
 	public:
 		// 構築と破棄
@@ -143,6 +148,7 @@ namespace basecross {
 			const wstring& meshName,
 			const shared_ptr<Player>& player);
 
+
 		virtual ~Enemy() {}
 		virtual void OnCreate() override; // 初期化
 		virtual void OnUpdate() override; // 更新
@@ -150,7 +156,7 @@ namespace basecross {
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
 		void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
-	protected:
+	public:
 		void EnemyJump();
 		void HipDropJump();
 		void ThisDestroy();
@@ -194,8 +200,16 @@ namespace basecross {
 		void PlayOverHeat();
 		void SetThrowFlag(bool flag);
 		void SetThorwLenght(float length);
+		template <class NextState>
+		void ChangeState() {
+			m_currentState->Exit();
+			m_currentState.reset();
+			m_currentState = make_unique<NextState>(GetThis<Enemy>());
+			m_currentState->Enter();
+		}
 
-	protected:
+
+	public:
 		//重力に関する関数
 		Vec3 Grav();
 		void SetGrav(Vec3 grav);

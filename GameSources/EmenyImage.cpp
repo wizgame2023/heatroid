@@ -126,7 +126,7 @@ namespace basecross {
 	void Square::Debug() {
 		//auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		//auto scene = App::GetApp()->GetScene<Scene>();
-		//auto enemy = m_enemy.lock();
+		//auto enemy = m_owner.lock();
 		//auto enemyPos = enemy->GetComponent<Transform>()->GetPosition();
 		//wstringstream wss(L"");
 		//wss << L"pos \n("

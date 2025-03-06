@@ -8,6 +8,7 @@
 #include "Project.h"
 
 namespace basecross {
+	class Enemy;
 	EnemyChase::EnemyChase(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotation,
@@ -161,4 +162,30 @@ namespace basecross {
 		//アニメーションの実装
 		m_draw->UpdateAnimation(elapsed);
 	}
+
+	BulletEnemy::BulletEnemy(const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotatoin,
+		const Vec3& scale,
+		const State& state,
+		const State& overHeatState,
+		const shared_ptr<Player>& player
+	) :
+		Enemy(stage,position,rotatoin,scale,state,overHeatState,player)
+	{
+	}
+	void BulletEnemy::OnCreate() {
+		Enemy::OnCreate();
+		//unique_ptr<ChaseState> chaseState = make_unique<ChaseState>(dynamic_pointer_cast<Enemy>(GetThis<BulletEnemy>()));
+		//m_currentState = move(chaseState);
+		m_currentState = make_unique<ChaseState>(dynamic_pointer_cast<Enemy>(GetThis<BulletEnemy>()));
+		m_currentState->Enter();
+	}
+	void BulletEnemy::OnUpdate() {
+		if (m_currentState) {
+			m_currentState->Execute();
+
+		}
+	}
 }
+
