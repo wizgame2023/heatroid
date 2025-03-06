@@ -58,16 +58,11 @@ namespace basecross {
         // ゲームステージの破棄処理
         void OnDestroy();
 
-        // ステージマネージャーの作成
-        void CreateStageManager();
+        // ステージの作成
+        void CreateStagegenerator();
 
         // ゲームをポーズする
         void GamePause();
-
-        // エフェクトを再生する
-        void EffectPlay();
-
-        void EffectCreate();
 
         void SpriteCreate();
 

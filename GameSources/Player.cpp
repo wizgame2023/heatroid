@@ -570,8 +570,8 @@ namespace basecross {
 			for (auto& v : vec) {
 				auto shObj = v.lock();
 				if ( shObj) {
-					auto Switchs = dynamic_pointer_cast<Door>(shObj);
-					Switchs->SetButton(true);
+					auto Switchs = dynamic_pointer_cast<Elevator>(shObj);
+					Switchs->OpenJudge(true);
 				}
 			}
 		}

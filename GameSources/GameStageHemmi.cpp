@@ -212,7 +212,7 @@ namespace basecross {
 	//		);
 
 	//		//各値がそろったのでオブジェクト作成
-	//		auto ptrFloor = AddGameObject<Door>(Pos, Rot, Scale, Tokens[10]);
+	//		auto ptrFloor = AddGameObject<Elevator>(Pos, Rot, Scale, Tokens[10]);
 	//		ptrFloor->AddTag(L"StageDoor");
 	//	}
 
@@ -220,10 +220,10 @@ namespace basecross {
 
 	//void GameStageHemmi::CreateGimmick()
 	//{
-	//	CreateSharedObjectGroup(L"Door");
+	//	CreateSharedObjectGroup(L"Elevator");
 	//	CreateSharedObjectGroup(L"Switch");
 	//	vector<wstring> LineVec;
-	//	m_GameStage1.GetSelect(LineVec, 0, L"Door");
+	//	m_GameStage1.GetSelect(LineVec, 0, L"Elevator");
 	//	for (auto& v : LineVec) {
 	//		//トークン（カラム）の配列
 	//		vector<wstring> Tokens;

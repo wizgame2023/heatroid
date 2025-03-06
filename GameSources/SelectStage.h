@@ -31,10 +31,8 @@ namespace basecross {
 		void StageSelect();
 		void SelectEffect();
 		void OnPushA();
-		void OnSelectSprite();
 		void PlayBGM(const wstring& StageBGM);
 		void PlaySE(wstring path, float loopcnt, float volume);
-		void CreateStageManager();
 		void SetSelect(int select) {
 			m_select = select;
 		}

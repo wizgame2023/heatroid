@@ -93,8 +93,6 @@ namespace basecross {
 		// ドアを開く
 		void OpenDoor();
 
-		// サウンドエフェクトを再生する
-		void PlaySE(wstring path, float loopcnt, float volume);
 
 		int GetState();
 
@@ -140,13 +138,10 @@ namespace basecross {
 		virtual void OnUpdate() override;
 
 		// ドアを開く
-		void OpenDoor();
-
-		// サウンドエフェクトを再生する
-		void PlaySE(wstring path, float loopcnt, float volume);
+		void UpDown();
 	};
 
-	class GimmickButton : public GameObject
+	class GimmickButton : public GimmickObject
 	{
 	public:
 		// エフェクト
@@ -211,7 +206,7 @@ namespace basecross {
 		}
 	};
 
-	class Door : public GameObject
+	class Elevator : public GimmickObject
 	{
 		Vec3 m_Position;                       // ドアの位置を保持するベクトル
 		Vec3 m_Rotation;                      // ドアの回転情報を保持するベクトル
@@ -224,13 +219,13 @@ namespace basecross {
 		float m_animTime = 0;
 	public:
 		// 構築と破棄
-		Door(const shared_ptr<Stage>& stage,
+		Elevator(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
 			const Vec3& scale,
 			const wstring& m_Texname
 		);
-		virtual ~Door();
+		virtual ~Elevator();
 
 		// 初期化
 		virtual void OnCreate() override;
@@ -249,13 +244,13 @@ namespace basecross {
 		}
 
 		// ボタンの状態を設定する
-		void SetButton(const bool& open)
+		void OpenJudge(const bool& open)
 		{
 			m_open = open;
 		}
 	};
 
-	class DoorGimmick : public GameObject
+	class DoorGimmickNum : public GimmickObject
 	{
 		Vec3 m_Position;                       // �h�A�̈ʒu��ێ�����x�N�g��
 		Vec3 m_UV;                      // �h�A�̉�]����ێ�����x�N�g��
@@ -268,18 +263,20 @@ namespace basecross {
 		shared_ptr<MeshResource> m_squareMesh;
 		wstring color;
 		int m_colorSwitch;
-		DoorGimmick(const shared_ptr<Stage>& stage,
+		DoorGimmickNum(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& UV,
 			const Vec3& scale,
 			const float& number,
 			const wstring& color
 		);
-		~DoorGimmick() {};
+		~DoorGimmickNum() {};
 		// ������
 		virtual void OnCreate() override;
 
 		// �X�V����
 		virtual void OnUpdate() override;
+
+		void ChangeNum();
 	};
 }
