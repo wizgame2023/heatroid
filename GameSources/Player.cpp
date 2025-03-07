@@ -547,18 +547,22 @@ namespace basecross {
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto grab = m_pGrab.lock();
 
+		//掴み判定を開始
 		if (m_grabTime == 0 && (pad[0].wPressedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bPressedKeyTbl['Q'] == true)) {
 			m_grabTime = m_grabTimeMax;
 		}
 
+		//非ヒット時に入力されたら判定を出す
 		if (!(grab->IsHit())) {
 			grab->SetCollActive(m_grabTime > 0);
 		}
 
+		//当たったら消す
 		if ((grab->IsHit()) && (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bUpKeyTbl['Q'] == true)) {
 			grab->SetCollActive(false);
 		}
 
+		//当たったフラグを更新
 		if (grab->IsHit()) {
 			m_isCarrying = true;
 			m_grabTime = 0.0f;
@@ -755,7 +759,6 @@ namespace basecross {
 			ResetCharge();
 			return;
 		}
-
 		//飛び道具発射
 		for (auto& e : m_proj) {
 			if (e->GetUpdateActive() == true) continue;	//既に存在する弾はいじらない
