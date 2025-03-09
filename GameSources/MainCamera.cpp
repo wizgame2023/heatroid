@@ -174,9 +174,9 @@ namespace basecross {
 		//‰ñ‚·Šp“x‚ð•Ô‚·
 		if (m_isMovingToFixedDir == true) {
 			float delta = App::GetApp()->GetElapsedTime();
-			if (abs(m_fixedDirY) > m_fixSpeed * delta * -m_RotSpeed) {
+			if (abs(m_fixedDirY) > m_fixSpeed * delta * abs(m_RotSpeed)) {
 				float sub = m_fixedDirY > 0 ? m_fixSpeed : -m_fixSpeed;
-				m_fixedDirY -= sub * delta * -m_RotSpeed;
+				m_fixedDirY -= sub * delta * abs(m_RotSpeed);
 				return sub;
 			}
 			else {
