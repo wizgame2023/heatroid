@@ -106,6 +106,7 @@ namespace basecross {
 		//アニメーション関係
 		Animate();
 
+		//最高速度
 		SpeedLimit();
 
 		GetComponent<Transform>()->SetRotation(0, m_moveAngle, 0);
@@ -186,7 +187,7 @@ namespace basecross {
 			Vec3(.4f, .4f, .4f), //(.1f, .1f, .1f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
-			Vec3(0.0f, -1.42f, 0.0f)
+			Vec3(0.0f, -XM_PIDIV2, 0.0f)
 		);
 
 		ptrDraw->SetMeshResource(L"PLAYER");
@@ -761,7 +762,7 @@ namespace basecross {
 		}
 		//飛び道具発射
 		for (auto& e : m_proj) {
-			if (e->GetUpdateActive() == true) continue;	//既に存在する弾はいじらない
+			if (e->GetUsed() == true) continue;	//既に存在する弾はいじらない
 			else {
 				e->Invoke(pos + firepos, fwd, m_chargePerc);
 				break;
@@ -914,7 +915,9 @@ namespace basecross {
 		m_speedBase(24.0f),
 		m_rangeMax(.4f),
 		m_stopped(false),
-		m_lifeEnded(false)
+		m_lifeEnded(false),
+		m_speed(0),
+		m_power(0)
 	{
 	}
 
@@ -962,16 +965,24 @@ namespace basecross {
 
 		AddTag(L"Attack");
 
-		SetUpdateActive(false);
 	}
 
 	void FireProjectile::OnUpdate() {
+		//ポーズ解除後に一瞬動くのを防止するため
+		if (!m_used) {
+			GetComponent<TriggerSphere>()->SetUpdateActive(false);
+			SetUpdateActive(false);
+			return;
+		}
+
 		auto trans = GetComponent<Transform>();
 
 		auto delta = App::GetApp()->GetElapsedTime();
 		m_playTime += delta;
 
-		m_EfkPlay[0]->SetLocation(trans->GetPosition());
+		if (m_EfkPlay[0]) {
+			m_EfkPlay[0]->SetLocation(trans->GetPosition());
+		}
 
 		if (!m_stopped) {
 			trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
@@ -985,7 +996,9 @@ namespace basecross {
 			auto fwd = -1 * trans->GetForward();
 			auto face = atan2f(fwd.z, fwd.x);
 
-			m_EfkPlay[0]->StopEffect();
+			if (m_EfkPlay[0]) {
+				m_EfkPlay[0]->StopEffect();
+			}
 			m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkProjEnd, trans->GetPosition(), 0.0f);
 			m_EfkPlay[1]->SetRotation(Vec3(0, 1, 0), -face);
 			m_EfkPlay[1]->SetScale(Vec3(.8f));
@@ -995,6 +1008,7 @@ namespace basecross {
 			m_EfkPlay[1]->SetLocation(trans->GetPosition());
 			if (m_range <= -.3f) {
 				m_EfkPlay[1]->StopEffect();
+				m_used = false;
 				SetUpdateActive(false);
 			}
 		}
@@ -1004,45 +1018,6 @@ namespace basecross {
 	void FireProjectile::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		if (Other->FindTag(L"FixedBox")) {
 			m_stopped = true;
-		}
-	}
-
-	//====================================================================
-	// class ChargePtcl
-	// チャージ中のパーティクル
-	//====================================================================
-
-	void ChargePtcl::OnCreate() {
-		SetAddType(true);
-	}
-
-	//パーティクルの挙動
-	void ChargePtcl::OnUpdate() {
-		for (auto ptrParticle : GetParticleVec()) {
-			for (auto& ptrParticleSprite : ptrParticle->GetParticleSpriteVec()) {
-				if (ptrParticleSprite.m_Active) {
-					if (ptrParticleSprite.m_LocalScale.x > 0) {
-						ptrParticleSprite.m_LocalScale.x -= .05f;
-						ptrParticleSprite.m_LocalScale.y -= .05f;
-					}
-				}
-			}
-		}
-		MultiParticle::OnUpdate();
-	}
-
-	void ChargePtcl::Emit(const Vec3& emitPos, const Vec3& randomEmitRange) {
-		auto ptrParticle = InsertParticle(1);
-		ptrParticle->SetEmitterPos(emitPos);
-		ptrParticle->SetTextureResource(L"AURA_TEX");
-		ptrParticle->SetMaxTime(1.0f);
-		for (auto& ptrParticleSprite : ptrParticle->GetParticleSpriteVec()) {
-			ptrParticleSprite.m_LocalPos.x = Util::RandZeroToOne() * randomEmitRange.x - randomEmitRange.x * 0.5f;
-			ptrParticleSprite.m_LocalPos.y = Util::RandZeroToOne() * randomEmitRange.y - randomEmitRange.y * 0.5f;
-			ptrParticleSprite.m_LocalPos.z = Util::RandZeroToOne() * randomEmitRange.z - randomEmitRange.z * 0.5f;
-
-			ptrParticleSprite.m_Velocity.y = .5f;
-			ptrParticleSprite.m_Color = Col4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 	}
 
