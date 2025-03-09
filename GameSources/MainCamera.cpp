@@ -16,7 +16,7 @@ namespace basecross {
 		TargetPos(Vec3(0.0f, 0.0f, 0.0f)),
 		m_ArmLen(15.5f),
 		m_RadY(.5f),
-		m_RadXZ(1.5f),
+		m_RadXZ(XM_PIDIV2),
 		m_RotSpeed(-2.0f),
 		m_ToTargetLerp(1.0f),
 		m_Hit(false),
@@ -57,6 +57,7 @@ namespace basecross {
 
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto keyData = App::GetApp()->GetInputDevice().GetKeyState();
+
 		//前回のターンからの時間
 		float elapsedTime = App::GetApp()->GetElapsedTime();
 		Vec3 newEye = ptrCamera->GetEye();
@@ -66,40 +67,42 @@ namespace basecross {
 		//正規化しておく
 		armVec.normalize();
 		float fThumbRX = 0.0f;
+
 		if (cntlVec[0].bConnected) {
 			fThumbRX = cntlVec[0].fThumbRX;
 		}
+		//キーボード操作の場合
+		if (keyData.m_bPushKeyTbl[VK_LEFT] || keyData.m_bPushKeyTbl[VK_RIGHT]) {
+			if (keyData.m_bPushKeyTbl[VK_LEFT]) {
+				fThumbRX = (IsLRBaseMode() ? -1.0f : 1.0f);
+			}
+			if (keyData.m_bPushKeyTbl[VK_RIGHT]) {
+				fThumbRX = (IsLRBaseMode() ? 1.0f : -1.0f);
+			}
+		}
+
+		//プレイヤーの向きにカメラを戻す
+		float tempFixedRad = FixCameraDirection(ptrTarget, (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_Y || keyData.m_bPressedKeyTbl['C']));
+		if (tempFixedRad != 0) 
+			fThumbRX = tempFixedRad;
+
 		armVec.y = sin(m_RadY);
 		//ここでY軸回転を作成
-		if (fThumbRX != 0 || keyData.m_bPushKeyTbl[VK_LEFT] || keyData.m_bPushKeyTbl[VK_RIGHT]) {
+		if (fThumbRX != 0) {
 			//回転スピードを反映
-			if (fThumbRX != 0) {
-				if (IsLRBaseMode()) {
-					m_RadXZ += -fThumbRX * elapsedTime * m_RotSpeed;
-				}
-				else {
-					m_RadXZ += fThumbRX * elapsedTime * m_RotSpeed;
-				}
+			if (IsLRBaseMode()) {
+				m_RadXZ += -fThumbRX * elapsedTime * m_RotSpeed;
 			}
-			else if (keyData.m_bPushKeyTbl[VK_LEFT]) {
-				if (IsLRBaseMode()) {
-					m_RadXZ += elapsedTime * m_RotSpeed;
-				}
-				else {
-					m_RadXZ -= elapsedTime * m_RotSpeed;
-				}
+			else {
+				m_RadXZ += fThumbRX * elapsedTime * m_RotSpeed;
 			}
-			else if (keyData.m_bPushKeyTbl[VK_RIGHT]) {
-				if (IsLRBaseMode()) {
-					m_RadXZ -= elapsedTime * m_RotSpeed;
-				}
-				else {
-					m_RadXZ += elapsedTime * m_RotSpeed;
-				}
-			}
-			if (abs(m_RadXZ) >= XM_2PI) {
+
+			if (m_RadXZ > XM_2PI) {
 				//1週回ったら0回転にする
-				m_RadXZ = 0;
+				m_RadXZ -= XM_2PI;
+			}
+			else if (m_RadXZ < 0) {
+				m_RadXZ += XM_2PI;
 			}
 		}
 
@@ -144,6 +147,47 @@ namespace basecross {
 	void CameraCollision::OnCollisionExcute(const CollisionPair& Pair)
 	{
 		m_Hit == true;
+	}
+
+	float CameraCollision::FixCameraDirection(shared_ptr<GameObject>& Other, bool Input)
+	{
+		//カメラの移動開始
+		if (Input == true) {
+			if (m_isMovingToFixedDir == false) {
+				//プレイヤーの向きベクトルを取得
+				Vec3 fwd = -1 * Other->GetComponent<Transform>()->GetForward();
+				float angle = atan2f(-fwd.z, fwd.x) - XM_PIDIV2;
+				m_fixedDirY = (angle - m_RadXZ);
+
+				//180°より大きい角度が入っている場合
+				if (m_fixedDirY > XM_PI) {
+					m_fixedDirY = -XM_2PI + m_fixedDirY;
+				}
+				if (m_fixedDirY < -XM_PI) {
+					m_fixedDirY = XM_2PI + m_fixedDirY;
+				}
+
+				m_isMovingToFixedDir = true;
+			}
+		}
+
+		//回す角度を返す
+		if (m_isMovingToFixedDir == true) {
+			float delta = App::GetApp()->GetElapsedTime();
+			if (abs(m_fixedDirY) > m_fixSpeed * delta * -m_RotSpeed) {
+				float sub = m_fixedDirY > 0 ? m_fixSpeed : -m_fixSpeed;
+				m_fixedDirY -= sub * delta * -m_RotSpeed;
+				return sub;
+			}
+			else {
+				m_isMovingToFixedDir = false;
+				return m_fixedDirY;
+			}
+		}
+		else {
+			return 0;
+		}
+
 	}
 
 	void CameraCollision::UpdateArmLengh() {

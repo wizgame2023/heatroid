@@ -370,6 +370,9 @@ namespace basecross {
 		//消去フラグ
 		bool m_lifeEnded;
 
+		//使用中フラグ
+		bool m_used = false;
+
 	public:
 		//構築と破棄
 
@@ -394,10 +397,18 @@ namespace basecross {
 			m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkProj, GetComponent<Transform>()->GetPosition(), 0.0f);
 			m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
 			m_EfkPlay[0]->SetScale(Vec3(.8f));
+
+		}
+
+		//使用中か否か
+		bool GetUsed() {
+			return m_used;
 		}
 
 		//呼び出す
 		void Invoke(const Vec3 dist, const Vec3 angle, const float power) {
+			m_used = true;
+			GetComponent<TriggerSphere>()->SetUpdateActive(true);
 			SetUpdateActive(true);
 
 			m_stopped = false;
@@ -413,24 +424,6 @@ namespace basecross {
 			EffectStart();
 		}
 
-	};
-
-	//====================================================================
-	// class ChargePtcl
-	// チャージ中のパーティクル
-	//====================================================================
-
-	class ChargePtcl : public MultiParticle {
-	public:
-		ChargePtcl(const shared_ptr<Stage>& StagePtr) :
-			MultiParticle(StagePtr)
-		{
-		}
-		virtual ~ChargePtcl() {}
-
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		void Emit(const Vec3& emitPos, const Vec3& randomEmitRange);
 	};
 
 	//====================================================================
