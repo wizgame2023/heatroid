@@ -248,6 +248,11 @@ namespace basecross {
 		{
 			m_open = open;
 		}
+
+		void SetButton(bool judge)
+		{
+			m_goaltrue = judge;
+		}
 	};
 
 	class DoorGimmickNum : public GimmickObject

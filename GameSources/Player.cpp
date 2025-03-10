@@ -582,7 +582,7 @@ namespace basecross {
 				auto shObj = v.lock();
 
 				if (shObj) {
-					auto Switchs = dynamic_pointer_cast<Door>(shObj);
+					auto Switchs = dynamic_pointer_cast<Elevator>(shObj);
 					Switchs->SetButton(true);
 				}
 			}
