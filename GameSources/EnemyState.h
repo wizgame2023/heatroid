@@ -43,6 +43,33 @@ namespace basecross {
 		virtual void Execute()override;
 		virtual void Exit() override;
 	};
+	class ThrowAwayState : public EnemyState {
+	public:
+		ThrowAwayState(shared_ptr<Enemy>& enemy) :
+			EnemyState(enemy)
+		{
+		}
+		virtual void Enter() override;
+		virtual void Execute() override;
+		virtual void Exit() override;
+	};
+	class MoveBulletState : public EnemyState {
+		MoveBulletState(shared_ptr<Enemy>& enemy) :
+			EnemyState(enemy)
+		{
+		}
+		virtual void Enter() override;
+		virtual void Execute() override;
+	};
+	class SlideState : public EnemyState {
+		SlideState(shared_ptr<Enemy>& enemy) :
+			EnemyState(enemy)
+		{
+		}
+		virtual void Enter() override;
+		virtual void Execute() override;
+	};
+	
 
 	//class EnemyStateMachine {
 	//protected:

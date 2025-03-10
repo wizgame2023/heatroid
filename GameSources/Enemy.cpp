@@ -76,6 +76,7 @@ namespace basecross {
 		m_plungeSE(false),
 		m_activeFlag(true),
 		m_throwFlag(false),
+		m_overHeatFlag(false),
 		m_test(1.0f),
 		m_throwTime(0.5f)
 	{
@@ -144,6 +145,7 @@ namespace basecross {
 		m_plungeSE(false),
 		m_activeFlag(true),
 		m_throwFlag(false),
+		m_overHeatFlag(false),
 		m_test(1.0f),
 		m_throwTime(0.5f)
 	{}
@@ -1047,7 +1049,7 @@ namespace basecross {
 		return m_trans->GetWorldPosition();
 	}
 	bool Enemy::GetOverHeat() {
-		if (m_stateType == m_overHeatState || m_stateType == throwAway) {
+		if (m_stateType == m_overHeatState || m_stateType == throwAway||m_overHeatFlag) {
 			return true;
 		}
 		else {

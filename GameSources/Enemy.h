@@ -88,6 +88,7 @@ namespace basecross {
 		bool m_overHeatSE;
 		bool m_plungeSE;
 		bool m_throwFlag;
+		bool m_overHeatFlag;
 
 		bool m_activeFlag;
 

@@ -9,6 +9,7 @@
 
 namespace basecross {
 	class Enemy;
+
 	EnemyChase::EnemyChase(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotation,
