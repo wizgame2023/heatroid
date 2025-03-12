@@ -8,12 +8,15 @@
 #include "Project.h"
 
 namespace basecross {
-	//追いかけてくるステート
+	//--------------------------------------------------------------------------------------
+	//	class ChaseState : public EnemyState	//プレイヤーを追いかけるステート
+	//--------------------------------------------------------------------------------------
 	void ChaseState::Enter() {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
 		enemy->m_speed = enemy->m_maxSpeed;
+		m_plungeTime = 7.0f;
 	}
 	void ChaseState::Execute() {
 		auto enemy = m_enemy.lock();
@@ -33,6 +36,10 @@ namespace basecross {
 			pos += enemy->m_speed * enemy->m_direcNorm * elapsed;
 		}
 
+		m_plungeTime -= elapsed;
+		if (m_plungeTime <= 0.0f) {
+			enemy->ChangeState<PlungeState>();
+		}
 
 		if (enemy->m_heat >= enemy->m_maxHeat) {
 			enemy->ChangeState<OverHeatState>();
@@ -41,7 +48,9 @@ namespace basecross {
 		enemy->m_draw->UpdateAnimation(elapsed);
 	}
 
-	//オーバーヒートステート
+	//--------------------------------------------------------------------------------------
+	//	class OverHeatState : public EnemyState	　//オーバーヒートステート
+	//--------------------------------------------------------------------------------------
 	void OverHeatState::Enter() {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
@@ -123,7 +132,9 @@ namespace basecross {
 		enemy->m_throwFlag = false;
 	}
 
-	//投げるステート
+	//--------------------------------------------------------------------------------------
+	//	class ThrowAwayState : public EnemyState	//オーバーヒート中に投げるステート
+	//--------------------------------------------------------------------------------------
 	void ThrowAwayState::Enter() {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
@@ -166,13 +177,15 @@ namespace basecross {
 
 	}
 
-	//追いかけながら弾を撃つステート
+	//--------------------------------------------------------------------------------------
+	//	class MoveBulletState : public EnemyState	//追いかけながら弾を撃ってくるステート
+	//--------------------------------------------------------------------------------------
 	void MoveBulletState::Enter() {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 
 		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
-		enemy->m_speed = enemy->m_maxSpeed;
+		enemy->m_speed = enemy->m_maxSpeed * 2.0f;
 	}
 	void MoveBulletState::Execute() {
 		auto enemy = m_enemy.lock();
@@ -186,6 +199,7 @@ namespace basecross {
 		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {
 			enemy->EnemyAnime(L"walk");
 			enemy->RapidFireBullet(3);
+			pos.x += enemy->m_speed * enemy->m_direcNorm.x * elapsed;
 			pos += enemy->m_speed * enemy->m_direcNorm * elapsed;
 		}
 		if (enemy->m_heat >= enemy->m_maxHeat) {
@@ -196,7 +210,9 @@ namespace basecross {
 		enemy->m_draw->UpdateAnimation(elapsed);
 	}
 
-	//左右に動くステート
+	//--------------------------------------------------------------------------------------
+	//	class SlideState : public EnemyState	　//左右移動しながら弾を撃ってくるステート
+	//--------------------------------------------------------------------------------------
 	void SlideState::Enter() {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
@@ -216,6 +232,7 @@ namespace basecross {
 		enemy->StraightXBullet();
 		auto pos = enemy->GetPos();
 		enemy->m_rad += 0.05f;
+		pos.y = enemy->Grav().y;
 		if (XMConvertToRadians(enemy->m_rad) >= 360) {
 			enemy->m_rad = 0;
 		}
@@ -224,32 +241,78 @@ namespace basecross {
 			enemy->EnemyAnime(L"kaihi");
 			pos += shaft.normalize() * sinf(enemy->m_rad) * enemy->m_speed * 2.0f * elapsed;
 		}
+		if (enemy->m_heat >= enemy->m_maxHeat) {
+			enemy->ChangeState<OverHeatState>();
+		}
 
 		enemy->m_trans->SetPosition(pos);
 		enemy->m_draw->UpdateAnimation(elapsed);
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	class PlungeState : public EnemyState	　//プレイヤーに向かって突っ込むステート
+	//--------------------------------------------------------------------------------------
+	void PlungeState::Enter() {
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
 
-	//void EnemyStateMachine::ChangeState(const shared_ptr<EnemyState>& newState) {
-	//	m_previousState = m_currentState;
-	//	auto currentState = m_currentState.lock();
-	//	auto owner = m_owner.lock();
+		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
+		enemy->EnemyAnime(L"spare");
+		auto pos = enemy->GetPos();
+		enemy->PlayerDic();
+	}
+	void PlungeState::Execute() {
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
+		float elapsed = App::GetApp()->GetElapsedTime();
+		auto pos = enemy->GetPos();
+		pos.y = enemy->Grav().y;
+		
+		enemy->m_spareTime -= elapsed;
+		m_spareTime -= elapsed;
+		if (m_spareTime <= 0.0f) {
+			pos += enemy->m_speed * enemy->m_direcNorm * elapsed * 3.5f;
+		}
+		m_time -= elapsed;
+		if (m_time <= 0.0f) {
+			enemy->ChangeState<ChaseState>();
+		}
+		if (enemy->m_heat >= enemy->m_maxHeat) {
+			enemy->ChangeState<OverHeatState>();
+		}
+		
+		enemy->m_trans->SetPosition(pos);
+		enemy->m_draw->UpdateAnimation(elapsed);
+	}
+	
+	//--------------------------------------------------------------------------------------
+	//	class ParabolaBulletState : public EnemyState	//動かず放物線上に弾を撃ってくるステート
+	//--------------------------------------------------------------------------------------
+	void ParabolaBulletState::Enter() {
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
+		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
+	}
+	void ParabolaBulletState::Execute() {
+		auto enemy = m_enemy.lock();
+		if (!enemy) return;
+		float elapsed = App::GetApp()->GetElapsedTime();
+		auto shaft = enemy->GetDirec().cross(Vec3(0.0f, 1.0f, 0.0f));
+		auto pos = enemy->GetPos();
+		pos.y = enemy->Grav().y;
 
-	//	if (currentState && owner) {
-	//		currentState->Exit();
-	//	}
-	//	m_currentState = newState;
-	//	currentState = m_currentState.lock();
-	//	if (currentState && owner) {
-	//		currentState->Enter();
-	//	}
-	//}
+		enemy->EnemyAngle();
+		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {
+			enemy->EnemyAnime(L"walk");
+			enemy->FallBullet();
+			pos += shaft.normalize() * sinf(enemy->m_rad) * enemy->m_speed * 2.0f * elapsed;
+		}
+		if (enemy->m_heat >= enemy->m_maxHeat) {
+			enemy->ChangeState<OverHeatState>();
+		}
 
-	//void EnemyStateMachine::SetCurrentState(const shared_ptr<EnemyState>& state) {
-	//	m_currentState = state;
-	//}
-	//void EnemyStateMachine::SetPreviousState(const shared_ptr<EnemyState>& state) {
-	//	m_previousState = state;
-	//}
+		enemy->m_trans->SetPosition(pos);
+		enemy->m_draw->UpdateAnimation(elapsed);
+	}
 
 }

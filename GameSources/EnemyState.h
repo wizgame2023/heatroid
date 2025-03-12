@@ -9,6 +9,9 @@
 #include "Enemy.h"
 
 namespace basecross {
+	//--------------------------------------------------------------------------------------
+	//	class EnemyState	//敵のデフォルトステート
+	//--------------------------------------------------------------------------------------
 	class EnemyState {
 	protected:
 		weak_ptr<Enemy> m_enemy;
@@ -24,15 +27,26 @@ namespace basecross {
 		virtual void Exit(){}
 
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class ChaseState : public EnemyState	//プレイヤーを追いかけるステート
+	//--------------------------------------------------------------------------------------
 	class ChaseState :public EnemyState {
+	private:
+		float m_plungeTime;
 	public:
 		ChaseState(shared_ptr<Enemy>& enemy):
-			EnemyState(enemy)
+			EnemyState(enemy),
+			m_plungeTime(7.0f)
 		{
 		}
 		void Enter() override;
 		void Execute()override;
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class OverHeatState : public EnemyState	　//オーバーヒートステート
+	//--------------------------------------------------------------------------------------
 	class OverHeatState : public EnemyState {
 	public:
 		OverHeatState(shared_ptr<Enemy>& enemy):
@@ -43,6 +57,10 @@ namespace basecross {
 		virtual void Execute()override;
 		virtual void Exit() override;
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class ThrowAwayState : public EnemyState	//オーバーヒート中に投げるステート
+	//--------------------------------------------------------------------------------------
 	class ThrowAwayState : public EnemyState {
 	public:
 		ThrowAwayState(shared_ptr<Enemy>& enemy) :
@@ -53,7 +71,12 @@ namespace basecross {
 		virtual void Execute() override;
 		virtual void Exit() override;
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class MoveBulletState : public EnemyState	//追いかけながら弾を撃ってくるステート
+	//--------------------------------------------------------------------------------------
 	class MoveBulletState : public EnemyState {
+	public:
 		MoveBulletState(shared_ptr<Enemy>& enemy) :
 			EnemyState(enemy)
 		{
@@ -61,7 +84,12 @@ namespace basecross {
 		virtual void Enter() override;
 		virtual void Execute() override;
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class SlideState : public EnemyState	　//左右移動しながら弾を撃ってくるステート
+	//--------------------------------------------------------------------------------------
 	class SlideState : public EnemyState {
+	public:
 		SlideState(shared_ptr<Enemy>& enemy) :
 			EnemyState(enemy)
 		{
@@ -69,24 +97,35 @@ namespace basecross {
 		virtual void Enter() override;
 		virtual void Execute() override;
 	};
-	
 
-	//class EnemyStateMachine {
-	//protected:
-	//	weak_ptr<Enemy> m_owner;
-	//	weak_ptr<EnemyState> m_currentState;
-	//	weak_ptr<EnemyState> m_previousState;
-	//	weak_ptr<EnemyState> m_nextState;
-	//public:
-	//	EnemyStateMachine(const shared_ptr<Enemy>& owner):
-	//		m_owner(owner)
-	//	{}
-	//	virtual ~EnemyStateMachine(){}
-	//	virtual void OnUpdate() {};
-	//	void SetCurrentState(const shared_ptr<EnemyState>& state);
-	//	void SetPreviousState(const shared_ptr<EnemyState>& state);
+	//--------------------------------------------------------------------------------------
+	//	class PlungeState : public EnemyState	　//プレイヤーに向かって突っ込むステート
+	//--------------------------------------------------------------------------------------
+	class PlungeState : public EnemyState {
+	private:
+		float m_time;
+		float m_spareTime;
+	public:
+		PlungeState(shared_ptr<Enemy>& enemy) :
+			EnemyState(enemy),
+			m_time(3.0f),
+			m_spareTime(1.0f)
+		{
+		}
+		virtual void Enter() override;
+		virtual void Execute() override;
+	};
 
-	//	void ChangeState(const shared_ptr<EnemyState>& newState);
-
-	//};
+	//--------------------------------------------------------------------------------------
+	//	class ParabolaBulletState : public EnemyState	//動かず放物線上に弾を撃ってくるステート
+	//--------------------------------------------------------------------------------------
+	class ParabolaBulletState : public EnemyState {
+	public:
+		ParabolaBulletState(shared_ptr<Enemy>& enemy) :
+			EnemyState(enemy)
+		{
+		}
+		virtual void Enter() override;
+		virtual void Execute() override;
+	};
 }

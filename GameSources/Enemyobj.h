@@ -33,7 +33,7 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void Debug();
-	private :
+	private:
 		float m_plungeTime;
 		float m_maxPlungeTime;
 		float m_plungeRargeTime;
