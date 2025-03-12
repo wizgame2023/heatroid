@@ -150,6 +150,11 @@ namespace basecross {
 			const State& overHeatState,
 			const wstring& meshName,
 			const shared_ptr<Player>& player);
+		Enemy(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale,
+			const shared_ptr<Player>& player);
 
 
 		virtual ~Enemy() {}

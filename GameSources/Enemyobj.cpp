@@ -168,11 +168,9 @@ namespace basecross {
 		const Vec3& position,
 		const Vec3& rotatoin,
 		const Vec3& scale,
-		const State& state,
-		const State& overHeatState,
 		const shared_ptr<Player>& player
 	) :
-		Enemy(stage,position,rotatoin,scale,state,overHeatState,player)
+		Enemy(stage,position,rotatoin,scale,player)
 	{
 	}
 	void BulletEnemy::OnCreate() {

@@ -267,7 +267,7 @@ namespace basecross {
 		float elapsed = App::GetApp()->GetElapsedTime();
 		auto pos = enemy->GetPos();
 		pos.y = enemy->Grav().y;
-		
+
 		enemy->m_spareTime -= elapsed;
 		m_spareTime -= elapsed;
 		if (m_spareTime <= 0.0f) {
@@ -280,7 +280,7 @@ namespace basecross {
 		if (enemy->m_heat >= enemy->m_maxHeat) {
 			enemy->ChangeState<OverHeatState>();
 		}
-		
+
 		enemy->m_trans->SetPosition(pos);
 		enemy->m_draw->UpdateAnimation(elapsed);
 	}

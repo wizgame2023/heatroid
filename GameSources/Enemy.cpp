@@ -83,7 +83,7 @@ namespace basecross {
 	}
 	Enemy::Enemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
-		const Vec3& rotatoin,
+		const Vec3& rotation,
 		const Vec3& scale,
 		const State& state,
 		const State& overHeatState,
@@ -92,7 +92,7 @@ namespace basecross {
 	) :
 		GameObject(stage),
 		m_beforePos(position),
-		m_rot(rotatoin),
+		m_rot(rotation),
 		m_scal(scale),
 		m_stateType(state),
 		m_overHeatState(overHeatState),
@@ -149,7 +149,72 @@ namespace basecross {
 		m_test(1.0f),
 		m_throwTime(0.5f)
 	{}
+	Enemy::Enemy(const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotation,
+		const Vec3& scale,
+		const shared_ptr<Player>& player
+	):
+		GameObject(stage),
+		m_beforePos(position),
+		m_rot(rotation),
+		m_scal(scale),
+		m_stateType(rightMove),
+		m_overHeatState(stay),
+		m_meshName(L"ENEMYARUKU"),
+		m_player(player),
+		m_heat(0),
+		m_maxHeat(100),
+		m_angle(0.0f),
+		m_speed(5.0f),
+		m_maxSpeed(5.0f),
+		m_upSpeed(3.0f),
+		m_upHeight(10.0f),
+		m_jumpPower(5.0f),
+		m_jumpTime(1.0f),
+		m_rad(0.0f),
+		m_dicUp(0),
+		m_direcNorm(Vec3(0.0f)),
+		m_dropTime(4.0f),
+		m_maxDropTime(m_dropTime),
+		m_hitDropTime(1.0f),
+		m_maxHitDropTime(m_hitDropTime),
+		m_spareTime(0.75f),
+		m_maxSpareTime(m_spareTime),
+		m_bulletTime(0.1f),
+		m_maxBulletTime(m_bulletTime),
+		m_pBulletTime(3.0f),
+		m_maxPbulletTime(m_pBulletTime),
+		m_bulletCnt(0),
+		m_bulletRangeTime(5.0f),
+		m_maxBulletRangeTime(m_bulletRangeTime),
+		m_trackingRange(30.0f),
+		m_efcTime(2.0f),
+		m_throwLength(1.0f),
+		m_firstDirec(Vec3(0.0f)),
+		m_bulletDic(Vec2(0.0f, 1.0f)),
+		m_gravity(-9.8f),
+		m_grav(Vec3(0.0f, m_gravity, 0.0f)),
+		m_gravVel(Vec3(0.0f)),
+		m_moveRot(Vec3(0.0f)),
+		m_bulletFlag(true),
+		m_jumpFlag(false),
+		m_jumpMoveFlag(false),
+		m_flyFlag(false),
+		m_floorFlag(false),
+		m_hitDropFlag(false),
+		m_plungeFlag(false),
+		m_pGrabFlag(false),
+		m_playerFlag(false),
+		m_overHeatSE(false),
+		m_plungeSE(false),
+		m_activeFlag(true),
+		m_throwFlag(false),
+		m_overHeatFlag(false),
+		m_test(1.0f),
+		m_throwTime(0.5f)
 
+	{}
 
 	void Enemy::OnCreate() {
 		m_trans = GetComponent<Transform>();
@@ -174,38 +239,53 @@ namespace basecross {
 		m_floorCol = GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
 		m_floorCol->SetDrawActive(false);
 
-		//左右に動く敵の場合モデルの変更と位置の調整
-		if (m_fastState == slide) {
-			m_meshName = L"ENEMYYOKO";
-			m_scal.y = m_scal.y * 0.5f;
-			pos.y = pos.y + m_scal.y;
+		//描画
+		m_scal.y = m_scal.y * 0.5;
+		pos.y = pos.y + m_scal.y * 0.5;
 
-			Mat4x4 meshMat;
-			meshMat.affineTransformation(
-				Vec3(1.0f, 1.0f * 2.0f, 1.0f),
-				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(0.0f, rad, 0.0f),
-				Vec3(0.0f, -1.5f, 0.0f)
-			);
-			m_draw->SetMeshToTransformMatrix(meshMat);
-			gauge->SetPosHight(6.0f);
-			gaugeFram->SetPosHight(6.0f);
-			m_floorCol->SetPosHight(3.0f);
-		}
-		else {
-			m_scal.y = m_scal.y * 0.5;
-			pos.y = pos.y + m_scal.y * 0.5;
+		Mat4x4 meshMat;
+		meshMat.affineTransformation(
+			Vec3(1.0f, 1.0f * 2.0f, 1.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, rad, 0.0f),
+			Vec3(0.0f, -1.5f, 0.0f)
+		);
+		m_draw->SetMeshToTransformMatrix(meshMat);
+		m_floorCol->SetPosHight(1.5f);
 
-			Mat4x4 meshMat;
-			meshMat.affineTransformation(
-				Vec3(1.0f, 1.0f * 2.0f, 1.0f),
-				Vec3(0.0f, 0.0f, 0.0f),
-				Vec3(0.0f, rad, 0.0f),
-				Vec3(0.0f, -1.5f, 0.0f)
-			);
-			m_draw->SetMeshToTransformMatrix(meshMat);
-			m_floorCol->SetPosHight(1.5f);
-		}
+
+		////左右に動く敵の場合モデルの変更と位置の調整
+		//if (m_fastState == slide) {
+		//	m_meshName = L"ENEMYYOKO";
+		//	m_scal.y = m_scal.y * 0.5f;
+		//	pos.y = pos.y + m_scal.y;
+
+		//	Mat4x4 meshMat;
+		//	meshMat.affineTransformation(
+		//		Vec3(1.0f, 1.0f * 2.0f, 1.0f),
+		//		Vec3(0.0f, 0.0f, 0.0f),
+		//		Vec3(0.0f, rad, 0.0f),
+		//		Vec3(0.0f, -1.5f, 0.0f)
+		//	);
+		//	m_draw->SetMeshToTransformMatrix(meshMat);
+		//	gauge->SetPosHight(6.0f);
+		//	gaugeFram->SetPosHight(6.0f);
+		//	m_floorCol->SetPosHight(3.0f);
+		//}
+		//else {
+		//	m_scal.y = m_scal.y * 0.5;
+		//	pos.y = pos.y + m_scal.y * 0.5;
+
+		//	Mat4x4 meshMat;
+		//	meshMat.affineTransformation(
+		//		Vec3(1.0f, 1.0f * 2.0f, 1.0f),
+		//		Vec3(0.0f, 0.0f, 0.0f),
+		//		Vec3(0.0f, rad, 0.0f),
+		//		Vec3(0.0f, -1.5f, 0.0f)
+		//	);
+		//	m_draw->SetMeshToTransformMatrix(meshMat);
+		//	m_floorCol->SetPosHight(1.5f);
+		//}
 
 		m_trans->SetScale(m_scal);
 		m_trans->SetPosition(pos);
