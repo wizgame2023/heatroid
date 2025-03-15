@@ -9,6 +9,8 @@
 #include "FixedBox.h"
 #include "Gimmick.h"
 #include "EnemyState.h"
+#include "EnemyImage.h"
+
 
 namespace basecross {
 	class EnemyFloorCol;
@@ -123,6 +125,8 @@ namespace basecross {
 		shared_ptr<CollisionCapsule> m_collision;
 		weak_ptr<TilingFixedBox> m_fixedBox;
 		weak_ptr<PlayerGrab> m_playerGrab;
+		weak_ptr<GaugeSquare> m_gauge;
+		weak_ptr<Square> m_gaugeFram;
 		//エフェクト
 		shared_ptr<EfkEffect> m_heatEffect;
 		shared_ptr<EfkEffect> m_eyeEffect;
@@ -212,9 +216,25 @@ namespace basecross {
 		template <class NextState>
 		void ChangeState() {
 			m_currentState->Exit();
+			m_previousState = move(m_currentState);
 			m_currentState.reset();
 			m_currentState = make_unique<NextState>(GetThis<Enemy>());
 			m_currentState->Enter();
+		}
+		template <class NextState>
+		void OnlyChangeState() {
+			m_currentState->Exit();
+			m_currentState.reset();
+			m_currentState = make_unique<NextState>(GetThis<Enemy>());
+			m_currentState->Enter();
+		}
+		void RetrunState() {
+			m_currentState->Exit();
+			m_currentState.reset();
+			m_currentState = move(m_previousState);
+			if (m_currentState) {
+				m_currentState->Enter();
+			}
 		}
 
 

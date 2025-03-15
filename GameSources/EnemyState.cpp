@@ -59,6 +59,13 @@ namespace basecross {
 		enemy->PlaySE(L"OverHeatSE", 5.0f);
 		enemy->EffectPlay(enemy->m_heatEffect, enemy->GetPos(), 3);
 		enemy->m_overHeatFlag = true;
+
+		auto gauge = enemy->m_gauge.lock();
+		if (!gauge) return;
+		gauge->DrawGauge(true);
+		auto gaugeFram = enemy->m_gaugeFram.lock();
+		if (!gaugeFram) return;
+		gaugeFram->DrawGauge(true);
 	}
 	void OverHeatState::Execute() {
 		auto enemy = m_enemy.lock();
@@ -74,13 +81,13 @@ namespace basecross {
 
 		enemy->m_playerFlag = false;
 		if (enemy->m_heat > 0.0f) {
-			enemy->m_heat -= elapsed * 2.5f * 10;
+			enemy->m_heat -= elapsed * 2.5f;
 		}
 		if (enemy->m_heat <= 0.0f) {
 			enemy->EnemyAnime(L"stand");
 			if (enemy->m_draw->IsTargetAnimeEnd()) {
 				enemy->EffectStop(3);
-				enemy->ChangeState<ChaseState>();
+				enemy->RetrunState();
 
 			}
 		}
@@ -105,7 +112,7 @@ namespace basecross {
 			}
 			if (cntlVec[0].bConnected) {
 				if (enemy->m_throwFlag) {
-					enemy->ChangeState<ThrowAwayState>();
+					enemy->OnlyChangeState<ThrowAwayState>();
 				}
 			}
 		}
@@ -130,6 +137,13 @@ namespace basecross {
 		enemy->PlaySE(L"EnemyRevival", 2.0f);
 		enemy->m_overHeatFlag = false;
 		enemy->m_throwFlag = false;
+
+		auto gauge = enemy->m_gauge.lock();
+		if (!gauge) return;
+		gauge->DrawGauge(false);
+		auto gaugeFram = enemy->m_gaugeFram.lock();
+		if (!gaugeFram) return;
+		gaugeFram->DrawGauge(false);
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -163,7 +177,7 @@ namespace basecross {
 
 		enemy->AroundOverHeat();
 		if (enemy->m_floorFlag) {
-			enemy->ChangeState<OverHeatState>();
+			enemy->OnlyChangeState<OverHeatState>();
 		}
 
 		enemy->m_trans->SetPosition(pos);
@@ -185,22 +199,27 @@ namespace basecross {
 		if (!enemy) return;
 
 		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
-		enemy->m_speed = enemy->m_maxSpeed * 2.0f;
+		enemy->m_speed = enemy->m_maxSpeed * 3.0f;
 	}
 	void MoveBulletState::Execute() {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 		float elapsed = App::GetApp()->GetElapsedTime();
-		auto pos = enemy->GetPos();
 		enemy->PlayerDic();
+		auto pos = enemy->GetPos();
+		Vec3 forward = enemy->m_trans->GetForward();
+		float face = atan2f(forward.z, forward.x);
+		Vec3 movePos;
+		movePos.z = (cosf(face) * enemy->m_direcNorm.z) + (sinf(face) * enemy->m_direcNorm.x);
+		Vec3 movePosNorm = movePos.normalize();
+		pos += movePosNorm * elapsed * enemy->m_speed;
 
 		pos.y = enemy->Grav().y;
 
 		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {
 			enemy->EnemyAnime(L"walk");
 			enemy->RapidFireBullet(3);
-			pos.x += enemy->m_speed * enemy->m_direcNorm.x * elapsed;
-			pos += enemy->m_speed * enemy->m_direcNorm * elapsed;
+			//pos += enemy->m_speed * enemy->m_direcNorm * elapsed;
 		}
 		if (enemy->m_heat >= enemy->m_maxHeat) {
 			enemy->ChangeState<OverHeatState>();

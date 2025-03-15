@@ -50,27 +50,45 @@ namespace basecross {
 			const Vec3& position,
 			const Vec3& rotatoin,
 			const Vec3& scale,
-			const State& state,
-			const State& overHeatState,
 			const shared_ptr<Player>& player);
 		virtual ~ChasingEnemy() {};
+		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
 
-	class BulletEnemy : public Enemy {
+	class MoveBulletEnemy : public Enemy {
 	private:
 	public:
-		BulletEnemy(const shared_ptr<Stage>& stage,
+		MoveBulletEnemy(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
-		virtual ~BulletEnemy() {};
+		virtual ~MoveBulletEnemy() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
 
 	class ParabolaBulletEnemy : public Enemy {
 	public:
+		ParabolaBulletEnemy(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotatoin,
+			const Vec3& scale,
+			const shared_ptr<Player>& player);
+		virtual ~ParabolaBulletEnemy() {};
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+	};
+	class SlideEnemy : public Enemy {
+	public:
+		SlideEnemy(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotatoin,
+			const Vec3& scale,
+			const shared_ptr<Player>& player);
+		virtual ~SlideEnemy() {};
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
 	};
 }

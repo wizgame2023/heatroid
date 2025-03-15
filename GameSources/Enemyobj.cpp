@@ -87,84 +87,22 @@ namespace basecross {
 		const Vec3& position,
 		const Vec3& rotation,
 		const Vec3& scale,
-		const State& defaultState,
-		const State& overheatState,
 		const shared_ptr<Player>& player
 	):
-		Enemy(stage, position, rotation, scale, defaultState, overheatState, player),
-		m_defaultState(rightMove),
-		m_overheatState(stay)
+		Enemy(stage, position, rotation, scale, player)
 	{}
+	void ChasingEnemy::OnCreate() {
+		Enemy::OnCreate();
+		m_currentState = make_unique<ChaseState>(dynamic_pointer_cast<Enemy>(GetThis<ChasingEnemy>()));
+		m_currentState->Enter();
+	}
 	void ChasingEnemy::OnUpdate() {
-		auto elapsed = App::GetApp()->GetElapsedTime();
-		auto pos = m_trans->GetPosition();
-
-		pos = Grav();
-
-		switch (m_stateType)
-		{
-		case basecross::Enemy::stay:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			EnemyAnime(L"wait");
-			break;
-		case basecross::Enemy::wait:
-			EnemyAnime(L"stand");
-			if (!m_overHeatSE) {
-				//起動時のエフェクト,SE
-				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, 0.5f)), 1, Vec3(0.5f));
-				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, -0.5f)), 2, Vec3(0.5f));
-				PlaySE(L"EnemyRevival", 2.0f);
-				m_overHeatSE = true;
-			}
-			m_spareTime -= elapsed;
-			if (m_spareTime <= 0.0f) {
-
-				m_stateType = m_fastState;
-			}
-			break;
-		case basecross::Enemy::rightMove:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			m_speed = m_maxSpeed;
-			PlayerDic();
-			if (!m_floorCol->GetPlayerFlag()) {
-				EnemyAngle();
-			}
-			if (m_direc.length() <= m_trackingRange * 2) {
-				EnemyAnime(L"walk");
-				pos += m_speed * m_direcNorm * elapsed;
-			}
-			break;
-			//投げる
-		case throwAway:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			PlayerDic();
-			pos.y += 0.25f * m_throwLength;
-			pos -= m_speed * m_direcNorm * elapsed * m_throwLength * 20.0f;
-			m_throwTime -= elapsed;
-			if (m_throwTime < 0.0f) {
-
-				EffectPlay(m_burstEffect, GetEyePos(Vec3(0, 0, 0)), 4, Vec3(0.5f));
-				PlaySE(L"EnemyBurst", 2.0f);
-				SetState(m_overHeatState);
-				m_throwTime = 0.5f;
-			}
-			AroundOverHeat();
-			break;
-		default:
-			break;
+		if (m_currentState) {
+			m_currentState->Execute();
 		}
-		m_trans->SetPosition(pos);
-
-		if (GetOverHeat()) {
-			Grab();
-		}
-		OverHeat();
-
-		//アニメーションの実装
-		m_draw->UpdateAnimation(elapsed);
 	}
 
-	BulletEnemy::BulletEnemy(const shared_ptr<Stage>& stage,
+	MoveBulletEnemy::MoveBulletEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotatoin,
 		const Vec3& scale,
@@ -173,17 +111,95 @@ namespace basecross {
 		Enemy(stage,position,rotatoin,scale,player)
 	{
 	}
-	void BulletEnemy::OnCreate() {
+	void MoveBulletEnemy::OnCreate() {
 		Enemy::OnCreate();
-		//unique_ptr<ChaseState> chaseState = make_unique<ChaseState>(dynamic_pointer_cast<Enemy>(GetThis<BulletEnemy>()));
-		//m_currentState = move(chaseState);
-		m_currentState = make_unique<ChaseState>(dynamic_pointer_cast<Enemy>(GetThis<BulletEnemy>()));
+		m_currentState = make_unique<MoveBulletState>(dynamic_pointer_cast<Enemy>(GetThis<MoveBulletEnemy>()));
 		m_currentState->Enter();
 	}
-	void BulletEnemy::OnUpdate() {
+	void MoveBulletEnemy::OnUpdate() {
 		if (m_currentState) {
 			m_currentState->Execute();
+		}
+	}
 
+	ParabolaBulletEnemy::ParabolaBulletEnemy(const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotatoin,
+		const Vec3& scale,
+		const shared_ptr<Player>& player
+	) :
+		Enemy(stage, position, rotatoin, scale, player)
+	{
+	}
+	void ParabolaBulletEnemy::OnCreate() {
+		Enemy::OnCreate();
+		m_currentState = make_unique<ParabolaBulletState>(dynamic_pointer_cast<Enemy>(GetThis<ParabolaBulletEnemy>()));
+		m_currentState->Enter();
+	}
+	void ParabolaBulletEnemy::OnUpdate() {
+		if (m_currentState) {
+			m_currentState->Execute();
+		}
+	}
+
+	SlideEnemy::SlideEnemy(const shared_ptr<Stage>& stage,
+		const Vec3& position,
+		const Vec3& rotatoin,
+		const Vec3& scale,
+		const shared_ptr<Player>& player
+	) :
+		Enemy(stage, position, rotatoin, scale, player)
+	{
+	}
+
+	void SlideEnemy::OnCreate() {
+		Enemy::OnCreate();
+		m_currentState = make_unique<SlideState>(dynamic_pointer_cast<Enemy>(GetThis<SlideEnemy>()));
+		m_currentState->Enter();
+
+
+		auto pos = m_beforePos;
+		float rad = XMConvertToRadians(180.0f);
+
+		//auto gauge = GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
+		//	Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
+		//auto gaugeFram = GetStage()->AddGameObject<Square>(4.0f, 2.0f, L"OverHeatFram",
+		//	Col4(1.0f, 1.0f, 1.0f, 1.0f), GetThis<Enemy>());
+
+		m_meshName = L"ENEMYYOKO";
+		m_scal.y = m_scal.y;
+		pos.y = pos.y + m_scal.y;
+
+		Mat4x4 meshMat;
+		meshMat.affineTransformation(
+			Vec3(1.0f, 1.0f * 2.0f, 1.0f),
+			Vec3(0.0f, 0.0f, 0.0f),
+			Vec3(0.0f, rad, 0.0f),
+			Vec3(0.0f, -1.5f, 0.0f)
+		);
+		m_draw->SetMeshToTransformMatrix(meshMat);
+		m_gauge.lock()->SetPosHight(6.0f);
+		m_gaugeFram.lock()->SetPosHight(6.0f);
+		m_floorCol->SetPosHight(3.0f);
+
+		m_trans->SetScale(m_scal);
+		m_trans->SetPosition(pos);
+		//描画
+		m_draw->SetMeshResource(m_meshName);
+		m_draw->SetOwnShadowActive(true);
+
+
+		auto shadowPtr = AddComponent<Shadowmap>();
+		shadowPtr->SetMeshResource(m_meshName);
+
+		m_draw->AddAnimation(L"stand", 160, 20, false, 30);
+		m_draw->AddAnimation(L"wait", 120, 30, false, 30);   //オーバーヒート状態
+
+
+	}
+	void SlideEnemy::OnUpdate() {
+		if (m_currentState) {
+			m_currentState->Execute();
 		}
 	}
 }

@@ -223,6 +223,7 @@ namespace basecross {
 		auto pos = m_beforePos;
 
 		m_currentState= make_unique<ChaseState>(GetThis<Enemy>());
+		m_previousState = move(m_currentState);
 
 		auto player = m_player.lock();
 		if (!player) return;
@@ -231,10 +232,12 @@ namespace basecross {
 		m_draw = AddComponent<PNTBoneModelDraw>();
 
 		//オーバーヒートゲージの追加
-		auto gauge = GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
+		m_gauge = GetStage()->AddGameObject<GaugeSquare>(4.0f, 2.0f, L"OverHeatGauge",
 			Col4(1.0f, 0.0f, 0.0f, 1.0f), GetThis<Enemy>());
-		auto gaugeFram = GetStage()->AddGameObject<Square>(4.0f, 2.0f, L"OverHeatFram",
+		m_gauge.lock()->DrawGauge(false);
+		m_gaugeFram = GetStage()->AddGameObject<Square>(4.0f, 2.0f, L"OverHeatFram",
 			Col4(1.0f, 1.0f, 1.0f, 1.0f), GetThis<Enemy>());
+		m_gaugeFram.lock()->DrawGauge(false);
 		//足場コリジョンの追加
 		m_floorCol = GetStage()->AddGameObject<EnemyFloorCol>(GetThis<Enemy>());
 		m_floorCol->SetDrawActive(false);
@@ -319,7 +322,7 @@ namespace basecross {
 		m_collision = AddComponent<CollisionCapsule>();
 		m_collision->SetAfterCollision(AfterCollision::Auto);
 		m_collision->SetFixed(false);
-		m_collision->SetDrawActive(true);
+		m_collision->SetDrawActive(false);
 		//敵の別コリジョンとの判定をなくす
 		m_collision->AddExcludeCollisionTag(L"EnemyFloor");
 		//m_collision->SetSleepActive(false);
@@ -559,7 +562,7 @@ namespace basecross {
 		if (player) {
 			auto playerTrans = player->GetComponent<Transform>();
 			auto playerPos = playerTrans->GetPosition();
-			m_direc = playerPos - GetWorldPos();
+			m_direc = playerPos - GetPos();
 			Vec3 dic = Vec3(m_direc.x, 0.0f, m_direc.z);
 			m_direcNorm = dic.normalize();
 		}
