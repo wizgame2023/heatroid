@@ -21,10 +21,11 @@ namespace basecross {
 		m_initSca(Vec3(3.0f, 3.0f, 3.0f)),
 
 		m_collideCount(m_collideCountInit)
-	{}
+	{
+	}
 
-	Player::Player(const shared_ptr<Stage>&StagePtr,
-		const Vec3 & pos, const Vec3 & rot, const Vec3 & sca) :
+	Player::Player(const shared_ptr<Stage>& StagePtr,
+		const Vec3& pos, const Vec3& rot, const Vec3& sca) :
 		GameObject(StagePtr),
 		m_initPos(pos),
 		m_initRot(rot),
@@ -32,7 +33,8 @@ namespace basecross {
 
 		m_collideCount(m_collideCountInit),
 		m_moveAngle(rot.y)
-	{}
+	{
+	}
 
 	Vec2 Player::GetInputState() const {
 		Vec2 ret;
@@ -72,7 +74,7 @@ namespace basecross {
 			front.normalize();
 			//進行方向向きからの角度を算出
 			float frontAngle = atan2(front.z, front.x);
-			
+
 			//コントローラの向き計算
 			Vec2 moveVec(moveX, moveZ);
 			float moveSize = moveVec.length();
@@ -104,6 +106,7 @@ namespace basecross {
 		//アニメーション関係
 		Animate();
 
+		//最高速度
 		SpeedLimit();
 
 		GetComponent<Transform>()->SetRotation(0, m_moveAngle, 0);
@@ -138,10 +141,10 @@ namespace basecross {
 		AddTag(L"Player");
 
 		//ステージマネージャ
-		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		//敵を掴む判定用オブジェクト
 		m_pGrab = GetStage()->AddGameObject<PlayerGrab>(GetThis<Player>());
-		
+
 		//エフェクト読み込み
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
@@ -184,7 +187,7 @@ namespace basecross {
 			Vec3(.4f, .4f, .4f), //(.1f, .1f, .1f),
 			Vec3(0.0f, 0.0f, 0.0f),
 			Vec3(0.0f, 0.0f, 0.0f),
-			Vec3(0.0f, -1.42f, 0.0f)
+			Vec3(0.0f, -XM_PIDIV2, 0.0f)
 		);
 
 		ptrDraw->SetMeshResource(L"PLAYER");
@@ -198,8 +201,12 @@ namespace basecross {
 		ptrShadow->SetMeshResource(ptrDraw->GetMeshResource());
 		ptrShadow->SetMeshToTransformMatrix(meshMat);
 
-		m_HP = m_HP_max;
+		//飛び道具オブジェクト生成
+		for (auto& e : m_proj) {
+			e = GetStage()->AddGameObject<FireProjectile>();
+		}
 
+		m_HP = m_HP_max;
 	}
 
 	void Player::OnUpdate() {
@@ -229,7 +236,7 @@ namespace basecross {
 			GetDrawPtr()->SetBlendState(BlendState::AlphaBlend);
 		}
 
-		if(GetDrawPtr()->GetCurrentAnimation()==L"Died") m_invincibleTime = m_invincibleTimeMax;
+		if (GetDrawPtr()->GetCurrentAnimation() == L"Died") m_invincibleTime = m_invincibleTimeMax;
 
 		//チャージも運搬も出来ない状況
 		if (m_stateType != stand) {
@@ -324,7 +331,7 @@ namespace basecross {
 			if (m_animTime <= 1.0f) {
 				SetAnim(L"Idle");
 			}
-			else if(m_animTime > 1.0f && m_animTime <= 3.0f) {
+			else if (m_animTime > 1.0f && m_animTime <= 3.0f) {
 				SetAnim(L"Walk");
 				Vec3 fwd = ForwardConvert(Vec3(1, 0, 0));
 				m_moveVel += fwd * m_accel * .0035;
@@ -336,7 +343,7 @@ namespace basecross {
 			SpeedLimit();
 
 			//ステージマネージャ取得、カメラ元に戻ったら操作可能に
-			if (m_stageMgr->m_CameraSelect != StageManager::CameraSelect::openingCamera) {
+			if (m_stageMgr->m_CameraSelect != StageGenerator::CameraSelect::OPENINGCAMERA) {
 				m_stateType = stand;
 			}
 
@@ -359,7 +366,7 @@ namespace basecross {
 			//---------------------------------------ゴール
 		case goalstandby:
 
-			if (m_animTime == 0){
+			if (m_animTime == 0) {
 				GetStage()->AddGameObject<GoalFade>();
 				PlaySnd(L"RevCymbal", 1.0f, 0.0f);
 			}
@@ -382,7 +389,7 @@ namespace basecross {
 				float face = atan2(fwd.z, fwd.x);
 				addpos1 = Vec3((m_distToGoal * cosf(face)), 0, (m_distToGoal * sinf(face)));
 				pos1 = Vec3(trans->GetPosition().x, GetComponent<Transform>()->GetPosition().y, trans->GetPosition().z);
-				GetComponent<Transform>()->SetPosition(addpos1 + pos1);	
+				GetComponent<Transform>()->SetPosition(addpos1 + pos1);
 			}
 			if (m_goalPosMoved) {
 				m_animTime = 0.0f;
@@ -396,7 +403,7 @@ namespace basecross {
 			//しばらく歩いてからエレベータに入ったところで180°振り向く
 			if (m_animTime > 0.0f && m_animTime <= 3.0f) {
 				SetAnim(L"Walk");
-				Vec3 fwd = ForwardConvert(Vec3(1, 0 ,0));
+				Vec3 fwd = ForwardConvert(Vec3(1, 0, 0));
 				m_moveVel += fwd * m_accel * .003f;
 			}
 			else if (m_animTime > 3.0f && m_animTime <= 3.5f) {
@@ -409,7 +416,7 @@ namespace basecross {
 				GetComponent<Transform>()->SetQuaternion(RotateQuat(m_goalRotate, Vec3(0, 1, 0), rot.EaseInOut(EasingType::Cubic, start, end, m_animTime - 3.0f, .5f)));
 			}
 			else if (m_animTime > 4.0f) {
-				 SetAnim(L"Idle");
+				SetAnim(L"Idle");
 			}
 			FrictionMovie();
 			SpeedLimit();
@@ -500,9 +507,9 @@ namespace basecross {
 		}
 		//被弾判定
 		if (Other->FindTag(L"EnemyBullet") && m_invincibleTime <= 0)
-				GetHit(Other);
+			GetHit(Other);
 
-		if (Other->FindTag(L"Floor")) 
+		if (Other->FindTag(L"Floor"))
 		{
 			if (m_stateType == died_air) {
 				PlaySnd(L"PlayerLand", 1.0f, 0);
@@ -541,18 +548,22 @@ namespace basecross {
 		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto grab = m_pGrab.lock();
 
+		//掴み判定を開始
 		if (m_grabTime == 0 && (pad[0].wPressedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bPressedKeyTbl['Q'] == true)) {
 			m_grabTime = m_grabTimeMax;
 		}
 
-		if (!(grab->IsHit())){
+		//非ヒット時に入力されたら判定を出す
+		if (!(grab->IsHit())) {
 			grab->SetCollActive(m_grabTime > 0);
 		}
 
+		//当たったら消す
 		if ((grab->IsHit()) && (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER || key.m_bUpKeyTbl['Q'] == true)) {
 			grab->SetCollActive(false);
 		}
 
+		//当たったフラグを更新
 		if (grab->IsHit()) {
 			m_isCarrying = true;
 			m_grabTime = 0.0f;
@@ -569,8 +580,9 @@ namespace basecross {
 			auto& vec = group->GetGroupVector();
 			for (auto& v : vec) {
 				auto shObj = v.lock();
-				if ( shObj) {
-					auto Switchs = dynamic_pointer_cast<Door>(shObj);
+
+				if (shObj) {
+					auto Switchs = dynamic_pointer_cast<Elevator>(shObj);
 					Switchs->SetButton(true);
 				}
 			}
@@ -749,9 +761,14 @@ namespace basecross {
 			ResetCharge();
 			return;
 		}
-
 		//飛び道具発射
-		GetStage()->AddGameObject<FireProjectile>(pos + firepos, fwd, m_chargePerc);
+		for (auto& e : m_proj) {
+			if (e->GetUsed() == true) continue;	//既に存在する弾はいじらない
+			else {
+				e->Invoke(pos + firepos, fwd, m_chargePerc);
+				break;
+			}
+		}
 		ResetCharge();
 	}
 
@@ -770,7 +787,7 @@ namespace basecross {
 			}
 		}
 		if (!condition) {
-			vector<wstring> target = { (prefix + L"_Idle"), (prefix + L"_Run")};
+			vector<wstring> target = { (prefix + L"_Idle"), (prefix + L"_Run") };
 			for (auto& anim : target) {
 				if (draw->GetCurrentAnimation() == anim) {
 					wstring changeanim = anim.replace(0, static_cast<int>(prefix.length()) + 1, L"");
@@ -893,23 +910,22 @@ namespace basecross {
 	// プレイヤーの飛び道具
 	//====================================================================
 
-	FireProjectile::FireProjectile(const shared_ptr<Stage>& StagePtr,
-		const Vec3 dist, const Vec3 angle, const float power) :
+	FireProjectile::FireProjectile(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_dist(dist),
-		m_angle(angle),
-		m_power(power),
-		m_speed(24.0f),
+		m_speedAdd(24.0f),
 		m_speedBase(24.0f),
 		m_rangeMax(.4f),
 		m_stopped(false),
-		m_lifeEnded(false)
-	{}
+		m_lifeEnded(false),
+		m_speed(0),
+		m_power(0)
+	{
+	}
 
 	void FireProjectile::OnCreate() {
 
 		//ステージマネージャ
-		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 
 		//エフェクト読み込み
 		wstring DataDir;
@@ -922,8 +938,8 @@ namespace basecross {
 
 		auto trans = GetComponent<Transform>();
 		trans->SetScale(Vec3(8.0f));
-		trans->SetRotation(0.0f, 0.0f, 0.0f);
-		trans->SetPosition(m_dist);
+		trans->SetRotation(Vec3(0));
+		trans->SetPosition(Vec3(0));
 
 		auto coll = AddComponent<TriggerSphere>();
 		coll->SetDrawActive(false);//debug
@@ -950,39 +966,30 @@ namespace basecross {
 
 		AddTag(L"Attack");
 
-		//速度×倍率+基底速度
-		m_speed = (m_speed * m_power) + m_speedBase;
-		//持続時間
-		m_range = m_rangeMax;
-
 	}
 
 	void FireProjectile::OnUpdate() {
-		auto trans = GetComponent<Transform>();
-
-		//エフェクトのプレイ
-		if(m_playTime <= 0.0f && !m_lifeEnded)
-		{
-			auto fwd = -1 * trans->GetForward();
-			auto face = atan2f(fwd.z, fwd.x);
-
-			auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-			m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkProj, trans->GetPosition(), 0.0f);
-			m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
-			m_EfkPlay[0]->SetScale(Vec3(.8f));
+		//ポーズ解除後に一瞬動くのを防止するため
+		if (!m_used) {
+			GetComponent<TriggerSphere>()->SetUpdateActive(false);
+			SetUpdateActive(false);
+			return;
 		}
+
+		auto trans = GetComponent<Transform>();
 
 		auto delta = App::GetApp()->GetElapsedTime();
 		m_playTime += delta;
 
-		m_EfkPlay[0]->SetLocation(trans->GetPosition());
+		if (m_EfkPlay[0]) {
+			m_EfkPlay[0]->SetLocation(trans->GetPosition());
+		}
 
 		if (!m_stopped) {
 			trans->SetPosition(trans->GetPosition() + (m_angle * m_speed * delta));
 		}
 
 		m_range -= delta;
-		GetComponent<PNTStaticDraw>()->SetDiffuse(Col4(1, 1, 1, m_range * 2 / m_rangeMax));
 
 		if (m_range <= 0 && !m_lifeEnded) {
 			m_lifeEnded = true;
@@ -990,7 +997,9 @@ namespace basecross {
 			auto fwd = -1 * trans->GetForward();
 			auto face = atan2f(fwd.z, fwd.x);
 
-			m_EfkPlay[0]->StopEffect();
+			if (m_EfkPlay[0]) {
+				m_EfkPlay[0]->StopEffect();
+			}
 			m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkProjEnd, trans->GetPosition(), 0.0f);
 			m_EfkPlay[1]->SetRotation(Vec3(0, 1, 0), -face);
 			m_EfkPlay[1]->SetScale(Vec3(.8f));
@@ -998,8 +1007,10 @@ namespace basecross {
 
 		if (m_lifeEnded) {
 			m_EfkPlay[1]->SetLocation(trans->GetPosition());
-			if (m_range <= -.25f) {
-				GetStage()->RemoveGameObject<FireProjectile>(GetThis<FireProjectile>());
+			if (m_range <= -.3f) {
+				m_EfkPlay[1]->StopEffect();
+				m_used = false;
+				SetUpdateActive(false);
 			}
 		}
 	}
@@ -1008,45 +1019,6 @@ namespace basecross {
 	void FireProjectile::OnCollisionEnter(shared_ptr<GameObject>& Other) {
 		if (Other->FindTag(L"FixedBox")) {
 			m_stopped = true;
-		}
-	}
-
-	//====================================================================
-	// class ChargePtcl
-	// チャージ中のパーティクル
-	//====================================================================
-
-	void ChargePtcl::OnCreate() {
-		SetAddType(true);
-	}
-
-	//パーティクルの挙動
-	void ChargePtcl::OnUpdate() {
-		for (auto ptrParticle : GetParticleVec()) {
-			for (auto& ptrParticleSprite : ptrParticle->GetParticleSpriteVec()) {
-				if (ptrParticleSprite.m_Active) {
-					if (ptrParticleSprite.m_LocalScale.x > 0) {
-						ptrParticleSprite.m_LocalScale.x -= .05f;
-						ptrParticleSprite.m_LocalScale.y -= .05f;
-					}
-				}
-			}
-		}
-		MultiParticle::OnUpdate();
-	}
-
-	void ChargePtcl::Emit(const Vec3& emitPos, const Vec3& randomEmitRange) {
-		auto ptrParticle = InsertParticle(1);
-		ptrParticle->SetEmitterPos(emitPos);
-		ptrParticle->SetTextureResource(L"AURA_TEX");
-		ptrParticle->SetMaxTime(1.0f);
-		for (auto& ptrParticleSprite : ptrParticle->GetParticleSpriteVec()) {
-			ptrParticleSprite.m_LocalPos.x = Util::RandZeroToOne() * randomEmitRange.x - randomEmitRange.x * 0.5f;
-			ptrParticleSprite.m_LocalPos.y = Util::RandZeroToOne() * randomEmitRange.y - randomEmitRange.y * 0.5f;
-			ptrParticleSprite.m_LocalPos.z = Util::RandZeroToOne() * randomEmitRange.z - randomEmitRange.z * 0.5f;
-
-			ptrParticleSprite.m_Velocity.y = .5f;
-			ptrParticleSprite.m_Color = Col4(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 	}
 

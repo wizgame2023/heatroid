@@ -338,7 +338,7 @@ namespace basecross {
 		wstring effectSmoke = DataDir + L"Effects\\smoke.efk";
 		wstring effectEye = DataDir + L"Effects\\EnemyEye.efk";
 		wstring effectBurst = DataDir + L"Effects\\EnemyBurst.efk";
-		auto stageManager = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto stageManager = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		auto efkInterface = stageManager->GetEfkInterface();
 		m_heatEffect = ObjectFactory::Create<EfkEffect>(efkInterface, effectSmoke);
 		m_eyeEffect = ObjectFactory::Create<EfkEffect>(efkInterface, effectEye);
