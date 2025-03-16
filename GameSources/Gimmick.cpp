@@ -170,11 +170,6 @@ namespace basecross {
 		}
 	}
 
-	void GimmickButton::PlaySE(wstring path, float loopcnt, float volume) {
-		auto playSE = App::GetApp()->GetXAudio2Manager();
-		playSE->Start(path, loopcnt, volume);
-	}
-
 	void GimmickButton::EfectPlay()
 	{
 		auto pos = GetComponent<Transform>()->GetPosition();
