@@ -226,6 +226,11 @@ namespace basecross {
 		{
 			m_open = open; // ドアの開閉状態を更新
 		}
+
+		void SetButton(bool judge)
+		{
+			m_goaltrue = judge;
+		}
 	};
 
 	class DoorGimmickNum : public GimmickObject

@@ -43,6 +43,7 @@ namespace basecross {
 		Quat RotCorrection(const Vec3& Line);
 		void Debug();
 		void SetPosHight(float hight);
+		void DrawGauge(bool flag);
 	};
 
 

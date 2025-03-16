@@ -24,6 +24,10 @@ namespace basecross {
 		float m_RadY;                           // Y軸の回転角度
 		float m_RadXZ;                          // XZ平面の回転角度
 
+		float m_fixedDirY;						// Yボタン(Cキー)押したときの目標角度
+		float m_fixSpeed = 3.0f;				// 目標角度に向けて回す速度
+		bool m_isMovingToFixedDir = false;		// 目標角度に向けて移動中
+
 	public:
 		// コンストラクタ
 		CameraCollision(const shared_ptr<Stage>& StagePtr);
@@ -46,6 +50,9 @@ namespace basecross {
 
 		// 腕の長さを更新する
 		void UpdateArmLengh();
+
+		// カメラの向きをターゲットに合わせる
+		float FixCameraDirection(shared_ptr<GameObject>& Other, bool Input);
 
 		// 左右スティック変更のモードを取得する
 		bool GetLRBaseMode() const;

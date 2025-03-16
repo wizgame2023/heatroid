@@ -8,12 +8,17 @@
 #include "stdafx.h"
 #include "FixedBox.h"
 #include "Gimmick.h"
+#include "EnemyState.h"
+#include "EnemyImage.h"
+
 
 namespace basecross {
 	class EnemyFloorCol;
+	class EnemyBullet;
 	//--------------------------------------------------------------------------------------
 	//	class Enemy : public GameObject;
 	//--------------------------------------------------------------------------------------
+	static const int MAX_EFFECT_NUM = 4; //エフェクトの数
 	class Enemy : public GameObject
 	{
 	public:
@@ -33,8 +38,9 @@ namespace basecross {
 			throwAway, //投げられる
 		};
 
+		
 
-	protected:
+	public:
 		float m_heat;          //オーバーヒート値
 		float m_maxHeat;       //最大オーバーヒート
 		float m_angle;          //プレイヤーに向く角度
@@ -84,6 +90,7 @@ namespace basecross {
 		bool m_overHeatSE;
 		bool m_plungeSE;
 		bool m_throwFlag;
+		bool m_overHeatFlag;
 
 		bool m_activeFlag;
 
@@ -99,7 +106,6 @@ namespace basecross {
 		State m_beforeState;
 		State m_overHeatState;
 
-		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
 		Vec3 m_beforePos;
@@ -119,12 +125,17 @@ namespace basecross {
 		shared_ptr<CollisionCapsule> m_collision;
 		weak_ptr<TilingFixedBox> m_fixedBox;
 		weak_ptr<PlayerGrab> m_playerGrab;
+		weak_ptr<GaugeSquare> m_gauge;
+		weak_ptr<Square> m_gaugeFram;
 		//エフェクト
 		shared_ptr<EfkEffect> m_heatEffect;
 		shared_ptr<EfkEffect> m_eyeEffect;
 		shared_ptr<EfkEffect> m_burstEffect;
-		shared_ptr<EfkPlay> m_EfkPlayer[4];
+		shared_ptr<EfkPlay> m_EfkPlayer[MAX_EFFECT_NUM];
 
+		unique_ptr<EnemyState> m_currentState;  //現在のステート
+		unique_ptr<EnemyState> m_nextState;     //次のステート
+		unique_ptr<EnemyState> m_previousState; //一つ前のステート
 
 	public:
 		// 構築と破棄
@@ -143,6 +154,12 @@ namespace basecross {
 			const State& overHeatState,
 			const wstring& meshName,
 			const shared_ptr<Player>& player);
+		Enemy(const shared_ptr<Stage>& stage,
+			const Vec3& position,
+			const Vec3& rotation,
+			const Vec3& scale,
+			const shared_ptr<Player>& player);
+
 
 		virtual ~Enemy() {}
 		virtual void OnCreate() override; // 初期化
@@ -151,14 +168,14 @@ namespace basecross {
 		void OnCollisionEnter(shared_ptr<GameObject>& other);
 		void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
-	protected:
+	public:
 		void EnemyJump();
 		void HipDropJump();
 		void ThisDestroy();
 		void PlayerDic();
 		void OneJump(float jumpHight);
 		void HitDrop();
-		void Plunge();
+		Vec3 Plunge();
 		void JumpMove();
 		void FindFixed();
 		void EnemyAngle();
@@ -172,6 +189,7 @@ namespace basecross {
 		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
 		void EffectPlay(const shared_ptr<EfkEffect>& efk,
 			const Vec3& pos, const int num, const Vec3& scale = Vec3(1.0f));
+		void EffectStop(int num);
 		Vec3 GetEyePos(const Vec3& eye);
 		void Debug();
 	public:
@@ -195,10 +213,34 @@ namespace basecross {
 		void PlayOverHeat();
 		void SetThrowFlag(bool flag);
 		void SetThorwLenght(float length);
+		template <class NextState>
+		void ChangeState() {
+			m_currentState->Exit();
+			m_previousState = move(m_currentState);
+			m_currentState.reset();
+			m_currentState = make_unique<NextState>(GetThis<Enemy>());
+			m_currentState->Enter();
+		}
+		template <class NextState>
+		void OnlyChangeState() {
+			m_currentState->Exit();
+			m_currentState.reset();
+			m_currentState = make_unique<NextState>(GetThis<Enemy>());
+			m_currentState->Enter();
+		}
+		void RetrunState() {
+			m_currentState->Exit();
+			m_currentState.reset();
+			m_currentState = move(m_previousState);
+			if (m_currentState) {
+				m_currentState->Enter();
+			}
+		}
 
-	protected:
+
+	public:
 		//重力に関する関数
-		void Grav();
+		Vec3 Grav();
 		void SetGrav(Vec3 grav);
 		void AddGrav(Vec3 grav);
 		void GravZero();
