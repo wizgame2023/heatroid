@@ -86,7 +86,6 @@ namespace basecross {
 		if (enemy->m_heat <= 0.0f) {
 			enemy->EnemyAnime(L"stand");
 			if (enemy->m_draw->IsTargetAnimeEnd()) {
-				enemy->EffectStop(3);
 				enemy->RetrunState();
 
 			}
@@ -112,6 +111,7 @@ namespace basecross {
 			}
 			if (cntlVec[0].bConnected) {
 				if (enemy->m_throwFlag) {
+					enemy->m_pGrabFlag = false;
 					enemy->OnlyChangeState<ThrowAwayState>();
 				}
 			}
@@ -135,6 +135,7 @@ namespace basecross {
 		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, 0.5f)), 1, Vec3(0.5f));
 		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, -0.5f)), 2, Vec3(0.5f));
 		enemy->PlaySE(L"EnemyRevival", 2.0f);
+		enemy->EffectStop(3);
 		enemy->m_overHeatFlag = false;
 		enemy->m_throwFlag = false;
 
