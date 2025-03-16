@@ -898,6 +898,7 @@ namespace basecross {
 		}
 		if (other->FindTag(L"Wall")) {
 			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
+			m_floorFlag = true;
 		}
 		if ((other->FindTag(L"GimmickButton")))
 		{
@@ -964,6 +965,11 @@ namespace basecross {
 			//m_floorPos = m_pos;
 			m_floorFlag = true;
 		}
+		if (other->FindTag(L"Wall")) {
+			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
+			m_floorFlag = true;
+		}
+
 
 		if ((other->FindTag(L"GimmickButton")))
 		{
