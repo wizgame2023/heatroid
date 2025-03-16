@@ -15,7 +15,7 @@ namespace basecross {
 	void GameStageTsuboi::OnCreate() {
 		try {
 
-			auto a = AddGameObject<StageManager>();
+			auto a = AddGameObject<StageGenerator>();
 			a->CreateViewLight();
 			a->CreatePlayer();
 			auto player = GetSharedGameObject<Player>(L"Player");
@@ -33,12 +33,12 @@ namespace basecross {
 
 	void GameStageTsuboi::PlayBGM(const wstring& StageBGM)
 	{
-		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
+		m_BGM = m_PtrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
 	}
 
 	void GameStageTsuboi::OnDestroy() {
 		//BGMのストップ
-		m_ptrXA->Stop(m_BGM);
+		m_PtrXA->Stop(m_BGM);
 	}
 
 }

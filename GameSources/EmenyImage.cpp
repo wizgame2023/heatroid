@@ -82,12 +82,12 @@ namespace basecross {
 			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + m_posHight, m_pos.z));
 			
 			//オーバーヒートの時のみ表示
-			if (enemy->GetOverHeat()) {
-				m_draw->SetDrawActive(true);
-			}
-			else {
-				m_draw->SetDrawActive(false);
-			}
+			//if (enemy->GetOverHeat()) {
+			//	m_draw->SetDrawActive(true);
+			//}
+			//else {
+			//	m_draw->SetDrawActive(false);
+			//}
 		}
 		auto ptrCamera = GetStage()->GetView()->GetTargetCamera();
 		Quat Qt = RotCorrection(ptrCamera->GetAt() - ptrCamera->GetEye());
@@ -114,6 +114,9 @@ namespace basecross {
 		Qt.normalize();
 		return Qt;
 	}
+	void Square::DrawGauge(bool flag) {
+		m_draw->SetDrawActive(flag);
+	}
 	//削除
 	void Square::ThisDestroy() {
 		auto stage = GetStage();
@@ -126,7 +129,7 @@ namespace basecross {
 	void Square::Debug() {
 		//auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		//auto scene = App::GetApp()->GetScene<Scene>();
-		//auto enemy = m_enemy.lock();
+		//auto enemy = m_owner.lock();
 		//auto enemyPos = enemy->GetComponent<Transform>()->GetPosition();
 		//wstringstream wss(L"");
 		//wss << L"pos \n("

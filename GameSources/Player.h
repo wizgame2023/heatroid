@@ -9,12 +9,13 @@
 
 namespace basecross {
 
-//====================================================================
-// class Player
-// プレイヤークラス
-//====================================================================
+	//====================================================================
+	// class Player
+	// プレイヤークラス
+	//====================================================================
 	class PlayerGrab;
-	class Player : public GameObject {
+	class FireProjectile;
+		class Player : public GameObject {
 
 		//エフェクト
 		shared_ptr<EfkEffect> m_EfkMuzzle;
@@ -23,6 +24,9 @@ namespace basecross {
 		shared_ptr<EfkEffect> m_EfkLand;
 		//エフェクト実行オブジェクト
 		shared_ptr<EfkPlay> m_EfkPlay[3];
+
+		//飛び道具オブジェクト(前以て3つ呼び出しておく)
+		shared_ptr<FireProjectile> m_proj[3];
 
 		//Transformの初期化
 		Vec3 m_initPos;
@@ -94,7 +98,7 @@ namespace basecross {
 		Vec3 pos1, addpos1;
 
 		//ステージマネージャ
-		shared_ptr<StageManager> m_stageMgr;
+		shared_ptr<StageGenerator> m_stageMgr;
 
 		//掴み判定用ポインタ
 		weak_ptr<PlayerGrab> m_pGrab;
@@ -122,164 +126,164 @@ namespace basecross {
 		//HP
 		int m_HP = 0;
 		const int m_HP_max = 4;
-		
+
 		float _delta = App::GetApp()->GetElapsedTime();
 
 		//クォータニオン基準での回転処理 1q:最初の回転 v:回転軸 rad:回転量
-		Quat RotateQuat(const Quat q, const Vec3 v,const float rad) {
+		Quat RotateQuat(const Quat q, const Vec3 v, const float rad) {
 			Quat r = Quat(cos(rad / 2), v.x * sin(rad / 2), v.y * sin(rad / 2), v.z * sin(rad / 2));
 			Quat r2 = Quat(cos(rad / 2), -v.x * sin(rad / 2), -v.y * sin(rad / 2), -v.z * sin(rad / 2));
 			return q * r * r2;
 
 		}
 
-	public:
-		//構築と破棄
+		public:
+			//構築と破棄
 
-		Player(const shared_ptr<Stage>& StagePtr,
-			const Vec3& pos, const Vec3& rot, const Vec3& sca);
+			Player(const shared_ptr<Stage>& StagePtr,
+				const Vec3& pos, const Vec3& rot, const Vec3& sca);
 
-		Player(const shared_ptr<Stage>& StagePtr);
+			Player(const shared_ptr<Stage>& StagePtr);
 
-		virtual ~Player() {}
-		//アクセサ
-		//初期化
-		virtual void OnCreate() override;
-		//更新
-		virtual void OnUpdate() override;
-		virtual void OnUpdate2() override;
+			virtual ~Player() {}
+			//アクセサ
+			//初期化
+			virtual void OnCreate() override;
+			//更新
+			virtual void OnUpdate() override;
+			virtual void OnUpdate2() override;
 
-		//何かに接触している判定(接地判定に活用？)
-		virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
-		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
-		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
+			//何かに接触している判定(接地判定に活用？)
+			virtual void OnCollisionExcute(shared_ptr<GameObject>& Other) override;
+			virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
+			virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 
-		////Aボタン
-		void OnPushA();
+			////Aボタン
+			void OnPushA();
 
-		//最高速度
-		void SpeedLimit();
-		//アニメーション制御
-		void Animate();
-		//重力
-		void Gravity();
-		//摩擦
-		void Friction();
-		//演出中の摩擦
-		void FrictionMovie();
-		//歩行音
-		void WalkSound();
+			//最高速度
+			void SpeedLimit();
+			//アニメーション制御
+			void Animate();
+			//重力
+			void Gravity();
+			//摩擦
+			void Friction();
+			//演出中の摩擦
+			void FrictionMovie();
+			//歩行音
+			void WalkSound();
 
-		//四捨五入
-		Vec3 RoundOff(Vec3 number, int point);
-		//アニメーションの登録
-		void RegisterAnim();
-		//敵を持つ
-		void GrabEnemy();
-		//飛び道具発射
-		void Projectile();
-		//攻撃をくらう/死ぬ
-		void GetHit(shared_ptr<GameObject>& target);
-		void Died();
+			//四捨五入
+			Vec3 RoundOff(Vec3 number, int point);
+			//アニメーションの登録
+			void RegisterAnim();
+			//敵を持つ
+			void GrabEnemy();
+			//飛び道具発射
+			void Projectile();
+			//攻撃をくらう/死ぬ
+			void GetHit(shared_ptr<GameObject>& target);
+			void Died();
 
-		//Transform.Scaleのゲッタ
-		const Vec3 GetScale() {
-			return GetComponent<Transform>()->GetScale();
-		}
-
-		//HPを1を最大値とした割合で返す
-		const float GetHPRate() {
-			if (m_HP < 0) return 0;
-			return static_cast<float>(m_HP) / static_cast<float>(m_HP_max);
-		}
-
-		//死んだらtrueを返す
-		const bool GetDied() {
-			return (m_stateType == died || m_stateType == died_air);
-		}
-
-		//ゴールに到達したらtrueを返す
-		const bool GetArrivedGoal() {
-			return (m_stateType == goal);
-		}
-
-		//描画コンポーネントのゲッタ
-		const shared_ptr<PNTBoneModelDraw> GetDrawPtr() {
-			return GetComponent<PNTBoneModelDraw>();
-		}
-
-		//敵を持っているか否か(持っていればtrueを返す)
-		const bool Player::IsCarryingEnemy();
-
-		//SEの再生
-		void Player::PlaySnd(wstring sndname, float volume, float loopcount) {
-			auto audio = App::GetApp()->GetXAudio2Manager();
-			audio->Start(sndname, loopcount, volume);
-		}
-
-		//isChargingフラグの取得
-		const bool IsCharging() {
-			return m_isCharging;
-		}
-
-		//ゲージの溜まり具合のゲッタ
-		const float GetChargePerc() {
-			return m_chargePerc;
-		}
-
-		//GetForwardから向きに応じたベクトルを返す
-		Vec3 ForwardConvert(Vec3 v) {
-			Vec3 ret;
-
-			auto trans = GetComponent<Transform>();
-			auto fwd = -1 * trans->GetForward();
-			auto face = atan2f(fwd.z, fwd.x);
-			auto scale = trans->GetScale();
-
-			ret.x = (cosf(face) * v.x) - (sinf(face) * v.z);
-			ret.y = v.y;
-			ret.z = (cosf(face) * v.z) + (sinf(face) * v.x);
-
-			return ret;
-		}
-
-		//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
-		const void SetAnim(wstring animname, float time = 0.0f) {
-			auto draw = GetComponent<PNTBoneModelDraw>();
-			if (draw->GetCurrentAnimation() != animname)
-				draw->ChangeCurrentAnimation(animname, time);
-		}
-
-		//通常時・チャージ中、敵運搬中でアニメーションを切り替える
-		void SwitchAnim(const float time, const float condition, const wstring prefix);
-
-		void Charging(bool charge) {
-			m_isCharging = charge;
-			if (charge == false) return;
-			
-			if (m_isOverCharge) {
-				m_chargePerc += m_chargeReduceSpeed * m_chargePerc * _delta;
-			}
-			else {
-				m_chargePerc += m_chargeSpeed * _delta;
+			//Transform.Scaleのゲッタ
+			const Vec3 GetScale() {
+				return GetComponent<Transform>()->GetScale();
 			}
 
-			if (m_chargePerc > 1.0f) m_isOverCharge = true;
-		}
+			//HPを1を最大値とした割合で返す
+			const float GetHPRate() {
+				if (m_HP < 0) return 0;
+				return static_cast<float>(m_HP) / static_cast<float>(m_HP_max);
+			}
 
-		//チャージ状態をリセットし、発射モーションに移行(chargePercが0になるので、オブジェクト生成後に呼ぶこと)
-		void ResetCharge() {
-			m_chargePerc = 0;
-			m_isOverCharge = false;
-			m_stateType = release;
-		}
+			//死んだらtrueを返す
+			const bool GetDied() {
+				return (m_stateType == died || m_stateType == died_air);
+			}
 
-		//状態に応じてアニメーションを変える
-		const wstring AddPrefix() {
-			if (m_isCarrying) return L"Grab_";
-			if (m_isCharging) return L"Fire_";
-			else return L"";
-		}
+			//ゴールに到達したらtrueを返す
+			const bool GetArrivedGoal() {
+				return (m_stateType == goal);
+			}
+
+			//描画コンポーネントのゲッタ
+			const shared_ptr<PNTBoneModelDraw> GetDrawPtr() {
+				return GetComponent<PNTBoneModelDraw>();
+			}
+
+			//敵を持っているか否か(持っていればtrueを返す)
+			const bool Player::IsCarryingEnemy();
+
+			//SEの再生
+			void Player::PlaySnd(wstring sndname, float volume, float loopcount) {
+				auto audio = App::GetApp()->GetXAudio2Manager();
+				audio->Start(sndname, loopcount, volume);
+			}
+
+			//isChargingフラグの取得
+			const bool IsCharging() {
+				return m_isCharging;
+			}
+
+			//ゲージの溜まり具合のゲッタ
+			const float GetChargePerc() {
+				return m_chargePerc;
+			}
+
+			//GetForwardから向きに応じたベクトルを返す
+			Vec3 ForwardConvert(Vec3 v) {
+				Vec3 ret;
+
+				auto trans = GetComponent<Transform>();
+				auto fwd = -1 * trans->GetForward();
+				auto face = atan2f(fwd.z, fwd.x);
+				auto scale = trans->GetScale();
+
+				ret.x = (cosf(face) * v.x) - (sinf(face) * v.z);
+				ret.y = v.y;
+				ret.z = (cosf(face) * v.z) + (sinf(face) * v.x);
+
+				return ret;
+			}
+
+			//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
+			const void SetAnim(wstring animname, float time = 0.0f) {
+				auto draw = GetComponent<PNTBoneModelDraw>();
+				if (draw->GetCurrentAnimation() != animname)
+					draw->ChangeCurrentAnimation(animname, time);
+			}
+
+			//通常時・チャージ中、敵運搬中でアニメーションを切り替える
+			void SwitchAnim(const float time, const float condition, const wstring prefix);
+
+			void Charging(bool charge) {
+				m_isCharging = charge;
+				if (charge == false) return;
+
+				if (m_isOverCharge) {
+					m_chargePerc += m_chargeReduceSpeed * m_chargePerc * _delta;
+				}
+				else {
+					m_chargePerc += m_chargeSpeed * _delta;
+				}
+
+				if (m_chargePerc > 1.0f) m_isOverCharge = true;
+			}
+
+			//チャージ状態をリセットし、発射モーションに移行(chargePercが0になるので、オブジェクト生成後に呼ぶこと)
+			void ResetCharge() {
+				m_chargePerc = 0;
+				m_isOverCharge = false;
+				m_stateType = release;
+			}
+
+			//状態に応じてアニメーションを変える
+			const wstring AddPrefix() {
+				if (m_isCarrying) return L"Grab_";
+				if (m_isCharging) return L"Fire_";
+				else return L"";
+			}
 	};
 
 	//====================================================================
@@ -305,7 +309,8 @@ namespace basecross {
 			m_dist(Vec3(-5.0f, 1, 0)),
 			m_scale(Vec3(8.0f)),
 			m_isHit(false)
-		{};
+		{
+		};
 
 		~PlayerGrab() {};
 
@@ -334,12 +339,12 @@ namespace basecross {
 
 	//====================================================================
 	// class FireProjectile
-	// プレイヤーの火炎放射
+	// プレイヤーの飛び道具
 	//====================================================================
 
 	class FireProjectile : public GameObject {
 		//ステージマネージャ
-		shared_ptr<StageManager> m_stageMgr;
+		shared_ptr<StageGenerator> m_stageMgr;
 
 		//エフェクト
 		shared_ptr<EfkEffect> m_EfkProj;
@@ -347,22 +352,31 @@ namespace basecross {
 		//エフェクト実行オブジェクト
 		shared_ptr<EfkPlay> m_EfkPlay[2];
 
+		//時間計測
 		float m_playTime = 0;
 
 		//どれくらいの位置からスタートするか
 		Vec3 m_dist;
-		//速度と方向
-		float m_speed, m_speedBase, m_power;
+		//速度と発射する力(0.0f～1.0f)
+		float m_speed, m_power;
+		//跳んでいく方向
 		Vec3 m_angle;
+		//変動する速度、基底速度
+		const float m_speedAdd, m_speedBase;
 		//射程
 		float m_range = 0, m_rangeMax;
-		bool m_stopped, m_lifeEnded;
+		//壁に当たって停止
+		bool m_stopped;
+		//消去フラグ
+		bool m_lifeEnded;
+
+		//使用中フラグ
+		bool m_used = false;
 
 	public:
 		//構築と破棄
 
-		FireProjectile(const shared_ptr<Stage>& StagePtr,
-			const Vec3 dist, const Vec3 angle, const float power);
+		FireProjectile(const shared_ptr<Stage>& StagePtr);
 
 		virtual ~FireProjectile() {}
 		//アクセサ
@@ -374,23 +388,42 @@ namespace basecross {
 		//何かに接触している判定
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 
-	};
 
-	//====================================================================
-	// class ChargePtcl
-	// チャージ中のパーティクル
-	//====================================================================
+		//エフェクト再生
+		void EffectStart() {
+			auto fwd = -1 * GetComponent<Transform>()->GetForward();
+			auto face = atan2f(fwd.z, fwd.x);
+			
+			m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkProj, GetComponent<Transform>()->GetPosition(), 0.0f);
+			m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
+			m_EfkPlay[0]->SetScale(Vec3(.8f));
 
-	class ChargePtcl : public MultiParticle {
-	public:
-		ChargePtcl(const shared_ptr<Stage>& StagePtr) :
-			MultiParticle(StagePtr)
-		{}
-		virtual ~ChargePtcl() {}
+		}
 
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		void Emit(const Vec3& emitPos, const Vec3& randomEmitRange);
+		//使用中か否か
+		bool GetUsed() {
+			return m_used;
+		}
+
+		//呼び出す
+		void Invoke(const Vec3 dist, const Vec3 angle, const float power) {
+			m_used = true;
+			GetComponent<TriggerSphere>()->SetUpdateActive(true);
+			SetUpdateActive(true);
+
+			m_stopped = false;
+			m_lifeEnded = false;
+			m_angle = angle;
+
+			GetComponent<Transform>()->SetPosition(dist);
+
+			//速度×倍率+基底速度
+			m_speed = (m_speedAdd * power) + m_speedBase;
+			//持続時間
+			m_range = m_rangeMax;
+			EffectStart();
+		}
+
 	};
 
 	//====================================================================
@@ -416,12 +449,13 @@ namespace basecross {
 		const float windowWidth = App::GetApp()->GetGameWidth();
 		const float windowHeight = App::GetApp()->GetGameHeight();
 	public:
-		SpritePlayerUI(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const wstring& resKey, const int& layer = 1):
-		GameObject(StagePtr),
-		m_player(player),
-		m_resKey(resKey),
-		m_layer(layer)
-		{}
+		SpritePlayerUI(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const wstring& resKey, const int& layer = 1) :
+			GameObject(StagePtr),
+			m_player(player),
+			m_resKey(resKey),
+			m_layer(layer)
+		{
+		}
 
 		~SpritePlayerUI() {};
 
@@ -450,7 +484,8 @@ namespace basecross {
 			GameObject(StagePtr),
 			m_player(player),
 			m_meter(meter)
-		{}
+		{
+		}
 		void Init(wstring ResKey);
 	};
 
@@ -463,7 +498,8 @@ namespace basecross {
 	public:
 		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
 			PlayerMeterBase(StagePtr, player, meter)
-		{}
+		{
+		}
 
 		~SpriteHealth() {}
 
@@ -481,7 +517,8 @@ namespace basecross {
 	public:
 		SpriteCharge(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
 			PlayerMeterBase(StagePtr, player, meter)
-		{}
+		{
+		}
 
 		~SpriteCharge() {}
 

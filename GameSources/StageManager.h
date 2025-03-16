@@ -1,26 +1,24 @@
 /*!
-@file StageManager.h
-@brief ステージマネージャークラス
+@file StageGenerator.h
+@brief ステージジェネレータークラス
 */
 
 #pragma once
 #include "stdafx.h"
 
 namespace basecross {
-    class StageManager : public GameObject
+    class StageGenerator : public GameObject
     {
     public:
         // カメラの選択
         enum CameraSelect {
-            openingCamera,    // オープニングカメラ
-	      	endingCamera,     // クリア演出カメラ
-            myCamera,         // ゲームプレイカメラ
+            OPENINGCAMERA,    // オープニングカメラ
+            ENDINGCAMERA,     // クリア演出カメラ
+            PLAYCAMERA,         // ゲームプレイカメラ
         };
 
         // ゲームステータスの選択
         enum GameStatus {
-            TITLE,            // タイトルシーン表示時
-            SELECT,           // ステージセレクトシーン表示時
             GAME_PLAYING,     // ゲームプレイ中
             TEST_PLAY         // テストプレイ中
         };
@@ -28,11 +26,11 @@ namespace basecross {
         // エフェクトのインターフェイス
         shared_ptr<EfkInterface> m_EfkInterface;
         shared_ptr<SoundItem> m_BGM;                   // バックグラウンドミュージックのサウンドアイテム
-        std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
+        std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
 
         CameraSelect m_CameraSelect;                 // 現在のカメラを保持する変数
         shared_ptr<SingleView> m_OpeningCameraView;  // オープニングカメラビュー
-		shared_ptr<SingleView> m_EndingCameraView;   // クリア演出カメラビュー
+        shared_ptr<SingleView> m_EndingCameraView;   // クリア演出カメラビュー
         shared_ptr<SingleView> m_MyCameraView;       // ゲームプレイカメラビュー
         int m_nowGameStatus;                         // 現在のゲームステータス
         wstring m_StageName;                         // ステージの名前
@@ -40,32 +38,33 @@ namespace basecross {
 
         // スプライト
         shared_ptr<GameObject> m_titleSprite;        // タイトルのスプライト
-        shared_ptr<Transform> m_PlayerObject;        // プレイヤーオブジェクトのトランスフォーム
-        shared_ptr<GameObject> m_SpriteDraw;         // スプライト描画オブジェクト
-        shared_ptr<GameObject> m_TextDraw;           // テキスト描画オブジェクト
-        shared_ptr<GameObject> m_StageUI;            // ステージUIオブジェクト
-        shared_ptr<GameObject> m_kakaeruUI;            // ステージUIオブジェクト
-        shared_ptr<GameObject> m_blowUI;            // ステージUIオブジェクト
+        shared_ptr<Transform> m_playerObject;        // プレイヤーオブジェクトのトランスフォーム
+        shared_ptr<GameObject> m_spriteDraw;         // スプライト描画オブジェクト
+        shared_ptr<GameObject> m_textDraw;           // テキスト描画オブジェクト
+        shared_ptr<GameObject> m_stageUI;            // ステージUIオブジェクト
+        shared_ptr<GameObject> m_kakaeruUI;          // ステージUIオブジェクト
+        shared_ptr<GameObject> m_blowUI;             // ステージUIオブジェクト
         shared_ptr<GameObject> m_nextStageUI;        // 次のステージUIオブジェクト
         shared_ptr<GameObject> m_clearSelectStage;   // クリアステージ選択UIオブジェクト
         shared_ptr<GameObject> m_retryStageUI;       // リトライステージUIオブジェクト
         shared_ptr<GameObject> m_overSelectStage;    // ゲームオーバー時のステージ選択UIオブジェクト
-        shared_ptr<GameObject> m_SelectCharge;       // 選択画面のチャージオブジェクト
-        shared_ptr<GameObject> m_TitleCharge;        // タイトル画面のチャージオブジェクト
-        shared_ptr<GameObject> m_BGfade;             // 背景フェードオブジェクト
+        shared_ptr<GameObject> m_selectCharge;       // 選択画面のチャージオブジェクト
+        shared_ptr<GameObject> m_titleCharge;        // タイトル画面のチャージオブジェクト
+        shared_ptr<GameObject> m_backgroundFade;     // 背景フェードオブジェクト
 
         float m_totalTime = 0.0f;                    // 合計時間を計測する変数
         float m_clearTotalTime = 0.0f;               // クリア後の演出用
         int m_select = 0;                            // 選択された項目のインデックス
 
-        bool m_Goaltrue = false;                     // ゴールに達したかのフラグ
-        bool m_Diedtrue = false;                     // 死亡したかのフラグ
+        bool m_goaltrue = false;                     // ゴールに達したかのフラグ
+        bool m_diedtrue = false;                     // 死亡したかのフラグ
         bool m_pause = false;                        // ポーズ中かのフラグ
-        bool m_Flag = true;                          // フラグ
+        bool m_flag = true;                          // フラグ
         bool m_fadeoutFlag = true;                   // フェードアウトフラグ
-        bool m_startFlag = false;                    // タイトルのフラグ
-        int m_PushState = 0;                         // ボタンの押下状態
+        int m_pushState = 0;                         // ボタンの押下状態
         float m_updateTime;                          //　計測時間
+        bool m_startFlag = false;                    // タイトルのフラグ
+
         // ビューの作成
         void CreateViewLight();
 
@@ -124,35 +123,29 @@ namespace basecross {
         void ToOpeningCamera();
 
         // クリア演出カメラに切り替える
-		void ToEndingCamera();
-        
+        void ToEndingCamera();
+
         // サウンドエフェクトを再生する
         void PlaySE(wstring path, float loopcnt, float volume);
 
         // バックグラウンドミュージックを再生する
         void PlayBGM(const wstring& StageBGM);
 
-        void UImake();
+        void OperationUIMake();
 
         //プレイヤーから敵に飛ばすレイ
         void EnemyRay();
 
         // 構築と破棄
-        StageManager(const shared_ptr<Stage>& stage) :
+        StageGenerator(const shared_ptr<Stage>& stage) :
             GameObject(stage)
         {
         }
 
-        virtual ~StageManager() {}
+        virtual ~StageGenerator() {}
 
         // 初期化
         virtual void OnCreate() override;
-
-        // 更新処理
-        virtual void OnUpdate() override;
-
-        // 描画処理
-        virtual void OnDraw() override;
 
         void EnemyUpdate();
 

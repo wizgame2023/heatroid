@@ -27,17 +27,17 @@ namespace basecross {
 
 	void GameStageHemmi::PlayBGM(const wstring& StageBGM)
 	{
-		m_BGM = m_ptrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
+		m_BGM = m_PtrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
 	}
 
 	void GameStageHemmi::OnDestroy() {
 		//BGMのストップ
-		m_ptrXA->Stop(m_BGM);
+		m_PtrXA->Stop(m_BGM);
 	}
 	void GameStageHemmi::CreateStageManager() {
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
-		auto ptrStageManager = AddGameObject<StageManager>();
+		auto ptrStageManager = AddGameObject<StageGenerator>();
 		SetSharedGameObject(L"StageManager", ptrStageManager);
 		auto Status = ptrStageManager->GameStatus::GAME_PLAYING;
 		ptrStageManager->SetNowGameStatus(Status);
@@ -212,7 +212,7 @@ namespace basecross {
 	//		);
 
 	//		//各値がそろったのでオブジェクト作成
-	//		auto ptrFloor = AddGameObject<Door>(Pos, Rot, Scale, Tokens[10]);
+	//		auto ptrFloor = AddGameObject<Elevator>(Pos, Rot, Scale, Tokens[10]);
 	//		ptrFloor->AddTag(L"StageDoor");
 	//	}
 
@@ -220,10 +220,10 @@ namespace basecross {
 
 	//void GameStageHemmi::CreateGimmick()
 	//{
-	//	CreateSharedObjectGroup(L"Door");
+	//	CreateSharedObjectGroup(L"Elevator");
 	//	CreateSharedObjectGroup(L"Switch");
 	//	vector<wstring> LineVec;
-	//	m_GameStage1.GetSelect(LineVec, 0, L"Door");
+	//	m_GameStage1.GetSelect(LineVec, 0, L"Elevator");
 	//	for (auto& v : LineVec) {
 	//		//トークン（カラム）の配列
 	//		vector<wstring> Tokens;
