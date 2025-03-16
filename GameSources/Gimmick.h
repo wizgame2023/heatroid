@@ -264,8 +264,5 @@ namespace basecross {
 
 		// 数値を変更するメソッド
 		void ChangeNum();
-
-		// ドアの開閉状態を設定するメソッド
-		void OpenJudge(const bool& open);       // ドアの状態を更新
 	};
 }

@@ -201,7 +201,20 @@ namespace basecross {
 		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
 	}
 
+	bool GimmickButton::GetButton()
+	{
+		return m_open;
+	}
 
+	void GimmickButton::SetButton(const bool& open)
+	{
+		m_open = open;
+	}
+
+	int GimmickButton::GetSwitch()
+	{
+		return m_switch;
+	}
 
 	GimmickDoor::GimmickDoor(const shared_ptr<Stage>& StagePtr,
 		const Vec3& position,
@@ -249,97 +262,92 @@ namespace basecross {
 	{
 		OpenDoor();
 	}
-
 	void GimmickDoor::OpenDoor()
 	{
+		// トランスフォームコンポーネントを取得
 		auto ptrTransform = GetComponent<Transform>();
-		Vec3 pos = ptrTransform->GetPosition();
+		Vec3 pos = ptrTransform->GetPosition(); // 現在の位置を取得
+
+		// "Switch" グループのオブジェクトを取得
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		auto& vec = group->GetGroupVector();
+
+		// グループ内のスイッチを探索
 		for (auto& v : vec) {
 			auto shObj = v.lock();
 			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
 			auto Switch = Switchs->GetSwitch();
-			float refugePos = 0;
-			if (Switch == m_OpenSwitch)
-			{
-				m_open = Switchs->GetButton();
-				if (m_open)
-				{
-					if (m_number == 1)
-					{
+			float refugePos = 0; // 移動の基準位置
+
+			// ボタンの識別番号が一致する場合
+			if (Switch == m_OpenSwitch) {
+				m_open = Switchs->GetButton(); // ボタンが押されているかを取得
+
+				if (m_open) { // ドアを開ける処理
+					if (m_number == 1) { // 必要ボタンの数が 1 の場合
 						State = 1;
-						for (int i = 0; i < 1; i++)
-						{
-							if (m_flag == false)
-							{
-								PlaySE(L"DoorSE", 0, 0.5f);
+						for (int i = 0; i < 1; i++) {
+							if (!m_flag) { // サウンド再生フラグ確認
+								PlaySE(L"DoorSE", 0, 0.5f); // サウンドを再生
 								m_flag = true;
 							}
-							if (m_Scale.x < m_Scale.z)
-							{
+
+							// ドアの移動方向を決定
+							if (m_Scale.x < m_Scale.z) { // Z軸方向の移動
 								refugePos = pos.z;
-								if (refugePos < 20.0f)
-								{
+								if (refugePos < 20.0f) {
 									ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
 								}
 							}
-							else
-							{
-									ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
+							else { // X軸方向の移動
+								ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
 							}
 						}
 					}
-					else if (m_number == 2)
-					{
+					else if (m_number == 2) { // 必要ボタンの数が 2 の場合
 						for (auto& v2 : vec) {
-							auto shObj2 = v2.lock();							
+							auto shObj2 = v2.lock();
 							auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
 							auto Switch2 = Switchs2->GetSwitch();
-							if (Switch2 == m_OpenSwitch && Switchs2!=Switchs)
-							{
-								m_open2 = Switchs2->GetButton();
-								if (m_open2)
-								{
+
+							// 2つのスイッチの識別番号の一致確認
+							if (Switch2 == m_OpenSwitch && Switchs2 != Switchs) {
+								m_open2 = Switchs2->GetButton(); // 別スイッチの状態を取得
+
+								if (m_open2) { // 両スイッチがオンのとき
 									State = 2;
-									for (int i = 0; i < 1; i++)
-									{
-										if (m_flag == false)
-										{
-											PlaySE(L"DoorSE", 0, 0.5f);
+									for (int i = 0; i < 1; i++) {
+										if (!m_flag) { // サウンド再生フラグ確認
+											PlaySE(L"DoorSE", 0, 0.5f); // サウンドを再生
 											m_flag = true;
 										}
-										if (m_Scale.x < m_Scale.z )
-										{
+
+										// ドアの移動方向を決定
+										if (m_Scale.x < m_Scale.z) { // Z軸方向の移動
 											refugePos = pos.z;
-											if (refugePos < 20.0f)
-											{
+											if (refugePos < 20.0f) {
 												ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
 											}
 										}
-										else
-										{
-												ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
+										else { // X軸方向の移動
+											ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
 										}
 									}
 								}
-								else
-								{
-									ptrTransform->SetPosition(m_Position);
-									m_flag == false;
+								else { // 別スイッチがオフの場合
+									ptrTransform->SetPosition(m_Position); // 初期位置に戻す
+									m_flag = false; // サウンド再生フラグをリセット
 									State = 1;
-								}									
+								}
 							}
 						}
 					}
 				}
-				else
-				{
-					ptrTransform->SetPosition(m_Position);
-					m_flag == false;
+				else { // ボタンが押されていない場合
+					ptrTransform->SetPosition(m_Position); // 初期位置に戻す
+					m_flag = false; // サウンド再生フラグをリセット
 					State = 0;
 				}
-
 			}
 		}
 	}
@@ -410,73 +418,74 @@ namespace basecross {
 
 	void GimmickUp::UpDown()
 	{
+		// トランスフォームコンポーネントを取得して現在の位置を取得
 		auto ptrTransform = GetComponent<Transform>();
 		Vec3 pos = ptrTransform->GetPosition();
+
+		// "Switch" グループに所属するオブジェクトを取得
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		auto& vec = group->GetGroupVector();
+
+		// グループ内のスイッチを探索
 		for (auto& v : vec) {
-			auto shObj = v.lock();
-			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-			auto Switch = Switchs->GetSwitch();
-			if (Switch == m_OpenSwitch)
-			{
-				m_open = Switchs->GetButton();
-				if (m_open)
-				{
-					if (m_number == 1)
-					{
-						switch (ido)
-						{
-						case 0:
+			auto shObj = v.lock(); // 弱参照から共有ポインタに変換
+			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj); // スイッチオブジェクトにキャスト
+			auto Switch = Switchs->GetSwitch(); // スイッチ識別番号を取得
+
+			// スイッチの識別番号が一致する場合
+			if (Switch == m_OpenSwitch) {
+				m_open = Switchs->GetButton(); // スイッチが押されているか取得
+
+				if (m_open) { // スイッチがオンの場合
+					if (m_number == 1) { // ギミック番号が 1 の場合
+						// 上下動作の処理
+						switch (ido) {
+						case 0: // 上昇中
 							ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
-							if (pos.y > m_Max) 
-								ido = 1;
+							if (pos.y > m_Max) ido = 1; // 最大高さに達したら降下に切り替え
 							break;
-						case 1:
+						case 1: // 降下中
 							ptrTransform->SetPosition(Vec3(pos.x, pos.y -= 0.05f, pos.z));
-							if (pos.y < 0)ido = 0;
+							if (pos.y < 0) ido = 0; // 最低高さに戻ったら上昇に切り替え
 							break;
 						}
 					}
-					else if (m_number == 2)
-					{
+					else if (m_number == 2) { // ギミック番号が 2 の場合
+						// 別のスイッチを探索
 						for (auto& v2 : vec) {
 							auto shObj2 = v2.lock();
 							auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
 							auto Switch2 = Switchs2->GetSwitch();
-							if (Switch2 == m_OpenSwitch && Switchs2 != Switchs)
-							{
-								m_open2 = Switchs2->GetButton();
-								if (m_open2)
-								{
-									switch (ido)
-									{
-									case 0:
+
+							// スイッチが一致し、現在のスイッチと異なる場合
+							if (Switch2 == m_OpenSwitch && Switchs2 != Switchs) {
+								m_open2 = Switchs2->GetButton(); // 別のスイッチが押されているか取得
+
+								if (m_open2) { // 両スイッチがオンの場合
+									// 上下動作の処理
+									switch (ido) {
+									case 0: // 上昇中
 										ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
-										if (pos.y > 10.0f) ido = 1;
+										if (pos.y > 10.0f) ido = 1; // 最大高さに達したら降下に切り替え
 										break;
-									case 1:
+									case 1: // 降下中
 										ptrTransform->SetPosition(Vec3(pos.x, pos.y -= 0.05f, pos.z));
-										if (pos.y < 0)ido = 0;
+										if (pos.y < 0) ido = 0; // 最低高さに戻ったら上昇に切り替え
 										break;
 									}
 								}
-								else
-								{
-									ptrTransform->SetPosition(m_Position);
-									m_flag == false;
+								else { // スイッチがオフの場合
+									ptrTransform->SetPosition(m_Position); // 位置を初期状態に戻す
+									m_flag = false; // フラグをリセット
 								}
 							}
 						}
 					}
-
 				}
-				else
-				{
-					ptrTransform->SetPosition(m_Position);
-					m_flag == false;
+				else { // スイッチがオフの場合
+					ptrTransform->SetPosition(m_Position); // 位置を初期状態に戻す
+					m_flag = false; // フラグをリセット
 				}
-
 			}
 		}
 	}
@@ -547,6 +556,14 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
 	}
+
+	const void Elevator::SetAnim(wstring animname, float time)
+	{
+		auto draw = GetComponent<PNTBoneModelDraw>();
+		if (draw->GetCurrentAnimation() != animname)
+			draw->ChangeCurrentAnimation(animname, time);
+	}
+
 	DoorGimmickNum::DoorGimmickNum(const shared_ptr<Stage>& stage, const Vec3& position, const Vec3& UV, const Vec3& scale, const float& number, const wstring& color):
 		GimmickObject(stage),
 		m_Position(position),
@@ -698,6 +715,4 @@ namespace basecross {
 			}
 		}
 	}
-
-
 }

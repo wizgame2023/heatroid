@@ -393,30 +393,17 @@ namespace basecross {
 				);
 				auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
 				if (Tokens[10] == L"Enemy::rightMove" && Tokens[11] == L"Enemy::stay") {
-					stateBefore = Enemy::rightMove;
-					stateAfter = Enemy::stay;
-					auto enemy = GetStage()->AddGameObject<EnemyChase>(Pos, Rot, Scale, stateBefore, stateAfter, player);
-					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
-					group->IntoGroup(enemy);
-				}
-				else if (Tokens[10] == L"Enemy::fly" && Tokens[11] == L"Enemy::fixedStay") {
-					stateBefore = Enemy::fly;
-					stateAfter = Enemy::fixedStay;
-					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto enemy = GetStage()->AddGameObject<ChasingEnemy>(Pos, Rot, Scale, player);
 					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 					group->IntoGroup(enemy);
 				}
 				else if (Tokens[10] == L"Enemy::bullet" && Tokens[11] == L"Enemy::stay") {
-					stateBefore = Enemy::bullet;
-					stateAfter = Enemy::stay;
-					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto enemy = GetStage()->AddGameObject<ParabolaBulletEnemy>(Pos, Rot, Scale, player);
 					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 					group->IntoGroup(enemy);
 				}
 				else if (Tokens[10] == L"Enemy::bulletMove" && Tokens[11] == L"Enemy::stay") {
-					stateBefore = Enemy::bulletMove;
-					stateAfter = Enemy::stay;
-					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto enemy = GetStage()->AddGameObject<MoveBulletEnemy>(Pos, Rot, Scale,  player);
 					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 					group->IntoGroup(enemy);
 					if (Tokens[12] == L"X")
@@ -438,9 +425,7 @@ namespace basecross {
 					}
 				}
 				else if (Tokens[10] == L"Enemy::slide" && Tokens[11] == L"Enemy::stay") {
-					stateBefore = Enemy::slide;
-					stateAfter = Enemy::stay;
-					auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, stateBefore, stateAfter, player);
+					auto enemy = GetStage()->AddGameObject<SlideEnemy>(Pos, Rot, Scale, player);
 					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 					group->IntoGroup(enemy);
 
@@ -469,7 +454,7 @@ namespace basecross {
 					(float)_wtof(Tokens[3].c_str())
 				);
 				auto player = GetStage()->GetSharedGameObject<Player>(L"Player");
-				auto enemy = GetStage()->AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
+				auto enemy = GetStage()->AddGameObject<ChasingEnemy>(Pos, Rot, Scale, player);
 				auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 				group->IntoGroup(enemy);
 			}
