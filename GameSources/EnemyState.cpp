@@ -168,18 +168,15 @@ namespace basecross {
 		pos.y = enemy->Grav().y;
 
 		enemy->PlayerDic();
-		pos.y += 0.25f * enemy->m_throwLength;
-		pos -= enemy->m_speed * enemy->m_direcNorm * elapsed * enemy->m_throwLength * 20.0f;
+		pos.y += 0.15f * enemy->m_throwLength;
+		pos -= enemy->m_speed * enemy->m_direcNorm * elapsed * enemy->m_throwLength * 15.0f;
 		enemy->m_throwTime -= elapsed;
-		if (enemy->m_throwTime < 0.0f) {
-
+		if (enemy->m_throwTime < 0.0f||enemy->m_floorFlag) {
+			enemy->OnlyChangeState<OverHeatState>();
 			enemy->m_throwTime = 0.5f;
 		}
 
 		enemy->AroundOverHeat();
-		if (enemy->m_floorFlag) {
-			enemy->OnlyChangeState<OverHeatState>();
-		}
 
 		enemy->m_trans->SetPosition(pos);
 		enemy->m_draw->UpdateAnimation(elapsed);
