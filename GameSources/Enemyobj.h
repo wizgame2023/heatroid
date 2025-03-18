@@ -10,36 +10,7 @@
 #include "EnemyState.h"
 
 namespace basecross {
-	class EnemyChase : public Enemy {
-		State m_defaultState;
-		State m_attackState;
-	public:
-		EnemyChase(const shared_ptr<Stage>& stage,
-			const Vec3& position,
-			const Vec3& rotation,
-			const Vec3& scale,
-			const State& defaultState,
-			const State& deathState,
-			const shared_ptr<Player>& player);
-		EnemyChase(const shared_ptr<Stage>& stage,
-			const Vec3& position,
-			const Vec3& rotation,
-			const Vec3& scale,
-			const State& defaultState,
-			const State& attackState,
-			const State& deathState,
-			const shared_ptr<Player>& player);
-		virtual ~EnemyChase() {};
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		void Debug();
-	private:
-		float m_plungeTime;
-		float m_maxPlungeTime;
-		float m_plungeRargeTime;
-		float m_maxPlungeRargeTime;
-	};
-
+	//’Ç‚¢‚©‚¯‚Ä“Ëi‚·‚é“G
 	class ChasingEnemy : public Enemy {
 	private:
 		State m_defaultState;
@@ -56,6 +27,7 @@ namespace basecross {
 		virtual void OnUpdate() override;
 	};
 
+	//¶‰E‚É’Ç‚¢‚©‚¯‚Ä’e‚ğŒ‚‚Á‚Ä‚­‚é“G
 	class MoveBulletEnemy : public Enemy {
 	private:
 	public:
@@ -69,6 +41,7 @@ namespace basecross {
 		virtual void OnUpdate() override;
 	};
 
+	//•ú•¨ü‚É’e‚ğ”ò‚Î‚µ‚Ä‚­‚é“G
 	class ParabolaBulletEnemy : public Enemy {
 	public:
 		ParabolaBulletEnemy(const shared_ptr<Stage>& stage,
@@ -80,6 +53,8 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
+
+	//¶‰EˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚é“G
 	class SlideEnemy : public Enemy {
 	public:
 		SlideEnemy(const shared_ptr<Stage>& stage,
