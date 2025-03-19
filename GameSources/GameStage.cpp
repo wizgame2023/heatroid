@@ -38,10 +38,13 @@ namespace basecross {
 			}
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::PLAYCAMERA)
 			{
-				stageMane->EnemyUpdate();
-				stageMane->OperationUIMake();
-				stageMane->GoalJudge();
-				stageMane->GameOverJudge();
+				if (m_pause == false)
+				{
+					stageMane->EnemyUpdate();
+					stageMane->OperationUIMake();
+					stageMane->GoalJudge();
+					stageMane->GameOverJudge();
+				}
 				GamePause();
 			}
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::ENDINGCAMERA)
@@ -60,10 +63,13 @@ namespace basecross {
 			}
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::PLAYCAMERA)
 			{
-				stageMane->EnemyUpdate();
-				stageMane->OperationUIMake();
-				stageMane->GoalJudge();
-				stageMane->GameOverJudge();
+				if (m_pause == false)
+				{
+					stageMane->EnemyUpdate();
+					stageMane->OperationUIMake();
+					stageMane->GoalJudge();
+					stageMane->GameOverJudge();
+				}
 				GamePause();
 			}
 		}
@@ -93,7 +99,7 @@ namespace basecross {
 		auto group = GetSharedObjectGroup(L"Enemy");
 		auto group2 = GetSharedObjectGroup(L"Door");
 
-		if (m_diedtrue){
+		if (m_diedtrue) {
 			auto& vec2 = group2->GetGroupVector();
 			for (auto v : vec2)
 			{
