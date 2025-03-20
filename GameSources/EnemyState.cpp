@@ -205,13 +205,18 @@ namespace basecross {
 		float elapsed = App::GetApp()->GetElapsedTime();
 		enemy->PlayerDic();
 		auto pos = enemy->GetPos();
+		auto rot = enemy->m_trans->GetRotation();
 		Vec3 forward = enemy->m_trans->GetForward();
-		float face = atan2f(forward.z, forward.x);
-		Vec3 movePos;
-		movePos.z = (cosf(face) * enemy->m_direcNorm.z) + (sinf(face) * enemy->m_direcNorm.x);
-		Vec3 movePosNorm = movePos.normalize();
-		pos += movePosNorm * elapsed * enemy->m_speed;
 
+		Vec3 cross = forward.cross(enemy->m_direc);
+		float sign;
+		if (cross.y < 0.0f) {
+			sign = -1.0f;
+		}
+		else {
+			sign = 1.0f;
+		}
+		pos += enemy->m_trans->GetRight() * elapsed * enemy->m_speed * sign;
 		pos.y = enemy->Grav().y;
 
 		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {
