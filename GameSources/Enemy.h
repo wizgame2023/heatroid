@@ -83,10 +83,6 @@ namespace basecross {
 		float m_gravity;
 		Vec3 m_grav;
 		Vec3 m_gravVel;
-		State m_stateType;
-		State m_fastState;
-		State m_beforeState;
-		State m_overHeatState;
 
 		Vec3 m_rot;
 		Vec3 m_scal;

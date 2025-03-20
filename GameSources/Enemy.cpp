@@ -25,8 +25,6 @@ namespace basecross {
 		m_beforePos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(state),
-		m_overHeatState(overHeatState),
 		m_player(player),
 		m_meshName(L"ENEMYARUKU"),
 		m_heat(0),
@@ -82,8 +80,6 @@ namespace basecross {
 		m_beforePos(position),
 		m_rot(rotation),
 		m_scal(scale),
-		m_stateType(state),
-		m_overHeatState(overHeatState),
 		m_meshName(meshName),
 		m_player(player),
 		m_heat(0),
@@ -135,8 +131,6 @@ namespace basecross {
 		m_beforePos(position),
 		m_rot(rotation),
 		m_scal(scale),
-		m_stateType(rightMove),
-		m_overHeatState(stay),
 		m_meshName(L"ENEMYARUKU"),
 		m_player(player),
 		m_heat(0),
@@ -181,13 +175,13 @@ namespace basecross {
 	{}
 
 	void Enemy::OnCreate() {
-		m_trans = GetComponent<Transform>();
-		m_trans->SetRotation(Vec3(m_rot.x,m_rot.y+XM_PIDIV2,m_rot.z));
-		m_fastState = m_stateType;
-		auto pos = m_beforePos;
-
+		//ステータスの設定
 		m_currentState= make_unique<ChaseState>(GetThis<Enemy>());
 		m_previousState = move(m_currentState);
+
+		m_trans = GetComponent<Transform>();
+		m_trans->SetRotation(Vec3(m_rot.x,m_rot.y+XM_PIDIV2,m_rot.z));
+		auto pos = m_beforePos;
 
 		auto player = m_player.lock();
 		if (!player) return;
@@ -321,19 +315,11 @@ namespace basecross {
 		auto shaft = GetDirec().cross(Vec3(0.0f, 1.0f, 0.0f));
 
 		//FindFixed();
-		if (m_stateType != m_beforeState) {
-			m_plungeFlag = false;
-			m_spareTime = m_maxSpareTime;
-			m_plungeSE = false;
-			m_overHeatSE = false;
-		}
 
 		pos.y = Grav().y;
 
 
 		m_trans->SetPosition(pos);
-		m_beforeState = m_stateType;
-
 
 		//アニメーションの実装
 		m_draw->UpdateAnimation(elapsed);
@@ -440,14 +426,9 @@ namespace basecross {
 		}
 		if (!m_bulletFlag) {
 			m_bulletCnt++;
-			if (m_fastState == slide) {
-				//プレイヤーをめがける弾
-				stage->AddGameObject<TrackingBullet>(GetThis<Enemy>(), player);
-			}
-			else {
-				//一方に跳ぶ弾
-				stage->AddGameObject<StraightBullet>(GetThis<Enemy>());
-			}
+			//一方に跳ぶ弾
+			stage->AddGameObject<StraightBullet>(GetThis<Enemy>());
+
 			m_bulletFlag = true;
 		}
 	}
@@ -638,8 +619,6 @@ namespace basecross {
 		wstringstream wss(L"");
 		wss << L"\nfps : "
 			<< fps
-			<< L"\nstate : "
-			<< m_stateType
 			<< L"\npos : "
 			<< L"x "
 			<< pos.x
