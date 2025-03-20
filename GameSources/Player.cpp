@@ -892,7 +892,6 @@ namespace basecross {
 		if (!m_target) return;
 		m_target->SetThorwLenght(charge);
 		m_target->SetThrowFlag(true);
-		m_target->SetState(Enemy::State::throwAway);
 		m_target->GetComponent<Transform>()->ClearParent();
 
 		//最後にターゲットを解放

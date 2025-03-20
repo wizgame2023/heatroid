@@ -168,18 +168,15 @@ namespace basecross {
 		pos.y = enemy->Grav().y;
 
 		enemy->PlayerDic();
-		pos.y += 0.25f * enemy->m_throwLength;
-		pos -= enemy->m_speed * enemy->m_direcNorm * elapsed * enemy->m_throwLength * 20.0f;
+		pos.y += 0.15f * enemy->m_throwLength;
+		pos -= enemy->m_speed * enemy->m_direcNorm * elapsed * enemy->m_throwLength * 15.0f;
 		enemy->m_throwTime -= elapsed;
-		if (enemy->m_throwTime < 0.0f) {
-
+		if (enemy->m_throwTime < 0.0f||enemy->m_floorFlag) {
+			enemy->OnlyChangeState<OverHeatState>();
 			enemy->m_throwTime = 0.5f;
 		}
 
 		enemy->AroundOverHeat();
-		if (enemy->m_floorFlag) {
-			enemy->OnlyChangeState<OverHeatState>();
-		}
 
 		enemy->m_trans->SetPosition(pos);
 		enemy->m_draw->UpdateAnimation(elapsed);
@@ -208,13 +205,18 @@ namespace basecross {
 		float elapsed = App::GetApp()->GetElapsedTime();
 		enemy->PlayerDic();
 		auto pos = enemy->GetPos();
+		auto rot = enemy->m_trans->GetRotation();
 		Vec3 forward = enemy->m_trans->GetForward();
-		float face = atan2f(forward.z, forward.x);
-		Vec3 movePos;
-		movePos.z = (cosf(face) * enemy->m_direcNorm.z) + (sinf(face) * enemy->m_direcNorm.x);
-		Vec3 movePosNorm = movePos.normalize();
-		pos += movePosNorm * elapsed * enemy->m_speed;
 
+		Vec3 cross = forward.cross(enemy->m_direc);
+		float sign;
+		if (cross.y < 0.0f) {
+			sign = -1.0f;
+		}
+		else {
+			sign = 1.0f;
+		}
+		pos += enemy->m_trans->GetRight() * elapsed * enemy->m_speed * sign;
 		pos.y = enemy->Grav().y;
 
 		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {

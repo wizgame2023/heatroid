@@ -25,8 +25,6 @@ namespace basecross {
 		m_beforePos(position),
 		m_rot(rotatoin),
 		m_scal(scale),
-		m_stateType(state),
-		m_overHeatState(overHeatState),
 		m_player(player),
 		m_meshName(L"ENEMYARUKU"),
 		m_heat(0),
@@ -35,16 +33,8 @@ namespace basecross {
 		m_speed(5.0f),
 		m_maxSpeed(5.0f),
 		m_upSpeed(3.0f),
-		m_upHeight(10.0f),
-		m_jumpPower(5.0f),
-		m_jumpTime(1.0f),
 		m_rad(0.0f),
-		m_dicUp(0),
 		m_direcNorm(Vec3(0.0f)),
-		m_dropTime(4.0f),
-		m_maxDropTime(m_dropTime),
-		m_hitDropTime(1.0f),
-		m_maxHitDropTime(m_hitDropTime),
 		m_spareTime(0.75f),
 		m_maxSpareTime(m_spareTime),
 		m_bulletTime(0.1f),
@@ -64,11 +54,7 @@ namespace basecross {
 		m_gravVel(Vec3(0.0f)),
 		m_moveRot(Vec3(0.0f)),
 		m_bulletFlag(true),
-		m_jumpFlag(false),
-		m_jumpMoveFlag(false),
-		m_flyFlag(false),
 		m_floorFlag(false),
-		m_hitDropFlag(false),
 		m_plungeFlag(false),
 		m_pGrabFlag(false),
 		m_playerFlag(false),
@@ -94,8 +80,6 @@ namespace basecross {
 		m_beforePos(position),
 		m_rot(rotation),
 		m_scal(scale),
-		m_stateType(state),
-		m_overHeatState(overHeatState),
 		m_meshName(meshName),
 		m_player(player),
 		m_heat(0),
@@ -104,16 +88,8 @@ namespace basecross {
 		m_speed(5.0f),
 		m_maxSpeed(5.0f),
 		m_upSpeed(3.0f),
-		m_upHeight(10.0f),
-		m_jumpPower(5.0f),
-		m_jumpTime(1.0f),
 		m_rad(0.0f),
-		m_dicUp(0),
 		m_direcNorm(Vec3(0.0f)),
-		m_dropTime(4.0f),
-		m_maxDropTime(m_dropTime),
-		m_hitDropTime(1.0f),
-		m_maxHitDropTime(m_hitDropTime),
 		m_spareTime(0.75f),
 		m_maxSpareTime(m_spareTime),
 		m_bulletTime(0.1f),
@@ -133,11 +109,7 @@ namespace basecross {
 		m_gravVel(Vec3(0.0f)),
 		m_moveRot(Vec3(0.0f)),
 		m_bulletFlag(true),
-		m_jumpFlag(false),
-		m_jumpMoveFlag(false),
-		m_flyFlag(false),
 		m_floorFlag(false),
-		m_hitDropFlag(false),
 		m_plungeFlag(false),
 		m_pGrabFlag(false),
 		m_playerFlag(false),
@@ -159,8 +131,6 @@ namespace basecross {
 		m_beforePos(position),
 		m_rot(rotation),
 		m_scal(scale),
-		m_stateType(rightMove),
-		m_overHeatState(stay),
 		m_meshName(L"ENEMYARUKU"),
 		m_player(player),
 		m_heat(0),
@@ -169,16 +139,8 @@ namespace basecross {
 		m_speed(5.0f),
 		m_maxSpeed(5.0f),
 		m_upSpeed(3.0f),
-		m_upHeight(10.0f),
-		m_jumpPower(5.0f),
-		m_jumpTime(1.0f),
 		m_rad(0.0f),
-		m_dicUp(0),
 		m_direcNorm(Vec3(0.0f)),
-		m_dropTime(4.0f),
-		m_maxDropTime(m_dropTime),
-		m_hitDropTime(1.0f),
-		m_maxHitDropTime(m_hitDropTime),
 		m_spareTime(0.75f),
 		m_maxSpareTime(m_spareTime),
 		m_bulletTime(0.1f),
@@ -198,11 +160,7 @@ namespace basecross {
 		m_gravVel(Vec3(0.0f)),
 		m_moveRot(Vec3(0.0f)),
 		m_bulletFlag(true),
-		m_jumpFlag(false),
-		m_jumpMoveFlag(false),
-		m_flyFlag(false),
 		m_floorFlag(false),
-		m_hitDropFlag(false),
 		m_plungeFlag(false),
 		m_pGrabFlag(false),
 		m_playerFlag(false),
@@ -217,13 +175,13 @@ namespace basecross {
 	{}
 
 	void Enemy::OnCreate() {
-		m_trans = GetComponent<Transform>();
-		m_trans->SetRotation(Vec3(m_rot.x,m_rot.y+XM_PIDIV2,m_rot.z));
-		m_fastState = m_stateType;
-		auto pos = m_beforePos;
-
+		//ステータスの設定
 		m_currentState= make_unique<ChaseState>(GetThis<Enemy>());
 		m_previousState = move(m_currentState);
+
+		m_trans = GetComponent<Transform>();
+		m_trans->SetRotation(Vec3(m_rot.x,m_rot.y+XM_PIDIV2,m_rot.z));
+		auto pos = m_beforePos;
 
 		auto player = m_player.lock();
 		if (!player) return;
@@ -357,184 +315,11 @@ namespace basecross {
 		auto shaft = GetDirec().cross(Vec3(0.0f, 1.0f, 0.0f));
 
 		//FindFixed();
-		if (m_stateType != m_beforeState) {
-			m_plungeFlag = false;
-			m_jumpMoveFlag = false;
-			m_spareTime = m_maxSpareTime;
-			m_plungeSE = false;
-			m_overHeatSE = false;
-		}
 
 		pos.y = Grav().y;
 
-		//行動パターン
-		switch (m_stateType)
-		{
-		//移動なし
-		case stay:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			if (m_fastState == slide) {
-				EnemyAnime(L"overheat");
-			}
-			else {
-				EnemyAnime(L"wait");
-			}
-			break;
-		//追従の左右移動
-		case rightMove:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			m_speed = m_maxSpeed;
-			PlayerDic();
-			if (!m_floorCol->GetPlayerFlag()) {
-				EnemyAngle();
-			}
-			if (m_direc.length() <= m_trackingRange * 2) {
-				EnemyAnime(L"walk");
-				pos += m_speed * m_direcNorm * elapsed;
-			}
-			break;
-		//上下に移動
-		case upMove:
-			GravZero();
-			Grav();
-			if (pos.y >= m_upHeight) {
-				m_dicUp = -1;
-			}
-			else if (pos.y <= m_beforePos.y) {
-				m_dicUp = 1;
-			}
-			pos.y += m_dicUp * m_upSpeed * elapsed;
-			break;
-		//追従浮遊
-		case flyMove:
-			OneJump(0.5f);
-			PlayerDic();
-			EnemyAngle();
-			FallBullet();
-			break;
-		//浮遊
-		case fly:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			OneJump(3.0f);
-			//EnemyAngle();
-			//RemoveTag(L"Enemy");
-			break;
-		//プレイヤーに触れた位置で固定
-		case fixedStay:
-			GravZero();
-			Grav();
-			pos = m_deathPos;
-			break;
-		//ジャンプ
-		case jump:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			JumpMove();
-			break;
-		//突っ込み
-		case plunge:
-			//EnemyAnime(L"spare");
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			if (m_direc.length() <= m_trackingRange * 2) {
-				pos = Plunge();
-			}
-			break;
-		//放物線の弾を撃ってくる
-		case bullet:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			EnemyAngle();
-			if (m_direc.length() <= m_trackingRange * 2) {
-				EnemyAnime(L"walk");
-				FallBullet();
-				pos += shaft.normalize() * sinf(m_rad) * m_speed * 2.0f * elapsed;
-			}
-
-			break;
-		//横についてきながら弾を撃つ
-		case bulletMove:
-			PlayerDic();
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			if (m_direc.length() <= m_trackingRange * 2) {
-				EnemyAnime(L"walk");
-				RapidFireBullet(3);
-				pos += m_speed * m_direcNorm * elapsed;
-			}
-
-			break;
-		//オーバーヒートから復活までの時間
-		case wait:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			if (m_fastState == slide) {
-				EnemyAnime(L"stand2");
-			}
-			else {
-				EnemyAnime(L"stand");
-			}
-			if (!m_overHeatSE) {
-				//起動時のエフェクト,SE
-				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, 0.5f)),1,Vec3(0.5f));
-				EffectPlay(m_eyeEffect, GetEyePos(Vec3(2.0f, 0.5f, -0.5f)),2, Vec3(0.5f));
-				PlaySE(L"EnemyRevival",2.0f);
-				m_overHeatSE = true;
-			}
-			m_spareTime -= elapsed;
-			if (m_spareTime <= 0.0f) {
-				
-				m_stateType = m_fastState;
-			}
-			break;
-		//左右移動しながら弾を撃つ
-		case slide:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			PlayerDic();
-			EnemyAngle();
-			m_maxBulletTime = 3.0f;
-			StraightXBullet();
-			m_rad += 0.05f;
-			if (XMConvertToRadians(m_rad) >= 360) {
-				m_rad = 0;
-			}
-
-			if (m_direc.length() <= m_trackingRange * 2) {
-				EnemyAnime(L"kaihi");
-				pos += shaft.normalize() * sinf(m_rad) * m_speed * 2.0f * elapsed;
-			}
-			break;
-		//投げる
-		case throwAway:
-			SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-			PlayerDic();
-			pos.y += 0.25f * m_throwLength;
-			pos -= m_speed * m_direcNorm * elapsed * m_throwLength * 20.0f;
-			m_throwTime -= elapsed;
-			if (m_throwTime < 0.0f) {
-
-				EffectPlay(m_burstEffect, GetEyePos(Vec3(0, 0, 0)), 4, Vec3(0.5f));
-				PlaySE(L"EnemyBurst", 2.0f);
-				SetState(m_overHeatState);
-				m_throwTime = 0.5f;
-			}
-
-			AroundOverHeat();
-			break;
-		default:
-			break;
-		}
-
-		//重力の処理
-		//m_gravVel += m_grav * elapsed;
-		//pos += m_gravVel * elapsed;
-		//if (m_gravVel.y < m_grav.y) {
-		//	m_gravVel.y = m_grav.y;
-		//}
 
 		m_trans->SetPosition(pos);
-		m_beforeState = m_stateType;
-
-		//オーバーヒート中の処理
-		if (GetOverHeat()) {
-			Grab();
-		}
-		OverHeat();
 
 		//アニメーションの実装
 		m_draw->UpdateAnimation(elapsed);
@@ -542,19 +327,6 @@ namespace basecross {
 
 	}
 
-
-	//ジャンプ
-	void Enemy::EnemyJump() {
-		m_floorFlag = false;
-		AddGrav(Vec3(0.0f, m_jumpPower * 2, 0.0f));
-		SetGrav(Vec3(0.0f, m_gravity, 0.0f));
-		Grav();
-	}
-	void Enemy::HipDropJump() {
-		m_hitDropFlag = true;
-		GravZero();
-		EnemyJump();
-	}
 	//プレイヤーの方向
 	void Enemy::PlayerDic() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
@@ -582,48 +354,6 @@ namespace basecross {
 		}
 	}
 
-	//ジャンプ
-	void Enemy::OneJump(float jumpHight) {
-		auto pos = m_trans->GetPosition();
-		if (!m_jumpFlag) {
-			EnemyJump();
-			m_jumpFlag = true;
-		}
-		if (pos.y <= jumpHight) {
-			m_jumpFlag = false;
-		}
-
-	}
-	//ヒップドロップ
-	void Enemy::HitDrop() {
-		auto fixed = m_fixedBox.lock();
-		auto elapsed = App::GetApp()->GetElapsedTime();
-		auto pos = m_trans->GetPosition();
-
-		//ヒップドロップ中
-		if (m_hitDropFlag) {
-			if (fixed) {
-				Vec3 fixPos = m_fixedBox.lock()->GetComponent<Transform>()->GetPosition();
-				Vec3 fixScal = m_fixedBox.lock()->GetComponent<Transform>()->GetScale();
-				//床に衝突した時
-				m_hitDropTime -= elapsed;
-				if (m_floorFlag) {
-					m_hitDropTime = m_maxHitDropTime;
-					m_hitDropFlag = false;
-					AddGrav(Vec3(0.0f, -m_jumpPower, 0.0f));
-					m_speed = m_maxSpeed;
-
-				}
-				if (m_hitDropTime <= 0) {
-					if (pos.y - m_scal.y / 2 + fixPos.y >= fixPos.y + fixScal.y / 2 + 0.01f) {
-						pos.y += -m_maxSpeed * 5 * elapsed;
-						m_speed = m_maxSpeed * 5;
-					}
-				}
-			}
-		}
-	}
-
 	//プレイヤーに突っ込む
 	Vec3 Enemy::Plunge() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
@@ -647,114 +377,7 @@ namespace basecross {
 		}
 		return pos;
 	}
-	//プレイヤーに跳びかかる
-	void Enemy::JumpMove() {
-		auto pos = m_trans->GetPosition();
-		float elapsed = App::GetApp()->GetElapsedTime();
-		EnemyAnime(L"spare");
-		if (!m_plungeSE) {
-			PlaySE(L"EnemyAttack");
-			m_plungeSE = true;
-		}
-		m_spareTime -= elapsed;
-		if (m_spareTime <= 0.0f) {
-			if (m_direc.length() <= m_trackingRange * 2) {
-				if (!m_jumpMoveFlag) {
-					PlayerDic();
-					EnemyAngle();
-					EnemyJump();
-					PlaySE(L"EnemyDash");
-					m_jumpMoveFlag = true;
-					m_speed = m_maxSpeed * 6;
-				}
-				pos += m_speed * m_direcNorm * elapsed;
-			}
-			if (m_floorFlag) {
-				m_speed = 0.0f;
-			}
-			else {
-				EnemyAnime(L"jump");
-			}
 
-		}
-	}
-	//オーバーヒート
-	void Enemy::OverHeat() {
-		auto pos = m_trans->GetPosition();
-		float elapsed = App::GetApp()->GetElapsedTime();
-		if (m_heat >= m_maxHeat) {
-			m_stateType = m_overHeatState;
-			EffectPlay(m_heatEffect, pos, 3);
-			if (!m_overHeatSE) {
-				PlaySE(L"OverHeatSE",5.0f);
-				m_overHeatSE = true;
-			}
-		}
-		if (m_heat > 0.0f) {
-			if (m_fastState == slide) {
-				m_heat -= elapsed * 5.0f;
-			}
-			else {
-				m_heat -= elapsed * 2.5f;
-
-			}
-			m_efcTime -= elapsed;
-			//EffectPlay(m_heatEffect, m_pos, 3);
-			//if (m_efcTime <= 0.0f && m_heat >= 20.0f) {
-			//	EffectPlay(m_heatEffect, m_pos, 3);
-			//	m_efcTime = 2.0f;
-			//}
-
-		}
-		else if (GetOverHeat() && m_heat <= 0.0f) {
-			m_heat = 0.0f;
-			m_stateType = wait;
-		}
-	}
-	//持つときの処理
-	void Enemy::Grab() {
-		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
-		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
-		auto elapsed = App::GetApp()->GetElapsedTime();
-
-		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (cntlVec[0].bConnected) {
-			if (pad[0].wReleasedButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-				m_pGrabFlag = false;
-			}
-		}
-		else if (keyState.m_bUpKeyTbl['Q'] == true) {
-			m_pGrabFlag = false;
-		}
-		//if (!(dynamic_pointer_cast<PlayerGrab>(GetComponent<Transform>()->GetParent()))) {
-
-		//	m_pGrabFlag = false;
-		//}
-		if (m_pGrabFlag) {
-			m_floorFlag = false;
-			auto pGrab = m_playerGrab.lock();
-			if (!pGrab) return;
-			auto grabTrans = pGrab->GetComponent<Transform>();
-
-			if (m_EfkPlayer[2]) {
-				m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
-			}
-			if (cntlVec[0].bConnected) {
-				if (m_throwFlag) {
-					SetState(throwAway);
-					m_test = 1.0f;
-					m_pGrabFlag = false;
-					m_throwFlag = false;
-				}
-			}
-		}
-		else {
-			if (m_EfkPlayer[2]) {
-				m_EfkPlayer[2]->SetLocation(GetWorldPos());
-			}
-
-		}
-	}
 	//周りもオーバーヒートする
 	void Enemy::AroundOverHeat() {
 		auto stage = GetStage();
@@ -768,11 +391,11 @@ namespace basecross {
 			auto dic = GetWorldPos() - shEnemyPos;
 			if (dic.length() < 10 && enemyObj != GetThis<Enemy>()) {
 				enemyObj->PlayOverHeat();
-				enemyObj->SetState(m_overHeatState);
 			}
 		}
 
 	}
+
 	//弾の発射
 	//放物線に発射する弾
 	void Enemy::FallBullet() {
@@ -803,14 +426,9 @@ namespace basecross {
 		}
 		if (!m_bulletFlag) {
 			m_bulletCnt++;
-			if (m_fastState == slide) {
-				//プレイヤーをめがける弾
-				stage->AddGameObject<TrackingBullet>(GetThis<Enemy>(), player);
-			}
-			else {
-				//一方に跳ぶ弾
-				stage->AddGameObject<StraightBullet>(GetThis<Enemy>());
-			}
+			//一方に跳ぶ弾
+			stage->AddGameObject<StraightBullet>(GetThis<Enemy>());
+
 			m_bulletFlag = true;
 		}
 	}
@@ -835,56 +453,6 @@ namespace basecross {
 
 	}
 
-	//床に触れたら取得
-	void Enemy::FindFixed() {
-		auto fixed = m_fixedBox.lock();
-		auto pos = m_trans->GetPosition();
-
-		if (fixed) {
-			Vec3 fixPos = fixed->GetComponent<Transform>()->GetPosition();
-			Vec3 fixScal = fixed->GetComponent<Transform>()->GetScale();
-			//if (m_pos.y - m_scal.y / 2 + fixPos.y <= fixPos.y + fixScal.y / 2 + 0.001f) {
-			//	m_floorFlag = true;
-			//}
-			Vec3 worldPos = GetWorldPos();
-			if (worldPos.y - m_scal.y / 2.0f <= (fixPos.y + fixScal.y / 2.0f)) {
-				m_floorFlag = true;
-				//m_pos.y = fixPos.y - fixScal.y / 2 - m_scal.y / 2;
-			}
-			//if (m_trans->GetPosition().y >= fixScal.y / 2.0f) {
-			//	m_floorFlag = true;
-			//}
-			if (pos.x >= fixScal.x / 2 ||
-				pos.x <= -fixScal.x / 2) {
-				m_floorFlag = false;
-			}
-			if (pos.z >=fixScal.z / 2 ||
-				pos.z <=-fixScal.z / 2) {
-				m_floorFlag = false;
-			}
-
-			//床から落ちないようにする
-			//if (m_pos.x > fixPos.x + fixScal.x / 2 - m_scal.x / 2 - 0.2f) {
-			//	m_speed = 0.0f;
-			//	if (m_pos.x > m_playerPos.x - fixPos.x) {
-			//		m_speed = 0.3f;
-			//	}
-			//}
-			//else if (m_pos.x < fixPos.x - fixScal.x / 2 + m_scal.x / 2 + 0.2f) {
-			//	m_speed = 0;
-			//	if (m_pos.x < m_playerPos.x - fixPos.x) {
-			//		m_speed = 0.3f;
-			//	}
-			//}
-			//else {
-			//	m_speed = 0.3f;
-			//}
-		}
-		else {
-			m_floorFlag = false;
-		}
-
-	}
 	//削除
 	void Enemy::ThisDestroy() {
 		GetStage()->RemoveGameObject<Enemy>(GetThis<Enemy>());
@@ -956,6 +524,7 @@ namespace basecross {
 		if (other->FindTag(L"Floor")) {
 			m_floorFlag = false;
 		}
+
 	}
 	void Enemy::OnCollisionExcute(shared_ptr<GameObject>& other)
 	{
@@ -1050,8 +619,6 @@ namespace basecross {
 		wstringstream wss(L"");
 		wss << L"\nfps : "
 			<< fps
-			<< L"\nstate : "
-			<< m_stateType
 			<< L"\npos : "
 			<< L"x "
 			<< pos.x
@@ -1067,6 +634,7 @@ namespace basecross {
 		scene->SetDebugString(wss.str());
 
 	}
+
 	//重力
 	Vec3 Enemy::Grav() {
 		auto elapsed = App::GetApp()->GetElapsedTime();
@@ -1081,18 +649,8 @@ namespace basecross {
 	void Enemy::GravZero() {
 		m_grav = Vec3(0.0f);
 	}
-	void Enemy::GravVelZero() {
-		m_gravVel = Vec3(0.0f);
-	}
 	void Enemy::SetGrav(Vec3 grav) {
 		m_grav = grav;
-	}
-	void Enemy::AddGrav(Vec3 grav) {
-		m_gravVel = grav;
-	}
-	void Enemy::SetGravVel(Vec3 grav) {
-		auto elapsed = App::GetApp()->GetElapsedTime();
-		m_gravVel = grav;
 	}
 
 	//ゲッターセッター
@@ -1106,21 +664,8 @@ namespace basecross {
 		return m_trans->GetPosition();
 
 	}
-	void Enemy::SetEnemyFlayFlag(bool flag) {
-		m_flyFlag = flag;
-	}
 	void Enemy::SetSpeed(float speed) {
 		m_speed = speed;
-	}
-	void Enemy::SetState(State state) {
-		m_stateType = state;
-	}
-	void Enemy::SetUpMove(float speed, float height) {
-		m_upSpeed = speed;
-		m_upHeight = height;
-	}
-	void Enemy::SetFlyPower(float power) {
-		m_jumpPower = power;
 	}
 	bool Enemy::GetFloorFlag() {
 		return m_floorFlag;
@@ -1138,12 +683,7 @@ namespace basecross {
 		return m_trans->GetWorldPosition();
 	}
 	bool Enemy::GetOverHeat() {
-		if (m_stateType == m_overHeatState || m_stateType == throwAway||m_overHeatFlag) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return m_overHeatFlag;
 	}
 	void Enemy::SetPlungeFlag(bool flag) {
 		m_plungeFlag = flag;
