@@ -19,7 +19,6 @@ namespace basecross {
 		m_meshName(meshName),
 		m_pos(pos),
 		m_color(color),
-		m_time(1.0f),
 		m_layer(layer)
 	{}
 	void GameSprite::OnCreate() {

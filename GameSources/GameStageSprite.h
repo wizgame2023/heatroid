@@ -11,10 +11,9 @@ namespace basecross {
 	class GameSprite : public GameObject {
 	private:
 		//表示サイズ
-		float m_width;
-		float m_height;
-		float m_time;
-		int m_layer;
+		float m_width;  //横のサイズ
+		float m_height; //縦のサイズ
+		int m_layer;   //表示レイヤー
 		Vec3 m_pos;
 		wstring m_meshName;
 		Col4 m_color;

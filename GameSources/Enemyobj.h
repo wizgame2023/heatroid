@@ -10,7 +10,9 @@
 #include "EnemyState.h"
 
 namespace basecross {
-	//’Ç‚¢‚©‚¯‚Ä“Ëi‚·‚é“G
+	//--------------------------------------------------------------------------------------
+	//	class Enemy : public GameObject;  //’Ç‚¢‚©‚¯‚Ä“Ëi‚·‚é“G
+	//--------------------------------------------------------------------------------------
 	class ChasingEnemy : public Enemy {
 	private:
 		State m_defaultState;
@@ -27,7 +29,9 @@ namespace basecross {
 		virtual void OnUpdate() override;
 	};
 
-	//¶‰E‚É’Ç‚¢‚©‚¯‚Ä’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//--------------------------------------------------------------------------------------
+	//	class MoveBulletEnemy : public Enemy;  //¶‰E‚É’Ç‚¢‚©‚¯‚Ä’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//--------------------------------------------------------------------------------------
 	class MoveBulletEnemy : public Enemy {
 	private:
 	public:
@@ -41,7 +45,9 @@ namespace basecross {
 		virtual void OnUpdate() override;
 	};
 
-	//•ú•¨ü‚É’e‚ğ”ò‚Î‚µ‚Ä‚­‚é“G
+	//--------------------------------------------------------------------------------------
+	//	class ParabolaBulletEnemy : public Enemy;  //•ú•¨ü‚É’e‚ğ”ò‚Î‚µ‚Ä‚­‚é“G
+	//--------------------------------------------------------------------------------------
 	class ParabolaBulletEnemy : public Enemy {
 	public:
 		ParabolaBulletEnemy(const shared_ptr<Stage>& stage,
@@ -54,7 +60,9 @@ namespace basecross {
 		virtual void OnUpdate() override;
 	};
 
-	//¶‰EˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//--------------------------------------------------------------------------------------
+	//	class SlideEnemy : public Enemy;  //¶‰EˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//--------------------------------------------------------------------------------------
 	class SlideEnemy : public Enemy {
 	public:
 		SlideEnemy(const shared_ptr<Stage>& stage,

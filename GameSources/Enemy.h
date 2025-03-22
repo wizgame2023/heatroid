@@ -47,62 +47,52 @@ namespace basecross {
 		float m_upSpeed;       //上下の速度
 		float m_bulletTime;    //弾の発射間隔
 		float m_maxBulletTime; //↑の最大値
-		float m_pBulletTime;
-		float m_maxPbulletTime;
-		int m_bulletCnt;
-		float m_throwLength;   //投げる長さをチャージ量によって変える変数
+		float m_parabolaBulletTime;    //放物線に飛ばす弾の間隔
+		float m_maxParabolabulletTime; //↑の最大値
+		int m_bulletCnt;        //連続で出す弾の数
+		float m_throwLength;    //投げる長さをチャージ量によって変える変数
 		float m_bulletRangeTime;//弾の発射クールタイム
 		float m_maxBulletRangeTime;//↑の最大値
-		float m_trackingRange; //弾を発射する距離
-		float m_spareTime;    //突っ込みの予備時間
-		float m_maxSpareTime; //↑の最大値
-		float m_efcTime;
-		float m_rad;
-		Vec3 m_direc;
-		Vec3 m_direcNorm;
-		Vec3 m_firstDirec;
+		float m_trackingRange;  //弾を発射する距離
+		float m_spareTime;      //突っ込みの予備時間
+		float m_maxSpareTime;   //↑の最大値
+		float m_rad;            //角度の計算
+		float m_throwTime;      //投げれる時間
+		Vec3 m_playerDirec;     //プレイヤーへのベクトル
+		Vec3 m_playerDirecNorm; //プレイヤーへのベクトルの正規化
 		Vec3 m_moveRot;
 		Vec2 m_bulletDic;
 		//テスト用
-		float m_test;
-		float m_throwTime;
-		bool m_bulletFlag;
-		bool m_floorFlag;
-		bool m_plungeFlag;
-		bool m_pGrabFlag;
-		bool m_playerFlag;
-		bool m_overHeatSE;
-		bool m_plungeSE;
-		bool m_throwFlag;
-		bool m_overHeatFlag;
-		bool m_activeFlag;
+		bool m_bulletFlag;      //弾を発射するフラグ
+		bool m_objFlag;         //オブジェクトへの衝突フラグ
+		bool m_pGrabFlag;       //持たれている状態
+		bool m_playerFlag;      //プレイヤーへの衝突フラグ
+		bool m_throwFlag;       //投げれる状態
+		bool m_overHeatFlag;    //オーバーヒート状態
+		bool m_activeFlag;      //アクティブ状態
 
-		wstring m_meshName;
+		wstring m_meshName;     //メッシュのパス
 
 		//重力
-		float m_gravity;
-		Vec3 m_grav;
-		Vec3 m_gravVel;
+		float m_gravity;        //重力の値
+		Vec3 m_grav;            //重力の大きさ
+		Vec3 m_gravVel;         //重力ベクトル
 
-		Vec3 m_rot;
-		Vec3 m_scal;
-		Vec3 m_beforePos;
-		Vec3 m_deathPos;
-		Vec3 m_playerPos;
-		Vec3 m_playerScale; //プレイヤーのサイズ
-
-		Vec3 m_floorPos;
-		Vec3 m_jumpPos;
+		Vec3 m_firstRot;        //最初の回転
+		Vec3 m_firstScal;       //最初の大きさ
+		Vec3 m_beforePos;       //最初の座標
+		Vec3 m_playerPos;       //プレイヤーの座標
+		Vec3 m_playerScale;     //プレイヤーのサイズ
 
 		shared_ptr<Transform> m_trans;
 		shared_ptr<PNTBoneModelDraw> m_draw;
+		shared_ptr<CollisionCapsule> m_collision;
 		shared_ptr<EnemyFloorCol> m_floorCol;
+		//プレイヤーの取得
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
-		weak_ptr<FixedBox> m_box;
-		shared_ptr<CollisionCapsule> m_collision;
-		weak_ptr<TilingFixedBox> m_fixedBox;
 		weak_ptr<PlayerGrab> m_playerGrab;
+		//オーバーヒートのUI
 		weak_ptr<GaugeSquare> m_gauge;
 		weak_ptr<Square> m_gaugeFram;
 		//エフェクト
@@ -110,9 +100,8 @@ namespace basecross {
 		shared_ptr<EfkEffect> m_eyeEffect;
 		shared_ptr<EfkEffect> m_burstEffect;
 		shared_ptr<EfkPlay> m_EfkPlayer[MAX_EFFECT_NUM];
-
+		//ステート
 		unique_ptr<EnemyState> m_currentState;  //現在のステート
-		unique_ptr<EnemyState> m_nextState;     //次のステート
 		unique_ptr<EnemyState> m_previousState; //一つ前のステート
 
 	public:
@@ -152,8 +141,6 @@ namespace basecross {
 		void ThisDestroy();
 		//プレイヤーの方向を計算
 		void PlayerDic();
-		//突っ込む
-		Vec3 Plunge();
 		//プレイヤーの方向を向かせる
 		void EnemyAngle();
 		//放物線に発射する弾
@@ -194,8 +181,6 @@ namespace basecross {
 		float GetHeatRatio();
 		//オーバーヒート状態
 		bool GetOverHeat();
-		//突っ込むときのフラグの取得
-		void SetPlungeFlag(bool flag);
 		//弾を飛ばす角度の設定
 		void SetBulletDirec(Vec2 direc);
 		bool GetActiveFlag();
@@ -234,7 +219,6 @@ namespace basecross {
 			}
 		}
 
-
 	public:
 		//重力に関する関数
 		Vec3 Grav();
@@ -250,8 +234,8 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class EnemyBullet : public GameObject {
 	protected:
-		float m_colTime;
-		bool m_playerColFlag;
+		float m_colTime;      //誤差の時間
+		bool m_playerColFlag; //プレイヤーへの衝突フラグ
 		shared_ptr<PNTStaticDraw> m_draw;
 
 	public:
@@ -293,13 +277,12 @@ namespace basecross {
 	class ParabolaBullet : public EnemyBullet {
 	private:
 
-		float m_speed;   //弾の速さ
 		Vec3 m_pos;
 		Vec3 m_rot;
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
-		Vec3 m_velocity;
-		float m_test;
+		float m_speed;   //弾の速さ
+		Vec3 m_velocity; //飛ばすベクトル
 
 		shared_ptr<Transform> m_trans;
 		weak_ptr<Enemy> m_enemy;
@@ -340,7 +323,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class EnemyFloorCol : public GameObject;
+	//	class EnemyFloorCol : public GameObject; //敵の頭上のコリジョン
 	//--------------------------------------------------------------------------------------
 	class EnemyFloorCol : public GameObject {
 	private:
