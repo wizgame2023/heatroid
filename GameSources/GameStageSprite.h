@@ -8,6 +8,9 @@
 #include "stdafx.h"
 
 namespace basecross {
+	//--------------------------------------------------------------------------------------
+	//	class GameSprite : public GameObject;   //UIの表示
+	//--------------------------------------------------------------------------------------
 	class GameSprite : public GameObject {
 	private:
 		//表示サイズ
@@ -35,6 +38,10 @@ namespace basecross {
 		virtual void OnUpdate() override;
 		void SetColor(Col4 color);
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class FadeOut : public GameObject;   //フェードアウト
+	//--------------------------------------------------------------------------------------
 	class FadeOut : public GameObject {
 	private: 
 		float m_time;
@@ -48,6 +55,9 @@ namespace basecross {
 		bool GetFadeOutEnd();
 		void SetColor(Col4 color);
 	};
+	//--------------------------------------------------------------------------------------
+	//	class FadeIn : public GameObject;   //フェードイン
+	//--------------------------------------------------------------------------------------
 	class FadeIn : public GameObject {
 	private:
 		float m_time;
@@ -73,6 +83,10 @@ namespace basecross {
 		virtual void OnUpdate() override;
 
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class GameOverSprite : public GameObject;   //ゲームオーバーの演出用UI
+	//--------------------------------------------------------------------------------------
 	class GameOverSprite :public GameObject {
 	private:
 		shared_ptr<FadeOut> m_fadeOut;
@@ -85,6 +99,9 @@ namespace basecross {
 		virtual void OnUpdate() override;
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class NumberSprite : public GameObject;   //数字の表示用UI
+	//--------------------------------------------------------------------------------------
 	class NumberSprite :public GameObject {
 	private:
 		int m_number;

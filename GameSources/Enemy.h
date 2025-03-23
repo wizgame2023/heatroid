@@ -108,21 +108,6 @@ namespace basecross {
 		// ç\ízÇ∆îjä¸
 		Enemy(const shared_ptr<Stage>& stage,
 			const Vec3& position,
-			const Vec3& rotatoin,
-			const Vec3& scale,
-			const State& state,
-			const State& overHeatState,
-			const shared_ptr<Player>& player);
-		Enemy(const shared_ptr<Stage>& stage,
-			const Vec3& position,
-			const Vec3& rotatoin,
-			const Vec3& scale,
-			const State& state,
-			const State& overHeatState,
-			const wstring& meshName,
-			const shared_ptr<Player>& player);
-		Enemy(const shared_ptr<Stage>& stage,
-			const Vec3& position,
 			const Vec3& rotation,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
