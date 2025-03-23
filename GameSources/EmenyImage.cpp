@@ -1,6 +1,7 @@
 /*!
 @file EmenyImage.cpp
 @brief キャラクターなど実体
+担当：逸見
 */
 
 #include "stdafx.h"
