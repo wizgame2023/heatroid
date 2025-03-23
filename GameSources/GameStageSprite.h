@@ -8,13 +8,15 @@
 #include "stdafx.h"
 
 namespace basecross {
+	//--------------------------------------------------------------------------------------
+	//	class GameSprite : public GameObject;   //UIの表示
+	//--------------------------------------------------------------------------------------
 	class GameSprite : public GameObject {
 	private:
 		//表示サイズ
-		float m_width;
-		float m_height;
-		float m_time;
-		int m_layer;
+		float m_width;  //横のサイズ
+		float m_height; //縦のサイズ
+		int m_layer;   //表示レイヤー
 		Vec3 m_pos;
 		wstring m_meshName;
 		Col4 m_color;
@@ -36,6 +38,10 @@ namespace basecross {
 		virtual void OnUpdate() override;
 		void SetColor(Col4 color);
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class FadeOut : public GameObject;   //フェードアウト
+	//--------------------------------------------------------------------------------------
 	class FadeOut : public GameObject {
 	private: 
 		float m_time;
@@ -49,6 +55,9 @@ namespace basecross {
 		bool GetFadeOutEnd();
 		void SetColor(Col4 color);
 	};
+	//--------------------------------------------------------------------------------------
+	//	class FadeIn : public GameObject;   //フェードイン
+	//--------------------------------------------------------------------------------------
 	class FadeIn : public GameObject {
 	private:
 		float m_time;
@@ -74,6 +83,10 @@ namespace basecross {
 		virtual void OnUpdate() override;
 
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class GameOverSprite : public GameObject;   //ゲームオーバーの演出用UI
+	//--------------------------------------------------------------------------------------
 	class GameOverSprite :public GameObject {
 	private:
 		shared_ptr<FadeOut> m_fadeOut;
@@ -86,6 +99,9 @@ namespace basecross {
 		virtual void OnUpdate() override;
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class NumberSprite : public GameObject;   //数字の表示用UI
+	//--------------------------------------------------------------------------------------
 	class NumberSprite :public GameObject {
 	private:
 		int m_number;
