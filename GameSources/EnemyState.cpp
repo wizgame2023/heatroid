@@ -1,5 +1,5 @@
 /*!
-@file Emenyobj.cpp
+@file EmenyState.cpp
 @brief 敵のオブジェクト
 担当：逸見
 */
