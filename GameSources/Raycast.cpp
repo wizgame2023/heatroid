@@ -211,7 +211,6 @@ namespace basecross {
 			m_hitWallFlag.clear();
 			m_hitDoorFlag.clear();
 		}
-		enemy->SetActiveFlag(m_activeFlag);
 
 		//デバック用
 		//当たっている場所の描画
