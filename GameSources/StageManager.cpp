@@ -403,7 +403,7 @@ namespace basecross {
 					group->IntoGroup(enemy);
 				}
 				else if (Tokens[10] == L"Enemy::bulletMove" && Tokens[11] == L"Enemy::stay") {
-					auto enemy = GetStage()->AddGameObject<MoveBulletEnemy>(Pos, Rot, Scale,  player);
+					auto enemy = GetStage()->AddGameObject<MoveBulletEnemy>(Pos, Rot, Scale, player);
 					auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 					group->IntoGroup(enemy);
 					if (Tokens[12] == L"X")
@@ -495,18 +495,26 @@ namespace basecross {
 
 	void StageGenerator::EnemyUpdate()
 	{
+		auto rayGroup = GetStage()->GetSharedObjectGroup(L"Line");
 		auto group = GetStage()->GetSharedObjectGroup(L"Enemy");
 		auto& vec = group->GetGroupVector();
+		auto& rayVec = rayGroup->GetGroupVector();
 		for (auto v : vec)
 		{
-			auto shObj = v.lock();
-			auto Ray = dynamic_pointer_cast<Enemy>(shObj);
-			if (Ray->GetActiveFlag() == false)
+			for (auto vline : rayVec)
 			{
-				Ray->SetUpdateActive(false);
-			}
-			else {
-				Ray->SetUpdateActive(true);
+				auto shObj = v.lock();
+				auto enemyptr = dynamic_pointer_cast<Enemy>(shObj);
+
+				auto shRay = vline.lock();
+				auto rayptr = dynamic_pointer_cast<RayMark>(shRay);
+				if (rayptr->GetActiveFlag() == false && enemyptr->GetActiveFlag() == false)
+				{
+					enemyptr->SetUpdateActive(false);
+				}				
+				else {
+					enemyptr->SetUpdateActive(true);
+				}
 			}
 		}
 	}
