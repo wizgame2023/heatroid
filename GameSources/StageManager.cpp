@@ -511,7 +511,7 @@ namespace basecross {
 				if (rayptr->GetActiveFlag() == false && enemyptr->GetActiveFlag() == false)
 				{
 					enemyptr->SetUpdateActive(false);
-				}				
+				}
 				else {
 					enemyptr->SetUpdateActive(true);
 				}
