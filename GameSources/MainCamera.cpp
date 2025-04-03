@@ -11,7 +11,7 @@ namespace basecross {
 
 	CameraCollision::CameraCollision(const shared_ptr<Stage>& StagePtr)
 		:GameObject(StagePtr),
-		GetPos(Vec3(0.0f, 1.0f, 0.0f)), 
+		GetPos(Vec3(0.0f, 1.0f, 0.0f)),
 		m_TargetToAt(0, 0, 0),
 		TargetPos(Vec3(0.0f, 0.0f, 0.0f)),
 		m_ArmLen(15.5f),
@@ -21,7 +21,8 @@ namespace basecross {
 		m_ToTargetLerp(1.0f),
 		m_Hit(false),
 		m_LRBaseMode(true)
-	{}
+	{
+	}
 
 	void CameraCollision::OnCreate() {
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
@@ -83,7 +84,7 @@ namespace basecross {
 
 		//ƒvƒŒƒCƒ„[‚ÌŒü‚«‚ÉƒJƒƒ‰‚ğ–ß‚·
 		float tempFixedRad = FixCameraDirection(ptrTarget, (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_Y || keyData.m_bPressedKeyTbl['C']));
-		if (tempFixedRad != 0) 
+		if (tempFixedRad != 0)
 			fThumbRX = tempFixedRad;
 
 		armVec.y = sin(m_RadY);
@@ -120,8 +121,8 @@ namespace basecross {
 
 		Vec3 posXZ = Mat.transInMatrix();
 		//XZ‚Ì’l‚ª‚í‚©‚Á‚½‚Ì‚Å˜rŠp“x‚É‘ã“ü
-		armVec.x = posXZ.x ;
-		armVec.z = posXZ.z ;
+		armVec.x = posXZ.x;
+		armVec.z = posXZ.z;
 		//˜rŠp“x‚ğ³‹K‰»
 		armVec.normalize();
 		if (ptrTarget) {
@@ -225,7 +226,7 @@ namespace basecross {
 
 	void CameraCollision::OnCollisionEnter(shared_ptr<GameObject>& Other)
 	{
-		
+
 	}
 
 	void CameraCollision::OnCollisionExit(shared_ptr<GameObject>& Other)
@@ -246,7 +247,8 @@ namespace basecross {
 		m_RotSpeed(-2.0f),
 		m_ZoomSpeed(0.1f),
 		m_LRBaseMode(true)
-	{}
+	{
+	}
 
 	MainCamera::MainCamera(float ArmLen) :
 		Camera(),
@@ -541,7 +543,8 @@ namespace basecross {
 		m_totalTime(TotalTime),
 		m_secondEndPos(secondEndPos),
 		m_secondAtEndPos(secondAtEndPos)
-	{}
+	{
+	}
 	OpeningCameraman::~OpeningCameraman() {}
 
 	//‰Šú‰»
@@ -663,7 +666,8 @@ namespace basecross {
 
 	OpeningCamera::OpeningCamera() :
 		Camera()
-	{}
+	{
+	}
 	OpeningCamera::~OpeningCamera() {}
 
 	void OpeningCamera::OnCreate()
@@ -691,7 +695,8 @@ namespace basecross {
 		m_atStartPos(AtStartPos),
 		m_atEndPos(AtEndPos),
 		m_totalTime(TotalTime)
-	{}
+	{
+	}
 	EndingCameraman::~EndingCameraman() {}
 
 	//‰Šú‰»
@@ -742,7 +747,8 @@ namespace basecross {
 
 	EndingCamera::EndingCamera() :
 		Camera()
-	{}
+	{
+	}
 	EndingCamera::~EndingCamera() {}
 
 	void EndingCamera::OnUpdate() {

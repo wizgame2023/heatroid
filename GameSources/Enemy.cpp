@@ -947,7 +947,7 @@ namespace basecross {
 					Switchs->SetButton(false);
 				}
 			}
-			m_activeFlag = false;
+			m_activeFlag = true;
 		}
 		if (other->FindTag(L"Player")) {
 			m_playerFlag = false;
