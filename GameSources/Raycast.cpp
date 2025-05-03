@@ -239,6 +239,12 @@ namespace basecross {
 		return m_activeFlag;
 	}
 
+	shared_ptr<Enemy> RayMark::GetEnemy()
+	{
+		auto enemy = m_enemy.lock();
+		return enemy;
+	}
+
 	void RayMark::Debug() {
 		auto scene = App::GetApp()->GetScene<Scene>();
 		wstringstream wss(L"");

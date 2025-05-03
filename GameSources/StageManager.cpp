@@ -501,19 +501,24 @@ namespace basecross {
 		auto& rayVec = rayGroup->GetGroupVector();
 		for (auto v : vec)
 		{
+			auto shObj = v.lock();
+			auto enemyptr = dynamic_pointer_cast<Enemy>(shObj);
+			bool enemyActiv = enemyptr->GetActiveFlag();
 			for (auto vline : rayVec)
 			{
-				auto shObj = v.lock();
-				auto enemyptr = dynamic_pointer_cast<Enemy>(shObj);
-
 				auto shRay = vline.lock();
 				auto rayptr = dynamic_pointer_cast<RayMark>(shRay);
-				if (rayptr->GetActiveFlag() == false && enemyptr->GetActiveFlag() == false)
+				if (rayptr->GetEnemy() == shObj)
 				{
-					enemyptr->SetUpdateActive(false);
-				}
-				else {
-					enemyptr->SetUpdateActive(true);
+					bool Activ = rayptr->GetActiveFlag();
+					if (Activ == false && enemyActiv == true)
+					{
+						enemyptr->SetUpdateActive(false);
+					}
+					else
+					{
+						enemyptr->SetUpdateActive(true);
+					}
 				}
 			}
 		}

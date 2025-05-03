@@ -297,10 +297,13 @@ namespace basecross {
 				auto shObj = v.lock();
 				if (other == shObj) {
 					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					Switchs->SetButton(true);
+					if (Switchs->GetButton() == false)
+					{
+						Switchs->SetButton(true);
+						m_activeFlag = true;
+					}
 				}
 			}
-			m_activeFlag = true;
 		}
 		if (other->FindTag(L"Attack")) {
 			PlayOverHeat();
@@ -330,10 +333,13 @@ namespace basecross {
 				auto shObj = v.lock();
 				if (other == shObj) {
 					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					Switchs->SetButton(false);
+					if (Switchs->GetButton() == false)
+					{
+						Switchs->SetButton(false);
+						m_activeFlag = false;
+					}
 				}
 			}
-			m_activeFlag = true;
 		}
 		if (other->FindTag(L"Player")) {
 			m_playerFlag = false;
@@ -362,10 +368,11 @@ namespace basecross {
 				auto shObj = v.lock();
 				if (other == shObj) {
 					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+					
 					Switchs->SetButton(true);
+					m_activeFlag = true;
 				}
 			}
-			m_activeFlag = true;
 		}
 
 		if (other->FindTag(L"Player")) {
