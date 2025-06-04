@@ -5,7 +5,7 @@
 
 #include "stdafx.h"
 #include "Project.h"
-#include "Collision.h"
+#include "Player.h"
 
 namespace basecross {
 
@@ -118,7 +118,7 @@ namespace basecross {
 		if (angle.length() > 0) {
 			angle.normalize();
 			float limit = m_speed;
-			if (m_stateType == air) limit *= m_airSpeedPerc;
+			if (m_isAir) limit *= m_airSpeedPerc;
 
 			if (angle.x > 0) {
 				if (m_moveVel.x > angle.x * limit) m_moveVel.x = angle.x * limit;
@@ -152,7 +152,8 @@ namespace basecross {
 		wstring HitDir = DataDir + L"Effects\\Hit.efk";
 		wstring JumpDir = DataDir + L"Effects\\PlayerJump.efk";
 		wstring LandDir = DataDir + L"Effects\\PlayerLand.efk";
-		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+
+		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
 		m_EfkMuzzle = ObjectFactory::Create<EfkEffect>(ShEfkInterface, MuzzleDir);
 		m_EfkHit = ObjectFactory::Create<EfkEffect>(ShEfkInterface, HitDir);
 		m_EfkJump = ObjectFactory::Create<EfkEffect>(ShEfkInterface, JumpDir);
@@ -206,16 +207,17 @@ namespace basecross {
 			e = GetStage()->AddGameObject<FireProjectile>();
 		}
 
+		//ステートマシン
+		m_state = shared_ptr<PlayerStateMachine>(new PlayerStateMachine(GetThis<Player>()));
+
 		m_HP = m_HP_max;
 	}
 
 	void Player::OnUpdate() {
 		_delta = App::GetApp()->GetElapsedTime();
-		auto key = App::GetApp()->GetInputDevice().GetKeyState();
-		auto pad = App::GetApp()->GetInputDevice().GetControlerVec();
 
 		//コントローラチェックして入力があればコマンド呼び出し
-		m_InputHandler.PushHandle(GetThis<Player>());
+		//m_InputHandler.PushHandle(GetThis<Player>());
 
 		//ステージ外に落下すると強制的に死ぬ(デバッグ？)
 		if (GetComponent<Transform>()->GetPosition().y <= -20.0f) {
@@ -223,9 +225,11 @@ namespace basecross {
 		}
 
 		//無敵時間
-		if (m_invincibleTime > 0 && m_stateType != died) {
+		if (m_invincibleTime > 0 && m_state->GetStateType() != PlayerStateMachine::player_died) {
+			//無敵時間を減算
 			m_invincibleTime -= _delta;
 			GetDrawPtr()->SetBlendState(BlendState::NonPremultiplied);
+			//点滅する
 			if (m_invincibleTime > m_invincibleTimeMax * .9f)
 				GetDrawPtr()->SetDiffuse(Col4(10, 1, 1, 1));
 			else
@@ -239,7 +243,8 @@ namespace basecross {
 		if (GetDrawPtr()->GetCurrentAnimation() == L"Died") m_invincibleTime = m_invincibleTimeMax;
 
 		//チャージも運搬も出来ない状況
-		if (m_stateType != stand) {
+		if ((m_state->GetStateType() == PlayerStateMachine::player_stand ||
+			 m_state->GetStateType() == PlayerStateMachine::player_release) == false) {
 			m_isCarrying = false;
 			m_pGrab.lock()->SetCollActive(false);
 			m_isCharging = false;
@@ -247,183 +252,22 @@ namespace basecross {
 			m_chargePerc = 0.0f;
 		}
 
-		//演出アニメを利用しないステート
-		if (m_stateType != start && m_stateType != goalstandby && m_stateType != goal) {
-			m_animTime = 0.0f;
-		}
+		////演出アニメを利用しないステート
+		//if (m_stateType != start && m_stateType != goalstandby && m_stateType != goal) {
+		//	m_animTime = 0.0f;
+		//}
 
 		WalkSound();
 
-		m_collideCount--;
-
-		switch (m_stateType) {
-
-			//---------------------------------------地上
-		case stand:
-			if (m_HP <= 0) {
-				m_stateType = died;
-			}
-			//プレイヤーの移動
-			MovePlayer();
-			Friction();
-			Gravity();
-
-			//Bボタンで射出
-			if ((pad[0].wReleasedButtons & XINPUT_GAMEPAD_B) || key.m_bUpKeyTbl[VK_LCONTROL] == true)
-				Projectile();
-
-			//Bボタンでチャージ
-			Charging((pad[0].wButtons & XINPUT_GAMEPAD_B) || key.m_bPushKeyTbl[VK_LCONTROL] == true);
-
-			//Rボタンで敵を持つ
-			GrabEnemy();
-
-			//空中判定
-			if (m_collideCount <= 0) m_stateType = air;
-
-			break;
-			//---------------------------------------空中
-		case air:
-			if (m_HP <= 0) {
-				m_stateType = died_air;
-			}
-			MovePlayer();
-			Gravity();
-
-			break;
-			//---------------------------------------地上のけぞり
-		case hit_stand:
-			if (m_HP <= 0) {
-				m_stateType = died;
-			}
-			SetAnim(L"GetHit_Stand");
-			Friction();
-			Gravity();
-			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Stand" && GetDrawPtr()->GetCurrentAnimationTime() >= .33f) {
-				m_stateType = stand;
-			}
-			break;
-			//---------------------------------------空中のけぞり
-		case hit_air:
-			if (m_HP <= 0) {
-				m_stateType = died_air;
-			}
-			SetAnim(L"GetHit_Air");
-			Gravity();
-			if (GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Air" && GetDrawPtr()->GetCurrentAnimationTime() >= .33f
-				&& m_HP > 0) {
-				m_stateType = air;
-			}
-
-			break;
-			//---------------------------------------発射
-		case release:
-			SetAnim(L"Release");
-			Gravity();
-			Friction();
-			if (GetDrawPtr()->GetCurrentAnimation() == L"Release" && GetDrawPtr()->GetCurrentAnimationTime() >= 8.0f / 30.0f) {
-				m_stateType = stand;
-			}
-			break;
-			//---------------------------------------開始演出
-		case start:
-			m_animTime += _delta;
-			if (m_animTime <= 1.0f) {
-				SetAnim(L"Idle");
-			}
-			else if (m_animTime > 1.0f && m_animTime <= 3.0f) {
-				SetAnim(L"Walk");
-				Vec3 fwd = ForwardConvert(Vec3(1, 0, 0));
-				m_moveVel += fwd * m_accel * .0035;
-			}
-			else if (m_animTime > 3.0f) {
-				SetAnim(L"Idle");
-			}
-			FrictionMovie();
-			SpeedLimit();
-
-			//ステージマネージャ取得、カメラ元に戻ったら操作可能に
-			if (m_stageMgr->m_CameraSelect != StageGenerator::CameraSelect::OPENINGCAMERA) {
-				m_stateType = stand;
-			}
-
-			break;
-			//---------------------------------------死亡
-		case died:
-			Died();
-			Friction();
-
-			//空中判定
-			if (m_collideCount <= 0) m_stateType = died_air;
-
-			break;
-			//---------------------------------------死亡
-		case died_air:
-			SetAnim(L"GetHit_Air");
-			Gravity();
-
-			break;
-			//---------------------------------------ゴール
-		case goalstandby:
-
-			if (m_animTime == 0) {
-				GetStage()->AddGameObject<GoalFade>();
-				PlaySnd(L"RevCymbal", 1.0f, 0.0f);
-			}
-			m_animTime += _delta;
-
-			SetAnim(L"Idle");
-			Friction();
-
-			//Goal床を参照してその手前にワープ
-			if (m_animTime > 1.5f && !m_goalPosMoved) {
-				m_goalPosMoved = true;
-				shared_ptr<Transform> trans = m_goal->GetComponent<Transform>();
-
-				m_moveVel = Vec3(0);
-				m_goalRotate = trans->GetQuaternion();
-				m_goalRotate = RotateQuat(m_goalRotate, Vec3(0, 1, 0), XM_PIDIV2);
-				GetComponent<Transform>()->SetQuaternion(m_goalRotate);
-
-				Vec3 fwd = GetComponent<Transform>()->GetForward();
-				float face = atan2(fwd.z, fwd.x);
-				addpos1 = Vec3((m_distToGoal * cosf(face)), 0, (m_distToGoal * sinf(face)));
-				pos1 = Vec3(trans->GetPosition().x, GetComponent<Transform>()->GetPosition().y, trans->GetPosition().z);
-				GetComponent<Transform>()->SetPosition(addpos1 + pos1);
-			}
-			if (m_goalPosMoved) {
-				m_animTime = 0.0f;
-				m_stateType = goal;
-			}
-
-			break;
-			//---------------------------------------ゴール
-		case goal:
-			m_animTime += _delta;
-			//しばらく歩いてからエレベータに入ったところで180°振り向く
-			if (m_animTime > 0.0f && m_animTime <= 3.0f) {
-				SetAnim(L"Walk");
-				Vec3 fwd = ForwardConvert(Vec3(1, 0, 0));
-				m_moveVel += fwd * m_accel * .003f;
-			}
-			else if (m_animTime > 3.0f && m_animTime <= 3.5f) {
-				SetAnim(L"Idle");
-
-				Easing<float> rot;
-				float start = 0;
-				float end = XM_PIDIV2;
-
-				GetComponent<Transform>()->SetQuaternion(RotateQuat(m_goalRotate, Vec3(0, 1, 0), rot.EaseInOut(EasingType::Cubic, start, end, m_animTime - 3.0f, .5f)));
-			}
-			else if (m_animTime > 4.0f) {
-				SetAnim(L"Idle");
-			}
-			FrictionMovie();
-			SpeedLimit();
-
-
-			break;
+		//空中判定の更新
+		if (m_collideCount <= 0) {
+			m_isAir = true;
 		}
+		else {
+			m_collideCount--;
+		}
+
+		m_state->Update(_delta);
 
 		if (m_grabTime > 0) m_grabTime -= _delta;
 		if (m_grabTime < 0) m_grabTime = 0;
@@ -440,20 +284,80 @@ namespace basecross {
 		//ShowDebug();
 	}
 
+	void Player::GoalStandbyBehavior() {
+
+		if (m_animTime == 0) {
+			GetStage()->AddGameObject<GoalFade>();
+			PlaySnd(L"RevCymbal", 1.0f, 0.0f);
+		}
+		m_animTime += _delta;
+
+		SetAnim(L"Idle");
+		Friction();
+
+		//Goal床を参照してその手前にワープ
+		if (m_animTime > 1.5f && !m_goalPosMoved) {
+			m_goalPosMoved = true;
+			shared_ptr<Transform> trans = m_goal->GetComponent<Transform>();
+
+			m_moveVel = Vec3(0);
+			m_goalRotate = trans->GetQuaternion();
+			m_goalRotate = RotateQuat(m_goalRotate, Vec3(0, 1, 0), XM_PIDIV2);
+			GetComponent<Transform>()->SetQuaternion(m_goalRotate);
+
+			Vec3 fwd = GetComponent<Transform>()->GetForward();
+			float face = atan2(fwd.z, fwd.x);
+			addpos1 = Vec3((m_distToGoal * cosf(face)), 0, (m_distToGoal * sinf(face)));
+			pos1 = Vec3(trans->GetPosition().x, GetComponent<Transform>()->GetPosition().y, trans->GetPosition().z);
+			GetComponent<Transform>()->SetPosition(addpos1 + pos1);
+		}
+		if (m_goalPosMoved) {
+			m_animTime = 0.0f;
+			ChangeState(PlayerStateMachine::player_goal);
+		}
+
+	}
+
+	void Player::GoalBehavior() {
+
+		m_animTime += _delta;
+		//しばらく歩いてからエレベータに入ったところで180°振り向く
+		if (m_animTime > 0.0f && m_animTime <= 3.0f) {
+			SetAnim(L"Walk");
+			Vec3 fwd = ForwardConvert(Vec3(1, 0, 0));
+			m_moveVel += fwd * m_accel * .003f;
+		}
+		else if (m_animTime > 3.0f && m_animTime <= 3.5f) {
+			SetAnim(L"Idle");
+
+			Easing<float> rot;
+			float start = 0;
+			float end = XM_PIDIV2;
+
+			GetComponent<Transform>()->SetQuaternion(RotateQuat(m_goalRotate, Vec3(0, 1, 0), rot.EaseInOut(EasingType::Cubic, start, end, m_animTime - 3.0f, .5f)));
+		}
+		else if (m_animTime > 4.0f) {
+			SetAnim(L"Idle");
+		}
+		FrictionMovie();
+		SpeedLimit();
+
+	}
+
 	void Player::ShowDebug() {
 		wstringstream wss;
 		auto pos = RoundOff(GetComponent<Transform>()->GetPosition(), 3);
 		auto rot = GetComponent<Transform>()->GetQuaternion();
 
 		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
-		wss << endl << endl << endl << "stateType : " << m_stateType << endl;
+		wss << endl << endl << endl << "stateType : " << m_state->GetStateType() << endl;
 		wss << "move : " << m_moveVel.x << " / " << m_moveVel.y << " / " << m_moveVel.z << endl;
 		wss << "pos : " << pos.x << " / " << pos.y << " / " << pos.z << endl;
 		wss << "rotate : " << rot.w << " / " << rot.x << " / " << rot.y << " / " << rot.z << endl;
 		wss << "anim : " << GetDrawPtr()->GetCurrentAnimation() << " animtime : " << GetDrawPtr()->GetCurrentAnimationTime() << endl;
 		wss << "fire : " << m_isCharging << " " << m_chargePerc << endl;
 		wss << "carry : " << m_isCarrying << endl;
-		wss << "hp : " << m_HP << " / " << m_HP_max << endl;
+		wss << "ColCnt : " << m_collideCount << "Airborne: " << m_isAir << endl;
 		wss << "grab : " << m_pGrab.lock()->IsHit() << " : " << m_grabTime << endl;
 		wss << "fps : " << App::GetApp()->GetStepTimer().GetFramesPerSecond() << " delta : " << _delta << endl;
 
@@ -468,8 +372,7 @@ namespace basecross {
 		scene->SetDebugString(L"Player\n" + wss.str());
 	}
 
-	void Player::OnPushA() {
-		if (m_stateType != stand) return;	//立ち状態以外ではジャンプしない
+	void Player::Jump() {
 		if (m_isCarrying == true) return;	//敵を持った状態でもジャンプしない
 
 		//ジャンプ時のエフェクト
@@ -477,23 +380,23 @@ namespace basecross {
 		plPos.y -= 4;
 		plPos.x += m_moveVel.x * _delta;
 		plPos.z += m_moveVel.z * _delta;
-		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
 		m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkJump, plPos, 1);
 		m_EfkPlay[2]->SetScale(Vec3(.35f));
 
 		PlaySnd(L"PlayerJump", 1, 0);
 
 		m_moveVel.y = m_jumpHeight;
-		m_stateType = air;
+		m_collideCount = 0;
+		ChangeState(PlayerStateMachine::player_air);
 	}
 
 	void Player::OnCollisionExcute(shared_ptr<GameObject>& Other) {
-		m_collideCount = m_collideCountInit;
 
 		//Goal床に触れたらgoalstandbyステートに移行
-		if (Other->FindTag(L"Goal") && m_stateType == stand) {
+		if (Other->FindTag(L"Goal") && !m_isAir) {
 			m_goal = Other;
-			m_stateType = goalstandby;
+			ChangeState(PlayerStateMachine::player_goalstandby);
 		}
 
 		//被弾判定
@@ -511,34 +414,39 @@ namespace basecross {
 
 		if (Other->FindTag(L"Floor"))
 		{
-			if (m_stateType == died_air) {
-				PlaySnd(L"PlayerLand", 1.0f, 0);
-				m_stateType = stand;
+			m_collideCount = m_collideCountInit;
+			if (m_isAir) {
+				m_isAir = false;
+				PlayerStateMachine::PlayerStateType type = m_state->GetStateType();
 
-				//着地時のエフェクト
-				auto plPos = GetComponent<Transform>()->GetPosition();
-				plPos.y -= 4;
-				plPos.x += m_moveVel.x * _delta;
-				plPos.z += m_moveVel.z * _delta;
-				auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-				m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkLand, plPos, 1);
-				m_EfkPlay[2]->SetScale(Vec3(.25f));
-				return;
-			}
+				if (type == PlayerStateMachine::player_died) {
+					PlaySnd(L"PlayerLand", 1.0f, 0);
 
-			if (m_stateType == air || m_stateType == hit_air) {
-				SetAnim(L"Land");
-				PlaySnd(L"PlayerLand", 1.0f, 0);
-				m_stateType = stand;
+					//着地時のエフェクト
+					auto plPos = GetComponent<Transform>()->GetPosition();
+					plPos.y -= 4;
+					plPos.x += m_moveVel.x * _delta;
+					plPos.z += m_moveVel.z * _delta;
+					auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
+					m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkLand, plPos, 1);
+					m_EfkPlay[2]->SetScale(Vec3(.25f));
+					return;
+				}
+				else
+				{
+					SetAnim(L"Land");
+					PlaySnd(L"PlayerLand", 1.0f, 0);
+					ChangeState(PlayerStateMachine::player_stand);
 
-				//着地時のエフェクト
-				auto plPos = GetComponent<Transform>()->GetPosition();
-				plPos.y -= 4;
-				plPos.x += m_moveVel.x * _delta;
-				plPos.z += m_moveVel.z * _delta;
-				auto ShEfkInterface = m_stageMgr->GetEfkInterface();
-				m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkLand, plPos, 1);
-				m_EfkPlay[2]->SetScale(Vec3(.25f));
+					//着地時のエフェクト
+					auto plPos = GetComponent<Transform>()->GetPosition();
+					plPos.y -= 4;
+					plPos.x += m_moveVel.x * _delta;
+					plPos.z += m_moveVel.z * _delta;
+					auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
+					m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkLand, plPos, 1);
+					m_EfkPlay[2]->SetScale(Vec3(.25f));
+				}
 			}
 		}
 	}
@@ -614,7 +522,7 @@ namespace basecross {
 		if ((GetDrawPtr()->GetCurrentAnimation() == L"Land" || GetDrawPtr()->GetCurrentAnimation() == L"Fire_Land") && GetDrawPtr()->GetCurrentAnimationTime() > .13f) {
 			SetAnim(AddPrefix() + L"Idle");
 		}
-		if (m_stateType == stand) {
+		if (!m_isAir) {
 			if (abs(GetMoveVector().x) > 0)
 				SetAnim(AddPrefix() + L"Run");
 			else
@@ -622,25 +530,26 @@ namespace basecross {
 					SetAnim(AddPrefix() + L"Idle");
 				}
 		}
-		if (m_stateType == air && m_moveVel.y > 0)
+		if (m_isAir && m_moveVel.y > 0)
 			SetAnim(L"Jumping");
-		if (m_stateType == air && (m_moveVel.y <= 0 || (GetDrawPtr()->GetCurrentAnimation() != L"Jumping" && GetDrawPtr()->GetCurrentAnimationTime() >= .13f)))
+		if (m_isAir && (m_moveVel.y <= 0 || (GetDrawPtr()->GetCurrentAnimation() != L"Jumping" && GetDrawPtr()->GetCurrentAnimationTime() >= .13f)))
 			SetAnim(L"Falling");
 
 	}
 
 	//重力
 	void Player::Gravity() {
-		if (m_doPhysicalProcess = false) return;
+		if (m_doPhysicalProcess == false) return;
 		m_moveVel.y += m_gravity * _delta;
-		if (m_stateType == stand && m_moveVel.y < m_gravity * .1f) m_moveVel.y = m_gravity * .1f;
+		
+		if (!m_isAir && m_moveVel.y < m_gravity * .1f) m_moveVel.y = m_gravity * .1f;
 	}
 
 	//摩擦(地上のみ)
 	void Player::Friction() {
-		if (m_doPhysicalProcess = false) return;
+		if (m_doPhysicalProcess == false || m_isAir == true) return;
 		//静摩擦
-		if (GetMoveVector() == Vec3(0) || m_stateType == died || m_animTime > 0.0f) {
+		if (GetMoveVector() == Vec3(0) || m_state->GetStateType() == PlayerStateMachine::player_died || m_animTime > 0.0f) {
 			m_moveVel.x -= m_moveVel.x * m_friction * (1000.0f / 60.0f) * _delta;
 			m_moveVel.z -= m_moveVel.z * m_friction * (1000.0f / 60.0f) * _delta;
 			if (abs(m_moveVel.x) <= m_frictionThreshold) m_moveVel.x = 0;
@@ -648,7 +557,7 @@ namespace basecross {
 			return;
 		}
 		//動摩擦
-		if (GetMoveVector() != Vec3(0)) {
+		else {
 			m_moveVel.x -= m_moveVel.x * m_frictionDynamic * (1000.0f / 60.0f) * _delta;
 			m_moveVel.z -= m_moveVel.z * m_frictionDynamic * (1000.0f / 60.0f) * _delta;
 		}
@@ -707,15 +616,10 @@ namespace basecross {
 		//敵とプレイヤーの間にヒットスパーク
 		auto plPos = GetComponent<Transform>()->GetPosition();
 		auto shPos = target->GetComponent<Transform>()->GetPosition();
-		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
 		m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
 
-		if (m_stateType == stand) {
-			m_stateType = hit_stand;
-		}
-		if (m_stateType == air) {
-			m_stateType = hit_air;
-		}
+		ChangeState(PlayerStateMachine::player_hit);
 
 		PlaySnd(L"PlayerDamage", 1.0f, 0);
 		auto trans = GetComponent<Transform>();
@@ -749,7 +653,7 @@ namespace basecross {
 		firepos = firepos * trans->GetScale();
 
 		//エフェクトのプレイ
-		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
 		m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkMuzzle, pos + firepos, 0.0f);
 		m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
 		m_EfkPlay[0]->SetScale(Vec3(.25f));
@@ -889,7 +793,9 @@ namespace basecross {
 
 	void PlayerGrab::ThrowTarget(float charge) {
 		m_isHit = false;
-		if (!m_target) return;
+		if (m_target == nullptr) {
+			return;
+		}
 		m_target->SetThorwLenght(charge);
 		m_target->SetThrowFlag(true);
 		m_target->GetComponent<Transform>()->ClearParent();
@@ -931,7 +837,7 @@ namespace basecross {
 		App::GetApp()->GetDataDirectory(DataDir);
 		wstring ProjEffectStr = DataDir + L"Effects\\playerproj.efk";
 		wstring EndEffectStr = DataDir + L"Effects\\playerprojend.efk";
-		auto ShEfkInterface = m_stageMgr->GetEfkInterface();
+		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
 		m_EfkProj = ObjectFactory::Create<EfkEffect>(ShEfkInterface, ProjEffectStr);
 		m_EfkProjEnd = ObjectFactory::Create<EfkEffect>(ShEfkInterface, EndEffectStr);
 

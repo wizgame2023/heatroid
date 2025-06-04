@@ -109,7 +109,7 @@ namespace basecross {
 			if (enemy->m_EfkPlayer[2]) {
 				enemy->m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
 			}
-			if (cntlVec[0].bConnected) {
+			if (true) {
 				if (enemy->m_throwFlag) {
 					enemy->m_pGrabFlag = false;
 					enemy->OnlyChangeState<ThrowAwayState>();

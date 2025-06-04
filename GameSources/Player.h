@@ -5,6 +5,9 @@
 
 #pragma once
 #include "stdafx.h"
+#include "EffectManager.h"
+#include "StageManager.h"
+#include "PlayerState.h"
 #include "Collision.h"
 
 namespace basecross {
@@ -15,7 +18,8 @@ namespace basecross {
 	//====================================================================
 	class PlayerGrab;
 	class FireProjectile;
-		class Player : public GameObject {
+	class Player : public GameObject {
+		shared_ptr<PlayerStateMachine> m_state;
 
 		//エフェクト
 		shared_ptr<EfkEffect> m_EfkMuzzle;
@@ -36,12 +40,8 @@ namespace basecross {
 		Vec2 GetInputState() const;
 		// コントローラから方向ベクトルを得る
 		Vec3 GetMoveVector();
-		//プレイヤーの移動
-		void MovePlayer();
 		//文字列の表示
 		void ShowDebug();
-		//入力ハンドラー
-		InputHandler<Player> m_InputHandler;
 		//スピード(最高速)
 		const float m_speed = 90.0f;
 		const float m_airSpeedPerc = .3f;
@@ -63,29 +63,14 @@ namespace basecross {
 		const Vec3 m_firePos = Vec3(1.0f, .8f, -.75f);
 		//移動方向
 		Vec3 m_moveVel = Vec3(0, 0, 0);
+		//空中判定
+		bool m_isAir = false;
 		//CollisionExitの空中判定用カウント
 		int m_collideCount;
 		const int m_collideCountInit = 15;
 
 		float m_landSEcooltime = 0.0f;
 
-		//プレイヤーの状態を表す列挙型
-		enum Stats {
-			stand,		//地上
-			air,		//空中
-			hit_stand,	//やられ地上
-			hit_air,	//やられ空中
-			shot_stand,	//チャージ地上
-			shot_air,	//チャージ空中
-			release,	//発射
-			start,		//ゲーム開始演出
-			died,		//死亡
-			died_air,	//死亡空中
-			goalstandby,//ゴール演出待機	
-			goal		//ステージクリア
-		};
-		//プレイヤーの状態
-		Stats m_stateType = start;
 		//演出アニメ制御用の時間計測変数
 		float m_animTime = 0;
 		//ゴール床
@@ -98,13 +83,13 @@ namespace basecross {
 		Vec3 pos1, addpos1;
 
 		//ステージマネージャ
-		shared_ptr<StageGenerator> m_stageMgr;
+		weak_ptr<StageGenerator> m_stageMgr;
 
 		//掴み判定用ポインタ
 		weak_ptr<PlayerGrab> m_pGrab;
 
 		//移動時の物理学的な計算を行うか否か
-		bool m_doPhysicalProcess;
+		bool m_doPhysicalProcess = true;
 		//チャージ中orオーバーチャージ中
 		bool m_isCharging = false;
 		bool m_isOverCharge = false;
@@ -139,7 +124,6 @@ namespace basecross {
 
 		public:
 			//構築と破棄
-
 			Player(const shared_ptr<Stage>& StagePtr,
 				const Vec3& pos, const Vec3& rot, const Vec3& sca);
 
@@ -158,9 +142,11 @@ namespace basecross {
 			virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 			virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 
-			////Aボタン
-			void OnPushA();
+			void GoalStandbyBehavior();
+			void GoalBehavior();
 
+			//プレイヤーの移動
+			void MovePlayer();
 			//最高速度
 			void SpeedLimit();
 			//アニメーション制御
@@ -180,15 +166,49 @@ namespace basecross {
 			void RegisterAnim();
 			//敵を持つ
 			void GrabEnemy();
+			//ジャンプ
+			void Jump();
 			//飛び道具発射
 			void Projectile();
 			//攻撃をくらう/死ぬ
 			void GetHit(shared_ptr<GameObject>& target);
 			void Died();
 
+			shared_ptr<StageGenerator> GetStageGen() {
+				return m_stageMgr.lock();
+			}
+
+			void ChangeState(PlayerStateMachine::PlayerStateType type) {
+				m_state->ChangeState(type);
+			}
+
+			shared_ptr<GameObject> GetGoalObj() {
+				return m_goal;
+			}
+
+			bool IsAir() {
+				return m_isAir;
+			}
+
+			void SetMoveVel(Vec3 vel) {
+				m_moveVel = vel;
+			}
+			Vec3 GetMoveVel() {
+				return m_moveVel;
+			}
+
+			void AddMoveVel(Vec3 vel, bool mulAccel = false) {
+				m_moveVel += vel * (mulAccel ? m_accel : 1.0f);
+			}
+
 			//Transform.Scaleのゲッタ
 			const Vec3 GetScale() {
 				return GetComponent<Transform>()->GetScale();
+			}
+
+			//HP取得
+			const int GetHP() {
+				return m_HP;
 			}
 
 			//HPを1を最大値とした割合で返す
@@ -199,12 +219,12 @@ namespace basecross {
 
 			//死んだらtrueを返す
 			const bool GetDied() {
-				return (m_stateType == died || m_stateType == died_air);
+				return (m_state->GetStateType() == PlayerStateMachine::player_died);
 			}
 
 			//ゴールに到達したらtrueを返す
 			const bool GetArrivedGoal() {
-				return (m_stateType == goal);
+				return (m_state->GetStateType() == PlayerStateMachine::player_goal);
 			}
 
 			//描画コンポーネントのゲッタ
@@ -275,7 +295,7 @@ namespace basecross {
 			void ResetCharge() {
 				m_chargePerc = 0;
 				m_isOverCharge = false;
-				m_stateType = release;
+				ChangeState(PlayerStateMachine::player_release);
 			}
 
 			//状態に応じてアニメーションを変える
@@ -344,7 +364,7 @@ namespace basecross {
 
 	class FireProjectile : public GameObject {
 		//ステージマネージャ
-		shared_ptr<StageGenerator> m_stageMgr;
+		weak_ptr<StageGenerator> m_stageMgr;
 
 		//エフェクト
 		shared_ptr<EfkEffect> m_EfkProj;
