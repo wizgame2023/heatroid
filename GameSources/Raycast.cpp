@@ -211,7 +211,6 @@ namespace basecross {
 			m_hitWallFlag.clear();
 			m_hitDoorFlag.clear();
 		}
-		enemy->SetActiveFlag(m_activeFlag);
 
 		//デバック用
 		//当たっている場所の描画
@@ -238,6 +237,12 @@ namespace basecross {
 	}
 	bool RayMark::GetActiveFlag() {
 		return m_activeFlag;
+	}
+
+	shared_ptr<Enemy> RayMark::GetEnemy()
+	{
+		auto enemy = m_enemy.lock();
+		return enemy;
 	}
 
 	void RayMark::Debug() {

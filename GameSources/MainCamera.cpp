@@ -11,7 +11,7 @@ namespace basecross {
 
 	CameraCollision::CameraCollision(const shared_ptr<Stage>& StagePtr)
 		:GameObject(StagePtr),
-		GetPos(Vec3(0.0f, 1.0f, 0.0f)), 
+		GetPos(Vec3(0.0f, 1.0f, 0.0f)),
 		m_TargetToAt(0, 0, 0),
 		TargetPos(Vec3(0.0f, 0.0f, 0.0f)),
 		m_ArmLen(15.5f),
@@ -21,7 +21,8 @@ namespace basecross {
 		m_ToTargetLerp(1.0f),
 		m_Hit(false),
 		m_LRBaseMode(true)
-	{}
+	{
+	}
 
 	void CameraCollision::OnCreate() {
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
@@ -83,7 +84,7 @@ namespace basecross {
 
 		//プレイヤーの向きにカメラを戻す
 		float tempFixedRad = FixCameraDirection(ptrTarget, (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_Y || keyData.m_bPressedKeyTbl['C']));
-		if (tempFixedRad != 0) 
+		if (tempFixedRad != 0)
 			fThumbRX = tempFixedRad;
 
 		armVec.y = sin(m_RadY);
@@ -120,8 +121,8 @@ namespace basecross {
 
 		Vec3 posXZ = Mat.transInMatrix();
 		//XZの値がわかったので腕角度に代入
-		armVec.x = posXZ.x ;
-		armVec.z = posXZ.z ;
+		armVec.x = posXZ.x;
+		armVec.z = posXZ.z;
 		//腕角度を正規化
 		armVec.normalize();
 		if (ptrTarget) {
@@ -225,7 +226,7 @@ namespace basecross {
 
 	void CameraCollision::OnCollisionEnter(shared_ptr<GameObject>& Other)
 	{
-		
+
 	}
 
 	void CameraCollision::OnCollisionExit(shared_ptr<GameObject>& Other)
@@ -246,7 +247,8 @@ namespace basecross {
 		m_RotSpeed(-2.0f),
 		m_ZoomSpeed(0.1f),
 		m_LRBaseMode(true)
-	{}
+	{
+	}
 
 	MainCamera::MainCamera(float ArmLen) :
 		Camera(),
@@ -541,7 +543,8 @@ namespace basecross {
 		m_totalTime(TotalTime),
 		m_secondEndPos(secondEndPos),
 		m_secondAtEndPos(secondAtEndPos)
-	{}
+	{
+	}
 	OpeningCameraman::~OpeningCameraman() {}
 
 	//初期化
@@ -572,7 +575,7 @@ namespace basecross {
 		m_StateMachine->Update();
 	}
 
-	void OpeningCameraman::ToGoalEnterBehavior() { //前半部
+	void OpeningCameraman::ToGoalEnterBehavior() { //後半部
 		m_startPos; //カメラの最初の位置
 		m_endPos; //カメラの最後の位置
 		m_atStartPos; //最初に見てる方角
@@ -581,7 +584,7 @@ namespace basecross {
 		m_totalTime;
 	}
 
-	void OpeningCameraman::ToStartEnterBehavior() { //後半部
+	void OpeningCameraman::ToStartEnterBehavior() { //前半部
 		m_startPos = m_tempEndPos; //カメラの最初の位置
 		m_endPos = m_secondEndPos; //カメラの最後の位置
 		m_atStartPos = m_tempAtEndPos; //最初に見てる方角
@@ -604,7 +607,7 @@ namespace basecross {
 		return false;
 	}
 	void OpeningCameraman::EndStateEnterBehavior() {
-		auto ptrGameStageManegeer = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto ptrGameStageManegeer = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		ptrGameStageManegeer->ToMainCamera();
 	}
 
@@ -663,7 +666,8 @@ namespace basecross {
 
 	OpeningCamera::OpeningCamera() :
 		Camera()
-	{}
+	{
+	}
 	OpeningCamera::~OpeningCamera() {}
 
 	void OpeningCamera::OnCreate()
@@ -691,7 +695,8 @@ namespace basecross {
 		m_atStartPos(AtStartPos),
 		m_atEndPos(AtEndPos),
 		m_totalTime(TotalTime)
-	{}
+	{
+	}
 	EndingCameraman::~EndingCameraman() {}
 
 	//初期化
@@ -724,7 +729,7 @@ namespace basecross {
 	}
 
 	void EndingCameraman::BasicStateEnterBehavior() {
-		auto ptrStageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto ptrStageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		//ptrStageMgr->ToMainCamera();
 	}
 
@@ -742,7 +747,8 @@ namespace basecross {
 
 	EndingCamera::EndingCamera() :
 		Camera()
-	{}
+	{
+	}
 	EndingCamera::~EndingCamera() {}
 
 	void EndingCamera::OnUpdate() {

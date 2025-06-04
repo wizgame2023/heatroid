@@ -73,7 +73,7 @@ namespace basecross {
 		void Debug();
 		Vec3 enemyPos(Vec3 pos);
 		bool GetActiveFlag();
-
+		shared_ptr<Enemy> GetEnemy();
 	};
 
 

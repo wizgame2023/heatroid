@@ -98,7 +98,7 @@ namespace basecross {
 		Vec3 pos1, addpos1;
 
 		//ステージマネージャ
-		shared_ptr<StageManager> m_stageMgr;
+		shared_ptr<StageGenerator> m_stageMgr;
 
 		//掴み判定用ポインタ
 		weak_ptr<PlayerGrab> m_pGrab;
@@ -344,7 +344,7 @@ namespace basecross {
 
 	class FireProjectile : public GameObject {
 		//ステージマネージャ
-		shared_ptr<StageManager> m_stageMgr;
+		shared_ptr<StageGenerator> m_stageMgr;
 
 		//エフェクト
 		shared_ptr<EfkEffect> m_EfkProj;

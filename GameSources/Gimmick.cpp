@@ -10,6 +10,50 @@
 #include "Gimmick.h"
 namespace basecross {
 
+	GimmickObject::GimmickObject(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{
+	}
+	GimmickObject::~GimmickObject(){}
+
+	void GimmickObject::OnCreate()
+	{
+	}
+
+	void GimmickObject::PlaySE(wstring path, float loopcnt, float volume)
+	{
+		auto SE = App::GetApp()->GetXAudio2Manager();
+		SE->Start(path, loopcnt, volume);
+	}
+
+	void GimmickObject::TilingBox(const Vec3& Scale ,const float& UPic, const float& VPic, const wstring& m_Texname)
+	{
+		vector<VertexPositionNormalTexture> vertices;
+		vector<uint16_t> indices;
+		MeshUtill::CreateCube(1.0f, vertices, indices);
+		float UCount = Scale.x / UPic;
+		float VCount = Scale.z / VPic;
+		for (size_t i = 0; i < vertices.size(); i++) {
+			if (vertices[i].textureCoordinate.x >= 1.0f) {
+				vertices[i].textureCoordinate.x = UCount;
+			}
+			if (vertices[i].textureCoordinate.y >= 1.0f) {
+				float FrontBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, 1, 0));
+				float BackBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, -1, 0));
+				if (FrontBetween < 0.01f || BackBetween < 0.01f) {
+					vertices[i].textureCoordinate.y = VCount;
+				}
+			}
+		}
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		PtrDraw->CreateOriginalMesh(vertices, indices);
+		PtrDraw->SetOriginalMeshUse(true);
+		auto Shadow = AddComponent<Shadowmap>();
+		PtrDraw->SetTextureResource(m_Texname);
+		//タイリング設定
+		PtrDraw->SetSamplerState(SamplerState::PointWrap);
+
+	}
 
 	TilingFixedBox::TilingFixedBox(const shared_ptr<Stage>& StagePtr,
 		const Vec3& position,
@@ -19,7 +63,7 @@ namespace basecross {
 		const float& VPic,
 		const wstring& Texname
 	) :
-		GameObject(StagePtr),
+		GimmickObject(StagePtr),
 		m_Position(position),
 		m_Rotation(rotation),
 		m_Scale(scale),
@@ -38,39 +82,12 @@ namespace basecross {
 		auto Coll = AddComponent<CollisionObb>();
 		Coll->SetFixed(true);
 		//Coll->SetDrawActive(true);
-
-		vector<VertexPositionNormalTexture> vertices;
-		vector<uint16_t> indices;
-		MeshUtill::CreateCube(1.0f, vertices, indices);
-		float UCount = m_Scale.x / m_UPic;
-		float VCount = m_Scale.z / m_VPic;
-		for (size_t i = 0; i < vertices.size(); i++) {
-			if (vertices[i].textureCoordinate.x >= 1.0f) {
-				vertices[i].textureCoordinate.x = UCount;
-			}
-			if (vertices[i].textureCoordinate.y >= 1.0f) {
-				float FrontBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, 1, 0));
-				float BackBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, -1, 0));
-				if (FrontBetween < 0.01f || BackBetween < 0.01f) {
-					vertices[i].textureCoordinate.y = VCount;
-				}
-			}
-		}
+		GimmickObject::TilingBox(m_Scale, m_UPic, m_VPic, m_Texname);
 		AddTag(L"FixedBox");
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		PtrDraw->CreateOriginalMesh(vertices, indices);
-		PtrDraw->SetOriginalMeshUse(true);
-		auto Shadow = AddComponent<Shadowmap>();
+		auto Shadow = GetComponent<Shadowmap>();
 		Shadow->SetLightHeight(100.0f);
 		Shadow->SetViewWidth(128.0f);
 		Shadow->SetViewHeight(128.0f);
-		//PtrDraw->SetFogEnabled(true);
-		//自分に影が映りこむようにする
-		//PtrDraw->SetOwnShadowActive(true);
-		//描画コンポーネントテクスチャの設定
-		PtrDraw->SetTextureResource(m_Texname);
-		//タイリング設定
-		PtrDraw->SetSamplerState(SamplerState::PointWrap);
 	}
 
 	GimmickButton::GimmickButton(const shared_ptr<Stage>& StagePtr,
@@ -81,7 +98,7 @@ namespace basecross {
 		int number,
 		const wstring& Texname
 	) :
-		GameObject(StagePtr),
+		GimmickObject(StagePtr),
 		m_Position(position),
 		m_Rotation(rotation),
 		m_Scale(scale),
@@ -127,7 +144,7 @@ namespace basecross {
 		App::GetApp()->GetDataDirectory(DataDir);
 		wstring TestEffectStr = DataDir + L"Effects\\Switch.efk";
 		wstring TestEffectStrLoop = DataDir + L"Effects\\SwitchLoop.efk";
-		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto stageMane = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		auto ShEfkInterface = stageMane->GetEfkInterface();
 		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
 		m_EfkEffectLoop = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStrLoop);
@@ -153,15 +170,10 @@ namespace basecross {
 		}
 	}
 
-	void GimmickButton::PlaySE(wstring path, float loopcnt, float volume) {
-		auto playSE = App::GetApp()->GetXAudio2Manager();
-		playSE->Start(path, loopcnt, volume);
-	}
-
 	void GimmickButton::EfectPlay()
 	{
 		auto pos = GetComponent<Transform>()->GetPosition();
-		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto stageMane = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		auto ShEfkInterface = stageMane->GetEfkInterface();
 		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos, 0);
 		m_EfkPlay->SetScale(Vec3(2, 2, 2));
@@ -182,14 +194,27 @@ namespace basecross {
 	void GimmickButton::EfectLoopPlay()
 	{
 		auto pos = GetComponent<Transform>()->GetPosition();
-		auto stageMane = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		auto stageMane = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		auto ShEfkInterface = stageMane->GetEfkInterface();
 		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffectLoop, pos, 0);
 		m_EfkPlay->SetScale(Vec3(2, 2, 2));
 		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
 	}
 
+	bool GimmickButton::GetButton()
+	{
+		return m_open;
+	}
 
+	void GimmickButton::SetButton(const bool& open)
+	{
+		m_open = open;
+	}
+
+	int GimmickButton::GetSwitch()
+	{
+		return m_switch;
+	}
 
 	GimmickDoor::GimmickDoor(const shared_ptr<Stage>& StagePtr,
 		const Vec3& position,
@@ -201,7 +226,7 @@ namespace basecross {
 		int number,
 		const wstring& Texname
 	) :
-		GameObject(StagePtr),
+		GimmickObject(StagePtr),
 		m_Position(position),
 		m_Rotation(rotation),
 		m_Scale(scale),
@@ -218,7 +243,7 @@ namespace basecross {
 	void GimmickDoor::OnCreate() {
 		m_open = false;
 		m_open2 = false;
-		m_Flag = false;
+		m_flag = false;
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_Position);
 		Trans->SetRotation(m_Rotation);
@@ -226,140 +251,105 @@ namespace basecross {
 		auto Coll = AddComponent<CollisionObb>();
 		Coll->SetFixed(true);
 		//Coll->SetDrawActive(true);
-		vector<VertexPositionNormalTexture> vertices;
-		vector<uint16_t> indices;
-		MeshUtill::CreateCube(1.0f, vertices, indices);
-		float UCount = m_Scale.x / m_UPic;
-		float VCount = m_Scale.z / m_VPic;
-		for (size_t i = 0; i < vertices.size(); i++) {
-			if (vertices[i].textureCoordinate.x >= 1.0f) {
-				vertices[i].textureCoordinate.x = UCount;
-			}
-			if (vertices[i].textureCoordinate.y >= 1.0f) {
-				float FrontBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, 1, 0));
-				float BackBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, -1, 0));
-				if (FrontBetween < 0.01f || BackBetween < 0.01f) {
-					vertices[i].textureCoordinate.y = VCount;
-				}
-			}
-		}
+		GimmickObject::TilingBox(m_Scale, m_UPic, m_VPic, m_Texname);
 		AddTag(L"FixedBox");
 		AddTag(L"GimmickDoor");
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		PtrDraw->CreateOriginalMesh(vertices, indices);
-		PtrDraw->SetOriginalMeshUse(true);
-		PtrDraw->SetTextureResource(m_Texname);
-		//タイリング設定
-		PtrDraw->SetSamplerState(SamplerState::PointWrap);
-
 		auto group = GetStage()->GetSharedObjectGroup(L"Door");
 		group->IntoGroup(GetThis<GameObject>());
-
-		auto Shadowm = AddComponent<Shadowmap>();
 	}
 
 	void GimmickDoor::OnUpdate()
 	{
 		OpenDoor();
 	}
-
 	void GimmickDoor::OpenDoor()
 	{
+		// トランスフォームコンポーネントを取得
 		auto ptrTransform = GetComponent<Transform>();
-		Vec3 pos = ptrTransform->GetPosition();
+		Vec3 pos = ptrTransform->GetPosition(); // 現在の位置を取得
+
+		// "Switch" グループのオブジェクトを取得
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		auto& vec = group->GetGroupVector();
+
+		// グループ内のスイッチを探索
 		for (auto& v : vec) {
 			auto shObj = v.lock();
 			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
 			auto Switch = Switchs->GetSwitch();
-			float refugePos = 0;
-			if (Switch == m_OpenSwitch)
-			{
-				m_open = Switchs->GetButton();
-				if (m_open)
-				{
-					if (m_number == 1)
-					{
+			float refugePos = 0; // 移動の基準位置
+
+			// ボタンの識別番号が一致する場合
+			if (Switch == m_OpenSwitch) {
+				m_open = Switchs->GetButton(); // ボタンが押されているかを取得
+
+				if (m_open) { // ドアを開ける処理
+					if (m_number == 1) { // 必要ボタンの数が 1 の場合
 						State = 1;
-						for (int i = 0; i < 1; i++)
-						{
-							if (m_Flag == false)
-							{
-								PlaySE(L"DoorSE", 0, 0.5f);
-								m_Flag = true;
+						for (int i = 0; i < 1; i++) {
+							if (!m_flag) { // サウンド再生フラグ確認
+								PlaySE(L"DoorSE", 0, 0.5f); // サウンドを再生
+								m_flag = true;
 							}
-							if (m_Scale.x < m_Scale.z)
-							{
+
+							// ドアの移動方向を決定
+							if (m_Scale.x < m_Scale.z) { // Z軸方向の移動
 								refugePos = pos.z;
-								if (refugePos < 20.0f)
-								{
+								if (refugePos < 20.0f) {
 									ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
 								}
 							}
-							else
-							{
-									ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
+							else { // X軸方向の移動
+								ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
 							}
 						}
 					}
-					else if (m_number == 2)
-					{
+					else if (m_number == 2) { // 必要ボタンの数が 2 の場合
 						for (auto& v2 : vec) {
-							auto shObj2 = v2.lock();							
+							auto shObj2 = v2.lock();
 							auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
 							auto Switch2 = Switchs2->GetSwitch();
-							if (Switch2 == m_OpenSwitch && Switchs2!=Switchs)
-							{
-								m_open2 = Switchs2->GetButton();
-								if (m_open2)
-								{
+
+							// 2つのスイッチの識別番号の一致確認
+							if (Switch2 == m_OpenSwitch && Switchs2 != Switchs) {
+								m_open2 = Switchs2->GetButton(); // 別スイッチの状態を取得
+
+								if (m_open2) { // 両スイッチがオンのとき
 									State = 2;
-									for (int i = 0; i < 1; i++)
-									{
-										if (m_Flag == false)
-										{
-											PlaySE(L"DoorSE", 0, 0.5f);
-											m_Flag = true;
+									for (int i = 0; i < 1; i++) {
+										if (!m_flag) { // サウンド再生フラグ確認
+											PlaySE(L"DoorSE", 0, 0.5f); // サウンドを再生
+											m_flag = true;
 										}
-										if (m_Scale.x < m_Scale.z )
-										{
+
+										// ドアの移動方向を決定
+										if (m_Scale.x < m_Scale.z) { // Z軸方向の移動
 											refugePos = pos.z;
-											if (refugePos < 20.0f)
-											{
+											if (refugePos < 20.0f) {
 												ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
 											}
 										}
-										else
-										{
-												ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
+										else { // X軸方向の移動
+											ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
 										}
 									}
 								}
-								else
-								{
-									ptrTransform->SetPosition(m_Position);
-									m_Flag == false;
+								else { // 別スイッチがオフの場合
+									ptrTransform->SetPosition(m_Position); // 初期位置に戻す
+									m_flag = false; // サウンド再生フラグをリセット
 									State = 1;
-								}									
+								}
 							}
 						}
 					}
 				}
-				else
-				{
-					ptrTransform->SetPosition(m_Position);
-					m_Flag == false;
+				else { // ボタンが押されていない場合
+					ptrTransform->SetPosition(m_Position); // 初期位置に戻す
+					m_flag = false; // サウンド再生フラグをリセット
 					State = 0;
 				}
-
 			}
 		}
-	}
-
-	void GimmickDoor::PlaySE(wstring path, float loopcnt, float volume) {
-		auto SE = App::GetApp()->GetXAudio2Manager();
-		SE->Start(path, loopcnt, volume);
 	}
 
 	int GimmickDoor::GetState()
@@ -383,7 +373,7 @@ namespace basecross {
 		int number,
 		const wstring& m_Texname,
 		float Max) :
-		GameObject(stage),
+		GimmickObject(stage),
 		m_Position(position),
 		m_Rotation(rotation),
 		m_Scale(scale),
@@ -401,7 +391,7 @@ namespace basecross {
 	void GimmickUp::OnCreate() {
 		m_open = false;
 		m_open2 = false;
-		m_Flag = false;
+		m_flag = false;
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_Position);
 		Trans->SetRotation(m_Rotation);
@@ -409,32 +399,11 @@ namespace basecross {
 		auto Coll = AddComponent<CollisionObb>();
 		Coll->SetFixed(true);
 		//Coll->SetDrawActive(true);
-		vector<VertexPositionNormalTexture> vertices;
-		vector<uint16_t> indices;
-		MeshUtill::CreateCube(1.0f, vertices, indices);
-		float UCount = m_Scale.x / m_UPic;
-		float VCount = m_Scale.z / m_VPic;
-		for (size_t i = 0; i < vertices.size(); i++) {
-			if (vertices[i].textureCoordinate.x >= 1.0f) {
-				vertices[i].textureCoordinate.x = UCount;
-			}
-			if (vertices[i].textureCoordinate.y >= 1.0f) {
-				float FrontBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, 1, 0));
-				float BackBetween = bsm::angleBetweenNormals(vertices[i].normal, Vec3(0, -1, 0));
-				if (FrontBetween < 0.01f || BackBetween < 0.01f) {
-					vertices[i].textureCoordinate.y = VCount;
-				}
-			}
-		}
+		GimmickObject::TilingBox(m_Scale, m_UPic, m_VPic, m_Texname);
+
 		AddTag(L"FixedBox");
 		AddTag(L"GimmickUp");
 		AddTag(L"Floor");
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		PtrDraw->CreateOriginalMesh(vertices, indices);
-		PtrDraw->SetOriginalMeshUse(true);
-		PtrDraw->SetTextureResource(m_Texname);
-		//タイリング設定
-		PtrDraw->SetSamplerState(SamplerState::PointWrap);
 
 		auto group = GetStage()->GetSharedObjectGroup(L"GimmickUp");
 		group->IntoGroup(GetThis<GameObject>());
@@ -444,110 +413,102 @@ namespace basecross {
 
 	void GimmickUp::OnUpdate()
 	{
-		OpenDoor();
+		UpDown();
 	}
 
-	void GimmickUp::OpenDoor()
+	void GimmickUp::UpDown()
 	{
+		// トランスフォームコンポーネントを取得して現在の位置を取得
 		auto ptrTransform = GetComponent<Transform>();
 		Vec3 pos = ptrTransform->GetPosition();
+
+		// "Switch" グループに所属するオブジェクトを取得
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		auto& vec = group->GetGroupVector();
+
+		// グループ内のスイッチを探索
 		for (auto& v : vec) {
-			auto shObj = v.lock();
-			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-			auto Switch = Switchs->GetSwitch();
-			if (Switch == m_OpenSwitch)
-			{
-				m_open = Switchs->GetButton();
-				if (m_open)
-				{
-					if (m_number == 1)
-					{
-						switch (ido)
-						{
-						case 0:
+			auto shObj = v.lock(); // 弱参照から共有ポインタに変換
+			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj); // スイッチオブジェクトにキャスト
+			auto Switch = Switchs->GetSwitch(); // スイッチ識別番号を取得
+
+			// スイッチの識別番号が一致する場合
+			if (Switch == m_OpenSwitch) {
+				m_open = Switchs->GetButton(); // スイッチが押されているか取得
+
+				if (m_open) { // スイッチがオンの場合
+					if (m_number == 1) { // ギミック番号が 1 の場合
+						// 上下動作の処理
+						switch (ido) {
+						case 0: // 上昇中
 							ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
-							if (pos.y > m_Max) 
-								ido = 1;
+							if (pos.y > m_Max) ido = 1; // 最大高さに達したら降下に切り替え
 							break;
-						case 1:
+						case 1: // 降下中
 							ptrTransform->SetPosition(Vec3(pos.x, pos.y -= 0.05f, pos.z));
-							if (pos.y < 0)ido = 0;
+							if (pos.y < 0) ido = 0; // 最低高さに戻ったら上昇に切り替え
 							break;
 						}
 					}
-					else if (m_number == 2)
-					{
+					else if (m_number == 2) { // ギミック番号が 2 の場合
+						// 別のスイッチを探索
 						for (auto& v2 : vec) {
 							auto shObj2 = v2.lock();
 							auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
 							auto Switch2 = Switchs2->GetSwitch();
-							if (Switch2 == m_OpenSwitch && Switchs2 != Switchs)
-							{
-								m_open2 = Switchs2->GetButton();
-								if (m_open2)
-								{
-									switch (ido)
-									{
-									case 0:
+
+							// スイッチが一致し、現在のスイッチと異なる場合
+							if (Switch2 == m_OpenSwitch && Switchs2 != Switchs) {
+								m_open2 = Switchs2->GetButton(); // 別のスイッチが押されているか取得
+
+								if (m_open2) { // 両スイッチがオンの場合
+									// 上下動作の処理
+									switch (ido) {
+									case 0: // 上昇中
 										ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
-										if (pos.y > 10.0f) ido = 1;
+										if (pos.y > 10.0f) ido = 1; // 最大高さに達したら降下に切り替え
 										break;
-									case 1:
+									case 1: // 降下中
 										ptrTransform->SetPosition(Vec3(pos.x, pos.y -= 0.05f, pos.z));
-										if (pos.y < 0)ido = 0;
+										if (pos.y < 0) ido = 0; // 最低高さに戻ったら上昇に切り替え
 										break;
 									}
 								}
-								else
-								{
-									ptrTransform->SetPosition(m_Position);
-									m_Flag == false;
+								else { // スイッチがオフの場合
+									ptrTransform->SetPosition(m_Position); // 位置を初期状態に戻す
+									m_flag = false; // フラグをリセット
 								}
 							}
 						}
 					}
-
 				}
-				else
-				{
-					ptrTransform->SetPosition(m_Position);
-					m_Flag == false;
+				else { // スイッチがオフの場合
+					ptrTransform->SetPosition(m_Position); // 位置を初期状態に戻す
+					m_flag = false; // フラグをリセット
 				}
-
 			}
 		}
 	}
 
-
-	void GimmickUp::PlaySE(wstring path, float loopcnt, float volume) {
-		auto SE = App::GetApp()->GetXAudio2Manager();
-		SE->Start(path, loopcnt, volume);
-	}
-
-
-
-
-	Door::Door(const shared_ptr<Stage>& StagePtr,
+	Elevator::Elevator(const shared_ptr<Stage>& StagePtr,
 		const Vec3& position,
 		const Vec3& rotation,
 		const Vec3& scale,
 		const wstring& Texname
 	):
-		GameObject(StagePtr),
+		GimmickObject(StagePtr),
 		m_Position(position),
 		m_Rotation(rotation),
 		m_Scale(scale),
 		m_Texname(Texname)
 
 	{}
-	Door::~Door() {}
+	Elevator::~Elevator() {}
 
-	void Door::OnCreate()
+	void Elevator::OnCreate()
 	{
 		m_open = false;
-		m_Goaltrue = false;
+		m_goaltrue = false;
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_Position);
 		Trans->SetRotation(m_Rotation);
@@ -566,16 +527,16 @@ namespace basecross {
 		ptrDraw->SetMeshToTransformMatrix(meshMat);
 		AddAnim();
 	}
-	void Door::OnUpdate()
+	void Elevator::OnUpdate()
 	{
 		auto playerSh = GetStage()->GetSharedGameObject<Player>(L"Player");
-		m_Goaltrue = playerSh->GetArrivedGoal();
+		m_goaltrue = playerSh->GetArrivedGoal();
 
-		if (m_open && !m_Goaltrue)
+		if (m_open && !m_goaltrue)
 		{
 			SetAnim(L"Open");
 		}
-		if (m_Goaltrue)
+		if (m_goaltrue)
 		{
 			m_animTime += _delta;
 			// プレイヤーがエレベータに入ったら閉じる
@@ -587,7 +548,7 @@ namespace basecross {
 		_delta = App::GetApp()->GetElapsedTime();
 	}
 
-	void Door::AddAnim() {
+	void Elevator::AddAnim() {
 		auto ptrDraw = GetComponent<PNTBoneModelDraw>();
 		auto anim_fps = 30.0f;
 
@@ -595,8 +556,16 @@ namespace basecross {
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
 	}
-	DoorGimmick::DoorGimmick(const shared_ptr<Stage>& stage, const Vec3& position, const Vec3& UV, const Vec3& scale, const float& number, const wstring& color):
-		GameObject(stage),
+
+	const void Elevator::SetAnim(wstring animname, float time)
+	{
+		auto draw = GetComponent<PNTBoneModelDraw>();
+		if (draw->GetCurrentAnimation() != animname)
+			draw->ChangeCurrentAnimation(animname, time);
+	}
+
+	DoorGimmickNum::DoorGimmickNum(const shared_ptr<Stage>& stage, const Vec3& position, const Vec3& UV, const Vec3& scale, const float& number, const wstring& color):
+		GimmickObject(stage),
 		m_Position(position),
 		m_UV(UV),
 		m_Scale(scale),
@@ -604,7 +573,7 @@ namespace basecross {
 		color(color)
 	{
 	}
-	void DoorGimmick::OnCreate()
+	void DoorGimmickNum::OnCreate()
 	{
 		if (color == L"Black")
 		{
@@ -655,7 +624,12 @@ namespace basecross {
 		}
 	}
 
-	void DoorGimmick::OnUpdate()
+	void DoorGimmickNum::OnUpdate()
+	{
+		ChangeNum();
+	}
+
+	void DoorGimmickNum::ChangeNum()
 	{
 		auto group = GetStage()->GetSharedObjectGroup(L"Door");
 		auto& vec = group->GetGroupVector();

@@ -8,6 +8,9 @@
 #include "stdafx.h"
 
 namespace basecross {
+	//--------------------------------------------------------------------------------------
+	//	class Square : public GameObject;   //スクエアの表示
+	//--------------------------------------------------------------------------------------
 	class Square : public GameObject{
 
 	protected:
@@ -43,9 +46,12 @@ namespace basecross {
 		Quat RotCorrection(const Vec3& Line);
 		void Debug();
 		void SetPosHight(float hight);
+		void DrawGauge(bool flag);
 	};
 
-
+	//--------------------------------------------------------------------------------------
+	//	class GaugeSquare : public Square;   //スクエアのゲージ表示
+	//--------------------------------------------------------------------------------------
 	class GaugeSquare : public Square {
 	private:
 		Vec3 m_enemyPos;

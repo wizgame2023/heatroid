@@ -176,7 +176,6 @@ namespace basecross {
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void Debug();
-		Vec3 enemyPos(Vec3 pos);
 		bool GetActiveFlag();
 		Vec3 GetActivePos();
 

@@ -141,7 +141,7 @@ namespace basecross {
 		AddTag(L"Player");
 
 		//ステージマネージャ
-		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		//敵を掴む判定用オブジェクト
 		m_pGrab = GetStage()->AddGameObject<PlayerGrab>(GetThis<Player>());
 
@@ -343,7 +343,7 @@ namespace basecross {
 			SpeedLimit();
 
 			//ステージマネージャ取得、カメラ元に戻ったら操作可能に
-			if (m_stageMgr->m_CameraSelect != StageManager::CameraSelect::openingCamera) {
+			if (m_stageMgr->m_CameraSelect != StageGenerator::CameraSelect::OPENINGCAMERA) {
 				m_stateType = stand;
 			}
 
@@ -580,8 +580,9 @@ namespace basecross {
 			auto& vec = group->GetGroupVector();
 			for (auto& v : vec) {
 				auto shObj = v.lock();
+
 				if (shObj) {
-					auto Switchs = dynamic_pointer_cast<Door>(shObj);
+					auto Switchs = dynamic_pointer_cast<Elevator>(shObj);
 					Switchs->SetButton(true);
 				}
 			}
@@ -891,7 +892,6 @@ namespace basecross {
 		if (!m_target) return;
 		m_target->SetThorwLenght(charge);
 		m_target->SetThrowFlag(true);
-		m_target->SetState(Enemy::State::throwAway);
 		m_target->GetComponent<Transform>()->ClearParent();
 
 		//最後にターゲットを解放
@@ -924,7 +924,7 @@ namespace basecross {
 	void FireProjectile::OnCreate() {
 
 		//ステージマネージャ
-		m_stageMgr = GetStage()->GetSharedGameObject<StageManager>(L"StageManager");
+		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 
 		//エフェクト読み込み
 		wstring DataDir;

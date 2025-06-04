@@ -15,7 +15,7 @@ namespace basecross {
 	class GameStageHemmi : public Stage {
 
 		shared_ptr<SoundItem> m_BGM;
-		std::shared_ptr<basecross::XAudio2Manager> m_ptrXA = App::GetApp()->GetXAudio2Manager();
+		std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager();
 		//CsvFile m_GameStage1;
 		//void CreateViewLight(); //ƒrƒ…[‚Ìì¬
 		//void CreateGameBox();//GameStage‚Ì¶¬

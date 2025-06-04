@@ -24,6 +24,7 @@ namespace basecross {
 					L"EfkEffect::EfkEffect()"
 					);
 			}
+
 			auto m_Efk = m_EfkInterface.lock();
 			m_manager = m_Efk->m_Manager;
 			// エフェクトの読込

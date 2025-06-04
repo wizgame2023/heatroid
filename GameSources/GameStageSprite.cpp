@@ -8,6 +8,9 @@
 #include "Project.h"
 
 namespace basecross {
+	//--------------------------------------------------------------------------------------
+	//	class GameSprite : public GameObject;   //UIの表示
+	//--------------------------------------------------------------------------------------
 	GameSprite::GameSprite(const shared_ptr<Stage>& stage,
 		float width, float heigth,
 		wstring meshName, Vec3 pos,
@@ -19,7 +22,6 @@ namespace basecross {
 		m_meshName(meshName),
 		m_pos(pos),
 		m_color(color),
-		m_time(1.0f),
 		m_layer(layer)
 	{}
 	void GameSprite::OnCreate() {
@@ -51,6 +53,10 @@ namespace basecross {
 	void GameSprite::SetColor(Col4 color) {
 		m_draw->SetDiffuse(color);
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	class FadeOut : public GameObject;   //フェードアウト
+	//--------------------------------------------------------------------------------------
 	FadeOut::FadeOut(const shared_ptr<Stage>& stage
 	):
 		GameObject(stage),
@@ -103,6 +109,9 @@ namespace basecross {
 		m_sprite->SetColor(Col4(1.0f, 1.0f, 1.0f, trans));
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	class FadeIn : public GameObject;   //フェードイン
+	//--------------------------------------------------------------------------------------
 	FadeIn::FadeIn(const shared_ptr<Stage>& stage
 	) :
 		GameObject(stage),
@@ -123,6 +132,9 @@ namespace basecross {
 		m_sprite->SetColor(Col4(1.0f, 1.0f, 1.0f, m_time));
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	class GameOverSprite : public GameObject;   //ゲームオーバーの演出用UI
+	//--------------------------------------------------------------------------------------
 	GameOverSprite::GameOverSprite(const shared_ptr<Stage>& stage
 	):
 		GameObject(stage)
@@ -148,6 +160,9 @@ namespace basecross {
 		}
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	class NumberSprite : public GameObject;   //数字の表示用UI
+	//--------------------------------------------------------------------------------------
 	NumberSprite::NumberSprite(const shared_ptr<Stage>& stage,
 		const int& number,
 		const Vec3& pos

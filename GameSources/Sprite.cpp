@@ -105,7 +105,7 @@ namespace basecross {
 
 	void SelectCharge::SetPushState(const bool PushState)
 	{
-		m_PushState = PushState;
+		m_pushState = PushState;
 	}
 
 	BlinkingSprite::BlinkingSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
