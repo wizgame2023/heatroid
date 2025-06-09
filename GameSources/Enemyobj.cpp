@@ -9,80 +9,9 @@
 
 namespace basecross {
 	class Enemy;
-
-	EnemyChase::EnemyChase(const shared_ptr<Stage>& stage,
-		const Vec3& position,
-		const Vec3& rotation,
-		const Vec3& scale,
-		const State& defaultState,
-		const State& deathState,
-		const shared_ptr<Player>& player
-	) :
-		Enemy(stage, position, rotation, scale, defaultState, deathState, player),
-		m_defaultState(defaultState),
-		m_attackState(plunge),
-		m_plungeTime(0.0f),
-		m_maxPlungeTime(3.0f),
-		m_plungeRargeTime(7.0f),
-		m_maxPlungeRargeTime(m_plungeRargeTime)
-	{}
-
-	EnemyChase::EnemyChase(const shared_ptr<Stage>& stage,
-		const Vec3& position,
-		const Vec3& rotation,
-		const Vec3& scale,
-		const State& defaultState,
-		const State& attackState,
-		const State& deathState,
-		const shared_ptr<Player>& player
-	):
-		Enemy(stage,position,rotation,scale,defaultState,deathState,player),
-		m_defaultState(defaultState),
-		m_attackState(attackState),
-		m_plungeTime(0.0f),
-		m_maxPlungeTime(3.0f),
-		m_plungeRargeTime(7.0f),
-		m_maxPlungeRargeTime(m_plungeRargeTime)
-	{}
-
-	void EnemyChase::OnCreate() {
-		Enemy::OnCreate();
-		//SetState(plunge);
-	}
-	void EnemyChase::OnUpdate() {
-		Enemy::OnUpdate();
-		float elapsed = App::GetApp()->GetApp()->GetElapsedTime();
-		m_plungeTime -= elapsed;
-
-		if (!GetOverHeat() && m_stateType != wait && m_stateType != throwAway) {
-			if (m_plungeTime >= 0.0f) {
-				EnemyAnime(L"spare");
-				SetState(m_attackState);
-			}
-			else if (m_plungeTime < 0.0f) {
-				SetState(m_defaultState);
-				m_plungeRargeTime -= elapsed;
-			}
-			if (m_plungeRargeTime <= 0.0f) {
-				m_plungeTime = m_maxPlungeTime;
-				m_plungeRargeTime = m_maxPlungeRargeTime;
-			}
-
-		}
-		//Debug();
-	}
-	void EnemyChase::Debug() {
-		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
-		auto scene = App::GetApp()->GetScene<Scene>();
-		wstringstream wss(L"");
-		wss << L"state : "
-			<< m_stateType
-			<<L"\n"
-			<<m_plungeFlag
-			<< endl;
-		scene->SetDebugString(wss.str());
-	}
-
+	//--------------------------------------------------------------------------------------
+	//	class Enemy : public GameObject;  //’Ç‚¢‚©‚¯‚Ä“Ëi‚·‚é“G
+	//--------------------------------------------------------------------------------------
 	ChasingEnemy::ChasingEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotation,
@@ -102,6 +31,9 @@ namespace basecross {
 		}
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	class MoveBulletEnemy : public Enemy;  //¶‰E‚É’Ç‚¢‚©‚¯‚Ä’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//--------------------------------------------------------------------------------------
 	MoveBulletEnemy::MoveBulletEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotatoin,
@@ -122,6 +54,9 @@ namespace basecross {
 		}
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	class ParabolaBulletEnemy : public Enemy;  //•ú•¨ü‚É’e‚ğ”ò‚Î‚µ‚Ä‚­‚é“G
+	//--------------------------------------------------------------------------------------
 	ParabolaBulletEnemy::ParabolaBulletEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotatoin,
@@ -142,6 +77,9 @@ namespace basecross {
 		}
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	class SlideEnemy : public Enemy;  //¶‰EˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//--------------------------------------------------------------------------------------
 	SlideEnemy::SlideEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
 		const Vec3& rotatoin,
@@ -151,7 +89,6 @@ namespace basecross {
 		Enemy(stage, position, rotatoin, scale, player)
 	{
 	}
-
 	void SlideEnemy::OnCreate() {
 		Enemy::OnCreate();
 		m_currentState = make_unique<SlideState>(dynamic_pointer_cast<Enemy>(GetThis<SlideEnemy>()));
@@ -167,8 +104,8 @@ namespace basecross {
 		//	Col4(1.0f, 1.0f, 1.0f, 1.0f), GetThis<Enemy>());
 
 		m_meshName = L"ENEMYYOKO";
-		m_scal.y = m_scal.y;
-		pos.y = pos.y + m_scal.y;
+		m_firstScal.y = m_firstScal.y;
+		pos.y = pos.y + m_firstScal.y;
 
 		Mat4x4 meshMat;
 		meshMat.affineTransformation(
@@ -182,7 +119,7 @@ namespace basecross {
 		m_gaugeFram.lock()->SetPosHight(6.0f);
 		m_floorCol->SetPosHight(3.0f);
 
-		m_trans->SetScale(m_scal);
+		m_trans->SetScale(m_firstScal);
 		m_trans->SetPosition(pos);
 		//•`‰æ
 		m_draw->SetMeshResource(m_meshName);
@@ -192,9 +129,10 @@ namespace basecross {
 		auto shadowPtr = AddComponent<Shadowmap>();
 		shadowPtr->SetMeshResource(m_meshName);
 
+		m_draw->AddAnimation(L"kaihi", 40, 60, true, 35);
+		m_draw->AddAnimation(L"hassya", 100, 10, false, 30);
 		m_draw->AddAnimation(L"stand", 160, 20, false, 30);
 		m_draw->AddAnimation(L"wait", 120, 30, false, 30);   //ƒI[ƒo[ƒq[ƒgó‘Ô
-
 
 	}
 	void SlideEnemy::OnUpdate() {

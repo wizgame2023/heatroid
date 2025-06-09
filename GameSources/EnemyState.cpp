@@ -1,5 +1,5 @@
 /*!
-@file Emenyobj.cpp
+@file EmenyState.cpp
 @brief 敵のオブジェクト
 担当：逸見
 */
@@ -31,9 +31,9 @@ namespace basecross {
 		if (!enemy->m_floorCol->GetPlayerFlag()) {
 			enemy->EnemyAngle();
 		}
-		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {
+		if (enemy->m_playerDirec.length() <= enemy->m_trackingRange * 2) {
 			enemy->EnemyAnime(L"walk");
-			pos += enemy->m_speed * enemy->m_direcNorm * elapsed;
+			pos += enemy->m_speed * enemy->m_playerDirecNorm * elapsed;
 		}
 
 		m_plungeTime -= elapsed;
@@ -86,7 +86,6 @@ namespace basecross {
 		if (enemy->m_heat <= 0.0f) {
 			enemy->EnemyAnime(L"stand");
 			if (enemy->m_draw->IsTargetAnimeEnd()) {
-				enemy->EffectStop(3);
 				enemy->RetrunState();
 
 			}
@@ -110,8 +109,9 @@ namespace basecross {
 			if (enemy->m_EfkPlayer[2]) {
 				enemy->m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
 			}
-			if (cntlVec[0].bConnected) {
+			if (true) {
 				if (enemy->m_throwFlag) {
+					enemy->m_pGrabFlag = false;
 					enemy->OnlyChangeState<ThrowAwayState>();
 				}
 			}
@@ -135,6 +135,7 @@ namespace basecross {
 		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, 0.5f)), 1, Vec3(0.5f));
 		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, -0.5f)), 2, Vec3(0.5f));
 		enemy->PlaySE(L"EnemyRevival", 2.0f);
+		enemy->EffectStop(3);
 		enemy->m_overHeatFlag = false;
 		enemy->m_throwFlag = false;
 
@@ -167,18 +168,15 @@ namespace basecross {
 		pos.y = enemy->Grav().y;
 
 		enemy->PlayerDic();
-		pos.y += 0.25f * enemy->m_throwLength;
-		pos -= enemy->m_speed * enemy->m_direcNorm * elapsed * enemy->m_throwLength * 20.0f;
+		pos.y += 0.15f * enemy->m_throwLength;
+		pos -= enemy->m_speed * enemy->m_playerDirecNorm * elapsed * enemy->m_throwLength * 15.0f;
 		enemy->m_throwTime -= elapsed;
-		if (enemy->m_throwTime < 0.0f) {
-
+		if (enemy->m_throwTime < 0.0f||enemy->m_objFlag) {
+			enemy->OnlyChangeState<OverHeatState>();
 			enemy->m_throwTime = 0.5f;
 		}
 
 		enemy->AroundOverHeat();
-		if (enemy->m_floorFlag) {
-			enemy->OnlyChangeState<OverHeatState>();
-		}
 
 		enemy->m_trans->SetPosition(pos);
 		enemy->m_draw->UpdateAnimation(elapsed);
@@ -207,19 +205,24 @@ namespace basecross {
 		float elapsed = App::GetApp()->GetElapsedTime();
 		enemy->PlayerDic();
 		auto pos = enemy->GetPos();
+		auto rot = enemy->m_trans->GetRotation();
 		Vec3 forward = enemy->m_trans->GetForward();
-		float face = atan2f(forward.z, forward.x);
-		Vec3 movePos;
-		movePos.z = (cosf(face) * enemy->m_direcNorm.z) + (sinf(face) * enemy->m_direcNorm.x);
-		Vec3 movePosNorm = movePos.normalize();
-		pos += movePosNorm * elapsed * enemy->m_speed;
 
+		Vec3 cross = forward.cross(enemy->m_playerDirec);
+		float sign;
+		if (cross.y < 0.0f) {
+			sign = -1.0f;
+		}
+		else {
+			sign = 1.0f;
+		}
+		pos += enemy->m_trans->GetRight() * elapsed * enemy->m_speed * sign;
 		pos.y = enemy->Grav().y;
 
-		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {
+		if (enemy->m_playerDirec.length() <= enemy->m_trackingRange * 2) {
 			enemy->EnemyAnime(L"walk");
 			enemy->RapidFireBullet(3);
-			//pos += enemy->m_speed * enemy->m_direcNorm * elapsed;
+			//pos += enemy->m_speed * enemy->m_playerDirecNorm * elapsed;
 		}
 		if (enemy->m_heat >= enemy->m_maxHeat) {
 			enemy->ChangeState<OverHeatState>();
@@ -256,7 +259,7 @@ namespace basecross {
 			enemy->m_rad = 0;
 		}
 
-		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {
+		if (enemy->m_playerDirec.length() <= enemy->m_trackingRange * 2) {
 			enemy->EnemyAnime(L"kaihi");
 			pos += shaft.normalize() * sinf(enemy->m_rad) * enemy->m_speed * 2.0f * elapsed;
 		}
@@ -277,6 +280,7 @@ namespace basecross {
 
 		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
 		enemy->EnemyAnime(L"spare");
+		enemy->PlaySE(L"EnemyAttack", 5.0f);
 		auto pos = enemy->GetPos();
 		enemy->PlayerDic();
 	}
@@ -290,7 +294,7 @@ namespace basecross {
 		enemy->m_spareTime -= elapsed;
 		m_spareTime -= elapsed;
 		if (m_spareTime <= 0.0f) {
-			pos += enemy->m_speed * enemy->m_direcNorm * elapsed * 3.5f;
+			pos += enemy->m_speed * enemy->m_playerDirecNorm * elapsed * 3.5f;
 		}
 		m_time -= elapsed;
 		if (m_time <= 0.0f) {
@@ -321,7 +325,7 @@ namespace basecross {
 		pos.y = enemy->Grav().y;
 
 		enemy->EnemyAngle();
-		if (enemy->m_direc.length() <= enemy->m_trackingRange * 2) {
+		if (enemy->m_playerDirec.length() <= enemy->m_trackingRange * 2) {
 			enemy->EnemyAnime(L"walk");
 			enemy->FallBullet();
 			pos += shaft.normalize() * sinf(enemy->m_rad) * enemy->m_speed * 2.0f * elapsed;

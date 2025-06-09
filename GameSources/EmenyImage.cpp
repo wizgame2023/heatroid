@@ -1,12 +1,16 @@
 /*!
 @file EmenyImage.cpp
 @brief キャラクターなど実体
+担当：逸見
 */
 
 #include "stdafx.h"
 #include "Project.h"
 
 namespace basecross {
+	//--------------------------------------------------------------------------------------
+	//	class Square : public GameObject;   //スクエアの表示
+	//--------------------------------------------------------------------------------------
 	Square::Square(const shared_ptr<Stage>& stage,
 		const float width, 
 		const float height,
@@ -153,6 +157,9 @@ namespace basecross {
 	}
 
 	//オーバーヒートゲージ
+	//--------------------------------------------------------------------------------------
+	//	class GaugeSquare : public Square;   //スクエアのゲージ表示
+	//--------------------------------------------------------------------------------------
 	GaugeSquare::GaugeSquare(const shared_ptr<Stage>& stage,
 		const float width, const float height,
 		const wstring meshName,

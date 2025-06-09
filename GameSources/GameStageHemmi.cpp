@@ -309,10 +309,7 @@ namespace basecross {
 		auto Rot = Vec3(0.0f, 0.0f, 0.0f);
 		auto Scale = Vec3(3.0f, 3.0f, 3.0f);
 		auto player = GetSharedGameObject<Player>(L"Player");
-		auto enemy = AddGameObject<Enemy>(Pos, Rot, Scale, Enemy::rightMove, Enemy::stay, player);
 		auto group = GetSharedObjectGroup(L"Enemy");
-
-		group->IntoGroup(enemy);
 		
 	}
 	//void GameStageHemmi::OnCreate() {
