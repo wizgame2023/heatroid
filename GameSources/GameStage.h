@@ -46,9 +46,6 @@ namespace basecross {
         // 描画処理
         virtual void OnDraw() override;
 
-        // ボタンAが押された時の処理
-        void OnPushA();
-
         // バックグラウンドミュージックを再生する
         void PlayBGM(const wstring& StageBGM);
 

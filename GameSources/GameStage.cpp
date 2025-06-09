@@ -84,10 +84,6 @@ namespace basecross {
 		ShEfkInterface->OnDraw();
 	}
 
-	void GameStage::OnPushA()
-	{
-	}
-
 	void GameStage::GamePause()
 	{
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
