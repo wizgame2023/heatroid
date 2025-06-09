@@ -96,10 +96,11 @@ namespace basecross {
 		weak_ptr<GaugeSquare> m_gauge;
 		weak_ptr<Square> m_gaugeFram;
 		//エフェクト
-		shared_ptr<EfkEffect> m_heatEffect;
-		shared_ptr<EfkEffect> m_eyeEffect;
-		shared_ptr<EfkEffect> m_burstEffect;
-		shared_ptr<EfkPlay> m_EfkPlayer[MAX_EFFECT_NUM];
+		shared_ptr<EffectManeger> m_EfkPlayer;
+		Effekseer::Handle m_heatEffect;
+		Effekseer::Handle m_eyeEffect;
+		Effekseer::Handle m_burstEffect;
+
 		//ステート
 		unique_ptr<EnemyState> m_currentState;  //現在のステート
 		unique_ptr<EnemyState> m_previousState; //一つ前のステート
@@ -141,10 +142,10 @@ namespace basecross {
 		//SEの再生
 		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
 		//エフェクトの再生
-		void EffectPlay(const shared_ptr<EfkEffect>& efk,
+		void EffectPlay(Effekseer::Handle efk, const wstring name,
 			const Vec3& pos, const int num, const Vec3& scale = Vec3(1.0f));
 		//エフェクトの止める
-		void EffectStop(int num);
+		void EffectStop(Effekseer::Handle& efk);
 		//敵の目の場所を設定
 		Vec3 GetEyePos(const Vec3& eye);
 		//デバック用

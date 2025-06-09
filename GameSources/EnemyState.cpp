@@ -57,7 +57,7 @@ namespace basecross {
 
 		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
 		enemy->PlaySE(L"OverHeatSE", 5.0f);
-		enemy->EffectPlay(enemy->m_heatEffect, enemy->GetPos(), 3);
+		enemy->EffectPlay(enemy->m_heatEffect,L"smoke", enemy->GetPos(), 3);
 		enemy->m_overHeatFlag = true;
 
 		auto gauge = enemy->m_gauge.lock();
@@ -106,8 +106,8 @@ namespace basecross {
 			auto pGrab = enemy->m_playerGrab.lock();
 			if (!pGrab) return;
 			auto grabTrans = pGrab->GetComponent<Transform>();
-			if (enemy->m_EfkPlayer[2]) {
-				enemy->m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
+			if (enemy->m_EfkPlayer) {
+				enemy->m_EfkPlayer->SetLocation(enemy->m_heatEffect, grabTrans->GetPosition());
 			}
 			if (true) {
 				if (enemy->m_throwFlag) {
@@ -117,8 +117,8 @@ namespace basecross {
 			}
 		}
 		else {
-			if (enemy->m_EfkPlayer[2]) {
-				enemy->m_EfkPlayer[2]->SetLocation(enemy->GetPos());
+			if (enemy->m_EfkPlayer) {
+				enemy->m_EfkPlayer->SetLocation(enemy->m_heatEffect, enemy->GetPos());
 			}
 
 		}
@@ -132,10 +132,10 @@ namespace basecross {
 		if (!enemy) return;
 
 		enemy->EnemyAnime(L"stand");
-		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, 0.5f)), 1, Vec3(0.5f));
-		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, -0.5f)), 2, Vec3(0.5f));
+		enemy->EffectPlay(enemy->m_eyeEffect,L"EnemyEye", enemy->GetEyePos(Vec3(2.0f, 2.5f, 0.5f)), 1, Vec3(0.5f));
+		enemy->EffectPlay(enemy->m_eyeEffect,L"EnemyEye", enemy->GetEyePos(Vec3(2.0f, 2.5f, -0.5f)), 2, Vec3(0.5f));
 		enemy->PlaySE(L"EnemyRevival", 2.0f);
-		enemy->EffectStop(3);
+		enemy->EffectStop(enemy->m_heatEffect);
 		enemy->m_overHeatFlag = false;
 		enemy->m_throwFlag = false;
 
@@ -185,7 +185,7 @@ namespace basecross {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 
-		enemy->EffectPlay(enemy->m_burstEffect, enemy->GetEyePos(Vec3(0, 0, 0)), 4, Vec3(0.5f));
+		enemy->EffectPlay(enemy->m_burstEffect,L"EnemyBurst", enemy->GetEyePos(Vec3(0, 0, 0)), 4, Vec3(0.5f));
 
 	}
 

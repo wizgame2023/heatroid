@@ -41,6 +41,7 @@ namespace basecross {
 		m_draw->SetDiffuse(Col4(m_color));
 		SetAlphaActive(true);
 		m_draw->SetDrawActive(true);
+		m_draw->SetDepthStencilState(DepthStencilState::Read);
 
 		m_trans = GetComponent<Transform>();
 		m_trans->SetPosition(m_pos);

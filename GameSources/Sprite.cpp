@@ -37,6 +37,7 @@ namespace basecross {
 		auto ptrDraw = AddComponent<PCTSpriteDraw>(vertices, indices);
 		ptrDraw->SetSamplerState(SamplerState::LinearWrap);
 		ptrDraw->SetTextureResource(m_TextureKey);
+		ptrDraw->SetDepthStencilState(DepthStencilState::Read);
 	}
 
 	SelectCharge::SelectCharge(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
@@ -72,6 +73,7 @@ namespace basecross {
 		//頂点とインデックスを指定してスプライト作成
 		auto ptrDraw = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
 		ptrDraw->SetTextureResource(m_TextureKey);
+		ptrDraw->SetDepthStencilState(DepthStencilState::Read);
 
 		auto group = GetStage()->GetSharedObjectGroup(L"Sprite");
 		group->IntoGroup(GetThis<GameObject>());

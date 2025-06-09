@@ -1,14 +1,11 @@
 /*!
 @file EffectManager.h
-@brief Effectãªã©
+@brief Effect‚È‚Ç
 */
 
 #pragma once
 #include "stdafx.h"
 
-#pragma once
-
-#include "stdafx.h"
 
 #include <Effekseer.h>
 #include <EffekseerRendererDX11.h>
@@ -19,144 +16,193 @@
 
 
 namespace basecross {
-
-	class EfkInterface;
-
 	//--------------------------------------------------------------------------------------
-	///	Effekseerã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+	///	@class	EffectManeger
+	///	@brief	Effekseerƒ‰ƒCƒuƒ‰ƒŠ‚ğg—p‚µ‚½ƒGƒtƒFƒNƒg‚ÌÄ¶AŠÇ—A•`‰æ‚ğs‚¤ƒNƒ‰ƒX
 	//--------------------------------------------------------------------------------------
-	class EfkEffect : public ObjectInterface {
-		wstring m_FileName;
-		Effekseer::ManagerRef m_manager;
-		weak_ptr<EfkInterface> m_EfkInterface;
-		friend class EfkPlay;
+	class EffectManeger : public MultiParticle {
+
+	/// @brief “Ç‚İ‚ñ‚¾ƒGƒtƒFƒNƒgƒŠƒ\[ƒX‚ğŠÇ—‚·‚éƒ}ƒbƒv (ƒL[: wstring, ’l: EffectRef)
+	map<wstring, Effekseer::EffectRef> m_ResMap;
+
+	/// @brief Ä¶’†‚ÌƒGƒtƒFƒNƒgƒnƒ“ƒhƒ‹ (ƒTƒ“ƒvƒ‹—pA‚Ü‚½‚Íˆê—˜—p)
+	Effekseer::Handle handle;
+
+	/// @brief Effekseer‚ÌŠÇ—ƒ}ƒl[ƒWƒƒ[
+	Effekseer::ManagerRef m_Manager;
+
+	/// @brief Effekseer‚Ì•`‰æƒŒƒ“ƒ_ƒ‰[ (DirectX11—p)
+	EffekseerRendererDX11::RendererRef m_renderer;
+
+	/// @brief Œo‰ßŠÔ
+	float m_TotalTime;
+
+	/// @brief ’Pˆê‚ÌƒGƒtƒFƒNƒgƒŠƒ\[ƒX‚Ö‚ÌQÆ (ƒTƒ“ƒvƒ‹—pA‚Ü‚½‚Íˆê—˜—p)
+	Effekseer::EffectRef m_Effect;
 	public:
-		Effekseer::EffectRef m_Effect;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ã‚³ãƒ³ã‚¹ãƒ©ãƒˆã‚¯ã‚¿
-		@param[in]	iface	ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
-		@param[in]	filename	ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¤ãƒ«å
-		*/
-		//--------------------------------------------------------------------------------------
-		EfkEffect(const shared_ptr<EfkInterface>& iface, const wstring& filename);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual ~EfkEffect();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	åˆæœŸåŒ–
-		@return	ãªã—
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void OnCreate() override;
-	};
 
-	//--------------------------------------------------------------------------------------
-	///	Effekseerã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®Playã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
-	//--------------------------------------------------------------------------------------
-	class EfkPlay : public ObjectInterface {
-		Effekseer::Handle m_handle;
-		Effekseer::ManagerRef m_Manager;
-	public:
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	ã‚³ãƒ³ã‚¹ãƒ©ãƒˆã‚¯ã‚¿
-		@param[in]	effect	ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
-		@param[in]	Emitter	ã‚¨ãƒŸãƒƒã‚¿ãƒ¼
+		@brief	ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		@param[in]	stage	ƒQ[ƒ€‚ÌƒXƒe[ƒWƒIƒuƒWƒFƒNƒg‚È‚ÇA‰Šú‰»‚É•K—v‚Èî•ñ‚ğ‚ÂƒIƒuƒWƒFƒNƒg
 		*/
 		//--------------------------------------------------------------------------------------
-		EfkPlay(const shared_ptr<EfkEffect>& effect, const bsm::Vec3& Emitter, const float freme);
-		virtual ~EfkPlay();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	åˆæœŸåŒ–ï¼ˆç©ºé–¢æ•°ï¼‰
-		@return	ãªã—
-		*/
-		//--------------------------------------------------------------------------------------
-		void OnCreate() override {}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’ã‚¹ãƒˆãƒƒãƒ—ã•ã›ã‚‹
-		@return	ãªã—
-		*/
-		//--------------------------------------------------------------------------------------
-		void StopEffect();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’ç§»å‹•ã™ã‚‹
-		@param[in]	Location	ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ï¼ˆç›¸å¯¾æ–¹å‘ï¼‰
-		@return	ãªã—
-		*/
-		//--------------------------------------------------------------------------------------
-		void AddLocation(const bsm::Vec3& Location);
-		void SetLocation(const bsm::Vec3& Location);
-		void SetRotation(const bsm::Vec3& Rotation, const float angle);
-		void SetScale(const bsm::Vec3& Scale);
-		void SetAllColor(const bsm::Col4 color);
-		void SetLoop(const bool  loop);
-		void SetLoopStop();
-	};
+		EffectManeger(const shared_ptr<Stage>& stage);
 
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	ƒfƒXƒgƒ‰ƒNƒ^
+		@details	EffekseerŠÖ˜A‚ÌƒŠƒ\[ƒX‚ğ‰ğ•ú‚µ‚Ü‚·B
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual ~EffectManeger();
 
-	//--------------------------------------------------------------------------------------
-	///	Effekseerã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
-	//--------------------------------------------------------------------------------------
-	class EfkInterface : public ObjectInterface, public ShapeInterface {
-		Effekseer::ManagerRef m_Manager;
-		EffekseerRendererDX11::RendererRef m_renderer;
-		friend class EfkPlay;
-		friend class EfkEffect;
-	public:
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	ã‚³ãƒ³ã‚¹ãƒ©ãƒˆã‚¯ã‚¿
-		*/
-		//--------------------------------------------------------------------------------------
-		EfkInterface();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
-+		*/
-//--------------------------------------------------------------------------------------
-		virtual ~EfkInterface();
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	ãƒ“ãƒ¥ãƒ¼ã¨å°„å½±è¡Œåˆ—ã‚’è¨­å®šã™ã‚‹
-		@param[in]	view	ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—
-		@param[in]	proj	å°„å½±è¡Œåˆ—
-		@return	ãªã—
-		*/
-		//--------------------------------------------------------------------------------------
-		void SetViewProj(const bsm::Mat4x4& view, const bsm::Mat4x4& proj);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	åˆæœŸåŒ–
-		@return	ãªã—
+		@brief	‰Šú‰»ˆ—
+		@details	Effekseer‚Ìƒ}ƒl[ƒWƒƒ[‚ÆƒŒƒ“ƒ_ƒ‰[‚ğ¶¬‚µAŠî–{“I‚Èİ’è‚ğs‚¢‚Ü‚·B
+		@return	‚È‚µ
 		*/
 		//--------------------------------------------------------------------------------------
 		virtual void OnCreate() override;
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	æ›´æ–°å‡¦ç†
-		@return	ãªã—
+		@brief	XVˆ—
+		@details	–ˆƒtƒŒ[ƒ€ŒÄ‚Ño‚³‚êAEffekseerƒ}ƒl[ƒWƒƒ[‚ğXV‚µ‚ÄƒGƒtƒFƒNƒg‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ği‚ß‚Ü‚·B
+		@return	‚È‚µ
 		*/
 		//--------------------------------------------------------------------------------------
 		virtual void OnUpdate()override;
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	æç”»å‡¦ç†ã€‚
-		@return	ãªã—
+		@brief	•`‰æˆ—B
+		@details	–ˆƒtƒŒ[ƒ€ŒÄ‚Ño‚³‚êAŠÇ—‚µ‚Ä‚¢‚éƒGƒtƒFƒNƒg‚ğ•`‰æ‚µ‚Ü‚·B
+		@return	‚È‚µ
 		*/
 		//--------------------------------------------------------------------------------------
 		virtual void OnDraw()override;
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	I—¹ˆ—
+		@details	ƒIƒuƒWƒFƒNƒg‚Ì”jŠü‚ÉAŠm•Û‚µ‚½ƒŠƒ\[ƒX‚ğ‰ğ•ú‚µ‚Ü‚·B
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void OnDestroy()override;
 
+		/*!
+		@brief	bsm::Mat4x4 ‚©‚ç Effekseer::Matrix44 ‚Ös—ñ‚ğ•ÏŠ·‚µ‚Ü‚·B
+		@param[in]	src		•ÏŠ·Œ³‚Ìs—ñ (bsm::Mat4x4)
+		@param[out]	dest	•ÏŠ·æ‚Ìs—ñ (Effekseer::Matrix44)
+		*/
+		void Mat4x4ToMatrix44(const bsm::Mat4x4& src, Effekseer::Matrix44& dest);
+
+		/*!
+		@brief	ƒrƒ…[s—ñ‚ÆƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ğƒŒƒ“ƒ_ƒ‰[‚Éİ’è‚µ‚Ü‚·B
+		@param[in]	view	ƒrƒ…[s—ñ
+		@param[in]	proj	ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
+		*/
+		void SetViewProj(const bsm::Mat4x4& view, const bsm::Mat4x4& proj);
+
+		/*!
+		@brief	w’è‚µ‚½ƒGƒtƒFƒNƒg‚ÌÄ¶‘¬“x‚ğİ’è‚µ‚Ü‚·B
+		@param[in]	handle	‘ÎÛ‚ÌƒGƒtƒFƒNƒgƒnƒ“ƒhƒ‹
+		@param[in]	speed	Ä¶‘¬“x (1.0f‚ª•W€‘¬)
+		*/
+		void SetEffectSpeed(Effekseer::Handle& handle, const float& speed);
+
+		/*!
+		@brief	ƒ}ƒl[ƒWƒƒ[‚ªŠÇ—‚·‚é‘S‚Ä‚ÌƒGƒtƒFƒNƒg‚ÌXV‚ğˆê’â~/ÄŠJ‚µ‚Ü‚·B
+		@param[in]	pause	true‚Åˆê’â~Afalse‚ÅÄŠJ
+		*/
+		void SetEffectPause(const bool& pause);
+
+		/*!
+		@brief	w’è‚µ‚½ƒL[‚ÌƒGƒtƒFƒNƒg‚ğÄ¶‚µ‚Ü‚·B
+		@param[out]	handle	Ä¶‚³‚ê‚½ƒGƒtƒFƒNƒg‚Ìƒnƒ“ƒhƒ‹‚ª‚±‚Ìˆø”‚ÉŠi”[‚³‚ê‚Ü‚·B
+		@param[in]	Key		ƒŠƒ\[ƒXƒ}ƒbƒv‚É“o˜^‚µ‚½ƒGƒtƒFƒNƒg‚ÌƒL[
+		@param[in]	Emitter	ƒGƒtƒFƒNƒg‚Ì”­¶À•W
+		@param[in]	freme	ƒGƒtƒFƒNƒg‚ÌŠJnƒtƒŒ[ƒ€ (0ƒtƒŒ[ƒ€–Ú‚©‚çÄ¶‚·‚éê‡‚Í0.0f)
+		*/
+		void PlayEffect(Effekseer::Handle& handle, const wstring& Key, const bsm::Vec3& Emitter, const float freme);
+
+		/*!
+		@brief	Effekseer‚Ìƒ}ƒl[ƒWƒƒ[‚ÆƒŒƒ“ƒ_ƒ‰[‚ğ¶¬‚µA‰Šúİ’è‚ğs‚¢‚Ü‚·B
+		*/
+		void CreateEffectInterface();
+
+		/*!
+		@brief	ƒGƒtƒFƒNƒgƒtƒ@ƒCƒ‹(.efkefc)‚ğ“Ç‚İ‚İAƒŠƒ\[ƒXƒ}ƒbƒv‚É“o˜^‚µ‚Ü‚·B
+		@param[in]	Key			“o˜^‚·‚éƒL[
+		@param[in]	FileName	ƒGƒtƒFƒNƒgƒtƒ@ƒCƒ‹‚ÌƒpƒX
+		*/
+		void RegisterResource(const wstring& Key, const  wstring& FileName);
+
+		/*!
+		@brief	“o˜^Ï‚İ‚ÌƒGƒtƒFƒNƒgƒŠƒ\[ƒX‚ğæ“¾‚µ‚Ü‚·B
+		@param[in]	Key		æ“¾‚µ‚½‚¢ƒGƒtƒFƒNƒg‚ÌƒL[
+		@return	Effekseer::EffectRef	ƒGƒtƒFƒNƒgƒŠƒ\[ƒX‚Ö‚ÌQÆBŒ©‚Â‚©‚ç‚È‚¢ê‡‚ÍnullptrB
+		*/
+		Effekseer::EffectRef GetEffectResource(const wstring& Key) const;
+
+		/*!
+		@brief	ƒGƒtƒFƒNƒg‚ÌÀ•W‚ğ‘Š‘Î“I‚ÉˆÚ“®‚³‚¹‚Ü‚·B
+		@param[in]	handle		‘ÎÛ‚ÌƒGƒtƒFƒNƒgƒnƒ“ƒhƒ‹
+		@param[in]	Location	Œ»İ‚ÌÀ•W‚É‰ÁZ‚·‚éˆÚ“®—Ê
+		*/
+		void AddLocation(Effekseer::Handle& handle, const bsm::Vec3& Location);
+
+		/*!
+		@brief	ƒGƒtƒFƒNƒg‚ÌÀ•W‚ğâ‘ÎÀ•W‚Åİ’è‚µ‚Ü‚·B
+		@param[in]	handle		‘ÎÛ‚ÌƒGƒtƒFƒNƒgƒnƒ“ƒhƒ‹
+		@param[in]	Location	İ’è‚·‚éÀ•W
+		*/
+		void SetLocation(Effekseer::Handle& handle, const bsm::Vec3& Location);
+
+		/*!
+		@brief	ƒGƒtƒFƒNƒg‚Ì‰ñ“]‚ğ²‚ÆŠp“x‚Åİ’è‚µ‚Ü‚·B
+		@param[in]	handle		‘ÎÛ‚ÌƒGƒtƒFƒNƒgƒnƒ“ƒhƒ‹
+		@param[in]	Rotation	‰ñ“]²
+		@param[in]	angle		‰ñ“]Šp“x (ƒ‰ƒWƒAƒ“)
+		*/
+		void SetRotation(Effekseer::Handle& handle, const bsm::Vec3& Rotation, const float angle);
+
+		/*!
+		@brief	ƒGƒtƒFƒNƒg‚ÌŠg‘åk¬—¦‚ğİ’è‚µ‚Ü‚·B
+		@param[in]	handle	‘ÎÛ‚ÌƒGƒtƒFƒNƒgƒnƒ“ƒhƒ‹
+		@param[in]	Scale	XYZŠe²‚ÌŠg‘å—¦
+		*/
+		void SetScale(Effekseer::Handle& handle, const bsm::Vec3& Scale);
+
+		/*!
+		@brief	ƒGƒtƒFƒNƒg‘S‘Ì‚ÌF‚ğİ’è‚µ‚Ü‚·B
+		@param[in]	handle	‘ÎÛ‚ÌƒGƒtƒFƒNƒgƒnƒ“ƒhƒ‹
+		@param[in]	color	İ’è‚·‚éF (RGBA)
+		*/
+		void SetAllColor(Effekseer::Handle& handle, const bsm::Col4 color);
+
+		/*!
+		@brief	w’è‚µ‚½ƒGƒtƒFƒNƒg‚Ì‹­§”jŠü‚ğ‚µ‚Ü‚·B
+		@param[in]	handle	’â~‚·‚éƒGƒtƒFƒNƒg‚Ìƒnƒ“ƒhƒ‹
+		*/
+		void StopEffect(Effekseer::Handle& handle);
+
+		/*!
+		@brief	ƒGƒtƒFƒNƒg‚Ì•`‰æƒŒƒCƒ„[‚ğİ’è‚µ‚Ü‚·B
+		@details	ƒŒƒCƒ„[‚²‚Æ‚É•`‰æƒ^ƒCƒ~ƒ“ƒO‚ğ§Œä‚µ‚½‚¢ê‡‚È‚Ç‚Ég—p‚µ‚Ü‚·B
+		@param[in]	handle	‘ÎÛ‚ÌƒGƒtƒFƒNƒgƒnƒ“ƒhƒ‹
+		@param[in]	layer	İ’è‚·‚éƒŒƒCƒ„[”Ô†
+		*/
+		void SetLayer(Effekseer::Handle& handle, int32_t layer);
+
+		/*!
+		@brief	ƒGƒtƒFƒNƒg‚Ì•`‰æƒŒƒCƒ„[‚ğæ“¾‚µ‚Ü‚·B
+		@param[in]	handle	‘ÎÛ‚ÌƒGƒtƒFƒNƒgƒnƒ“ƒhƒ‹
+		@return	ƒŒƒCƒ„[”Ô†
+		*/
+		int32_t GetLayer(Effekseer::Handle& handle)
+		{
+			return m_Manager->GetLayer(handle);
+		}
 	};
-
-
-
 }
 //end basecross

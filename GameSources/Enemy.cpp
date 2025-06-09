@@ -138,16 +138,8 @@ namespace basecross {
 		AddTag(L"Enemy");
 
 		//エフェクトの設定
-		wstring DataDir;
-		App::GetApp()->GetAssetsDirectory(DataDir);
-		wstring effectSmoke = DataDir + L"Effects\\smoke.efk";
-		wstring effectEye = DataDir + L"Effects\\EnemyEye.efk";
-		wstring effectBurst = DataDir + L"Effects\\EnemyBurst.efk";
 		auto stageManager = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		auto efkInterface = stageManager->GetEfkInterface();
-		m_heatEffect = ObjectFactory::Create<EfkEffect>(efkInterface, effectSmoke);
-		m_eyeEffect = ObjectFactory::Create<EfkEffect>(efkInterface, effectEye);
-		m_burstEffect = ObjectFactory::Create<EfkEffect>(efkInterface, effectBurst);
 	}
 
 	void Enemy::OnUpdate() {
@@ -394,19 +386,16 @@ namespace basecross {
 	}
 
 	//エフェクトの再生
-	void Enemy::EffectPlay(const shared_ptr<EfkEffect>& efk,const Vec3& pos, 
+	void Enemy::EffectPlay(Effekseer::Handle efk,const wstring name,const Vec3& pos,
 		const int num, const Vec3& scale) {
-		m_EfkPlayer[num - 1] = ObjectFactory::Create<EfkPlay>(efk, pos, 0.0f);
-		
-		m_EfkPlayer[num - 1]->SetScale(scale);
-		m_EfkPlayer[num - 1]->SetAllColor(Col4(1.0f));
+		m_EfkPlayer->PlayEffect(efk, name, pos, 0.0f);
+
+		m_EfkPlayer->SetScale(efk, scale);
+		m_EfkPlayer->SetAllColor(efk, Col4(1.0f));
 	}
 	//エフェクトを止める
-	void Enemy::EffectStop(int num) {
-		if (MAX_EFFECT_NUM <= num) return;
-		if (m_EfkPlayer[num - 1]) {
-			m_EfkPlayer[num - 1]->StopEffect();
-		}
+	void Enemy::EffectStop(Effekseer::Handle& efk) {
+		m_EfkPlayer->StopEffect(efk);
 	}
 	//敵の目の場所を設定
 	Vec3 Enemy::GetEyePos(const Vec3& eye) {

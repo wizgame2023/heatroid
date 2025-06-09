@@ -140,14 +140,8 @@ namespace basecross {
 		group->IntoGroup(GetThis<GameObject>());
 		auto Shadowm = AddComponent<Shadowmap>();
 		//エフェクトの初期化
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring TestEffectStr = DataDir + L"Effects\\Switch.efk";
-		wstring TestEffectStrLoop = DataDir + L"Effects\\SwitchLoop.efk";
 		auto stageMane = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
-		auto ShEfkInterface = stageMane->GetEfkInterface();
-		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
-		m_EfkEffectLoop = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStrLoop);
+		m_Effect = stageMane->GetEfkInterface();
 	}
 	
 	void GimmickButton::OnUpdate()
@@ -175,30 +169,28 @@ namespace basecross {
 		auto pos = GetComponent<Transform>()->GetPosition();
 		auto stageMane = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		auto ShEfkInterface = stageMane->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos, 0);
-		m_EfkPlay->SetScale(Vec3(2, 2, 2));
+		m_Effect->PlayEffect(m_Handle, L"PlayerLand", pos, 1);
+		m_Effect->SetScale(m_Handle, Vec3(2, 2, 2));
 		if (m_Texname == L"BLUCKSWITCH")
 		{
-			m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
+			m_Effect->SetAllColor(m_Handle, Col4(0.5f, 0.5f, 0.5f, 1.0f));
 		}
 		else if (m_Texname == L"BLUESWITCH")
 		{
-			m_EfkPlay->SetAllColor(Col4(0.0f, 1.0f, 1.0f, 0.5f));
+			m_Effect->SetAllColor(m_Handle, Col4(0.0f, 1.0f, 1.0f, 0.5f));
 		}
 		else if (m_Texname == L"REDSWITCH")
 		{
-			m_EfkPlay->SetAllColor(Col4(1.0f, 0.0f, 0.25f, 0.5f));
+			m_Effect->SetAllColor(m_Handle, Col4(1.0f, 0.0f, 0.25f, 0.5f));
 		}
 	}
 
 	void GimmickButton::EfectLoopPlay()
 	{
 		auto pos = GetComponent<Transform>()->GetPosition();
-		auto stageMane = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
-		auto ShEfkInterface = stageMane->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffectLoop, pos, 0);
-		m_EfkPlay->SetScale(Vec3(2, 2, 2));
-		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
+		m_Effect->PlayEffect(m_EfkEffectLoop, L"PlayerLand", pos, 0);
+		m_Effect->SetScale(m_EfkEffectLoop, Vec3(2, 2, 2));
+		m_Effect->SetAllColor(m_EfkEffectLoop, Col4(0.5f, 0.5f, 0.5f, 1.0f));
 	}
 
 	bool GimmickButton::GetButton()

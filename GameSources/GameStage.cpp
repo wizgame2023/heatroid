@@ -31,7 +31,6 @@ namespace basecross {
 		auto ShEfkInterface = stageMane->GetEfkInterface();
 		if (stageMane->m_nowGameStatus == StageGenerator::GameStatus::GAME_PLAYING)
 		{
-			ShEfkInterface->OnUpdate();
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::OPENINGCAMERA)
 			{
 				EnemyUpdateChange();
@@ -55,8 +54,6 @@ namespace basecross {
 		}
 		if (stageMane->m_nowGameStatus == StageGenerator::GameStatus::TEST_PLAY)
 		{
-			ShEfkInterface->OnUpdate();
-
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::OPENINGCAMERA)
 			{
 				EnemyUpdateChange();
@@ -77,11 +74,6 @@ namespace basecross {
 
 	void GameStage::OnDraw()
 	{
-		auto& camera = GetView()->GetTargetCamera();
-		auto stageMane = GetSharedGameObject<StageGenerator>(L"StageManager");
-		auto ShEfkInterface = stageMane->GetEfkInterface();
-		ShEfkInterface->SetViewProj(camera->GetViewMatrix(), camera->GetProjMatrix());
-		ShEfkInterface->OnDraw();
 	}
 
 	void GameStage::GamePause()
@@ -309,6 +301,7 @@ namespace basecross {
 		{
 			auto Status = ptrStageManager->GameStatus::TEST_PLAY;
 			ptrStageManager->SetNowGameStatus(Status);
+			ptrStageManager->CreateEffect();
 			ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
 			ptrStageManager->CreateViewLight();
 			ptrStageManager->CreatePlayer();
@@ -322,6 +315,7 @@ namespace basecross {
 			auto Status = ptrStageManager->GameStatus::GAME_PLAYING;
 			ptrStageManager->SetNowGameStatus(Status);
 			ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
+			ptrStageManager->CreateEffect();
 			ptrStageManager->CreatePlayer();
 			ptrStageManager->CreateViewLight();
 			ptrStageManager->CreateFixedBox();

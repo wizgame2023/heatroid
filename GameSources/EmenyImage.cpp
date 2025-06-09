@@ -70,6 +70,7 @@ namespace basecross {
 		m_draw->SetMeshResource(m_squareMesh);
 		m_draw->SetTextureResource(m_meshName);
 		m_draw->SetOriginalMeshResource(m_squareMesh);
+		m_draw->SetDepthStencilState(DepthStencilState::Read);
 		SetAlphaActive(true);//“§‰ßˆ——LŒø
 		SetDrawLayer(1);
 		if (enemy) {
