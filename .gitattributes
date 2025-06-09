@@ -1,0 +1,4 @@
+*.txt diff=sjis
+git config --global diff.sjis.textconv "iconv -f sjis -t utf-8"
+*.txt text working-tree-encoding=sjis diff=sjis
+git add --renormalize .
