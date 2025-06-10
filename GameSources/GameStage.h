@@ -26,13 +26,14 @@ namespace basecross {
         shared_ptr<GameObject> m_selectCharge;         // 選択画面のチャージオブジェクト
         shared_ptr<GameObject> m_titleCharge;          // タイトル画面のチャージオブジェクト
         float totaltime = 0.0f;                        // 合計時間を計測する変数
-
         // エフェクトのインターフェイス
         shared_ptr<EffectManeger> m_EfkInterface;
 
     public:
         bool m_pause = false;                          // ポーズ状態かどうかのフラグ
         bool m_soundFlg = false;
+        shared_ptr<EfkEffect> m_EfkEffect;             // エフェクトオブジェクト
+        shared_ptr<EfkPlay> m_EfkPlay;                 // エフェクト実行オブジェクト>>>>>>> main
 
         // 構築と破棄
         GameStage() :Stage() {}
