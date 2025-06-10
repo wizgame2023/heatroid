@@ -1,7 +1,7 @@
 /*!
 @file EmenyState.cpp
-@brief “G‚ÌƒIƒuƒWƒFƒNƒg
-’S“–FˆíŒ©
+@brief æ•µã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -9,7 +9,7 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class ChaseState : public EnemyState	//ƒvƒŒƒCƒ„[‚ğ’Ç‚¢‚©‚¯‚éƒXƒe[ƒg
+	//	class ChaseState : public EnemyState	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’è¿½ã„ã‹ã‘ã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	void ChaseState::Enter() {
 		auto enemy = m_enemy.lock();
@@ -49,15 +49,16 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class OverHeatState : public EnemyState	@//ƒI[ƒo[ƒq[ƒgƒXƒe[ƒg
+	//	class OverHeatState : public EnemyState	ã€€//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	void OverHeatState::Enter() {
 		auto enemy = m_enemy.lock();
+		auto obj = dynamic_pointer_cast<Enemy>(enemy);
 		if (!enemy) return;
 
 		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
 		enemy->PlaySE(L"OverHeatSE", 5.0f);
-		enemy->EffectPlay(enemy->m_heatEffect, enemy->GetPos(), 3);
+		enemy->EffectPlay(obj->m_heatEffect,L"smoke", obj->GetPos(), 3);
 		enemy->m_overHeatFlag = true;
 
 		auto gauge = enemy->m_gauge.lock();
@@ -106,8 +107,8 @@ namespace basecross {
 			auto pGrab = enemy->m_playerGrab.lock();
 			if (!pGrab) return;
 			auto grabTrans = pGrab->GetComponent<Transform>();
-			if (enemy->m_EfkPlayer[2]) {
-				enemy->m_EfkPlayer[2]->SetLocation(grabTrans->GetPosition());
+			if (enemy->m_EfkPlayer) {
+				enemy->m_EfkPlayer->SetLocation(enemy->m_heatEffect, grabTrans->GetPosition());
 			}
 			if (true) {
 				if (enemy->m_throwFlag) {
@@ -117,8 +118,8 @@ namespace basecross {
 			}
 		}
 		else {
-			if (enemy->m_EfkPlayer[2]) {
-				enemy->m_EfkPlayer[2]->SetLocation(enemy->GetPos());
+			if (enemy->m_EfkPlayer) {
+				enemy->m_EfkPlayer->SetLocation(enemy->m_heatEffect, enemy->GetPos());
 			}
 
 		}
@@ -132,10 +133,10 @@ namespace basecross {
 		if (!enemy) return;
 
 		enemy->EnemyAnime(L"stand");
-		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, 0.5f)), 1, Vec3(0.5f));
-		enemy->EffectPlay(enemy->m_eyeEffect, enemy->GetEyePos(Vec3(2.0f, 2.5f, -0.5f)), 2, Vec3(0.5f));
+		enemy->EffectPlay(enemy->m_eyeEffect,L"EnemyEye", enemy->GetEyePos(Vec3(2.0f, 2.5f, 0.5f)), 1, Vec3(0.5f));
+		enemy->EffectPlay(enemy->m_eyeEffect,L"EnemyEye", enemy->GetEyePos(Vec3(2.0f, 2.5f, -0.5f)), 2, Vec3(0.5f));
 		enemy->PlaySE(L"EnemyRevival", 2.0f);
-		enemy->EffectStop(3);
+		enemy->EffectStop(enemy->m_heatEffect);
 		enemy->m_overHeatFlag = false;
 		enemy->m_throwFlag = false;
 
@@ -148,7 +149,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class ThrowAwayState : public EnemyState	//ƒI[ƒo[ƒq[ƒg’†‚É“Š‚°‚éƒXƒe[ƒg
+	//	class ThrowAwayState : public EnemyState	//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆä¸­ã«æŠ•ã’ã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	void ThrowAwayState::Enter() {
 		auto enemy = m_enemy.lock();
@@ -185,12 +186,12 @@ namespace basecross {
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 
-		enemy->EffectPlay(enemy->m_burstEffect, enemy->GetEyePos(Vec3(0, 0, 0)), 4, Vec3(0.5f));
+		enemy->EffectPlay(enemy->m_burstEffect,L"EnemyBurst", enemy->GetEyePos(Vec3(0, 0, 0)), 4, Vec3(0.5f));
 
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class MoveBulletState : public EnemyState	//’Ç‚¢‚©‚¯‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚éƒXƒe[ƒg
+	//	class MoveBulletState : public EnemyState	//è¿½ã„ã‹ã‘ãªãŒã‚‰å¼¾ã‚’æ’ƒã£ã¦ãã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	void MoveBulletState::Enter() {
 		auto enemy = m_enemy.lock();
@@ -233,7 +234,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class SlideState : public EnemyState	@//¶‰EˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚éƒXƒe[ƒg
+	//	class SlideState : public EnemyState	ã€€//å·¦å³ç§»å‹•ã—ãªãŒã‚‰å¼¾ã‚’æ’ƒã£ã¦ãã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	void SlideState::Enter() {
 		auto enemy = m_enemy.lock();
@@ -272,7 +273,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class PlungeState : public EnemyState	@//ƒvƒŒƒCƒ„[‚ÉŒü‚©‚Á‚Ä“Ë‚Á‚ŞƒXƒe[ƒg
+	//	class PlungeState : public EnemyState	ã€€//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å‘ã‹ã£ã¦çªã£è¾¼ã‚€ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	void PlungeState::Enter() {
 		auto enemy = m_enemy.lock();
@@ -309,7 +310,7 @@ namespace basecross {
 	}
 	
 	//--------------------------------------------------------------------------------------
-	//	class ParabolaBulletState : public EnemyState	//“®‚©‚¸•ú•¨üã‚É’e‚ğŒ‚‚Á‚Ä‚­‚éƒXƒe[ƒg
+	//	class ParabolaBulletState : public EnemyState	//å‹•ã‹ãšæ”¾ç‰©ç·šä¸Šã«å¼¾ã‚’æ’ƒã£ã¦ãã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	void ParabolaBulletState::Enter() {
 		auto enemy = m_enemy.lock();

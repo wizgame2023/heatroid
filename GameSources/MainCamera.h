@@ -1,7 +1,7 @@
 /*!
-* Š™“c‘å‹P
+* éŒç”°å¤§è¼
 @file MainCamera.h
-@brief ƒJƒƒ‰‚È‚Ç
+@brief ã‚«ãƒ¡ãƒ©ãªã©
 */
 
 #pragma once
@@ -13,143 +13,143 @@ namespace basecross {
 
 	class CameraCollision : public GameObject
 	{
-		Vec3 GetPos;                            // ƒJƒƒ‰‚ÌŒ»İˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 TargetPos;                         // ƒJƒƒ‰‚Ì–Ú•WˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		bool m_Hit;                             // ƒqƒbƒg”»’èƒtƒ‰ƒO
-		float m_ArmLen;                         // ˜r‚Ì’·‚³‚ğ•Û‚·‚é•Ï”
-		float m_ToTargetLerp;                   // –Ú•W‚ğ’Ç‚¢‚©‚¯‚éÛ‚Ì•âŠÔ’l
-		bsm::Vec3 m_TargetToAt;                 // –Ú•W‚©‚ç‹“_‚ğ’²®‚·‚éˆÊ’uƒxƒNƒgƒ‹
-		float m_RotSpeed;						// ‰ñ“]ƒXƒs[ƒh
-		bool m_LRBaseMode;						// ¶‰EƒXƒeƒBƒbƒN•ÏX‚Ìƒ‚[ƒh
-		float m_RadY;                           // Y²‚Ì‰ñ“]Šp“x
-		float m_RadXZ;                          // XZ•½–Ê‚Ì‰ñ“]Šp“x
+		Vec3 GetPos;                            // ã‚«ãƒ¡ãƒ©ã®ç¾åœ¨ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 TargetPos;                         // ã‚«ãƒ¡ãƒ©ã®ç›®æ¨™ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		bool m_Hit;                             // ãƒ’ãƒƒãƒˆåˆ¤å®šãƒ•ãƒ©ã‚°
+		float m_ArmLen;                         // è…•ã®é•·ã•ã‚’ä¿æŒã™ã‚‹å¤‰æ•°
+		float m_ToTargetLerp;                   // ç›®æ¨™ã‚’è¿½ã„ã‹ã‘ã‚‹éš›ã®è£œé–“å€¤
+		bsm::Vec3 m_TargetToAt;                 // ç›®æ¨™ã‹ã‚‰è¦–ç‚¹ã‚’èª¿æ•´ã™ã‚‹ä½ç½®ãƒ™ã‚¯ãƒˆãƒ«
+		float m_RotSpeed;						// å›è»¢ã‚¹ãƒ”ãƒ¼ãƒ‰
+		bool m_LRBaseMode;						// å·¦å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯å¤‰æ›´ã®ãƒ¢ãƒ¼ãƒ‰
+		float m_RadY;                           // Yè»¸ã®å›è»¢è§’åº¦
+		float m_RadXZ;                          // XZå¹³é¢ã®å›è»¢è§’åº¦
 
-		float m_fixedDirY;						// Yƒ{ƒ^ƒ“(CƒL[)‰Ÿ‚µ‚½‚Æ‚«‚Ì–Ú•WŠp“x
-		float m_fixSpeed = 3.0f;				// –Ú•WŠp“x‚ÉŒü‚¯‚Ä‰ñ‚·‘¬“x
-		bool m_isMovingToFixedDir = false;		// –Ú•WŠp“x‚ÉŒü‚¯‚ÄˆÚ“®’†
+		float m_fixedDirY;						// Yãƒœã‚¿ãƒ³(Cã‚­ãƒ¼)æŠ¼ã—ãŸã¨ãã®ç›®æ¨™è§’åº¦
+		float m_fixSpeed = 3.0f;				// ç›®æ¨™è§’åº¦ã«å‘ã‘ã¦å›ã™é€Ÿåº¦
+		bool m_isMovingToFixedDir = false;		// ç›®æ¨™è§’åº¦ã«å‘ã‘ã¦ç§»å‹•ä¸­
 
 	public:
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		CameraCollision(const shared_ptr<Stage>& StagePtr);
-		virtual ~CameraCollision() {}
+		virtual â€¾CameraCollision() {}
 
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		virtual void OnCreate();
 
-		// XVˆ—
+		// æ›´æ–°å‡¦ç†
 		virtual void OnUpdate();
 
-		// Õ“Ëˆ—‚ÌÀs
+		// è¡çªå‡¦ç†ã®å®Ÿè¡Œ
 		virtual void OnCollisionExcute(const CollisionPair& Pair) override;
 
-		// Õ“ËŠJn‚Ìˆ—
+		// è¡çªé–‹å§‹æ™‚ã®å‡¦ç†
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 
-		// Õ“ËI—¹‚Ìˆ—
+		// è¡çªçµ‚äº†æ™‚ã®å‡¦ç†
 		virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 
-		// ˜r‚Ì’·‚³‚ğXV‚·‚é
+		// è…•ã®é•·ã•ã‚’æ›´æ–°ã™ã‚‹
 		void UpdateArmLengh();
 
-		// ƒJƒƒ‰‚ÌŒü‚«‚ğƒ^[ƒQƒbƒg‚É‡‚í‚¹‚é
+		// ã‚«ãƒ¡ãƒ©ã®å‘ãã‚’ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«åˆã‚ã›ã‚‹
 		float FixCameraDirection(shared_ptr<GameObject>& Other, bool Input);
 
-		// ¶‰EƒXƒeƒBƒbƒN•ÏX‚Ìƒ‚[ƒh‚ğæ“¾‚·‚é
+		// å·¦å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯å¤‰æ›´ã®ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—ã™ã‚‹
 		bool GetLRBaseMode() const;
 
-		// ¶‰EƒXƒeƒBƒbƒN•ÏX‚Ìƒ‚[ƒh‚©‚Ç‚¤‚©‚ğ”»’è‚·‚é
+		// å·¦å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯å¤‰æ›´ã®ãƒ¢ãƒ¼ãƒ‰ã‹ã©ã†ã‹ã‚’åˆ¤å®šã™ã‚‹
 		bool IsLRBaseMode() const;
 	};
 
 	class MainCamera : public Camera {
 	public:
-		weak_ptr<GameObject> m_TargetObject;    // –Ú•W‚Æ‚È‚éƒIƒuƒWƒFƒNƒg
-		float m_ToTargetLerp;                   // –Ú•W‚ğ’Ç‚¢‚©‚¯‚éÛ‚Ì•âŠÔ’l
-		bsm::Vec3 m_TargetToAt;                 // –Ú•W‚©‚ç‹“_‚ğ’²®‚·‚éˆÊ’uƒxƒNƒgƒ‹
-		float m_RadY;                           // Y²‚Ì‰ñ“]Šp“x
-		float m_RadXZ;                          // XZ•½–Ê‚Ì‰ñ“]Šp“x
-		float m_CameraUnderRot;					// ƒJƒƒ‰‚ğ‰º‚°‚é‰ºŒÀŠp“x
-		float m_ArmLen;							// ˜r‚Ì’·‚³‚Ìİ’è
-		float m_MaxArm;                         // ˜r‚ÌÅ‘å’·‚³
-		float m_MinArm;                         // ˜r‚ÌÅ¬’·‚³
-		float m_RotSpeed;						// ‰ñ“]ƒXƒs[ƒh
-		float m_ZoomSpeed;						// ƒY[ƒ€ƒXƒs[ƒh
-		bool m_LRBaseMode;						// ¶‰EƒXƒeƒBƒbƒN•ÏX‚Ìƒ‚[ƒh
+		weak_ptr<GameObject> m_TargetObject;    // ç›®æ¨™ã¨ãªã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+		float m_ToTargetLerp;                   // ç›®æ¨™ã‚’è¿½ã„ã‹ã‘ã‚‹éš›ã®è£œé–“å€¤
+		bsm::Vec3 m_TargetToAt;                 // ç›®æ¨™ã‹ã‚‰è¦–ç‚¹ã‚’èª¿æ•´ã™ã‚‹ä½ç½®ãƒ™ã‚¯ãƒˆãƒ«
+		float m_RadY;                           // Yè»¸ã®å›è»¢è§’åº¦
+		float m_RadXZ;                          // XZå¹³é¢ã®å›è»¢è§’åº¦
+		float m_CameraUnderRot;					// ã‚«ãƒ¡ãƒ©ã‚’ä¸‹ã’ã‚‹ä¸‹é™è§’åº¦
+		float m_ArmLen;							// è…•ã®é•·ã•ã®è¨­å®š
+		float m_MaxArm;                         // è…•ã®æœ€å¤§é•·ã•
+		float m_MinArm;                         // è…•ã®æœ€å°é•·ã•
+		float m_RotSpeed;						// å›è»¢ã‚¹ãƒ”ãƒ¼ãƒ‰
+		float m_ZoomSpeed;						// ã‚ºãƒ¼ãƒ ã‚¹ãƒ”ãƒ¼ãƒ‰
+		bool m_LRBaseMode;						// å·¦å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯å¤‰æ›´ã®ãƒ¢ãƒ¼ãƒ‰
 
-		bool m_Hit;                             // ƒqƒbƒg”»’è
-		bool m_Pushbool = false;                // ƒ{ƒ^ƒ“‰Ÿ‰º‚Ìó‘Ô
-		POINT m_beforeCursorPos{ 0, 0 };        // ƒJ[ƒ\ƒ‹‚Ì‘O‰ñˆÊ’u
+		bool m_Hit;                             // ãƒ’ãƒƒãƒˆåˆ¤å®š
+		bool m_Pushbool = false;                // ãƒœã‚¿ãƒ³æŠ¼ä¸‹ã®çŠ¶æ…‹
+		POINT m_beforeCursorPos{ 0, 0 };        // ã‚«ãƒ¼ã‚½ãƒ«ã®å‰å›ä½ç½®
 
-		// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		MainCamera();
 		MainCamera(float ArmLen);
-		virtual ~MainCamera();
+		virtual â€¾MainCamera();
 
-		// ƒJƒƒ‰‚Ì‹“_‚ğİ’è‚·‚éiƒxƒNƒgƒ‹j
+		// ã‚«ãƒ¡ãƒ©ã®è¦–ç‚¹ã‚’è¨­å®šã™ã‚‹ï¼ˆãƒ™ã‚¯ãƒˆãƒ«ï¼‰
 		virtual void SetEye(const bsm::Vec3& Eye) override;
-		// ƒJƒƒ‰‚Ì‹“_‚ğİ’è‚·‚éiÀ•Wj
+		// ã‚«ãƒ¡ãƒ©ã®è¦–ç‚¹ã‚’è¨­å®šã™ã‚‹ï¼ˆåº§æ¨™ï¼‰
 		virtual void SetEye(float x, float y, float z) override;
 
-		// –Ú•WƒIƒuƒWƒFƒNƒg‚ğæ“¾‚·‚é
+		// ç›®æ¨™ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—ã™ã‚‹
 		shared_ptr<GameObject> GetTargetObject() const;
 
-		// –Ú•WƒIƒuƒWƒFƒNƒg‚ğİ’è‚·‚é
+		// ç›®æ¨™ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’è¨­å®šã™ã‚‹
 		void SetTargetObject(const shared_ptr<GameObject>& Obj);
 
-		// •âŠÔ’l‚ğæ“¾‚·‚é
+		// è£œé–“å€¤ã‚’å–å¾—ã™ã‚‹
 		float GetToTargetLerp() const;
 
-		// •âŠÔ’l‚ğİ’è‚·‚é
+		// è£œé–“å€¤ã‚’è¨­å®šã™ã‚‹
 		void SetToTargetLerp(float f);
 
-		// ˜r‚Ì’·‚³‚ğæ“¾‚·‚é
+		// è…•ã®é•·ã•ã‚’å–å¾—ã™ã‚‹
 		float GetArmLengh() const;
 
-		// ˜r‚Ì’·‚³‚ğXV‚·‚é
+		// è…•ã®é•·ã•ã‚’æ›´æ–°ã™ã‚‹
 		void UpdateArmLengh();
 
-		// ˜r‚ÌÅ‘å’·‚³‚ğæ“¾‚·‚é
+		// è…•ã®æœ€å¤§é•·ã•ã‚’å–å¾—ã™ã‚‹
 		float GetMaxArm() const;
 
-		// ˜r‚ÌÅ‘å’·‚³‚ğİ’è‚·‚é
+		// è…•ã®æœ€å¤§é•·ã•ã‚’è¨­å®šã™ã‚‹
 		void SetMaxArm(float f);
 
-		// ˜r‚ÌÅ¬’·‚³‚ğæ“¾‚·‚é
+		// è…•ã®æœ€å°é•·ã•ã‚’å–å¾—ã™ã‚‹
 		float GetMinArm() const;
 
-		// ˜r‚ÌÅ¬’·‚³‚ğİ’è‚·‚é
+		// è…•ã®æœ€å°é•·ã•ã‚’è¨­å®šã™ã‚‹
 		void SetMinArm(float f);
 
-		// ‰ñ“]ƒXƒs[ƒh‚ğæ“¾‚·‚é
+		// å›è»¢ã‚¹ãƒ”ãƒ¼ãƒ‰ã‚’å–å¾—ã™ã‚‹
 		float GetRotSpeed() const;
 
-		// ‰ñ“]ƒXƒs[ƒh‚ğİ’è‚·‚é
+		// å›è»¢ã‚¹ãƒ”ãƒ¼ãƒ‰ã‚’è¨­å®šã™ã‚‹
 		void SetRotSpeed(float f);
 
-		// –Ú•W‚©‚ç‹“_‚ğ’²®‚·‚éˆÊ’uƒxƒNƒgƒ‹‚ğæ“¾‚·‚é
+		// ç›®æ¨™ã‹ã‚‰è¦–ç‚¹ã‚’èª¿æ•´ã™ã‚‹ä½ç½®ãƒ™ã‚¯ãƒˆãƒ«ã‚’å–å¾—ã™ã‚‹
 		bsm::Vec3 GetTargetToAt() const;
 
-		// –Ú•W‚©‚ç‹“_‚ğ’²®‚·‚éˆÊ’uƒxƒNƒgƒ‹‚ğİ’è‚·‚é
+		// ç›®æ¨™ã‹ã‚‰è¦–ç‚¹ã‚’èª¿æ•´ã™ã‚‹ä½ç½®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¨­å®šã™ã‚‹
 		void SetTargetToAt(const bsm::Vec3& v);
 
-		// ¶‰EƒXƒeƒBƒbƒN•ÏX‚Ìƒ‚[ƒh‚ğæ“¾‚·‚é
+		// å·¦å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯å¤‰æ›´ã®ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—ã™ã‚‹
 		bool GetLRBaseMode() const;
 
-		// ¶‰EƒXƒeƒBƒbƒN•ÏX‚Ìƒ‚[ƒh‚©‚Ç‚¤‚©‚ğ”»’è‚·‚é
+		// å·¦å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯å¤‰æ›´ã®ãƒ¢ãƒ¼ãƒ‰ã‹ã©ã†ã‹ã‚’åˆ¤å®šã™ã‚‹
 		bool IsLRBaseMode() const;
 
-		// ’‹“_‚ğİ’è‚·‚éiƒxƒNƒgƒ‹j
+		// æ³¨è¦–ç‚¹ã‚’è¨­å®šã™ã‚‹ï¼ˆãƒ™ã‚¯ãƒˆãƒ«ï¼‰
 		virtual void SetAt(const bsm::Vec3& At) override;
 
-		// ’‹“_‚ğİ’è‚·‚éiÀ•Wj
+		// æ³¨è¦–ç‚¹ã‚’è¨­å®šã™ã‚‹ï¼ˆåº§æ¨™ï¼‰
 		virtual void SetAt(float x, float y, float z) override;
 
-		// XVˆ—
+		// æ›´æ–°å‡¦ç†
 		virtual void OnUpdate() override;
 	};
 
 //--------------------------------------------------------------------------------------
-//	class RayMark : public GameObject; //ƒIƒuƒWƒFƒNƒg‚ÉG‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©
+//	class RayMark : public GameObject; //ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«è§¦ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹
 //--------------------------------------------------------------------------------------
 	class RayCameraMark : public GameObject {
 	private:
@@ -171,7 +171,7 @@ namespace basecross {
 	public:
 		RayCameraMark(const shared_ptr<Stage>& stage);
 		RayCameraMark(const shared_ptr<Stage>& stage, const shared_ptr <Player>& player, const shared_ptr<Camera>& enemy);
-		virtual ~RayCameraMark() {};
+		virtual â€¾RayCameraMark() {};
 
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
@@ -183,39 +183,39 @@ namespace basecross {
 
 
 	class OpeningCameraman : public GameObject {
-		Vec3 m_startPos;                          // ƒJƒƒ‰‚ÌŠJnˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_endPos;                            // ƒJƒƒ‰‚ÌI—¹ˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_atStartPos;                        // ’‹“_‚ÌŠJnˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_atEndPos;                          // ’‹“_‚ÌI—¹ˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_atPos;                             // Œ»İ‚Ì’‹“_ˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_eyePos;                            // Œ»İ‚ÌƒJƒƒ‰ˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		float m_totalTime;                        // ‡ŒvŠÔ‚ğ•Û‚·‚é•Ï”
-		Vec3 m_secondEndPos;                      // “ñŸI—¹ˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_secondAtEndPos;                    // “ñŸ’‹“_I—¹ˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
+		Vec3 m_startPos;                          // ã‚«ãƒ¡ãƒ©ã®é–‹å§‹ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_endPos;                            // ã‚«ãƒ¡ãƒ©ã®çµ‚äº†ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_atStartPos;                        // æ³¨è¦–ç‚¹ã®é–‹å§‹ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_atEndPos;                          // æ³¨è¦–ç‚¹ã®çµ‚äº†ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_atPos;                             // ç¾åœ¨ã®æ³¨è¦–ç‚¹ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_eyePos;                            // ç¾åœ¨ã®ã‚«ãƒ¡ãƒ©ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		float m_totalTime;                        // åˆè¨ˆæ™‚é–“ã‚’ä¿æŒã™ã‚‹å¤‰æ•°
+		Vec3 m_secondEndPos;                      // äºŒæ¬¡çµ‚äº†ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_secondAtEndPos;                    // äºŒæ¬¡æ³¨è¦–ç‚¹çµ‚äº†ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
 
-		Vec3 m_tempStartPos;                      // ˆê“I‚ÈŠJnˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_tempEndPos;                        // ˆê“I‚ÈI—¹ˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_tempAtStartPos;                    // ˆê“I‚È’‹“_ŠJnˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_tempAtEndPos;                      // ˆê“I‚È’‹“_I—¹ˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		Vec3 m_tempAtPos;                         // ˆê“I‚È’‹“_ˆÊ’u‚ğ•Û‚·‚éƒxƒNƒgƒ‹
-		float m_tempTotalTime;                    // ˆê“I‚È‡ŒvŠÔ‚ğ•Û‚·‚é•Ï”
+		Vec3 m_tempStartPos;                      // ä¸€æ™‚çš„ãªé–‹å§‹ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_tempEndPos;                        // ä¸€æ™‚çš„ãªçµ‚äº†ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_tempAtStartPos;                    // ä¸€æ™‚çš„ãªæ³¨è¦–ç‚¹é–‹å§‹ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_tempAtEndPos;                      // ä¸€æ™‚çš„ãªæ³¨è¦–ç‚¹çµ‚äº†ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_tempAtPos;                         // ä¸€æ™‚çš„ãªæ³¨è¦–ç‚¹ä½ç½®ã‚’ä¿æŒã™ã‚‹ãƒ™ã‚¯ãƒˆãƒ«
+		float m_tempTotalTime;                    // ä¸€æ™‚çš„ãªåˆè¨ˆæ™‚é–“ã‚’ä¿æŒã™ã‚‹å¤‰æ•°
 
-		// ƒXƒe[ƒgƒ}ƒVƒ“
+		// ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³
 		unique_ptr< StateMachine<OpeningCameraman> >  m_StateMachine;
 	public:
-		// \’z‚Æ”jŠü
+		// æ§‹ç¯‰ã¨ç ´æ£„
 		OpeningCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
 			const Vec3& AtStartPos, const Vec3& AtEndPos, const Vec3& AtPos, float& TotalTime,
 			const Vec3& secondEndPos, const Vec3& secondAtEndPos);
-		virtual ~OpeningCameraman();
+		virtual â€¾OpeningCameraman();
 
-		// ‰Šú‰»
+		// åˆæœŸåŒ–
 		virtual void OnCreate() override;
 
-		// ‘€ì
+		// æ“ä½œ
 		virtual void OnUpdate() override;
 
-		// ƒAƒNƒZƒT
+		// ã‚¢ã‚¯ã‚»ã‚µ
 		const unique_ptr<StateMachine<OpeningCameraman>>& GetStateMachine() {
 			return m_StateMachine;
 		}
@@ -228,16 +228,14 @@ namespace basecross {
 			return m_eyePos;
 		}
 
-		// ƒS[ƒ‹ƒGƒ“ƒ^[ƒrƒwƒCƒrƒA
 		void ToGoalEnterBehavior();
 
-		// ƒXƒ^[ƒgƒGƒ“ƒ^[ƒrƒwƒCƒrƒA
 		void ToStartEnterBehavior();
 
-		// s“®‚ğÀs‚·‚é
+		// è¡Œå‹•ã‚’å®Ÿè¡Œã™ã‚‹
 		bool ExcuteBehavior(float totaltime);
 
-		// I—¹ó‘ÔƒGƒ“ƒ^[ƒrƒwƒCƒrƒA
+		// çµ‚äº†çŠ¶æ…‹ã‚¨ãƒ³ã‚¿ãƒ¼ãƒ“ãƒ˜ã‚¤ãƒ“ã‚¢
 		void EndStateEnterBehavior();
 	};
 
@@ -284,27 +282,27 @@ namespace basecross {
 	public:
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		@brief	ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		*/
 		//--------------------------------------------------------------------------------------
 		OpeningCamera();
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	ƒfƒXƒgƒ‰ƒNƒ^
+		@brief	ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual ~OpeningCamera();
+		virtual â€¾OpeningCamera();
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief XVˆ—
-		@return	‚È‚µ
+		@brief æ›´æ–°å‡¦ç†
+		@return	ãªã—
 		*/
 		//--------------------------------------------------------------------------------------
 		virtual void OnCreate()override;
 		virtual void OnUpdate()override;
 	};
 
-	//ƒXƒe[ƒWƒNƒŠƒA‚ÌƒJƒƒ‰
+	//ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒªã‚¢æ™‚ã®ã‚«ãƒ¡ãƒ©
 	class EndingCameraman : public GameObject {
 		Vec3 m_startPos;
 		Vec3 m_endPos;
@@ -314,19 +312,19 @@ namespace basecross {
 		Vec3 m_atPos;
 		float m_totalTime;
 
-		//ƒXƒe[ƒgƒ}ƒV[ƒ“
+		//ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ¼ãƒ³
 		unique_ptr< StateMachine<EndingCameraman> >  m_StateMachine;
 	public:
-		//\’z‚Æ”jŠü
+		//æ§‹ç¯‰ã¨ç ´æ£„
 		EndingCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
 			const Vec3& AtStartPos, const Vec3& AtEndPos, const float& TotalTime);
-		virtual ~EndingCameraman();
-		//‰Šú‰»
+		virtual â€¾EndingCameraman();
+		//åˆæœŸåŒ–
 		virtual void OnCreate() override;
-		//‘€ì
+		//æ“ä½œ
 		virtual void OnUpdate() override;
 
-		//ƒAƒNƒZƒT
+		//ã‚¢ã‚¯ã‚»ã‚µ
 		const unique_ptr<StateMachine<EndingCameraman>>& GetStateMachine() {
 			return m_StateMachine;
 		}
@@ -363,20 +361,20 @@ namespace basecross {
 	public:
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		@brief	ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		*/
 		//--------------------------------------------------------------------------------------
 		EndingCamera();
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	ƒfƒXƒgƒ‰ƒNƒ^
+		@brief	ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual ~EndingCamera();
+		virtual â€¾EndingCamera();
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief XVˆ—
-		@return	‚È‚µ
+		@brief æ›´æ–°å‡¦ç†
+		@return	ãªã—
 		*/
 		//--------------------------------------------------------------------------------------
 		virtual void OnUpdate()override;

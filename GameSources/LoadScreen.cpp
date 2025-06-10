@@ -1,7 +1,7 @@
 /*!
 @file LoadScreen.cpp
-@brief ƒLƒƒƒ‰ƒNƒ^[‚È‚ÇÀ‘Ì
-@author ’Øˆä—D–í
+@brief ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãªã©å®Ÿä½“
+@author åªäº•å„ªå¼¥
 */
 
 #include "stdafx.h"
@@ -11,19 +11,19 @@ namespace basecross {
 
 	//====================================================================
 	// class LoadScreen
-	// ƒ[ƒh‰æ–Ê‚à‚Ç‚«
+	// ãƒ­ãƒ¼ãƒ‰ç”»é¢ã‚‚ã©ã
 	//====================================================================
 
 	void LoadScreen::CreateViewLight() {
-		//ƒrƒ…[‚ÌƒJƒƒ‰‚Ìİ’è
+		//ãƒ“ãƒ¥ãƒ¼ã®ã‚«ãƒ¡ãƒ©ã®è¨­å®š
 		auto cameraView = ObjectFactory::Create<SingleView>(GetThis<Stage>());
 		auto ptrMyCamera = ObjectFactory::Create<Camera>();
 		cameraView->SetCamera(ptrMyCamera);
 		ptrMyCamera->SetEye(Vec3(0.0f, 5.0f, -5.0f));
 		ptrMyCamera->SetAt(Vec3(0.0f, 0.0f, 0.0f));
-		//ƒ}ƒ‹ƒ`ƒ‰ƒCƒg‚Ìì¬
+		//ãƒãƒ«ãƒãƒ©ã‚¤ãƒˆã®ä½œæˆ
 		auto ptrMultiLight = CreateLight<MultiLight>();
-		//ƒfƒtƒHƒ‹ƒg‚Ìƒ‰ƒCƒeƒBƒ“ƒO‚ğw’è
+		//ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°ã‚’æŒ‡å®š
 		ptrMultiLight->SetDefaultLighting();
 		SetView(cameraView);
 	}
@@ -83,7 +83,7 @@ namespace basecross {
 			}
 		}
 		else {
-			PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
+			PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToGameStage");
 		}
 		if (m_progCnt < m_progress.size()) {
 			float load = Lerp::CalculateLerp(m_progress[m_progCnt - 1], m_progress[m_progCnt], 0.0f, loadLength, m_time, Lerp::Linear);
@@ -94,7 +94,7 @@ namespace basecross {
 
 	//====================================================================
 	// class SpriteLoadBG
-	// ƒ[ƒfƒBƒ“ƒO‰æ–Ê”wŒi
+	// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ç”»é¢èƒŒæ™¯
 	//====================================================================
 
 	void SpriteLoadBG::OnCreate() {
@@ -133,7 +133,7 @@ namespace basecross {
 
 	//====================================================================
 	// class SpriteLoadCircle
-	// ƒ[ƒfƒBƒ“ƒO‰æ–Ê‚Ì‚®‚é‚®‚é‚·‚é‚â‚Â
+	// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ç”»é¢ã®ãã‚‹ãã‚‹ã™ã‚‹ã‚„ã¤
 	//====================================================================
 
 	void SpriteLoadCircle::OnCreate() {
@@ -176,7 +176,7 @@ namespace basecross {
 
 	//====================================================================
 	// class SpriteLoad
-	// ƒ[ƒfƒBƒ“ƒO‚Ì•¶š
+	// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã®æ–‡å­—
 	//====================================================================
 
 	void SpriteLoad::OnCreate() {
@@ -238,7 +238,7 @@ namespace basecross {
 
 	//====================================================================
 	// class SpriteLoadFade
-	// ƒ[ƒfƒBƒ“ƒO‰æ–Ê‚Ì‰æ–Ê‘JˆÚ
+	// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ç”»é¢ã®ç”»é¢é·ç§»
 	//====================================================================
 
 	void SpriteLoadFade::OnCreate() {

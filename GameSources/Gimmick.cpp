@@ -1,7 +1,7 @@
 /*!
 @file Gimmick.cpp
-@brief Gimmick‚È‚Ç
-’S“–FŠ™“c
+@brief Gimmickãªã©
+æ‹…å½“ï¼šéŒç”°
 */
 
 #include "stdafx.h"
@@ -14,7 +14,7 @@ namespace basecross {
 		GameObject(StagePtr)
 	{
 	}
-	GimmickObject::~GimmickObject(){}
+	GimmickObject::â€¾GimmickObject(){}
 
 	void GimmickObject::OnCreate()
 	{
@@ -50,7 +50,7 @@ namespace basecross {
 		PtrDraw->SetOriginalMeshUse(true);
 		auto Shadow = AddComponent<Shadowmap>();
 		PtrDraw->SetTextureResource(m_Texname);
-		//ƒ^ƒCƒŠƒ“ƒOİ’è
+		//ã‚¿ã‚¤ãƒªãƒ³ã‚°è¨­å®š
 		PtrDraw->SetSamplerState(SamplerState::PointWrap);
 
 	}
@@ -72,8 +72,8 @@ namespace basecross {
 		m_Texname(Texname)
 	{
 	}
-	TilingFixedBox::~TilingFixedBox() {}
-	//‰Šú‰»
+	TilingFixedBox::â€¾TilingFixedBox() {}
+	//åˆæœŸåŒ–
 	void TilingFixedBox::OnCreate() {
 		auto Trans = AddComponent<Transform>();
 		Trans->SetPosition(m_Position);
@@ -107,8 +107,8 @@ namespace basecross {
 		m_Texname(Texname)
 	{	}
 
-	GimmickButton::~GimmickButton() {}
-	//‰Šú‰»
+	GimmickButton::â€¾GimmickButton() {}
+	//åˆæœŸåŒ–
 	void GimmickButton::OnCreate() {
 		m_open = false;
 		auto Trans = AddComponent<Transform>();
@@ -139,15 +139,9 @@ namespace basecross {
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		group->IntoGroup(GetThis<GameObject>());
 		auto Shadowm = AddComponent<Shadowmap>();
-		//ƒGƒtƒFƒNƒg‚Ì‰Šú‰»
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring TestEffectStr = DataDir + L"Effects\\Switch.efk";
-		wstring TestEffectStrLoop = DataDir + L"Effects\\SwitchLoop.efk";
+		//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®åˆæœŸåŒ–
 		auto stageMane = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
-		auto ShEfkInterface = stageMane->GetEfkInterface();
-		m_EfkEffect = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStr);
-		m_EfkEffectLoop = ObjectFactory::Create<EfkEffect>(ShEfkInterface, TestEffectStrLoop);
+		m_Effect = stageMane->GetEfkInterface();
 	}
 	
 	void GimmickButton::OnUpdate()
@@ -175,30 +169,28 @@ namespace basecross {
 		auto pos = GetComponent<Transform>()->GetPosition();
 		auto stageMane = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		auto ShEfkInterface = stageMane->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffect, pos, 0);
-		m_EfkPlay->SetScale(Vec3(2, 2, 2));
+		m_Effect->PlayEffect(m_Handle, L"Switch", pos, 1);
+		m_Effect->SetScale(m_Handle, Vec3(2, 2, 2));
 		if (m_Texname == L"BLUCKSWITCH")
 		{
-			m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
+			m_Effect->SetAllColor(m_Handle, Col4(0.5f, 0.5f, 0.5f, 1.0f));
 		}
 		else if (m_Texname == L"BLUESWITCH")
 		{
-			m_EfkPlay->SetAllColor(Col4(0.0f, 1.0f, 1.0f, 0.5f));
+			m_Effect->SetAllColor(m_Handle, Col4(0.0f, 1.0f, 1.0f, 0.5f));
 		}
 		else if (m_Texname == L"REDSWITCH")
 		{
-			m_EfkPlay->SetAllColor(Col4(1.0f, 0.0f, 0.25f, 0.5f));
+			m_Effect->SetAllColor(m_Handle, Col4(1.0f, 0.0f, 0.25f, 0.5f));
 		}
 	}
 
 	void GimmickButton::EfectLoopPlay()
 	{
 		auto pos = GetComponent<Transform>()->GetPosition();
-		auto stageMane = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
-		auto ShEfkInterface = stageMane->GetEfkInterface();
-		m_EfkPlay = ObjectFactory::Create<EfkPlay>(m_EfkEffectLoop, pos, 0);
-		m_EfkPlay->SetScale(Vec3(2, 2, 2));
-		m_EfkPlay->SetAllColor(Col4(0.5f, 0.5f, 0.5f, 1.0f));
+		m_Effect->PlayEffect(m_EfkEffectLoop, L"PlayerLand", pos, 0);
+		m_Effect->SetScale(m_EfkEffectLoop, Vec3(2, 2, 2));
+		m_Effect->SetAllColor(m_EfkEffectLoop, Col4(0.5f, 0.5f, 0.5f, 1.0f));
 	}
 
 	bool GimmickButton::GetButton()
@@ -237,9 +229,9 @@ namespace basecross {
 		m_Texname(Texname)
 	{
 	}
-	GimmickDoor::~GimmickDoor() {}
+	GimmickDoor::â€¾GimmickDoor() {}
 
-	//‰Šú‰»
+	//åˆæœŸåŒ–
 	void GimmickDoor::OnCreate() {
 		m_open = false;
 		m_open2 = false;
@@ -264,88 +256,88 @@ namespace basecross {
 	}
 	void GimmickDoor::OpenDoor()
 	{
-		// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€ƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾
+		// ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—
 		auto ptrTransform = GetComponent<Transform>();
-		Vec3 pos = ptrTransform->GetPosition(); // Œ»İ‚ÌˆÊ’u‚ğæ“¾
+		Vec3 pos = ptrTransform->GetPosition(); // ç¾åœ¨ã®ä½ç½®ã‚’å–å¾—
 
-		// "Switch" ƒOƒ‹[ƒv‚ÌƒIƒuƒWƒFƒNƒg‚ğæ“¾
+		// "Switch" ã‚°ãƒ«ãƒ¼ãƒ—ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		auto& vec = group->GetGroupVector();
 
-		// ƒOƒ‹[ƒv“à‚ÌƒXƒCƒbƒ`‚ğ’Tõ
+		// ã‚°ãƒ«ãƒ¼ãƒ—å†…ã®ã‚¹ã‚¤ãƒƒãƒã‚’æ¢ç´¢
 		for (auto& v : vec) {
 			auto shObj = v.lock();
 			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
 			auto Switch = Switchs->GetSwitch();
-			float refugePos = 0; // ˆÚ“®‚ÌŠî€ˆÊ’u
+			float refugePos = 0; // ç§»å‹•ã®åŸºæº–ä½ç½®
 
-			// ƒ{ƒ^ƒ“‚Ì¯•Ê”Ô†‚ªˆê’v‚·‚éê‡
+			// ãƒœã‚¿ãƒ³ã®è­˜åˆ¥ç•ªå·ãŒä¸€è‡´ã™ã‚‹å ´åˆ
 			if (Switch == m_OpenSwitch) {
-				m_open = Switchs->GetButton(); // ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é‚©‚ğæ“¾
+				m_open = Switchs->GetButton(); // ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‹ã‚’å–å¾—
 
-				if (m_open) { // ƒhƒA‚ğŠJ‚¯‚éˆ—
-					if (m_number == 1) { // •K—vƒ{ƒ^ƒ“‚Ì”‚ª 1 ‚Ìê‡
+				if (m_open) { // ãƒ‰ã‚¢ã‚’é–‹ã‘ã‚‹å‡¦ç†
+					if (m_number == 1) { // å¿…è¦ãƒœã‚¿ãƒ³ã®æ•°ãŒ 1 ã®å ´åˆ
 						State = 1;
 						for (int i = 0; i < 1; i++) {
-							if (!m_flag) { // ƒTƒEƒ“ƒhÄ¶ƒtƒ‰ƒOŠm”F
-								PlaySE(L"DoorSE", 0, 0.5f); // ƒTƒEƒ“ƒh‚ğÄ¶
+							if (!m_flag) { // ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿãƒ•ãƒ©ã‚°ç¢ºèª
+								PlaySE(L"DoorSE", 0, 0.5f); // ã‚µã‚¦ãƒ³ãƒ‰ã‚’å†ç”Ÿ
 								m_flag = true;
 							}
 
-							// ƒhƒA‚ÌˆÚ“®•ûŒü‚ğŒˆ’è
-							if (m_Scale.x < m_Scale.z) { // Z²•ûŒü‚ÌˆÚ“®
+							// ãƒ‰ã‚¢ã®ç§»å‹•æ–¹å‘ã‚’æ±ºå®š
+							if (m_Scale.x < m_Scale.z) { // Zè»¸æ–¹å‘ã®ç§»å‹•
 								refugePos = pos.z;
 								if (refugePos < 20.0f) {
 									ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
 								}
 							}
-							else { // X²•ûŒü‚ÌˆÚ“®
+							else { // Xè»¸æ–¹å‘ã®ç§»å‹•
 								ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
 							}
 						}
 					}
-					else if (m_number == 2) { // •K—vƒ{ƒ^ƒ“‚Ì”‚ª 2 ‚Ìê‡
+					else if (m_number == 2) { // å¿…è¦ãƒœã‚¿ãƒ³ã®æ•°ãŒ 2 ã®å ´åˆ
 						for (auto& v2 : vec) {
 							auto shObj2 = v2.lock();
 							auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
 							auto Switch2 = Switchs2->GetSwitch();
 
-							// 2‚Â‚ÌƒXƒCƒbƒ`‚Ì¯•Ê”Ô†‚Ìˆê’vŠm”F
+							// 2ã¤ã®ã‚¹ã‚¤ãƒƒãƒã®è­˜åˆ¥ç•ªå·ã®ä¸€è‡´ç¢ºèª
 							if (Switch2 == m_OpenSwitch && Switchs2 != Switchs) {
-								m_open2 = Switchs2->GetButton(); // •ÊƒXƒCƒbƒ`‚Ìó‘Ô‚ğæ“¾
+								m_open2 = Switchs2->GetButton(); // åˆ¥ã‚¹ã‚¤ãƒƒãƒã®çŠ¶æ…‹ã‚’å–å¾—
 
-								if (m_open2) { // —¼ƒXƒCƒbƒ`‚ªƒIƒ“‚Ì‚Æ‚«
+								if (m_open2) { // ä¸¡ã‚¹ã‚¤ãƒƒãƒãŒã‚ªãƒ³ã®ã¨ã
 									State = 2;
 									for (int i = 0; i < 1; i++) {
-										if (!m_flag) { // ƒTƒEƒ“ƒhÄ¶ƒtƒ‰ƒOŠm”F
-											PlaySE(L"DoorSE", 0, 0.5f); // ƒTƒEƒ“ƒh‚ğÄ¶
+										if (!m_flag) { // ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿãƒ•ãƒ©ã‚°ç¢ºèª
+											PlaySE(L"DoorSE", 0, 0.5f); // ã‚µã‚¦ãƒ³ãƒ‰ã‚’å†ç”Ÿ
 											m_flag = true;
 										}
 
-										// ƒhƒA‚ÌˆÚ“®•ûŒü‚ğŒˆ’è
-										if (m_Scale.x < m_Scale.z) { // Z²•ûŒü‚ÌˆÚ“®
+										// ãƒ‰ã‚¢ã®ç§»å‹•æ–¹å‘ã‚’æ±ºå®š
+										if (m_Scale.x < m_Scale.z) { // Zè»¸æ–¹å‘ã®ç§»å‹•
 											refugePos = pos.z;
 											if (refugePos < 20.0f) {
 												ptrTransform->SetPosition(Vec3(pos.x, pos.y, pos.z += 0.05f));
 											}
 										}
-										else { // X²•ûŒü‚ÌˆÚ“®
+										else { // Xè»¸æ–¹å‘ã®ç§»å‹•
 											ptrTransform->SetPosition(Vec3(pos.x += 0.05f, pos.y, pos.z));
 										}
 									}
 								}
-								else { // •ÊƒXƒCƒbƒ`‚ªƒIƒt‚Ìê‡
-									ptrTransform->SetPosition(m_Position); // ‰ŠúˆÊ’u‚É–ß‚·
-									m_flag = false; // ƒTƒEƒ“ƒhÄ¶ƒtƒ‰ƒO‚ğƒŠƒZƒbƒg
+								else { // åˆ¥ã‚¹ã‚¤ãƒƒãƒãŒã‚ªãƒ•ã®å ´åˆ
+									ptrTransform->SetPosition(m_Position); // åˆæœŸä½ç½®ã«æˆ»ã™
+									m_flag = false; // ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿãƒ•ãƒ©ã‚°ã‚’ãƒªã‚»ãƒƒãƒˆ
 									State = 1;
 								}
 							}
 						}
 					}
 				}
-				else { // ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢ê‡
-					ptrTransform->SetPosition(m_Position); // ‰ŠúˆÊ’u‚É–ß‚·
-					m_flag = false; // ƒTƒEƒ“ƒhÄ¶ƒtƒ‰ƒO‚ğƒŠƒZƒbƒg
+				else { // ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚Œã¦ã„ãªã„å ´åˆ
+					ptrTransform->SetPosition(m_Position); // åˆæœŸä½ç½®ã«æˆ»ã™
+					m_flag = false; // ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿãƒ•ãƒ©ã‚°ã‚’ãƒªã‚»ãƒƒãƒˆ
 					State = 0;
 				}
 			}
@@ -385,9 +377,9 @@ namespace basecross {
 		m_Max(Max)
 	{
 	}
-	GimmickUp::~GimmickUp() {}
+	GimmickUp::â€¾GimmickUp() {}
 
-	//‰Šú‰»
+	//åˆæœŸåŒ–
 	void GimmickUp::OnCreate() {
 		m_open = false;
 		m_open2 = false;
@@ -418,73 +410,73 @@ namespace basecross {
 
 	void GimmickUp::UpDown()
 	{
-		// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€ƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾‚µ‚ÄŒ»İ‚ÌˆÊ’u‚ğæ“¾
+		// ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—ã—ã¦ç¾åœ¨ã®ä½ç½®ã‚’å–å¾—
 		auto ptrTransform = GetComponent<Transform>();
 		Vec3 pos = ptrTransform->GetPosition();
 
-		// "Switch" ƒOƒ‹[ƒv‚ÉŠ‘®‚·‚éƒIƒuƒWƒFƒNƒg‚ğæ“¾
+		// "Switch" ã‚°ãƒ«ãƒ¼ãƒ—ã«æ‰€å±ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—
 		auto group = GetStage()->GetSharedObjectGroup(L"Switch");
 		auto& vec = group->GetGroupVector();
 
-		// ƒOƒ‹[ƒv“à‚ÌƒXƒCƒbƒ`‚ğ’Tõ
+		// ã‚°ãƒ«ãƒ¼ãƒ—å†…ã®ã‚¹ã‚¤ãƒƒãƒã‚’æ¢ç´¢
 		for (auto& v : vec) {
-			auto shObj = v.lock(); // ãQÆ‚©‚ç‹¤—Lƒ|ƒCƒ“ƒ^‚É•ÏŠ·
-			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj); // ƒXƒCƒbƒ`ƒIƒuƒWƒFƒNƒg‚ÉƒLƒƒƒXƒg
-			auto Switch = Switchs->GetSwitch(); // ƒXƒCƒbƒ`¯•Ê”Ô†‚ğæ“¾
+			auto shObj = v.lock(); // å¼±å‚ç…§ã‹ã‚‰å…±æœ‰ãƒã‚¤ãƒ³ã‚¿ã«å¤‰æ›
+			auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj); // ã‚¹ã‚¤ãƒƒãƒã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã‚­ãƒ£ã‚¹ãƒˆ
+			auto Switch = Switchs->GetSwitch(); // ã‚¹ã‚¤ãƒƒãƒè­˜åˆ¥ç•ªå·ã‚’å–å¾—
 
-			// ƒXƒCƒbƒ`‚Ì¯•Ê”Ô†‚ªˆê’v‚·‚éê‡
+			// ã‚¹ã‚¤ãƒƒãƒã®è­˜åˆ¥ç•ªå·ãŒä¸€è‡´ã™ã‚‹å ´åˆ
 			if (Switch == m_OpenSwitch) {
-				m_open = Switchs->GetButton(); // ƒXƒCƒbƒ`‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é‚©æ“¾
+				m_open = Switchs->GetButton(); // ã‚¹ã‚¤ãƒƒãƒãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‹å–å¾—
 
-				if (m_open) { // ƒXƒCƒbƒ`‚ªƒIƒ“‚Ìê‡
-					if (m_number == 1) { // ƒMƒ~ƒbƒN”Ô†‚ª 1 ‚Ìê‡
-						// ã‰º“®ì‚Ìˆ—
+				if (m_open) { // ã‚¹ã‚¤ãƒƒãƒãŒã‚ªãƒ³ã®å ´åˆ
+					if (m_number == 1) { // ã‚®ãƒŸãƒƒã‚¯ç•ªå·ãŒ 1 ã®å ´åˆ
+						// ä¸Šä¸‹å‹•ä½œã®å‡¦ç†
 						switch (ido) {
-						case 0: // ã¸’†
+						case 0: // ä¸Šæ˜‡ä¸­
 							ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
-							if (pos.y > m_Max) ido = 1; // Å‘å‚‚³‚É’B‚µ‚½‚ç~‰º‚ÉØ‚è‘Ö‚¦
+							if (pos.y > m_Max) ido = 1; // æœ€å¤§é«˜ã•ã«é”ã—ãŸã‚‰é™ä¸‹ã«åˆ‡ã‚Šæ›¿ãˆ
 							break;
-						case 1: // ~‰º’†
+						case 1: // é™ä¸‹ä¸­
 							ptrTransform->SetPosition(Vec3(pos.x, pos.y -= 0.05f, pos.z));
-							if (pos.y < 0) ido = 0; // Å’á‚‚³‚É–ß‚Á‚½‚çã¸‚ÉØ‚è‘Ö‚¦
+							if (pos.y < 0) ido = 0; // æœ€ä½é«˜ã•ã«æˆ»ã£ãŸã‚‰ä¸Šæ˜‡ã«åˆ‡ã‚Šæ›¿ãˆ
 							break;
 						}
 					}
-					else if (m_number == 2) { // ƒMƒ~ƒbƒN”Ô†‚ª 2 ‚Ìê‡
-						// •Ê‚ÌƒXƒCƒbƒ`‚ğ’Tõ
+					else if (m_number == 2) { // ã‚®ãƒŸãƒƒã‚¯ç•ªå·ãŒ 2 ã®å ´åˆ
+						// åˆ¥ã®ã‚¹ã‚¤ãƒƒãƒã‚’æ¢ç´¢
 						for (auto& v2 : vec) {
 							auto shObj2 = v2.lock();
 							auto Switchs2 = dynamic_pointer_cast<GimmickButton>(shObj2);
 							auto Switch2 = Switchs2->GetSwitch();
 
-							// ƒXƒCƒbƒ`‚ªˆê’v‚µAŒ»İ‚ÌƒXƒCƒbƒ`‚ÆˆÙ‚È‚éê‡
+							// ã‚¹ã‚¤ãƒƒãƒãŒä¸€è‡´ã—ã€ç¾åœ¨ã®ã‚¹ã‚¤ãƒƒãƒã¨ç•°ãªã‚‹å ´åˆ
 							if (Switch2 == m_OpenSwitch && Switchs2 != Switchs) {
-								m_open2 = Switchs2->GetButton(); // •Ê‚ÌƒXƒCƒbƒ`‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é‚©æ“¾
+								m_open2 = Switchs2->GetButton(); // åˆ¥ã®ã‚¹ã‚¤ãƒƒãƒãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‹å–å¾—
 
-								if (m_open2) { // —¼ƒXƒCƒbƒ`‚ªƒIƒ“‚Ìê‡
-									// ã‰º“®ì‚Ìˆ—
+								if (m_open2) { // ä¸¡ã‚¹ã‚¤ãƒƒãƒãŒã‚ªãƒ³ã®å ´åˆ
+									// ä¸Šä¸‹å‹•ä½œã®å‡¦ç†
 									switch (ido) {
-									case 0: // ã¸’†
+									case 0: // ä¸Šæ˜‡ä¸­
 										ptrTransform->SetPosition(Vec3(pos.x, pos.y += 0.05f, pos.z));
-										if (pos.y > 10.0f) ido = 1; // Å‘å‚‚³‚É’B‚µ‚½‚ç~‰º‚ÉØ‚è‘Ö‚¦
+										if (pos.y > 10.0f) ido = 1; // æœ€å¤§é«˜ã•ã«é”ã—ãŸã‚‰é™ä¸‹ã«åˆ‡ã‚Šæ›¿ãˆ
 										break;
-									case 1: // ~‰º’†
+									case 1: // é™ä¸‹ä¸­
 										ptrTransform->SetPosition(Vec3(pos.x, pos.y -= 0.05f, pos.z));
-										if (pos.y < 0) ido = 0; // Å’á‚‚³‚É–ß‚Á‚½‚çã¸‚ÉØ‚è‘Ö‚¦
+										if (pos.y < 0) ido = 0; // æœ€ä½é«˜ã•ã«æˆ»ã£ãŸã‚‰ä¸Šæ˜‡ã«åˆ‡ã‚Šæ›¿ãˆ
 										break;
 									}
 								}
-								else { // ƒXƒCƒbƒ`‚ªƒIƒt‚Ìê‡
-									ptrTransform->SetPosition(m_Position); // ˆÊ’u‚ğ‰Šúó‘Ô‚É–ß‚·
-									m_flag = false; // ƒtƒ‰ƒO‚ğƒŠƒZƒbƒg
+								else { // ã‚¹ã‚¤ãƒƒãƒãŒã‚ªãƒ•ã®å ´åˆ
+									ptrTransform->SetPosition(m_Position); // ä½ç½®ã‚’åˆæœŸçŠ¶æ…‹ã«æˆ»ã™
+									m_flag = false; // ãƒ•ãƒ©ã‚°ã‚’ãƒªã‚»ãƒƒãƒˆ
 								}
 							}
 						}
 					}
 				}
-				else { // ƒXƒCƒbƒ`‚ªƒIƒt‚Ìê‡
-					ptrTransform->SetPosition(m_Position); // ˆÊ’u‚ğ‰Šúó‘Ô‚É–ß‚·
-					m_flag = false; // ƒtƒ‰ƒO‚ğƒŠƒZƒbƒg
+				else { // ã‚¹ã‚¤ãƒƒãƒãŒã‚ªãƒ•ã®å ´åˆ
+					ptrTransform->SetPosition(m_Position); // ä½ç½®ã‚’åˆæœŸçŠ¶æ…‹ã«æˆ»ã™
+					m_flag = false; // ãƒ•ãƒ©ã‚°ã‚’ãƒªã‚»ãƒƒãƒˆ
 				}
 			}
 		}
@@ -503,7 +495,7 @@ namespace basecross {
 		m_Texname(Texname)
 
 	{}
-	Elevator::~Elevator() {}
+	Elevator::â€¾Elevator() {}
 
 	void Elevator::OnCreate()
 	{
@@ -539,7 +531,7 @@ namespace basecross {
 		if (m_goaltrue)
 		{
 			m_animTime += _delta;
-			// ƒvƒŒƒCƒ„[‚ªƒGƒŒƒx[ƒ^‚É“ü‚Á‚½‚ç•Â‚¶‚é
+			// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã‚¨ãƒ¬ãƒ™ãƒ¼ã‚¿ã«å…¥ã£ãŸã‚‰é–‰ã˜ã‚‹
 			if (m_animTime >= 3.5f) {
 				SetAnim(L"Close");
 			}
@@ -552,7 +544,7 @@ namespace basecross {
 		auto ptrDraw = GetComponent<PNTBoneModelDraw>();
 		auto anim_fps = 30.0f;
 
-		//ˆÚ“®ŠÖ˜A
+		//ç§»å‹•é–¢é€£
 		ptrDraw->AddAnimation(L"Open", 0, 30, false, anim_fps);
 		ptrDraw->AddAnimation(L"Close", 60, 90, false, anim_fps);
 	}
@@ -589,14 +581,14 @@ namespace basecross {
 		}
 
 		float helfSize = 1.0f;
-		//’¸“_”z—ñ(c‰¡5ŒÂ‚¸‚Â•\¦)
+		//é ‚ç‚¹é…åˆ—(ç¸¦æ¨ª5å€‹ãšã¤è¡¨ç¤º)
 		m_vertices = {
 			{Vec3(-m_UV.x * 0.5f, m_UV.y * 0.5f,-m_UV.z * 0.5f), bsm::Vec3(1.0f, 1.0f, 1.0f),Vec2(0.0f,0.0f)},
 			{Vec3(m_UV.x * 0.5f, m_UV.y * 0.5f,m_UV.z * 0.5f), bsm::Vec3(1.0f, 1.0f, 1.0f),Vec2(1.0f,0.0f)},
 			{Vec3(-m_UV.x * 0.5f,-m_UV.y * 0.5f,-m_UV.z * 0.5f), bsm::Vec3(1.0f, 1.0f, 1.0f),Vec2(0.0f,1.0f)},
 			{Vec3(m_UV.x * 0.5f,-m_UV.y * 0.5f,m_UV.z* 0.5f), bsm::Vec3(1.0f, 1.0f, 1.0f),Vec2(1.0f,1.0f)}
 		};
-		//ƒCƒ“ƒfƒbƒNƒX”z—ñ
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹é…åˆ—
 	    m_indices = { 0, 1, 2, 1, 3, 2 };
 		SetAlphaActive(true);
 		auto ptrTrans = GetComponent<Transform>();
@@ -605,7 +597,7 @@ namespace basecross {
 		ptrTrans->SetPosition(m_Position);
 		m_squareMesh = MeshResource::CreateMeshResource<VertexPositionColorTexture>(m_vertices, m_indices, true);
 
-		//’¸“_‚ÆƒCƒ“ƒfƒbƒNƒX‚ğw’è‚µ‚ÄƒXƒvƒ‰ƒCƒgì¬
+		//é ‚ç‚¹ã¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æŒ‡å®šã—ã¦ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä½œæˆ
 		auto ptrDraw = AddComponent<PCTStaticDraw>();
 		ptrDraw->SetMeshResource(m_squareMesh);
 		ptrDraw->SetOriginalMeshResource(m_squareMesh);
