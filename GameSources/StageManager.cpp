@@ -471,6 +471,7 @@ namespace basecross {
 			// CSVパスを取得
 			auto csvPath = path + L"CSV/";
 			m_StageName = scene->GetSelectedMap();
+
 			//CSVパスを取得
 			if (m_StageName != L"")
 			{
@@ -521,6 +522,11 @@ namespace basecross {
 		}
 	}
 
+	shared_ptr<EffectManeger> StageGenerator::GetEfkInterface()
+	{
+		return GetTypeStage<GameStage>()->GetEfkInterface();
+	}
+
 	void StageGenerator::CreateSprite()
 	{
 
@@ -562,27 +568,6 @@ namespace basecross {
 
 		ToOpeningCamera();
 	}
-
-	void StageGenerator::CreateEffect()
-	{
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring EffectPath = DataDir + L"Effects\\";
-
-		m_EfkInterface = GetStage()->AddGameObject<EffectManeger>();
-		m_EfkInterface->RegisterResource(L"Switch", EffectPath + L"Switch.efk");
-		m_EfkInterface->RegisterResource(L"SwitchLoop", EffectPath + L"SwitchLoop.efk");
-		m_EfkInterface->RegisterResource(L"playerproj", EffectPath + L"playerproj.efk");
-		m_EfkInterface->RegisterResource(L"playerprojend", EffectPath + L"playerprojend.efk");
-		m_EfkInterface->RegisterResource(L"Muzzle", EffectPath + L"Muzzle.efk");
-		m_EfkInterface->RegisterResource(L"Hit", EffectPath + L"Hit.efk");
-		m_EfkInterface->RegisterResource(L"PlayerJump", EffectPath + L"PlayerJump.efk");
-		m_EfkInterface->RegisterResource(L"PlayerLand", EffectPath + L"PlayerLand.efk");
-		m_EfkInterface->RegisterResource(L"smoke", EffectPath + L"smoke.efk");
-		m_EfkInterface->RegisterResource(L"EnemyEye", EffectPath + L"EnemyEye.efk");
-		m_EfkInterface->RegisterResource(L"EnemyBurst", EffectPath + L"EnemyBurst.efk");
-	}
-
 	void StageGenerator::GoalJudge()
 	{
 
@@ -746,7 +731,7 @@ namespace basecross {
 			selectUI->SetPosition(select);
 			if (m_totalTime > 1.0f)
 			{
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+				PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
 			}
 		}
 		else if (m_select == 2)
@@ -760,11 +745,11 @@ namespace basecross {
 				if (stage != 5)
 				{
 					scene->SetSelectedMap(scene->m_select + 1);
-					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
+					PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
 				}
 				else {
 					scene->SetSelectedMap(scene->m_select + 1);
-					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+					PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
 				}
 			}
 		}
@@ -774,7 +759,7 @@ namespace basecross {
 			nextStage->SetPosition(m_nxsttPos);
 			if (m_totalTime > 1.0f)
 			{
-				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
+				PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
 			}
 		}
 	}

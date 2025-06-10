@@ -830,7 +830,7 @@ namespace basecross {
 		trans->SetRotation(Vec3(0));
 		trans->SetPosition(Vec3(0));
 
-		auto coll = AddComponent<TriggerSphere>();
+		auto coll =  AddComponent<CollisionSphere>();
 		coll->SetDrawActive(false);//debug
 		coll->SetAfterCollision(AfterCollision::None);
 		coll->AddExcludeCollisionTag(L"Player");
@@ -860,7 +860,7 @@ namespace basecross {
 	void FireProjectile::OnUpdate() {
 		//ポーズ解除後に一瞬動くのを防止するため
 		if (!m_used) {
-			GetComponent<TriggerSphere>()->SetUpdateActive(false);
+			GetComponent<CollisionSphere>()->SetUpdateActive(false);
 			SetUpdateActive(false);
 			return;
 		}

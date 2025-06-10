@@ -23,8 +23,6 @@ namespace basecross {
             TEST_PLAY         // テストプレイ中
         };
 
-        // エフェクトのインターフェイス
-        shared_ptr<EffectManeger> m_EfkInterface;
         shared_ptr<SoundItem> m_BGM;                   // バックグラウンドミュージックのサウンドアイテム
         std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2マネージャー
 
@@ -82,9 +80,6 @@ namespace basecross {
 
         // スプライトの作成
         void CreateSprite();
-
-        // スプライトの作成
-        void CreateEffect();
 
         // ゴール判定
         void GoalJudge();
@@ -153,8 +148,6 @@ namespace basecross {
         void EnemyUpdate();
 
         // エフェクトインターフェイスを取得する
-        shared_ptr<EffectManeger> GetEfkInterface() const {
-            return m_EfkInterface;
-        }
+        shared_ptr<EffectManeger> GetEfkInterface();
     };
 }

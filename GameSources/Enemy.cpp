@@ -139,7 +139,7 @@ namespace basecross {
 
 		//エフェクトの設定
 		auto stageManager = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
-		auto efkInterface = stageManager->GetEfkInterface();
+		m_EfkPlayer = stageManager->GetEfkInterface();
 	}
 
 	void Enemy::OnUpdate() {
@@ -386,7 +386,7 @@ namespace basecross {
 	}
 
 	//エフェクトの再生
-	void Enemy::EffectPlay(Effekseer::Handle efk,const wstring name,const Vec3& pos,
+	void Enemy::EffectPlay(Effekseer::Handle& efk,const wstring name,const Vec3& pos,
 		const int num, const Vec3& scale) {
 		m_EfkPlayer->PlayEffect(efk, name, pos, 0.0f);
 
