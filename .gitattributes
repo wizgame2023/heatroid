@@ -1,10 +1,6 @@
 *.cpp diff=sjis
 *.h diff=sjis
-git config --global diff.sjis.textconv "iconv -f sjis -t utf-8"
 *.cpp text working-tree-encoding=sjis diff=sjis
 *.h text working-tree-encoding=sjis diff=sjis
+git config --global diff.sjis.textconv "iconv -f sjis -t utf-8"
 git add --renormalize .
-[diff "sjis"]
-    textconv = iconv -f sjis -t utf-8
-[diff "cp932"]
-    textconv = iconv -f cp932 -t utf-8
