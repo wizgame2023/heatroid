@@ -14,9 +14,12 @@ namespace basecross {
 	EffectManeger::EffectManeger(const shared_ptr<Stage>& stage) :
 		MultiParticle(stage),
 		m_renderer(nullptr),
-		m_Manager(nullptr)
+		m_Manager(nullptr),
+		m_TotalTime(0.0f)
 	{
 	}
+
+
 	EffectManeger::‾EffectManeger() {
 		// 先にエフェクト管理用インスタンスを破棄
 		m_Manager.Reset();
@@ -39,7 +42,6 @@ namespace basecross {
 		// エフェクトの更新処理を行う
 		m_Manager->Update();
 		m_renderer->SetTime(elps);
-
 	}
 
 	void EffectManeger::OnDraw()
@@ -57,7 +59,6 @@ namespace basecross {
 
 	void EffectManeger::OnDestroy()
 	{
-		m_Manager->Release();
 	}
 
 	void EffectManeger::SetEffectSpeed(Effekseer::Handle& handle, const float& speed)

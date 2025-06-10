@@ -1,7 +1,7 @@
 /*!
 @file Enemy.h
-@brief “G‚È‚Ç
-’S“–FˆíŒ©
+@brief æ•µãªã©
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -18,95 +18,95 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	//	class Enemy : public GameObject;
 	//--------------------------------------------------------------------------------------
-	static const int MAX_EFFECT_NUM = 4; //ƒGƒtƒFƒNƒg‚Ì”
+	static const int MAX_EFFECT_NUM = 4; //ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æ•°
 	class Enemy : public GameObject
 	{
 	public:
 		enum State {
-			stay,      //ˆÚ“®‚È‚µ
-			rightMove, //’Ç]¶‰EˆÚ“®
-			upMove,    //ã‰ºˆÚ“®
-			flyMove,   //’Ç]•‚—VˆÚ“®
-			fly,       //•‚—V
-			fixedStay, //ƒvƒŒƒCƒ„[‚ÉG‚ê‚½ˆÊ’u‚ÅŒÅ’è
-			jump,      //ƒWƒƒƒ“ƒv
-			plunge,    //“Ë‚Á‚İ
-			bullet,    //’e‚ğŒ‚‚Á‚Ä‚­‚é
-			bulletMove,//‰¡‚Ì“®‚«‚¾‚¯‚Â‚¢‚Ä‚«‚Ä’e‚ğŒ‚‚Â
-			wait,      //—§‚¿ã‚ª‚é
-			slide,     //¶‰E‚ÉˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Â
-			throwAway, //“Š‚°‚ç‚ê‚é
+			stay,      //ç§»å‹•ãªã—
+			rightMove, //è¿½å¾“å·¦å³ç§»å‹•
+			upMove,    //ä¸Šä¸‹ç§»å‹•
+			flyMove,   //è¿½å¾“æµ®éŠç§»å‹•
+			fly,       //æµ®éŠ
+			fixedStay, //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«è§¦ã‚ŒãŸä½ç½®ã§å›ºå®š
+			jump,      //ã‚¸ãƒ£ãƒ³ãƒ—
+			plunge,    //çªã£è¾¼ã¿
+			bullet,    //å¼¾ã‚’æ’ƒã£ã¦ãã‚‹
+			bulletMove,//æ¨ªã®å‹•ãã ã‘ã¤ã„ã¦ãã¦å¼¾ã‚’æ’ƒã¤
+			wait,      //ç«‹ã¡ä¸ŠãŒã‚‹
+			slide,     //å·¦å³ã«ç§»å‹•ã—ãªãŒã‚‰å¼¾ã‚’æ’ƒã¤
+			throwAway, //æŠ•ã’ã‚‰ã‚Œã‚‹
 		};
 
 	public:
-		float m_heat;          //ƒI[ƒo[ƒq[ƒg’l
-		float m_maxHeat;       //Å‘åƒI[ƒo[ƒq[ƒg
-		float m_angle;          //ƒvƒŒƒCƒ„[‚ÉŒü‚­Šp“x
-		float m_speed;         //ˆÚ“®‘¬“x
-		float m_maxSpeed;      //ª‚ÌÅ‘å’l
-		float m_upSpeed;       //ã‰º‚Ì‘¬“x
-		float m_bulletTime;    //’e‚Ì”­ËŠÔŠu
-		float m_maxBulletTime; //ª‚ÌÅ‘å’l
-		float m_parabolaBulletTime;    //•ú•¨ü‚É”ò‚Î‚·’e‚ÌŠÔŠu
-		float m_maxParabolabulletTime; //ª‚ÌÅ‘å’l
-		int m_bulletCnt;        //˜A‘±‚Åo‚·’e‚Ì”
-		float m_throwLength;    //“Š‚°‚é’·‚³‚ğƒ`ƒƒ[ƒW—Ê‚É‚æ‚Á‚Ä•Ï‚¦‚é•Ï”
-		float m_bulletRangeTime;//’e‚Ì”­ËƒN[ƒ‹ƒ^ƒCƒ€
-		float m_maxBulletRangeTime;//ª‚ÌÅ‘å’l
-		float m_trackingRange;  //’e‚ğ”­Ë‚·‚é‹——£
-		float m_spareTime;      //“Ë‚Á‚İ‚Ì—\”õŠÔ
-		float m_maxSpareTime;   //ª‚ÌÅ‘å’l
-		float m_rad;            //Šp“x‚ÌŒvZ
-		float m_throwTime;      //“Š‚°‚ê‚éŠÔ
-		Vec3 m_playerDirec;     //ƒvƒŒƒCƒ„[‚Ö‚ÌƒxƒNƒgƒ‹
-		Vec3 m_playerDirecNorm; //ƒvƒŒƒCƒ„[‚Ö‚ÌƒxƒNƒgƒ‹‚Ì³‹K‰»
+		float m_heat;          //ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆå€¤
+		float m_maxHeat;       //æœ€å¤§ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆ
+		float m_angle;          //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å‘ãè§’åº¦
+		float m_speed;         //ç§»å‹•é€Ÿåº¦
+		float m_maxSpeed;      //â†‘ã®æœ€å¤§å€¤
+		float m_upSpeed;       //ä¸Šä¸‹ã®é€Ÿåº¦
+		float m_bulletTime;    //å¼¾ã®ç™ºå°„é–“éš”
+		float m_maxBulletTime; //â†‘ã®æœ€å¤§å€¤
+		float m_parabolaBulletTime;    //æ”¾ç‰©ç·šã«é£›ã°ã™å¼¾ã®é–“éš”
+		float m_maxParabolabulletTime; //â†‘ã®æœ€å¤§å€¤
+		int m_bulletCnt;        //é€£ç¶šã§å‡ºã™å¼¾ã®æ•°
+		float m_throwLength;    //æŠ•ã’ã‚‹é•·ã•ã‚’ãƒãƒ£ãƒ¼ã‚¸é‡ã«ã‚ˆã£ã¦å¤‰ãˆã‚‹å¤‰æ•°
+		float m_bulletRangeTime;//å¼¾ã®ç™ºå°„ã‚¯ãƒ¼ãƒ«ã‚¿ã‚¤ãƒ 
+		float m_maxBulletRangeTime;//â†‘ã®æœ€å¤§å€¤
+		float m_trackingRange;  //å¼¾ã‚’ç™ºå°„ã™ã‚‹è·é›¢
+		float m_spareTime;      //çªã£è¾¼ã¿ã®äºˆå‚™æ™‚é–“
+		float m_maxSpareTime;   //â†‘ã®æœ€å¤§å€¤
+		float m_rad;            //è§’åº¦ã®è¨ˆç®—
+		float m_throwTime;      //æŠ•ã’ã‚Œã‚‹æ™‚é–“
+		Vec3 m_playerDirec;     //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¸ã®ãƒ™ã‚¯ãƒˆãƒ«
+		Vec3 m_playerDirecNorm; //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¸ã®ãƒ™ã‚¯ãƒˆãƒ«ã®æ­£è¦åŒ–
 		Vec3 m_moveRot;
 		Vec2 m_bulletDic;
-		//ƒeƒXƒg—p
-		bool m_bulletFlag;      //’e‚ğ”­Ë‚·‚éƒtƒ‰ƒO
-		bool m_objFlag;         //ƒIƒuƒWƒFƒNƒg‚Ö‚ÌÕ“Ëƒtƒ‰ƒO
-		bool m_pGrabFlag;       //‚½‚ê‚Ä‚¢‚éó‘Ô
-		bool m_playerFlag;      //ƒvƒŒƒCƒ„[‚Ö‚ÌÕ“Ëƒtƒ‰ƒO
-		bool m_throwFlag;       //“Š‚°‚ê‚éó‘Ô
-		bool m_overHeatFlag;    //ƒI[ƒo[ƒq[ƒgó‘Ô
-		bool m_activeFlag;      //ƒAƒNƒeƒBƒuó‘Ô
+		//ãƒ†ã‚¹ãƒˆç”¨
+		bool m_bulletFlag;      //å¼¾ã‚’ç™ºå°„ã™ã‚‹ãƒ•ãƒ©ã‚°
+		bool m_objFlag;         //ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¸ã®è¡çªãƒ•ãƒ©ã‚°
+		bool m_pGrabFlag;       //æŒãŸã‚Œã¦ã„ã‚‹çŠ¶æ…‹
+		bool m_playerFlag;      //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¸ã®è¡çªãƒ•ãƒ©ã‚°
+		bool m_throwFlag;       //æŠ•ã’ã‚Œã‚‹çŠ¶æ…‹
+		bool m_overHeatFlag;    //ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆçŠ¶æ…‹
+		bool m_activeFlag;      //ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹
 
-		wstring m_meshName;     //ƒƒbƒVƒ…‚ÌƒpƒX
+		wstring m_meshName;     //ãƒ¡ãƒƒã‚·ãƒ¥ã®ãƒ‘ã‚¹
 
-		//d—Í
-		float m_gravity;        //d—Í‚Ì’l
-		Vec3 m_grav;            //d—Í‚Ì‘å‚«‚³
-		Vec3 m_gravVel;         //d—ÍƒxƒNƒgƒ‹
+		//é‡åŠ›
+		float m_gravity;        //é‡åŠ›ã®å€¤
+		Vec3 m_grav;            //é‡åŠ›ã®å¤§ãã•
+		Vec3 m_gravVel;         //é‡åŠ›ãƒ™ã‚¯ãƒˆãƒ«
 
-		Vec3 m_firstRot;        //Å‰‚Ì‰ñ“]
-		Vec3 m_firstScal;       //Å‰‚Ì‘å‚«‚³
-		Vec3 m_beforePos;       //Å‰‚ÌÀ•W
-		Vec3 m_playerPos;       //ƒvƒŒƒCƒ„[‚ÌÀ•W
-		Vec3 m_playerScale;     //ƒvƒŒƒCƒ„[‚ÌƒTƒCƒY
+		Vec3 m_firstRot;        //æœ€åˆã®å›è»¢
+		Vec3 m_firstScal;       //æœ€åˆã®å¤§ãã•
+		Vec3 m_beforePos;       //æœ€åˆã®åº§æ¨™
+		Vec3 m_playerPos;       //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åº§æ¨™
+		Vec3 m_playerScale;     //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚µã‚¤ã‚º
 
 		shared_ptr<Transform> m_trans;
 		shared_ptr<PNTBoneModelDraw> m_draw;
 		shared_ptr<CollisionCapsule> m_collision;
 		shared_ptr<EnemyFloorCol> m_floorCol;
-		//ƒvƒŒƒCƒ„[‚Ìæ“¾
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å–å¾—
 		weak_ptr<Player> m_player;
 		weak_ptr<Transform> m_playerTrans;
 		weak_ptr<PlayerGrab> m_playerGrab;
-		//ƒI[ƒo[ƒq[ƒg‚ÌUI
+		//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆã®UI
 		weak_ptr<GaugeSquare> m_gauge;
 		weak_ptr<Square> m_gaugeFram;
-		//ƒGƒtƒFƒNƒg
+		//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 		shared_ptr<EffectManeger> m_EfkPlayer;
 		Effekseer::Handle m_heatEffect;
 		Effekseer::Handle m_eyeEffect;
 		Effekseer::Handle m_burstEffect;
 
-		//ƒXƒe[ƒg
-		unique_ptr<EnemyState> m_currentState;  //Œ»İ‚ÌƒXƒe[ƒg
-		unique_ptr<EnemyState> m_previousState; //ˆê‚Â‘O‚ÌƒXƒe[ƒg
+		//ã‚¹ãƒ†ãƒ¼ãƒˆ
+		unique_ptr<EnemyState> m_currentState;  //ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆ
+		unique_ptr<EnemyState> m_previousState; //ä¸€ã¤å‰ã®ã‚¹ãƒ†ãƒ¼ãƒˆ
 
 	public:
-		// \’z‚Æ”jŠü
+		// æ§‹ç¯‰ã¨ç ´æ£„
 		Enemy(const shared_ptr<Stage>& stage,
 			const Vec3& position,
 			const Vec3& rotation,
@@ -114,71 +114,71 @@ namespace basecross {
 			const shared_ptr<Player>& player);
 
 
-		virtual ~Enemy() {}
-		virtual void OnCreate() override; // ‰Šú‰»
-		virtual void OnUpdate() override; // XV
+		virtual â€¾Enemy() {}
+		virtual void OnCreate() override; // åˆæœŸåŒ–
+		virtual void OnUpdate() override; // æ›´æ–°
 
-		//Õ“Ë”»’è
+		//è¡çªåˆ¤å®š
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& other) override;
 		virtual void OnCollisionExit(shared_ptr<GameObject>& other) override;
 		virtual void OnCollisionExcute(shared_ptr<GameObject>& other) override;
 	public:
-		//©•ª©g‚Ìíœ
+		//è‡ªåˆ†è‡ªèº«ã®å‰Šé™¤
 		void ThisDestroy();
-		//ƒvƒŒƒCƒ„[‚Ì•ûŒü‚ğŒvZ
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘ã‚’è¨ˆç®—
 		void PlayerDic();
-		//ƒvƒŒƒCƒ„[‚Ì•ûŒü‚ğŒü‚©‚¹‚é
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ–¹å‘ã‚’å‘ã‹ã›ã‚‹
 		void EnemyAngle();
-		//•ú•¨ü‚É”­Ë‚·‚é’e
+		//æ”¾ç‰©ç·šã«ç™ºå°„ã™ã‚‹å¼¾
 		void FallBullet();
-		//^‚Á’¼‚®”­Ë‚·‚é’e
+		//çœŸã£ç›´ãç™ºå°„ã™ã‚‹å¼¾
 		void StraightXBullet();
-		//˜AË‚·‚é’e
+		//é€£å°„ã™ã‚‹å¼¾
 		void RapidFireBullet(int bulletNum);
-		//ü‚è‚àƒI[ƒo[ƒq[ƒg‚·‚é
+		//å‘¨ã‚Šã‚‚ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆã™ã‚‹
 		void AroundOverHeat();
-		//ƒAƒjƒ[ƒVƒ‡ƒ“‚ÌÄ¶
+		//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®å†ç”Ÿ
 		void EnemyAnime(wstring anime);
-		//SE‚ÌÄ¶
+		//SEã®å†ç”Ÿ
 		void PlaySE(wstring path, float volume = 1.0f, float loopcnt = 0);
-		//ƒGƒtƒFƒNƒg‚ÌÄ¶
-		void EffectPlay(Effekseer::Handle efk, const wstring name,
+		//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®å†ç”Ÿ
+		void EffectPlay(Effekseer::Handle& efk, const wstring name,
 			const Vec3& pos, const int num, const Vec3& scale = Vec3(1.0f));
-		//ƒGƒtƒFƒNƒg‚Ì~‚ß‚é
+		//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æ­¢ã‚ã‚‹
 		void EffectStop(Effekseer::Handle& efk);
-		//“G‚Ì–Ú‚ÌêŠ‚ğİ’è
+		//æ•µã®ç›®ã®å ´æ‰€ã‚’è¨­å®š
 		Vec3 GetEyePos(const Vec3& eye);
-		//ƒfƒoƒbƒN—p
+		//ãƒ‡ãƒãƒƒã‚¯ç”¨
 		void Debug();
 	public:
 		//get,set
-		//Šp“x‚Ìæ“¾
+		//è§’åº¦ã®å–å¾—
 		float GetAngle();
-		//ƒXƒs[ƒh‚Ìİ’è
+		//ã‚¹ãƒ”ãƒ¼ãƒ‰ã®è¨­å®š
 		void SetSpeed(float speed);
 		Vec3 GetDirec();
-		//À•W‚Ìæ“¾
+		//åº§æ¨™ã®å–å¾—
 		Vec3 GetPos();
-		//ƒ[ƒ‹ƒhÀ•W‚Ìæ“¾
+		//ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã®å–å¾—
 		Vec3 GetWorldPos();
-		//°‚ÉG‚ê‚Ä‚é‚©‚Ìó‘Ô
+		//åºŠã«è§¦ã‚Œã¦ã‚‹ã‹ã®çŠ¶æ…‹
 		bool GetFloorFlag();
-		//ƒI[ƒo[ƒq[ƒg—¦‚Ìæ“¾
+		//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆç‡ã®å–å¾—
 		float GetHeatRatio();
-		//ƒI[ƒo[ƒq[ƒgó‘Ô
+		//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆçŠ¶æ…‹
 		bool GetOverHeat();
-		//’e‚ğ”ò‚Î‚·Šp“x‚Ìİ’è
+		//å¼¾ã‚’é£›ã°ã™è§’åº¦ã®è¨­å®š
 		void SetBulletDirec(Vec2 direc);
 		bool GetActiveFlag();
 		void SetActiveFlag(bool flag);
-		//ƒI[ƒo[ƒq[ƒg‚É‚·‚é
+		//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆã«ã™ã‚‹
 		void PlayOverHeat();
-		//“Š‚°‚Ä‚¢‚éó‘Ô
+		//æŠ•ã’ã¦ã„ã‚‹çŠ¶æ…‹
 		void SetThrowFlag(bool flag);
-		//“Š‚°‚é‚Æ‚«‚Æ‚«‚Ì‹­‚³
+		//æŠ•ã’ã‚‹ã¨ãã¨ãã®å¼·ã•
 		void SetThorwLenght(float length);
 
-		//ƒXƒe[ƒ^ƒX‚ÌØ‚è‘Ö‚¦
+		//ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®åˆ‡ã‚Šæ›¿ãˆ
 		template <class NextState>
 		void ChangeState() {
 			m_currentState->Exit();
@@ -187,7 +187,7 @@ namespace basecross {
 			m_currentState = make_unique<NextState>(GetThis<Enemy>());
 			m_currentState->Enter();
 		}
-		//ƒXƒe[ƒ^ƒX‚ÌØ‚è‘Ö‚¦@i‘O‚ÌƒXƒe[ƒ^ƒX‚Ì‹L‰¯‚È‚µj
+		//ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®åˆ‡ã‚Šæ›¿ãˆã€€ï¼ˆå‰ã®ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®è¨˜æ†¶ãªã—ï¼‰
 		template <class NextState>
 		void OnlyChangeState() {
 			m_currentState->Exit();
@@ -195,7 +195,7 @@ namespace basecross {
 			m_currentState = make_unique<NextState>(GetThis<Enemy>());
 			m_currentState->Enter();
 		}
-		//‘O‚ÌƒXƒe[ƒ^ƒX‚ÆØ‚è‘Ö‚¦
+		//å‰ã®ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã¨åˆ‡ã‚Šæ›¿ãˆ
 		void RetrunState() {
 			m_currentState->Exit();
 			m_currentState.reset();
@@ -206,27 +206,27 @@ namespace basecross {
 		}
 
 	public:
-		//d—Í‚ÉŠÖ‚·‚éŠÖ”
+		//é‡åŠ›ã«é–¢ã™ã‚‹é–¢æ•°
 		Vec3 Grav();
-		//d—Í‚Ì‘å‚«‚³‚ğİ’è
+		//é‡åŠ›ã®å¤§ãã•ã‚’è¨­å®š
 		void SetGrav(Vec3 grav);
-		//d—Í‚ğ‚È‚­‚·
+		//é‡åŠ›ã‚’ãªãã™
 		void GravZero();
 		
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class EnemyBullet : public GameObject; //’e
+	//	class EnemyBullet : public GameObject; //å¼¾
 	//--------------------------------------------------------------------------------------
 	class EnemyBullet : public GameObject {
 	protected:
-		float m_colTime;      //Œë·‚ÌŠÔ
-		bool m_playerColFlag; //ƒvƒŒƒCƒ„[‚Ö‚ÌÕ“Ëƒtƒ‰ƒO
+		float m_colTime;      //èª¤å·®ã®æ™‚é–“
+		bool m_playerColFlag; //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¸ã®è¡çªãƒ•ãƒ©ã‚°
 		shared_ptr<PNTStaticDraw> m_draw;
 
 	public:
 		EnemyBullet(const shared_ptr<Stage>& stage);
-		virtual ~EnemyBullet() {};
+		virtual â€¾EnemyBullet() {};
 		virtual void OnCreate();
 		virtual void OnUpdate();
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);
@@ -235,13 +235,13 @@ namespace basecross {
 
 	};
 	//--------------------------------------------------------------------------------------
-	//	class StraightBullet : public EnemyBullet; //’¼ü‚É’µ‚Ô’e
+	//	class StraightBullet : public EnemyBullet; //ç›´ç·šã«è·³ã¶å¼¾
 	//--------------------------------------------------------------------------------------
 	class StraightBullet : public EnemyBullet {
 	private:
-		float m_speed;   //’e‚Ì‘¬‚³
-		float m_range;   //Ë’ö
-		float m_height;  //’e‚ğ”­Ë‚Ì‚‚³
+		float m_speed;   //å¼¾ã®é€Ÿã•
+		float m_range;   //å°„ç¨‹
+		float m_height;  //å¼¾ã‚’ç™ºå°„æ™‚ã®é«˜ã•
 		Vec3 m_pos;
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
@@ -251,14 +251,14 @@ namespace basecross {
 	public:
 		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
 		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy, const float height);
-		virtual ~StraightBullet() {};
+		virtual â€¾StraightBullet() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void Debug();
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class ParabolaBullet : public EnemyBullet; //•ú•¨üó‚É’µ‚Ô’e
+	//	class ParabolaBullet : public EnemyBullet; //æ”¾ç‰©ç·šçŠ¶ã«è·³ã¶å¼¾
 	//--------------------------------------------------------------------------------------
 	class ParabolaBullet : public EnemyBullet {
 	private:
@@ -267,8 +267,8 @@ namespace basecross {
 		Vec3 m_rot;
 		Vec3 m_scal;
 		Vec3 m_enemyPos;
-		float m_speed;   //’e‚Ì‘¬‚³
-		Vec3 m_velocity; //”ò‚Î‚·ƒxƒNƒgƒ‹
+		float m_speed;   //å¼¾ã®é€Ÿã•
+		Vec3 m_velocity; //é£›ã°ã™ãƒ™ã‚¯ãƒˆãƒ«
 
 		shared_ptr<Transform> m_trans;
 		weak_ptr<Enemy> m_enemy;
@@ -279,7 +279,7 @@ namespace basecross {
 
 	public:
 		ParabolaBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
-		virtual ~ParabolaBullet() {}
+		virtual â€¾ParabolaBullet() {}
 		virtual void OnCreate();
 		virtual void OnUpdate();
 
@@ -289,7 +289,7 @@ namespace basecross {
 
 	};
 	//--------------------------------------------------------------------------------------
-	//	class TrackingBullet : public EnemyBullet; //ƒvƒŒƒCƒ„[‚ğ‚ß‚ª‚¯‚Ä’µ‚Ô’e
+	//	class TrackingBullet : public EnemyBullet; //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ã‚ãŒã‘ã¦è·³ã¶å¼¾
 	//--------------------------------------------------------------------------------------
 	class TrackingBullet : public EnemyBullet {
 	private:
@@ -303,13 +303,13 @@ namespace basecross {
 		weak_ptr<Player> m_player;
 	public:
 		TrackingBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy, const shared_ptr<Player>& player);
-		virtual ~TrackingBullet() {};
+		virtual â€¾TrackingBullet() {};
 		virtual void OnCreate();
 		virtual void OnUpdate();
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class EnemyFloorCol : public GameObject; //“G‚Ì“ªã‚ÌƒRƒŠƒWƒ‡ƒ“
+	//	class EnemyFloorCol : public GameObject; //æ•µã®é ­ä¸Šã®ã‚³ãƒªã‚¸ãƒ§ãƒ³
 	//--------------------------------------------------------------------------------------
 	class EnemyFloorCol : public GameObject {
 	private:
@@ -327,7 +327,7 @@ namespace basecross {
 
 	public:
 		EnemyFloorCol(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
-		virtual ~EnemyFloorCol() {}
+		virtual â€¾EnemyFloorCol() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);
