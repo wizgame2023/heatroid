@@ -24,7 +24,7 @@ namespace basecross {
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
-		virtual ‾ChasingEnemy() {};
+		virtual ~ChasingEnemy() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
@@ -40,7 +40,7 @@ namespace basecross {
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
-		virtual ‾MoveBulletEnemy() {};
+		virtual ~MoveBulletEnemy() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
@@ -55,7 +55,7 @@ namespace basecross {
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
-		virtual ‾ParabolaBulletEnemy() {};
+		virtual ~ParabolaBulletEnemy() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
@@ -70,7 +70,7 @@ namespace basecross {
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
-		virtual ‾SlideEnemy() {};
+		virtual ~SlideEnemy() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};

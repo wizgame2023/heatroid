@@ -31,7 +31,7 @@ namespace basecross {
 	public:
 		// コンストラクタ
 		CameraCollision(const shared_ptr<Stage>& StagePtr);
-		virtual ‾CameraCollision() {}
+		virtual ~CameraCollision() {}
 
 		// 初期化
 		virtual void OnCreate();
@@ -83,7 +83,7 @@ namespace basecross {
 		// コンストラクタ
 		MainCamera();
 		MainCamera(float ArmLen);
-		virtual ‾MainCamera();
+		virtual ~MainCamera();
 
 		// カメラの視点を設定する（ベクトル）
 		virtual void SetEye(const bsm::Vec3& Eye) override;
@@ -171,7 +171,7 @@ namespace basecross {
 	public:
 		RayCameraMark(const shared_ptr<Stage>& stage);
 		RayCameraMark(const shared_ptr<Stage>& stage, const shared_ptr <Player>& player, const shared_ptr<Camera>& enemy);
-		virtual ‾RayCameraMark() {};
+		virtual ~RayCameraMark() {};
 
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
@@ -207,7 +207,7 @@ namespace basecross {
 		OpeningCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
 			const Vec3& AtStartPos, const Vec3& AtEndPos, const Vec3& AtPos, float& TotalTime,
 			const Vec3& secondEndPos, const Vec3& secondAtEndPos);
-		virtual ‾OpeningCameraman();
+		virtual ~OpeningCameraman();
 
 		// 初期化
 		virtual void OnCreate() override;
@@ -291,7 +291,7 @@ namespace basecross {
 		@brief	デストラクタ
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual ‾OpeningCamera();
+		virtual ~OpeningCamera();
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief 更新処理
@@ -318,7 +318,7 @@ namespace basecross {
 		//構築と破棄
 		EndingCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
 			const Vec3& AtStartPos, const Vec3& AtEndPos, const float& TotalTime);
-		virtual ‾EndingCameraman();
+		virtual ~EndingCameraman();
 		//初期化
 		virtual void OnCreate() override;
 		//操作
@@ -370,7 +370,7 @@ namespace basecross {
 		@brief	デストラクタ
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual ‾EndingCamera();
+		virtual ~EndingCamera();
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief 更新処理

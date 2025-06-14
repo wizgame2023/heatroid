@@ -23,7 +23,7 @@ namespace basecross {
 
 	public:
 		SelectStage() : Stage() {}
-		virtual ‾SelectStage() {}
+		virtual ~SelectStage() {}
 
 		virtual void OnCreate()override; //初期化
 		virtual void OnUpdate()override; //初期化

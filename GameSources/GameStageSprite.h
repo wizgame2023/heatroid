@@ -33,7 +33,7 @@ namespace basecross {
 			Col4 color = Col4(1.0f, 1.0f, 1.0f, 1.0f),
 			int layer = 1
 		);
-		virtual ‾GameSprite() {};
+		virtual ~GameSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void SetColor(Col4 color);
@@ -49,7 +49,7 @@ namespace basecross {
 		shared_ptr<GameSprite> m_sprite;
 	public:
 		FadeOut(const shared_ptr<Stage>& stage);
-		virtual ‾FadeOut() {};
+		virtual ~FadeOut() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		bool GetFadeOutEnd();
@@ -64,7 +64,7 @@ namespace basecross {
 		shared_ptr<GameSprite> m_sprite;
 	public:
 		FadeIn(const shared_ptr<Stage>& stage);
-		virtual ‾FadeIn() {};
+		virtual ~FadeIn() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 
@@ -78,7 +78,7 @@ namespace basecross {
 		shared_ptr<GameSprite> m_sprite;
 	public:
 		GoalFade(const shared_ptr<Stage>& stage);
-		virtual ‾GoalFade() {};
+		virtual ~GoalFade() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 
@@ -94,7 +94,7 @@ namespace basecross {
 		shared_ptr<GameSprite> m_backEffSprite;
 	public:
 		GameOverSprite(const shared_ptr<Stage>& stage);
-		virtual ‾GameOverSprite() {};
+		virtual ~GameOverSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
@@ -120,7 +120,7 @@ namespace basecross {
 
 	public:
 		NumberSprite(const shared_ptr<Stage>& stage,const int& number,const Vec3& pos);
-		virtual ‾NumberSprite() {};
+		virtual ~NumberSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void UpdateVar(int num);

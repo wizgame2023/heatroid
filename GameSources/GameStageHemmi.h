@@ -28,7 +28,7 @@ namespace basecross {
 	public:
 		//構築と破棄
 		GameStageHemmi() :Stage(){}
-		virtual ‾GameStageHemmi() {}
+		virtual ~GameStageHemmi() {}
 		virtual void OnCreate()override; //初期化
 		
 		void PlayBGM(const wstring& StageBGM);

@@ -37,7 +37,7 @@ namespace basecross {
 
 	public:
 		LoadScreen(): Stage() {}
-		virtual ‾LoadScreen() {}
+		virtual ~LoadScreen() {}
 
 		void CreateViewLight();
 		virtual void OnCreate()override; //初期化
@@ -60,7 +60,7 @@ namespace basecross {
 			GameObject(StagePtr)
 		{}
 
-		‾SpriteLoadBG() {}
+		~SpriteLoadBG() {}
 
 		virtual void OnCreate() override;
 
@@ -86,7 +86,7 @@ namespace basecross {
 			GameObject(StagePtr)
 		{}
 
-		‾SpriteLoadCircle() {}
+		~SpriteLoadCircle() {}
 
 		virtual void OnCreate() override;
 
@@ -111,7 +111,7 @@ namespace basecross {
 			GameObject(StagePtr)
 		{}
 
-		‾SpriteLoad() {}
+		~SpriteLoad() {}
 
 		virtual void OnCreate() override;
 
@@ -140,7 +140,7 @@ namespace basecross {
 			GameObject(StagePtr)
 		{}
 
-		‾SpriteLoadFade() {}
+		~SpriteLoadFade() {}
 
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;

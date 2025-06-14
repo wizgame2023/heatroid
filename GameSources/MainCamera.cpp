@@ -48,7 +48,7 @@ namespace basecross {
 
 		//wstringstream wss;
 		//wss << GetPos.x << " : " << GetPos.y << " : " << GetPos.z << " : " << endl;
-		//scene->SetDebugString(L"Camera¥n" + wss.str());
+		//scene->SetDebugString(L"Camera\n" + wss.str());
 		auto Ptr = GetComponent<Transform>();
 		auto ptrCamera = dynamic_pointer_cast<MainCamera>(OnGetDrawCamera());
 		if (!ptrCamera) {
@@ -270,7 +270,7 @@ namespace basecross {
 		SetEye(eye);
 	}
 
-	MainCamera::‾MainCamera() {}
+	MainCamera::~MainCamera() {}
 	//アクセサ
 
 	void MainCamera::SetEye(const bsm::Vec3& Eye) {
@@ -545,7 +545,7 @@ namespace basecross {
 		m_secondAtEndPos(secondAtEndPos)
 	{
 	}
-	OpeningCameraman::‾OpeningCameraman() {}
+	OpeningCameraman::~OpeningCameraman() {}
 
 	//初期化
 	void OpeningCameraman::OnCreate() {
@@ -668,7 +668,7 @@ namespace basecross {
 		Camera()
 	{
 	}
-	OpeningCamera::‾OpeningCamera() {}
+	OpeningCamera::~OpeningCamera() {}
 
 	void OpeningCamera::OnCreate()
 	{
@@ -697,7 +697,7 @@ namespace basecross {
 		m_totalTime(TotalTime)
 	{
 	}
-	EndingCameraman::‾EndingCameraman() {}
+	EndingCameraman::~EndingCameraman() {}
 
 	//初期化
 	void EndingCameraman::OnCreate() {
@@ -749,7 +749,7 @@ namespace basecross {
 		Camera()
 	{
 	}
-	EndingCamera::‾EndingCamera() {}
+	EndingCamera::~EndingCamera() {}
 
 	void EndingCamera::OnUpdate() {
 		Camera::OnUpdate();

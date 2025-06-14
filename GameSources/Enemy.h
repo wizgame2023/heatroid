@@ -114,7 +114,7 @@ namespace basecross {
 			const shared_ptr<Player>& player);
 
 
-		virtual ‾Enemy() {}
+		virtual ~Enemy() {}
 		virtual void OnCreate() override; // 初期化
 		virtual void OnUpdate() override; // 更新
 
@@ -226,7 +226,7 @@ namespace basecross {
 
 	public:
 		EnemyBullet(const shared_ptr<Stage>& stage);
-		virtual ‾EnemyBullet() {};
+		virtual ~EnemyBullet() {};
 		virtual void OnCreate();
 		virtual void OnUpdate();
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);
@@ -251,7 +251,7 @@ namespace basecross {
 	public:
 		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
 		StraightBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy, const float height);
-		virtual ‾StraightBullet() {};
+		virtual ~StraightBullet() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void Debug();
@@ -279,7 +279,7 @@ namespace basecross {
 
 	public:
 		ParabolaBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
-		virtual ‾ParabolaBullet() {}
+		virtual ~ParabolaBullet() {}
 		virtual void OnCreate();
 		virtual void OnUpdate();
 
@@ -303,7 +303,7 @@ namespace basecross {
 		weak_ptr<Player> m_player;
 	public:
 		TrackingBullet(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy, const shared_ptr<Player>& player);
-		virtual ‾TrackingBullet() {};
+		virtual ~TrackingBullet() {};
 		virtual void OnCreate();
 		virtual void OnUpdate();
 	};
@@ -327,7 +327,7 @@ namespace basecross {
 
 	public:
 		EnemyFloorCol(const shared_ptr<Stage>& stage, const shared_ptr<Enemy>& enemy);
-		virtual ‾EnemyFloorCol() {}
+		virtual ~EnemyFloorCol() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		virtual void OnCollisionEnter(shared_ptr<GameObject>& other);

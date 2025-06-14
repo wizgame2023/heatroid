@@ -39,7 +39,7 @@ namespace basecross {
 			const Col4 color = Col4(1.0f),
 			const shared_ptr<Enemy>& enemy = nullptr,
 			const Vec3 pos = Vec3(0.0f));
-		virtual ‾Square() {};
+		virtual ~Square() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void ThisDestroy();
@@ -66,7 +66,7 @@ namespace basecross {
 			const Col4 color = Col4(1.0f),
 			const shared_ptr<Enemy>& enemy = nullptr,
 			const Vec3 pos = Vec3(0.0f));
-		virtual ‾GaugeSquare() {};
+		virtual ~GaugeSquare() {};
 		virtual void OnUpdate() override;
 		void UpdateValue(float ratio);
 

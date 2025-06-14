@@ -20,7 +20,7 @@ namespace basecross {
 			m_enemy(enemy)
 		{
 		}
-		virtual ‾EnemyState(){}
+		virtual ~EnemyState(){}
 
 		virtual void Enter(){}
 		virtual void Execute(){}

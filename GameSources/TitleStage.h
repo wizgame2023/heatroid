@@ -20,7 +20,7 @@ namespace basecross {
     public:
         // コンストラクタ
         TitleStage() : Stage() {}
-        virtual ‾TitleStage() {}
+        virtual ~TitleStage() {}
 
         // 初期化
         virtual void OnCreate() override;

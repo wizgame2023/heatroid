@@ -21,7 +21,7 @@ namespace basecross {
 	public:
 		//構築と破棄
 		GameStageTsuboi() :Stage(){}
-		virtual ‾GameStageTsuboi() {}
+		virtual ~GameStageTsuboi() {}
 
 		virtual void OnCreate() override; //初期化
 		virtual void OnDestroy() override; //初期化

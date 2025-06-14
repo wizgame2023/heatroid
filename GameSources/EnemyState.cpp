@@ -53,12 +53,11 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	void OverHeatState::Enter() {
 		auto enemy = m_enemy.lock();
-		auto obj = dynamic_pointer_cast<Enemy>(enemy);
 		if (!enemy) return;
 
 		enemy->SetGrav(Vec3(0.0f, enemy->m_gravity, 0.0f));
 		enemy->PlaySE(L"OverHeatSE", 5.0f);
-		enemy->EffectPlay(obj->m_heatEffect,L"smoke", obj->GetPos(), 3);
+		enemy->EffectPlay(enemy->m_heatEffect,L"smoke", enemy->GetPos(), 3);
 		enemy->m_overHeatFlag = true;
 
 		auto gauge = enemy->m_gauge.lock();

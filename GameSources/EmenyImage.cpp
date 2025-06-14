@@ -137,21 +137,21 @@ namespace basecross {
 		//auto enemy = m_owner.lock();
 		//auto enemyPos = enemy->GetComponent<Transform>()->GetPosition();
 		//wstringstream wss(L"");
-		//wss << L"pos ¥n("
+		//wss << L"pos \n("
 		//	<<m_pos.x
-		//	<<L"¥n,"
+		//	<<L"\n,"
 		//	<<m_pos.y
-		//	<<L"¥n,"
+		//	<<L"\n,"
 		//	<<m_pos.z
 		//	<<L")"
-		//	<< L"enemyPos ¥n("
+		//	<< L"enemyPos \n("
 		//	<< enemyPos.x
-		//	<< L"¥n,"
+		//	<< L"\n,"
 		//	<< enemyPos.y
-		//	<< L"¥n,"
+		//	<< L"\n,"
 		//	<< enemyPos.z
 		//	<< L")"
-		//	<<L"¥n"
+		//	<<L"\n"
 		//	<<m_test
 		//	<< endl;
 		//scene->SetDebugString(wss.str());

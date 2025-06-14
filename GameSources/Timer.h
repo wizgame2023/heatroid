@@ -20,7 +20,7 @@ namespace basecross{
 	public:
 		// 構築と破棄
 		Timer(const shared_ptr<Stage>& stage, const Vec3 pos);
-		virtual ‾Timer(){}
+		virtual ~Timer(){}
 
 		virtual void OnCreate() override; // 初期化
 		virtual void OnUpdate() override; // 更新

@@ -38,7 +38,7 @@ namespace basecross {
 	public:
 		PlayerStateBase(const shared_ptr<Player>& obj) : m_player(obj) {
 		}
-		‾PlayerStateBase() {}
+		~PlayerStateBase() {}
 
 		virtual void Enter() {}
 		virtual void Update(float deltatime) {
@@ -165,7 +165,7 @@ namespace basecross {
 			//初期ステート
 			ChangeState(player_start);
 		}
-		‾PlayerStateMachine() {}
+		~PlayerStateMachine() {}
 	};
 
 }

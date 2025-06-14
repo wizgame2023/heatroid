@@ -25,7 +25,7 @@ namespace basecross {
 	/// @brief 読み込んだエフェクトリソースを管理するマップ (キー: wstring, 値: EffectRef)
 	map<wstring, Effekseer::EffectRef> m_ResMap;
 
-	/// @brief 再生中のエフェクトハンドル 
+	/// @brief 再生中のエフェクトハンドル (サンプル用、または一時利用)
 	Effekseer::Handle handle;
 
 	/// @brief Effekseerの管理マネージャー
@@ -37,7 +37,7 @@ namespace basecross {
 	/// @brief 経過時間
 	float m_TotalTime;
 
-	/// @brief 単一のエフェクトリソースへの参照 
+	/// @brief 単一のエフェクトリソースへの参照 (サンプル用、または一時利用)
 	Effekseer::EffectRef m_Effect;
 	public:
 
@@ -55,7 +55,7 @@ namespace basecross {
 		@details	Effekseer関連のリソースを解放します。
 		*/
 		//--------------------------------------------------------------------------------------
-		virtual ‾EffectManeger();
+		virtual ~EffectManeger();
 
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -104,9 +104,9 @@ namespace basecross {
 		void SetViewProj(const bsm::Mat4x4& view, const bsm::Mat4x4& proj);
 
 		/*!
-		@brief	指定したエフェクトの再生速度を設定します。
-		@param[in]	handle	対象のエフェクトハンドル
-		@param[in]	speed	再生速度 (1.0fが標準速)
+		@brief 指定したエフェクトの再生速度を設定します。
+		@param[in] handle 対象のエフェクトハンドル
+		@param[in] speed 再生速度 (1.0fが標準速)
 		*/
 		void SetEffectSpeed(Effekseer::Handle& handle, const float& speed);
 
@@ -142,7 +142,7 @@ namespace basecross {
 		@param[in]	Key		取得したいエフェクトのキー
 		@return	Effekseer::EffectRef	エフェクトリソースへの参照。見つからない場合はnullptr。
 		*/
-		Effekseer::EffectRef GetEffectResource(const wstring& Key) const;
+		Effekseer::EffectRef GetEffectResource(const wstring& Key);
 
 		/*!
 		@brief	エフェクトの座標を相対的に移動させます。

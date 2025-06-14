@@ -228,17 +228,17 @@ namespace basecross{
 		wstringstream wss(L"");
 		wss << L"selectPos.y : "
 			<< m_selectPos.y
-			<< L"¥nnextFlag : "
+			<< L"\nnextFlag : "
 			<< m_nextFlag
-			<< L"¥nUp : "
+			<< L"\nUp : "
 			<< m_sCheck[0]
-			<< L"¥nKeepTime : "
+			<< L"\nKeepTime : "
 			<< m_keepTime
-			<< L"¥nselectNum : "
+			<< L"\nselectNum : "
 			<< m_selectNum
-			<<L"¥n"
+			<<L"\n"
 			<< m_maxPos.y
-			<< L"¥n"
+			<< L"\n"
 			<<m_selectPos.x
 			<< endl;
 		scene->SetDebugString(wss.str());

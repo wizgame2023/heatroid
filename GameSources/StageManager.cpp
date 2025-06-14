@@ -471,7 +471,6 @@ namespace basecross {
 			// CSVパスを取得
 			auto csvPath = path + L"CSV/";
 			m_StageName = scene->GetSelectedMap();
-
 			//CSVパスを取得
 			if (m_StageName != L"")
 			{
@@ -568,6 +567,7 @@ namespace basecross {
 
 		ToOpeningCamera();
 	}
+
 	void StageGenerator::GoalJudge()
 	{
 
@@ -731,7 +731,7 @@ namespace basecross {
 			selectUI->SetPosition(select);
 			if (m_totalTime > 1.0f)
 			{
-				PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
 			}
 		}
 		else if (m_select == 2)
@@ -745,11 +745,11 @@ namespace basecross {
 				if (stage != 5)
 				{
 					scene->SetSelectedMap(scene->m_select + 1);
-					PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
 				}
 				else {
 					scene->SetSelectedMap(scene->m_select + 1);
-					PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
+					PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToSlelctStage");
 				}
 			}
 		}
@@ -759,7 +759,7 @@ namespace basecross {
 			nextStage->SetPosition(m_nxsttPos);
 			if (m_totalTime > 1.0f)
 			{
-				PostEvent(1.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
+				PostEvent(0.0f, GetThis<ObjectInterface>(), App::GetApp()->GetScene<Scene>(), L"ToLoad");
 			}
 		}
 	}

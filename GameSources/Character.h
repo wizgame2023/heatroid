@@ -20,7 +20,7 @@ namespace basecross{
 			GameObject(stage)
 		{
 		}
-		virtual ‾Foo()
+		virtual ~Foo()
 		{
 		}
 

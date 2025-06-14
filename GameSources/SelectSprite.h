@@ -45,7 +45,7 @@ namespace basecross{
 		shared_ptr<NumberSprite> m_sNum[20];
 	public:
 		SelectSprite(const shared_ptr<Stage>& stage);
-		virtual ‾SelectSprite() {};
+		virtual ~SelectSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void StickSelect();

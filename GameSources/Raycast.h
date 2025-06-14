@@ -32,7 +32,7 @@ namespace basecross {
 	public:
 		LineObject(const shared_ptr<Stage>& stage);
 		LineObject(const shared_ptr<Stage>& stage, const shared_ptr<Player>& player,const shared_ptr<Enemy>& enemy);
-		virtual ‾LineObject() {}
+		virtual ~LineObject() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 
@@ -66,7 +66,7 @@ namespace basecross {
 	public:
 		RayMark(const shared_ptr<Stage>& stage);
 		RayMark(const shared_ptr<Stage>& stage, const shared_ptr <Player>& player,const shared_ptr<Enemy>& enemy);
-		virtual ‾RayMark() {};
+		virtual ~RayMark() {};
 
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
