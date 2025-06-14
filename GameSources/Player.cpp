@@ -605,7 +605,7 @@ namespace basecross {
 		auto plPos = GetComponent<Transform>()->GetPosition();
 		auto shPos = target->GetComponent<Transform>()->GetPosition();
 		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
-		m_Effect->PlayEffect(m_EfkHit, L"PlayerLand", Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
+		m_Effect->PlayEffect(m_EfkHit, L"Hit", Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
 
 		//m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
 
