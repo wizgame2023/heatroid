@@ -1,7 +1,7 @@
 /*!
 @file SelectSprite.cpp
-@brief ƒZƒŒƒNƒgƒXƒe[ƒW‚ÌUIŽÀ‘Ì
-’S“–FˆíŒ©
+@brief ã‚»ãƒ¬ã‚¯ãƒˆã‚¹ãƒ†ãƒ¼ã‚¸ã®UIå®Ÿä½“
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -84,16 +84,16 @@ namespace basecross{
 		}
 
 	}
-	//À•W‚ð^‚ñ’†‚É‚·‚éŒvŽZ
+	//åº§æ¨™ã‚’çœŸã‚“ä¸­ã«ã™ã‚‹è¨ˆç®—
 	void SelectSprite::PosSetting() {
-		//‰¡
+		//æ¨ª
 		if (m_widthNum % 2 == 0) {
 			m_pos.x = m_pos.x - (m_wSize * (m_widthNum / 2 - 1) + m_wSpace * (m_widthNum / 2 - 1) + m_wSize / 2 + m_wSpace / 2);
 		}
 		else {
 			m_pos.x = m_pos.x + (m_wSize * (m_widthNum / 2) + m_wSpace * (m_widthNum / 2));
 		}
-		//c
+		//ç¸¦
 		if (m_heightNum % 2 == 0) {
 			m_pos.y = m_pos.y + (m_hSize * (m_heightNum / 2 - 1) + m_hSpace * (m_heightNum / 2 - 1) + m_hSize / 2 + m_hSpace / 2);
 		}
@@ -107,7 +107,7 @@ namespace basecross{
 		auto keyState = App::GetApp()->GetInputDevice().GetKeyState();
 		CoolTimeStick();
 		if (m_select) return;
-		//ã
+		//ä¸Š
 		if (cntVec[0].fThumbLY > 0.7f || keyState.m_bPressedKeyTbl[VK_UP]) {
 			if ((!m_sCheck[0] || m_nextFlag) &&
 				m_maxPos.y > m_selectPos.y) {
@@ -119,7 +119,7 @@ namespace basecross{
 		else if ((cntVec[0].fThumbLY < 0.7f || keyState.m_bLastKeyTbl[VK_UP])) {
 			m_sCheck[0] = false;
 		}
-		//‰º
+		//ä¸‹
 		if (cntVec[0].fThumbLY < -0.7f || keyState.m_bPressedKeyTbl[VK_DOWN]) {
 			if ((!m_sCheck[2] || m_nextFlag)&&
 				m_minPos.y < m_selectPos.y) {
@@ -143,7 +143,7 @@ namespace basecross{
 		else if (cntVec[0].fThumbLX < 0.7f || keyState.m_bLastKeyTbl[VK_RIGHT]) {
 			m_sCheck[1] = false;
 		}
-		//¶
+		//å·¦
 		if (cntVec[0].fThumbLX < -0.7f || keyState.m_bPressedKeyTbl[VK_LEFT]) {
 			if ((!m_sCheck[3] || m_nextFlag) &&
 				m_maxPos.x < m_selectPos.x) {
@@ -228,17 +228,17 @@ namespace basecross{
 		wstringstream wss(L"");
 		wss << L"selectPos.y : "
 			<< m_selectPos.y
-			<< L"\nnextFlag : "
+			<< L"Â¥nnextFlag : "
 			<< m_nextFlag
-			<< L"\nUp : "
+			<< L"Â¥nUp : "
 			<< m_sCheck[0]
-			<< L"\nKeepTime : "
+			<< L"Â¥nKeepTime : "
 			<< m_keepTime
-			<< L"\nselectNum : "
+			<< L"Â¥nselectNum : "
 			<< m_selectNum
-			<<L"\n"
+			<<L"Â¥n"
 			<< m_maxPos.y
-			<< L"\n"
+			<< L"Â¥n"
 			<<m_selectPos.x
 			<< endl;
 		scene->SetDebugString(wss.str());

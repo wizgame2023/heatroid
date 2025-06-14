@@ -1,7 +1,7 @@
 /*!
 @file SelectSprite.h
-@brief@ƒZƒŒƒNƒgƒXƒe[ƒW‚ÌUI ‚È‚Ç
-’S“–FˆíŒ©
+@briefã€€ã‚»ãƒ¬ã‚¯ãƒˆã‚¹ãƒ†ãƒ¼ã‚¸ã®UI ãªã©
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -45,7 +45,7 @@ namespace basecross{
 		shared_ptr<NumberSprite> m_sNum[20];
 	public:
 		SelectSprite(const shared_ptr<Stage>& stage);
-		virtual ~SelectSprite() {};
+		virtual â€¾SelectSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void StickSelect();

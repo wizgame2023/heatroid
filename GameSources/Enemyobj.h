@@ -1,7 +1,7 @@
 /*!
 @file Emenyobj.h
-@brief “G‚ÌƒIƒuƒWƒFƒNƒg
-’S“–FˆíŒ©
+@brief æ•µã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -11,7 +11,7 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class Enemy : public GameObject;  //’Ç‚¢‚©‚¯‚Ä“Ëi‚·‚é“G
+	//	class Enemy : public GameObject;  //è¿½ã„ã‹ã‘ã¦çªé€²ã™ã‚‹æ•µ
 	//--------------------------------------------------------------------------------------
 	class ChasingEnemy : public Enemy {
 	private:
@@ -24,13 +24,13 @@ namespace basecross {
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
-		virtual ~ChasingEnemy() {};
+		virtual â€¾ChasingEnemy() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class MoveBulletEnemy : public Enemy;  //¶‰E‚É’Ç‚¢‚©‚¯‚Ä’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//	class MoveBulletEnemy : public Enemy;  //å·¦å³ã«è¿½ã„ã‹ã‘ã¦å¼¾ã‚’æ’ƒã£ã¦ãã‚‹æ•µ
 	//--------------------------------------------------------------------------------------
 	class MoveBulletEnemy : public Enemy {
 	private:
@@ -40,13 +40,13 @@ namespace basecross {
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
-		virtual ~MoveBulletEnemy() {};
+		virtual â€¾MoveBulletEnemy() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class ParabolaBulletEnemy : public Enemy;  //•ú•¨ü‚É’e‚ğ”ò‚Î‚µ‚Ä‚­‚é“G
+	//	class ParabolaBulletEnemy : public Enemy;  //æ”¾ç‰©ç·šã«å¼¾ã‚’é£›ã°ã—ã¦ãã‚‹æ•µ
 	//--------------------------------------------------------------------------------------
 	class ParabolaBulletEnemy : public Enemy {
 	public:
@@ -55,13 +55,13 @@ namespace basecross {
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
-		virtual ~ParabolaBulletEnemy() {};
+		virtual â€¾ParabolaBulletEnemy() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class SlideEnemy : public Enemy;  //¶‰EˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//	class SlideEnemy : public Enemy;  //å·¦å³ç§»å‹•ã—ãªãŒã‚‰å¼¾ã‚’æ’ƒã£ã¦ãã‚‹æ•µ
 	//--------------------------------------------------------------------------------------
 	class SlideEnemy : public Enemy {
 	public:
@@ -70,7 +70,7 @@ namespace basecross {
 			const Vec3& rotatoin,
 			const Vec3& scale,
 			const shared_ptr<Player>& player);
-		virtual ~SlideEnemy() {};
+		virtual â€¾SlideEnemy() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};

@@ -1,6 +1,6 @@
 /*!
 @file Sprite.h
-@brief ƒXƒvƒ‰ƒCƒg
+@brief ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 */
 
 #pragma once
@@ -17,7 +17,7 @@ namespace basecross {
 	public:
 		Sprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
 			const Vec2& StartScale, const Vec3& StartPos);
-		virtual ~Sprite() {}
+		virtual â€¾Sprite() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override {}
 	};
@@ -45,7 +45,7 @@ namespace basecross {
 
 		SelectCharge(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
 			const Vec2& StartScale, const Vec3& StartPos);
-		virtual ~SelectCharge() {}
+		virtual â€¾SelectCharge() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void ChargeUV(const float& time);
@@ -66,7 +66,7 @@ namespace basecross {
 
 		BlinkingSprite(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
 			const Vec2& StartScale, const Vec3& StartPos, const float& m_TransSpeed);
-		virtual ~BlinkingSprite() {}
+		virtual â€¾BlinkingSprite() {}
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
