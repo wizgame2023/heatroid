@@ -32,8 +32,6 @@ namespace basecross {
     public:
         bool m_pause = false;                          // ポーズ状態かどうかのフラグ
         bool m_soundFlg = false;
-        shared_ptr<EfkEffect> m_EfkEffect;             // エフェクトオブジェクト
-        shared_ptr<EfkPlay> m_EfkPlay;                 // エフェクト実行オブジェクト>>>>>>> main
 
         // 構築と破棄
         GameStage() :Stage() {}
