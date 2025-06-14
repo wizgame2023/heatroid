@@ -1,6 +1,6 @@
 /*!
 @file Timer.cpp
-@brief ƒ^ƒCƒ}[‚È‚ÇŽÀ‘Ì
+@brief ã‚¿ã‚¤ãƒžãƒ¼ãªã©å®Ÿä½“
 */
 
 #include "stdafx.h"
@@ -43,7 +43,7 @@ namespace basecross{
 		m_numSprite[2]->UpdateVar(m_timeNum[2] + 9);
 		m_numSprite[3]->UpdateVar(m_timeNum[3] + 9);
 
-		//1ŽžŠÔ‚½‚Á‚½ê‡
+		//1æ™‚é–“ãŸã£ãŸå ´åˆ
 		if (m_time > 3600) {
 			m_numSprite[0]->UpdateVar(0);
 			m_numSprite[1]->UpdateVar(0);
