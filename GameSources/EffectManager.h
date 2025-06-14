@@ -25,7 +25,7 @@ namespace basecross {
 	/// @brief 読み込んだエフェクトリソースを管理するマップ (キー: wstring, 値: EffectRef)
 	map<wstring, Effekseer::EffectRef> m_ResMap;
 
-	/// @brief 再生中のエフェクトハンドル (サンプル用、または一時利用)
+	/// @brief 再生中のエフェクトハンドル
 	Effekseer::Handle handle;
 
 	/// @brief Effekseerの管理マネージャー
@@ -37,7 +37,7 @@ namespace basecross {
 	/// @brief 経過時間
 	float m_TotalTime;
 
-	/// @brief 単一のエフェクトリソースへの参照 (サンプル用、または一時利用)
+	/// @brief 単一のエフェクトリソースへの参照 
 	Effekseer::EffectRef m_Effect;
 	public:
 
