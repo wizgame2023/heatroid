@@ -521,6 +521,11 @@ namespace basecross {
 		}
 	}
 
+	shared_ptr<EffectManeger> StageGenerator::GetEfkInterface()
+	{
+		return GetTypeStage<GameStage>()->GetEfkInterface();
+	}
+
 	void StageGenerator::CreateSprite()
 	{
 
@@ -561,26 +566,6 @@ namespace basecross {
 		m_blowUI->SetDrawActive(false);
 
 		ToOpeningCamera();
-	}
-
-	void StageGenerator::CreateEffect()
-	{
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring EffectPath = DataDir + L"Effects\\";
-
-		m_EfkInterface = GetStage()->AddGameObject<EffectManeger>();
-		m_EfkInterface->RegisterResource(L"Switch", EffectPath + L"Switch.efk");
-		m_EfkInterface->RegisterResource(L"SwitchLoop", EffectPath + L"SwitchLoop.efk");
-		m_EfkInterface->RegisterResource(L"playerproj", EffectPath + L"playerproj.efk");
-		m_EfkInterface->RegisterResource(L"playerprojend", EffectPath + L"playerprojend.efk");
-		m_EfkInterface->RegisterResource(L"Muzzle", EffectPath + L"Muzzle.efk");
-		m_EfkInterface->RegisterResource(L"Hit", EffectPath + L"Hit.efk");
-		m_EfkInterface->RegisterResource(L"PlayerJump", EffectPath + L"PlayerJump.efk");
-		m_EfkInterface->RegisterResource(L"PlayerLand", EffectPath + L"PlayerLand.efk");
-		m_EfkInterface->RegisterResource(L"smoke", EffectPath + L"smoke.efk");
-		m_EfkInterface->RegisterResource(L"EnemyEye", EffectPath + L"EnemyEye.efk");
-		m_EfkInterface->RegisterResource(L"EnemyBurst", EffectPath + L"EnemyBurst.efk");
 	}
 
 	void StageGenerator::GoalJudge()

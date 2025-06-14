@@ -374,7 +374,7 @@ namespace basecross {
 
 		//どれくらいの位置からスタートするか
 		Vec3 m_dist;
-		//速度と発射する力(0.0f～1.0f)
+		//速度と発射する力(0.0f〜1.0f)
 		float m_speed, m_power;
 		//跳んでいく方向
 		Vec3 m_angle;
@@ -424,8 +424,7 @@ namespace basecross {
 		//呼び出す
 		void Invoke(const Vec3 dist, const Vec3 angle, const float power) {
 			m_used = true;
-			auto Coll = GetComponent<CollisionSphere>();
-			Coll->SetAfterCollision(AfterCollision::None);
+			GetComponent<TriggerSphere>()->SetUpdateActive(true);
 			SetUpdateActive(true);
 
 			m_stopped = false;

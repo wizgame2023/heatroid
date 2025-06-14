@@ -14,12 +14,9 @@ namespace basecross {
 	EffectManeger::EffectManeger(const shared_ptr<Stage>& stage) :
 		MultiParticle(stage),
 		m_renderer(nullptr),
-		m_Manager(nullptr),
-		m_TotalTime(0.0f)
+		m_Manager(nullptr)
 	{
 	}
-
-
 	EffectManeger::~EffectManeger() {
 		// 先にエフェクト管理用インスタンスを破棄
 		m_Manager.Reset();
@@ -37,6 +34,7 @@ namespace basecross {
 	void EffectManeger::OnUpdate()
 	{
 		auto elps = App::GetApp()->GetElapsedTime();
+		
 		m_TotalTime += elps;
 
 		// エフェクトの更新処理を行う
@@ -58,8 +56,7 @@ namespace basecross {
 	}
 
 	void EffectManeger::OnDestroy()
-	{
-	}
+	{}
 
 	void EffectManeger::SetEffectSpeed(Effekseer::Handle& handle, const float& speed)
 	{
@@ -150,7 +147,7 @@ namespace basecross {
 						return;
 					}
 					// 同じエフェクトデータが「異なるキー」で登録されようとしているため、例外をスロー
-					wstring keyerr = L"" + Key;
+					wstring keyerr = L"同じエフェクトリソースが別のキー(" + it->first + L")で既に登録されています。キー: " + Key;
 					throw BaseException(
 						L"リソースの重複登録エラー",
 						keyerr,
@@ -182,14 +179,14 @@ namespace basecross {
 		}
 	}
 
-	Effekseer::EffectRef EffectManeger::GetEffectResource(const wstring& Key) const
+	Effekseer::EffectRef EffectManeger::GetEffectResource(const wstring& Key)
 	{
 		// キーが空文字列の場合は不正な呼び出しとして例外をスロー
 		if (Key == L"") {
 			throw BaseException(
 				L"",
-				L"if(Key == L¥"")",
-				L"App::GetResource()" 
+				L"if(Key == "")",
+				L"App::GetResource()" // NOTE: EffectManeger::GetEffectResource() がより正確かもしれません
 			);
 		}
 
@@ -203,11 +200,11 @@ namespace basecross {
 		}
 		else {
 			// キーが見つからなかったため、例外をスロー
-			wstring keyerr = L"";
+			wstring keyerr = L"指定されたキー(" + Key + L")のリソースが見つかりません。\n";
 			throw BaseException(
-				L"リソース未発見エラー",
+				L"",
 				keyerr,
-				L"App::GetResource()" 
+				L"App::GetResource()" // NOTE: EffectManeger::GetEffectResource() がより正確かもしれません
 			);
 		}
 	}
