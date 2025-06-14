@@ -28,7 +28,6 @@ namespace basecross {
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto stageMane = GetSharedGameObject<StageGenerator>(L"StageManager");
 		int camerastatus = stageMane->GetNowCameraStatus();
-		auto ShEfkInterface = stageMane->GetEfkInterface();
 		if (stageMane->m_nowGameStatus == StageGenerator::GameStatus::GAME_PLAYING)
 		{
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::OPENINGCAMERA)
@@ -279,6 +278,27 @@ namespace basecross {
 		}
 	}
 
+	void GameStage::CreateEffect()
+	{
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		wstring EffectPath = DataDir + L"Effects\\";
+
+		m_EfkInterface = AddGameObject<EffectManeger>();
+		m_EfkInterface->RegisterResource(L"Switch", EffectPath + L"Switch.efk");
+		m_EfkInterface->RegisterResource(L"SwitchLoop", EffectPath + L"SwitchLoop.efk");
+		m_EfkInterface->RegisterResource(L"playerproj", EffectPath + L"playerproj.efk");
+		m_EfkInterface->RegisterResource(L"playerprojend", EffectPath + L"playerprojend.efk");
+		m_EfkInterface->RegisterResource(L"Muzzle", EffectPath + L"Muzzle.efk");
+		m_EfkInterface->RegisterResource(L"Hit", EffectPath + L"Hit.efk");
+		m_EfkInterface->RegisterResource(L"PlayerJump", EffectPath + L"PlayerJump.efk");
+		m_EfkInterface->RegisterResource(L"PlayerLand", EffectPath + L"PlayerLand.efk");
+		m_EfkInterface->RegisterResource(L"smoke", EffectPath + L"smoke.efk");
+		m_EfkInterface->RegisterResource(L"EnemyEye", EffectPath + L"EnemyEye.efk");
+		m_EfkInterface->RegisterResource(L"EnemyBurst", EffectPath + L"EnemyBurst.efk");
+
+	}
+
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{
 		m_BGM = m_PtrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
@@ -296,12 +316,12 @@ namespace basecross {
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
 		auto ptrStageManager = AddGameObject<StageGenerator>();
+		CreateEffect();
 		SetSharedGameObject(L"StageManager", ptrStageManager);
 		if (scene->GetSelectedMap() == L"ToTitle")
 		{
 			auto Status = ptrStageManager->GameStatus::TEST_PLAY;
 			ptrStageManager->SetNowGameStatus(Status);
-			ptrStageManager->CreateEffect();
 			ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
 			ptrStageManager->CreateViewLight();
 			ptrStageManager->CreatePlayer();
@@ -309,13 +329,13 @@ namespace basecross {
 			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateSprite();
 			ptrStageManager->CreateGimmick();
+
 		}
 		else
 		{
 			auto Status = ptrStageManager->GameStatus::GAME_PLAYING;
 			ptrStageManager->SetNowGameStatus(Status);
 			ptrStageManager->SetGameStageSelect(scene->GetSelectedMap());
-			ptrStageManager->CreateEffect();
 			ptrStageManager->CreatePlayer();
 			ptrStageManager->CreateViewLight();
 			ptrStageManager->CreateFixedBox();

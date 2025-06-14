@@ -1,6 +1,6 @@
 /*!
 @file GameStageTsuboi.h
-@brief ƒQ[ƒ€ƒXƒe[ƒW
+@brief ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸
 */
 
 #pragma once
@@ -9,7 +9,7 @@
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
-	//	ƒQ[ƒ€ƒXƒe[ƒWƒNƒ‰ƒX
+	//	ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒ©ã‚¹
 	//--------------------------------------------------------------------------------------
 	class GameStageTsuboi : public Stage {
 		CsvFile m_GameStage1;
@@ -19,12 +19,12 @@ namespace basecross {
 		void PlayBGM(const wstring& StageBGM);
 
 	public:
-		//\’z‚Æ”jŠü
+		//æ§‹ç¯‰ã¨ç ´æ£„
 		GameStageTsuboi() :Stage(){}
 		virtual ~GameStageTsuboi() {}
 
-		virtual void OnCreate() override; //‰Šú‰»
-		virtual void OnDestroy() override; //‰Šú‰»
+		virtual void OnCreate() override; //åˆæœŸåŒ–
+		virtual void OnDestroy() override; //åˆæœŸåŒ–
 	};
 
 }

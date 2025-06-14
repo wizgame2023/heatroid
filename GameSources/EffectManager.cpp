@@ -1,6 +1,6 @@
 /*!
 @file EffectManager.cpp
-@brief ƒGƒtƒFƒNƒg‚È‚ÇÀ‘Ì
+@brief ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãªã©å®Ÿä½“
 */
 
 #include "stdafx.h"
@@ -9,18 +9,21 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	///	EffekseerƒGƒtƒFƒNƒg‚ÌƒGƒtƒFƒNƒg
+	///	Effekseerã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 	//--------------------------------------------------------------------------------------
 	EffectManeger::EffectManeger(const shared_ptr<Stage>& stage) :
 		MultiParticle(stage),
 		m_renderer(nullptr),
-		m_Manager(nullptr)
+		m_Manager(nullptr),
+		m_TotalTime(0.0f)
 	{
 	}
+
+
 	EffectManeger::~EffectManeger() {
-		// æ‚ÉƒGƒtƒFƒNƒgŠÇ——pƒCƒ“ƒXƒ^ƒ“ƒX‚ğ”jŠü
+		// å…ˆã«ã‚¨ãƒ•ã‚§ã‚¯ãƒˆç®¡ç†ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç ´æ£„
 		m_Manager.Reset();
-		// Ÿ‚É•`‰æ—pƒCƒ“ƒXƒ^ƒ“ƒX‚ğ”jŠü
+		// æ¬¡ã«æç”»ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç ´æ£„
 		m_renderer.Reset();
 	}
 
@@ -36,28 +39,26 @@ namespace basecross {
 		auto elps = App::GetApp()->GetElapsedTime();
 		m_TotalTime += elps;
 
-		// ƒGƒtƒFƒNƒg‚ÌXVˆ—‚ğs‚¤
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æ›´æ–°å‡¦ç†ã‚’è¡Œã†
 		m_Manager->Update();
 		m_renderer->SetTime(elps);
-
 	}
 
 	void EffectManeger::OnDraw()
 	{
 		auto& camera = GetStage()->GetView()->GetTargetCamera();
 		SetViewProj(camera->GetViewMatrix(), camera->GetProjMatrix());
-		// ƒGƒtƒFƒNƒg‚Ì•`‰æŠJnˆ—‚ğs‚¤B
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æç”»é–‹å§‹å‡¦ç†ã‚’è¡Œã†ã€‚
 		m_renderer->BeginRendering();
-		// ƒGƒtƒFƒNƒg‚Ì•`‰æ‚ğs‚¤B
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æç”»ã‚’è¡Œã†ã€‚
 		m_Manager->Draw();
 		
-		// ƒGƒtƒFƒNƒg‚Ì•`‰æI—¹ˆ—‚ğs‚¤B
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æç”»çµ‚äº†å‡¦ç†ã‚’è¡Œã†ã€‚
 		m_renderer->EndRendering();
 	}
 
 	void EffectManeger::OnDestroy()
 	{
-		m_Manager->Release();
 	}
 
 	void EffectManeger::SetEffectSpeed(Effekseer::Handle& handle, const float& speed)
@@ -101,20 +102,20 @@ namespace basecross {
 		auto Dev = App::GetApp()->GetDeviceResources();
 		auto pDx11Device = Dev->GetD3DDevice();
 		auto pID3D11DeviceContext = Dev->GetD3DDeviceContext();
-		// •`‰æ—pƒCƒ“ƒXƒ^ƒ“ƒX‚Ì¶¬
+		// æç”»ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ç”Ÿæˆ
 		m_renderer = EffekseerRendererDX11::Renderer::Create(pDx11Device, pID3D11DeviceContext, 8000);
-		// ƒGƒtƒFƒNƒgŠÇ——pƒCƒ“ƒXƒ^ƒ“ƒX‚Ì¶¬
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆç®¡ç†ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ç”Ÿæˆ
 		m_Manager = Effekseer::Manager::Create(8000);
 
-		// •`‰æ—pƒCƒ“ƒXƒ^ƒ“ƒX‚©‚ç•`‰æ‹@”\‚ğİ’è
+		// æç”»ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‹ã‚‰æç”»æ©Ÿèƒ½ã‚’è¨­å®š
 		m_Manager->SetSpriteRenderer(m_renderer->CreateSpriteRenderer());
 		m_Manager->SetRibbonRenderer(m_renderer->CreateRibbonRenderer());
 		m_Manager->SetRingRenderer(m_renderer->CreateRingRenderer());
 		m_Manager->SetTrackRenderer(m_renderer->CreateTrackRenderer());
 		m_Manager->SetModelRenderer(m_renderer->CreateModelRenderer());
 
-		// •`‰æ—pƒCƒ“ƒXƒ^ƒ“ƒX‚©‚çƒeƒNƒXƒ`ƒƒ‚Ì“Ç‹@”\‚ğİ’è
-		// “Æ©Šg’£‰Â”\AŒ»İ‚Íƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚ñ‚Å‚¢‚éB
+		// æç”»ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­è¾¼æ©Ÿèƒ½ã‚’è¨­å®š
+		// ç‹¬è‡ªæ‹¡å¼µå¯èƒ½ã€ç¾åœ¨ã¯ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚“ã§ã„ã‚‹ã€‚
 		m_Manager->SetTextureLoader(m_renderer->CreateTextureLoader());
 		m_Manager->SetModelLoader(m_renderer->CreateModelLoader());
 		m_Manager->SetMaterialLoader(m_renderer->CreateMaterialLoader());
@@ -124,89 +125,89 @@ namespace basecross {
 	void EffectManeger::RegisterResource(const wstring& Key, const  wstring& FileName)
 	{
 		try {
-			// ƒL[‚ª‹ó•¶š—ñ‚Ìê‡‚Í•s³‚ÈŒÄ‚Ño‚µ‚Æ‚µ‚Ä—áŠO‚ğƒXƒ[
+			// ã‚­ãƒ¼ãŒç©ºæ–‡å­—åˆ—ã®å ´åˆã¯ä¸æ­£ãªå‘¼ã³å‡ºã—ã¨ã—ã¦ä¾‹å¤–ã‚’ã‚¹ãƒ­ãƒ¼
 			if (Key == L"") {
 				throw BaseException(
-					L"ƒL[‚ª‹ó‚Å‚·B", // ƒGƒ‰[ƒƒbƒZ[ƒW
-					L"if(Key == L\"\")", // ƒGƒ‰[‰ÓŠ
-					L"Effect::RegisterResource()" // ŠÖ”–¼
+					L"", // ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+					L"if(Key == LÂ¥"")", // ã‚¨ãƒ©ãƒ¼ç®‡æ‰€
+					L"Effect::RegisterResource()" // é–¢æ•°å
 				);
 			}
 
-			// Effekseer‚ğg—p‚µ‚Äƒtƒ@ƒCƒ‹‚©‚çƒGƒtƒFƒNƒgƒf[ƒ^‚ğ“Ç‚İ‚Ş
+			// Effekseerã‚’ä½¿ç”¨ã—ã¦ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€
 			auto Effect = Effekseer::Effect::Create(m_Manager, (const char16_t*)FileName.c_str());
 
-			//--- d•¡ƒ`ƒFƒbƒN ---
+			//--- é‡è¤‡ãƒã‚§ãƒƒã‚¯ ---
 			map<wstring, Effekseer::EffectRef>::iterator it;
-			// 1. Šù‚É“Ç‚İ‚Ü‚ê‚½ƒGƒtƒFƒNƒgƒf[ƒ^‚Æ“¯‚¶‚à‚Ì‚Å‚Í‚È‚¢‚©ƒ`ƒFƒbƒN
+			// 1. æ—¢ã«èª­ã¿è¾¼ã¾ã‚ŒãŸã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ‡ãƒ¼ã‚¿ã¨åŒã˜ã‚‚ã®ã§ã¯ãªã„ã‹ãƒã‚§ãƒƒã‚¯
 			for (it = m_ResMap.begin(); it != m_ResMap.end(); it++) {
-				// “¯‚¶ƒGƒtƒFƒNƒgƒf[ƒ^‚ªŒ©‚Â‚©‚Á‚½ê‡
+				// åŒã˜ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ‡ãƒ¼ã‚¿ãŒè¦‹ã¤ã‹ã£ãŸå ´åˆ
 				if (it->second == Effect)
 				{
-					// ƒL[‚à“¯‚¶‚È‚çAŠù‚É“o˜^Ï‚İ‚Ì‚½‚ß³íI—¹i“ñd“o˜^–h~j
+					// ã‚­ãƒ¼ã‚‚åŒã˜ãªã‚‰ã€æ—¢ã«ç™»éŒ²æ¸ˆã¿ã®ãŸã‚æ­£å¸¸çµ‚äº†ï¼ˆäºŒé‡ç™»éŒ²é˜²æ­¢ï¼‰
 					if (it->first == Key)
 					{
 						return;
 					}
-					// “¯‚¶ƒGƒtƒFƒNƒgƒf[ƒ^‚ªuˆÙ‚È‚éƒL[v‚Å“o˜^‚³‚ê‚æ‚¤‚Æ‚µ‚Ä‚¢‚é‚½‚ßA—áŠO‚ğƒXƒ[
-					wstring keyerr = L"“¯‚¶ƒGƒtƒFƒNƒgƒŠƒ\[ƒX‚ª•Ê‚ÌƒL[(" + it->first + L")‚ÅŠù‚É“o˜^‚³‚ê‚Ä‚¢‚Ü‚·BƒL[: " + Key;
+					// åŒã˜ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ‡ãƒ¼ã‚¿ãŒã€Œç•°ãªã‚‹ã‚­ãƒ¼ã€ã§ç™»éŒ²ã•ã‚Œã‚ˆã†ã¨ã—ã¦ã„ã‚‹ãŸã‚ã€ä¾‹å¤–ã‚’ã‚¹ãƒ­ãƒ¼
+					wstring keyerr = L"" + Key;
 					throw BaseException(
-						L"ƒŠƒ\[ƒX‚Ìd•¡“o˜^ƒGƒ‰[",
+						L"ãƒªã‚½ãƒ¼ã‚¹ã®é‡è¤‡ç™»éŒ²ã‚¨ãƒ©ãƒ¼",
 						keyerr,
 						L"Effect::RegisterResource()"
 					);
 				}
 			}
 
-			// 2. w’è‚³‚ê‚½ƒL[‚ªŠù‚Ég‚í‚ê‚Ä‚¢‚È‚¢‚©ƒ`ƒFƒbƒN
+			// 2. æŒ‡å®šã•ã‚ŒãŸã‚­ãƒ¼ãŒæ—¢ã«ä½¿ã‚ã‚Œã¦ã„ãªã„ã‹ãƒã‚§ãƒƒã‚¯
 			it = m_ResMap.find(Key);
 			if (it != m_ResMap.end())
 			{
-				// w’è‚ÌƒL[‚ªŒ©‚Â‚©‚Á‚½iƒL[‚ªd•¡‚µ‚Ä‚¢‚éj‚½‚ßA—áŠO‚ğƒXƒ[
-				wstring keyerr = L"w’è‚³‚ê‚½ƒL[(" + Key + L")‚ÍŠù‚Ég—p‚³‚ê‚Ä‚¢‚Ü‚·B";
+				// æŒ‡å®šã®ã‚­ãƒ¼ãŒè¦‹ã¤ã‹ã£ãŸï¼ˆã‚­ãƒ¼ãŒé‡è¤‡ã—ã¦ã„ã‚‹ï¼‰ãŸã‚ã€ä¾‹å¤–ã‚’ã‚¹ãƒ­ãƒ¼
+				wstring keyerr = L"";
 				throw BaseException(
-					L"ƒL[‚Ìd•¡ƒGƒ‰[",
+					L"ã‚­ãƒ¼ã®é‡è¤‡ã‚¨ãƒ©ãƒ¼",
 					keyerr,
 					L"Effect::RegisterResource()"
 				);
 			}
 			else {
-				// ƒ`ƒFƒbƒN‚ğ‚·‚×‚ÄƒpƒX‚µ‚½ê‡AƒŠƒ\[ƒXƒ}ƒbƒv‚É“o˜^‚·‚é
+				// ãƒã‚§ãƒƒã‚¯ã‚’ã™ã¹ã¦ãƒ‘ã‚¹ã—ãŸå ´åˆã€ãƒªã‚½ãƒ¼ã‚¹ãƒãƒƒãƒ—ã«ç™»éŒ²ã™ã‚‹
 				m_ResMap[Key] = Effect;
 			}
 		}
 		catch (...) {
-			// ‚±‚ÌŠÖ”“à‚Å”­¶‚µ‚½—áŠO‚ğA‚»‚Ì‚Ü‚ÜŒÄ‚Ño‚µŒ³‚É“Š‚°‚é
+			// ã“ã®é–¢æ•°å†…ã§ç™ºç”Ÿã—ãŸä¾‹å¤–ã‚’ã€ãã®ã¾ã¾å‘¼ã³å‡ºã—å…ƒã«æŠ•ã’ã‚‹
 			throw;
 		}
 	}
 
 	Effekseer::EffectRef EffectManeger::GetEffectResource(const wstring& Key) const
 	{
-		// ƒL[‚ª‹ó•¶š—ñ‚Ìê‡‚Í•s³‚ÈŒÄ‚Ño‚µ‚Æ‚µ‚Ä—áŠO‚ğƒXƒ[
+		// ã‚­ãƒ¼ãŒç©ºæ–‡å­—åˆ—ã®å ´åˆã¯ä¸æ­£ãªå‘¼ã³å‡ºã—ã¨ã—ã¦ä¾‹å¤–ã‚’ã‚¹ãƒ­ãƒ¼
 		if (Key == L"") {
 			throw BaseException(
-				L"ƒL[‚ª‹ó‚Å‚·B",
-				L"if(Key == L\"\")",
-				L"App::GetResource()" // NOTE: EffectManeger::GetEffectResource() ‚ª‚æ‚è³Šm‚©‚à‚µ‚ê‚Ü‚¹‚ñ
+				L"",
+				L"if(Key == LÂ¥"")",
+				L"App::GetResource()" 
 			);
 		}
 
-		// ƒ}ƒbƒv‚©‚çƒL[‚ğŒŸõiconst_iterator‚ğg—pj
+		// ãƒãƒƒãƒ—ã‹ã‚‰ã‚­ãƒ¼ã‚’æ¤œç´¢ï¼ˆconst_iteratorã‚’ä½¿ç”¨ï¼‰
 		map<wstring, Effekseer::EffectRef >::const_iterator  it;
 		it = m_ResMap.find(Key);
 
 		if (it != m_ResMap.end()) {
-			// w’è‚ÌƒL[‚ªŒ©‚Â‚©‚Á‚½ê‡A‘Î‰‚·‚éƒGƒtƒFƒNƒgƒŠƒ\[ƒX‚ğ•Ô‚·
+			// æŒ‡å®šã®ã‚­ãƒ¼ãŒè¦‹ã¤ã‹ã£ãŸå ´åˆã€å¯¾å¿œã™ã‚‹ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒªã‚½ãƒ¼ã‚¹ã‚’è¿”ã™
 			return  it->second;
 		}
 		else {
-			// ƒL[‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚½‚ßA—áŠO‚ğƒXƒ[
-			wstring keyerr = L"w’è‚³‚ê‚½ƒL[(" + Key + L")‚ÌƒŠƒ\[ƒX‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB";
+			// ã‚­ãƒ¼ãŒè¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸãŸã‚ã€ä¾‹å¤–ã‚’ã‚¹ãƒ­ãƒ¼
+			wstring keyerr = L"";
 			throw BaseException(
-				L"ƒŠƒ\[ƒX–¢”­Œ©ƒGƒ‰[",
+				L"ãƒªã‚½ãƒ¼ã‚¹æœªç™ºè¦‹ã‚¨ãƒ©ãƒ¼",
 				keyerr,
-				L"App::GetResource()" // NOTE: EffectManeger::GetEffectResource() ‚ª‚æ‚è³Šm‚©‚à‚µ‚ê‚Ü‚¹‚ñ
+				L"App::GetResource()" 
 			);
 		}
 	}

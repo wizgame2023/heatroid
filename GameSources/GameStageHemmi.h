@@ -1,7 +1,7 @@
 /*!
 @file GameStageHemmi.h
-@brief ƒeƒXƒgƒQ[ƒ€ƒXƒe[ƒW
-’S“–FˆíŒ©
+@brief ãƒ†ã‚¹ãƒˆã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -10,26 +10,26 @@
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
-	//	ƒQ[ƒ€ƒXƒe[ƒWƒNƒ‰ƒX
+	//	ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒ©ã‚¹
 	//--------------------------------------------------------------------------------------
 	class GameStageHemmi : public Stage {
 
 		shared_ptr<SoundItem> m_BGM;
 		std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager();
 		//CsvFile m_GameStage1;
-		//void CreateViewLight(); //ƒrƒ…[‚Ìì¬
-		//void CreateGameBox();//GameStage‚Ì¶¬
-		//void CreatePlayer(); //Player‚Ì¶¬
+		//void CreateViewLight(); //ãƒ“ãƒ¥ãƒ¼ã®ä½œæˆ
+		//void CreateGameBox();//GameStageã®ç”Ÿæˆ
+		//void CreatePlayer(); //Playerã®ç”Ÿæˆ
 		//void CreateFixedBox();
 		//void CreateGimmick();
 		//void CreateEnemy();
 		//void InstanceStage();
 		//void ToMainCamera();
 	public:
-		//\’z‚Æ”jŠü
+		//æ§‹ç¯‰ã¨ç ´æ£„
 		GameStageHemmi() :Stage(){}
 		virtual ~GameStageHemmi() {}
-		virtual void OnCreate()override; //‰Šú‰»
+		virtual void OnCreate()override; //åˆæœŸåŒ–
 		
 		void PlayBGM(const wstring& StageBGM);
 		void CreateStageManager();

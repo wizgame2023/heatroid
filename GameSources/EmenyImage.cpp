@@ -1,7 +1,7 @@
 /*!
 @file EmenyImage.cpp
-@brief ƒLƒƒƒ‰ƒNƒ^[‚È‚ÇÀ‘Ì
-’S“–FˆíŒ©
+@brief ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãªã©å®Ÿä½“
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -9,7 +9,7 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class Square : public GameObject;   //ƒXƒNƒGƒA‚Ì•\¦
+	//	class Square : public GameObject;   //ã‚¹ã‚¯ã‚¨ã‚¢ã®è¡¨ç¤º
 	//--------------------------------------------------------------------------------------
 	Square::Square(const shared_ptr<Stage>& stage,
 		const float width, 
@@ -45,7 +45,7 @@ namespace basecross {
 			m_trans->SetScale(Vec3(1.0f, 1.0f, 1.0f));
 			m_trans->SetRotation(Vec3(0.0f, 0.0f, 0.0f));
 		}
-		//’¸“_ƒf[ƒ^
+		//é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
 		m_normalVertices = {
 			{Vec3(-m_width * 0.5f, m_height * 0.5f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(0.0f,0.0f)},
 			{Vec3(m_width * 0.5f, m_height * 0.5f,0.0f), bsm::Vec3(0.0f, 0.0f, -1.0f),Vec2(1.0f,0.0f)},
@@ -71,7 +71,7 @@ namespace basecross {
 		m_draw->SetTextureResource(m_meshName);
 		m_draw->SetOriginalMeshResource(m_squareMesh);
 		m_draw->SetDepthStencilState(DepthStencilState::Read);
-		SetAlphaActive(true);//“§‰ßˆ——LŒø
+		SetAlphaActive(true);//é€éå‡¦ç†æœ‰åŠ¹
 		SetDrawLayer(1);
 		if (enemy) {
 			m_draw->SetDrawActive(false);
@@ -86,7 +86,7 @@ namespace basecross {
 			m_pos = enemy->GetWorldPos();
 			m_trans->SetPosition(Vec3(m_pos.x, m_pos.y + m_posHight, m_pos.z));
 			
-			//ƒI[ƒo[ƒq[ƒg‚Ì‚Ì‚İ•\¦
+			//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆã®æ™‚ã®ã¿è¡¨ç¤º
 			//if (enemy->GetOverHeat()) {
 			//	m_draw->SetDrawActive(true);
 			//}
@@ -101,7 +101,7 @@ namespace basecross {
 		
 		//Debug();
 	}
-	//‰ñ“]‚Ì•â³
+	//å›è»¢ã®è£œæ­£
 	Quat Square::RotCorrection(const Vec3& Line) {
 		Vec3 temp = Line;
 		Vec2 tempVec2(temp.x, temp.z);
@@ -122,7 +122,7 @@ namespace basecross {
 	void Square::DrawGauge(bool flag) {
 		m_draw->SetDrawActive(flag);
 	}
-	//íœ
+	//å‰Šé™¤
 	void Square::ThisDestroy() {
 		auto stage = GetStage();
 		stage->RemoveGameObject<Square>(GetThis<Square>());
@@ -130,7 +130,7 @@ namespace basecross {
 	void Square::SetPosHight(float hight) {
 		m_posHight = hight;
 	}
-	//ƒfƒoƒbƒN—p
+	//ãƒ‡ãƒãƒƒã‚¯ç”¨
 	void Square::Debug() {
 		//auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
 		//auto scene = App::GetApp()->GetScene<Scene>();
@@ -157,9 +157,9 @@ namespace basecross {
 		//scene->SetDebugString(wss.str());
 	}
 
-	//ƒI[ƒo[ƒq[ƒgƒQ[ƒW
+	//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆã‚²ãƒ¼ã‚¸
 	//--------------------------------------------------------------------------------------
-	//	class GaugeSquare : public Square;   //ƒXƒNƒGƒA‚ÌƒQ[ƒW•\¦
+	//	class GaugeSquare : public Square;   //ã‚¹ã‚¯ã‚¨ã‚¢ã®ã‚²ãƒ¼ã‚¸è¡¨ç¤º
 	//--------------------------------------------------------------------------------------
 	GaugeSquare::GaugeSquare(const shared_ptr<Stage>& stage,
 		const float width, const float height,
@@ -181,7 +181,7 @@ namespace basecross {
 			ThisDestroy();
 		}
 	}
-	//’¸“_‚ÌXVˆ—
+	//é ‚ç‚¹ã®æ›´æ–°å‡¦ç†
 	void GaugeSquare::UpdateValue(float ratio) {
 		auto moveX = (m_width * ratio) / m_width;
 		m_vertices[1].position.x = -m_width / 2 + (m_width * ratio);

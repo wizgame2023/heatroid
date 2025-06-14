@@ -1,7 +1,7 @@
 /*!
 @file GameStageSprite.h
-@brief ƒQ[ƒ€ƒXƒe[ƒW‚ÌƒXƒvƒ‰ƒCƒg‚È‚ÇÀ‘Ì
-’S“–FˆíŒ©
+@brief ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãªã©å®Ÿä½“
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -9,14 +9,14 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class GameSprite : public GameObject;   //UI‚Ì•\¦
+	//	class GameSprite : public GameObject;   //UIã®è¡¨ç¤º
 	//--------------------------------------------------------------------------------------
 	class GameSprite : public GameObject {
 	private:
-		//•\¦ƒTƒCƒY
-		float m_width;  //‰¡‚ÌƒTƒCƒY
-		float m_height; //c‚ÌƒTƒCƒY
-		int m_layer;   //•\¦ƒŒƒCƒ„[
+		//è¡¨ç¤ºã‚µã‚¤ã‚º
+		float m_width;  //æ¨ªã®ã‚µã‚¤ã‚º
+		float m_height; //ç¸¦ã®ã‚µã‚¤ã‚º
+		int m_layer;   //è¡¨ç¤ºãƒ¬ã‚¤ãƒ¤ãƒ¼
 		Vec3 m_pos;
 		wstring m_meshName;
 		Col4 m_color;
@@ -40,7 +40,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class FadeOut : public GameObject;   //ƒtƒF[ƒhƒAƒEƒg
+	//	class FadeOut : public GameObject;   //ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class FadeOut : public GameObject {
 	private: 
@@ -56,7 +56,7 @@ namespace basecross {
 		void SetColor(Col4 color);
 	};
 	//--------------------------------------------------------------------------------------
-	//	class FadeIn : public GameObject;   //ƒtƒF[ƒhƒCƒ“
+	//	class FadeIn : public GameObject;   //ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
 	//--------------------------------------------------------------------------------------
 	class FadeIn : public GameObject {
 	private:
@@ -69,7 +69,7 @@ namespace basecross {
 		virtual void OnUpdate() override;
 
 	};
-	//ƒS[ƒ‹‚ÌƒtƒF[ƒhƒAƒEƒg/ƒtƒF[ƒhƒCƒ“(Player‚©‚çŒÄ‚Ño‚·H)
+	//ã‚´ãƒ¼ãƒ«æ™‚ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ/ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³(Playerã‹ã‚‰å‘¼ã³å‡ºã™ï¼Ÿ)
 	class GoalFade : public GameObject {
 	private:
 		float m_time;
@@ -85,7 +85,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class GameOverSprite : public GameObject;   //ƒQ[ƒ€ƒI[ƒo[‚Ì‰‰o—pUI
+	//	class GameOverSprite : public GameObject;   //ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã®æ¼”å‡ºç”¨UI
 	//--------------------------------------------------------------------------------------
 	class GameOverSprite :public GameObject {
 	private:
@@ -100,7 +100,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class NumberSprite : public GameObject;   //”š‚Ì•\¦—pUI
+	//	class NumberSprite : public GameObject;   //æ•°å­—ã®è¡¨ç¤ºç”¨UI
 	//--------------------------------------------------------------------------------------
 	class NumberSprite :public GameObject {
 	private:

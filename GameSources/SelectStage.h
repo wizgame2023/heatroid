@@ -1,6 +1,6 @@
 /*!
 @file Character.h
-@brief ƒLƒƒƒ‰ƒNƒ^[‚È‚Ç
+@brief ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãªã©
 */
 
 #pragma once
@@ -18,15 +18,15 @@ namespace basecross {
 		shared_ptr<SoundItem> m_BGM;
 		std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager();
 		shared_ptr<GameObject> EffectGround;
-		void CreateViewLight(); //ƒrƒ…[‚Ìì¬		
+		void CreateViewLight(); //ãƒ“ãƒ¥ãƒ¼ã®ä½œæˆ		
 		void ShowDebug();
 
 	public:
 		SelectStage() : Stage() {}
 		virtual ~SelectStage() {}
 
-		virtual void OnCreate()override; //‰Šú‰»
-		virtual void OnUpdate()override; //‰Šú‰»
+		virtual void OnCreate()override; //åˆæœŸåŒ–
+		virtual void OnUpdate()override; //åˆæœŸåŒ–
 		void OnDestroy();
 		void StageSelect();
 		void SelectEffect();

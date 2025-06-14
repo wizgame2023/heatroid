@@ -424,7 +424,8 @@ namespace basecross {
 		//呼び出す
 		void Invoke(const Vec3 dist, const Vec3 angle, const float power) {
 			m_used = true;
-			GetComponent<TriggerSphere>()->SetUpdateActive(true);
+			auto Coll = GetComponent<CollisionSphere>();
+			Coll->SetAfterCollision(AfterCollision::None);
 			SetUpdateActive(true);
 
 			m_stopped = false;

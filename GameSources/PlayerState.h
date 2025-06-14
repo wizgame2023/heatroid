@@ -1,7 +1,7 @@
 #pragma once
 /*!
 @file PlayerState.h
-@brief ƒvƒŒƒCƒ„[‚ÌƒXƒe[ƒg
+@brief ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¹ãƒ†ãƒ¼ãƒˆ
 */
 
 #pragma once
@@ -24,8 +24,8 @@ namespace basecross {
 	class PlayerDiedState;
 
 	/**
-	 * @brief ƒvƒŒƒCƒ„[‚ÌƒXƒe[ƒgŠî’êƒNƒ‰ƒX
-	 * ƒvƒŒƒCƒ„[‚Ìs“®Eó‘Ô‚ğŠÇ—‚·‚éƒIƒuƒWƒFƒNƒg
+	 * @brief ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¹ãƒ†ãƒ¼ãƒˆåŸºåº•ã‚¯ãƒ©ã‚¹
+	 * ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®è¡Œå‹•ãƒ»çŠ¶æ…‹ã‚’ç®¡ç†ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	 */
 	class PlayerStateBase : enable_shared_from_this<PlayerStateBase> {
 	protected:
@@ -33,7 +33,7 @@ namespace basecross {
 		KEYBOARD_STATE m_key;
 		vector<CONTROLER_STATE> m_pad;
 
-		//‰‰oƒAƒjƒ§Œä—p‚ÌŠÔŒv‘ª•Ï”
+		//æ¼”å‡ºã‚¢ãƒ‹ãƒ¡åˆ¶å¾¡ç”¨ã®æ™‚é–“è¨ˆæ¸¬å¤‰æ•°
 		float m_animTime = 0;
 	public:
 		PlayerStateBase(const shared_ptr<Player>& obj) : m_player(obj) {
@@ -49,7 +49,7 @@ namespace basecross {
 	};
 
 	//----------------------------------------------------------------
-	// ‚±‚±‚©‚çƒXƒe[ƒg(PlayerStateBaseŒp³)
+	// ã“ã“ã‹ã‚‰ã‚¹ãƒ†ãƒ¼ãƒˆ(PlayerStateBaseç¶™æ‰¿)
 	//----------------------------------------------------------------
 	class PlayerStandState : public PlayerStateBase {
 	public:
@@ -109,21 +109,21 @@ namespace basecross {
 	};
 
 	/**
-	 * @brief ƒvƒŒƒCƒ„[‚ÌƒXƒe[ƒgƒ}ƒVƒ“
-	 * ƒvƒŒƒCƒ„[‚ğƒXƒe[ƒg‰Ò“­‚³‚¹‚é‚½‚ß‚ÌŠÇ—ƒIƒuƒWƒFƒNƒg
+	 * @brief ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³
+	 * ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ã‚¹ãƒ†ãƒ¼ãƒˆç¨¼åƒã•ã›ã‚‹ãŸã‚ã®ç®¡ç†ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	 */
 	class PlayerStateMachine : enable_shared_from_this<PlayerStateMachine> {
 	public:
-		//ƒXƒe[ƒgƒ^ƒCƒv
+		//ã‚¹ãƒ†ãƒ¼ãƒˆã‚¿ã‚¤ãƒ—
 		enum PlayerStateType {
-			player_stand,		//’nã
-			player_air,			//‹ó’†
-			player_hit,			//‚â‚ç‚ê
-			player_release,		//”­Ë
-			player_start,		//ƒQ[ƒ€ŠJn‰‰o
-			player_goalstandby,	//ƒS[ƒ‹‰‰o‘Ò‹@	
-			player_goal,		//ƒXƒe[ƒWƒNƒŠƒA
-			player_died			//€–S
+			player_stand,		//åœ°ä¸Š
+			player_air,			//ç©ºä¸­
+			player_hit,			//ã‚„ã‚‰ã‚Œ
+			player_release,		//ç™ºå°„
+			player_start,		//ã‚²ãƒ¼ãƒ é–‹å§‹æ¼”å‡º
+			player_goalstandby,	//ã‚´ãƒ¼ãƒ«æ¼”å‡ºå¾…æ©Ÿ	
+			player_goal,		//ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒªã‚¢
+			player_died			//æ­»äº¡
 		};
 
 		void ChangeState(PlayerStateType type);
@@ -133,36 +133,36 @@ namespace basecross {
 			return _stateType;
 		}
 	private:
-		//Œ»İ‚ÌƒXƒe[ƒgƒ^ƒCƒv
+		//ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚¿ã‚¤ãƒ—
 		PlayerStateType _stateType;
-		//ƒXƒe[ƒgˆê——
+		//ã‚¹ãƒ†ãƒ¼ãƒˆä¸€è¦§
 		unordered_map<PlayerStateType, shared_ptr<PlayerStateBase>> _stateList;
 
 		void AddState(PlayerStateType type, const shared_ptr<PlayerStateBase> state) {
 			_stateList[type] = state;
 		}
 	public:
-		//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		PlayerStateMachine(shared_ptr<Player> obj) {
 
-			//—§‚¿
+			//ç«‹ã¡
 			AddState(player_stand, shared_ptr<PlayerStandState>(new PlayerStandState(obj)));
-			//‹ó’†
+			//ç©ºä¸­
 			AddState(player_air, shared_ptr<PlayerAirState>(new PlayerAirState(obj)));
-			//‹ò‚ç‚¢
+			//å–°ã‚‰ã„
 			AddState(player_hit, shared_ptr<PlayerHitState>(new PlayerHitState(obj)));
-			//”­Ë
+			//ç™ºå°„
 			AddState(player_release, shared_ptr<PlayerReleaseState>(new PlayerReleaseState(obj)));
-			//ƒXƒ^[ƒg
+			//ã‚¹ã‚¿ãƒ¼ãƒˆ
 			AddState(player_start, shared_ptr<PlayerStartState>(new PlayerStartState(obj)));
-			//€–S
+			//æ­»äº¡
 			AddState(player_died, shared_ptr<PlayerDiedState>(new PlayerDiedState(obj)));
-			//ƒS[ƒ‹‰‰o‘Ò‹@’†
+			//ã‚´ãƒ¼ãƒ«æ¼”å‡ºå¾…æ©Ÿä¸­
 			AddState(player_goalstandby, shared_ptr<PlayerGoalStandbyState>(new PlayerGoalStandbyState(obj)));
-			//ƒS[ƒ‹
+			//ã‚´ãƒ¼ãƒ«
 			AddState(player_goal, shared_ptr<PlayerGoalState>(new PlayerGoalState(obj)));
 
-			//‰ŠúƒXƒe[ƒg
+			//åˆæœŸã‚¹ãƒ†ãƒ¼ãƒˆ
 			ChangeState(player_start);
 		}
 		~PlayerStateMachine() {}

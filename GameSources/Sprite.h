@@ -1,6 +1,6 @@
 /*!
 @file Sprite.h
-@brief ƒXƒvƒ‰ƒCƒg
+@brief ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 */
 
 #pragma once

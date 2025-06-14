@@ -1,6 +1,6 @@
 /*!
 @file TitleStage.h
-@brief ƒLƒƒƒ‰ƒNƒ^[‚È‚Ç
+@brief ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãªã©
 */
 
 #pragma once
@@ -9,38 +9,38 @@
 namespace basecross {
     class TitleStage : public Stage
     {
-        shared_ptr<SoundItem> m_BGM;                   // ƒoƒbƒNƒOƒ‰ƒEƒ“ƒhƒ~ƒ…[ƒWƒbƒN‚ÌƒTƒEƒ“ƒhƒAƒCƒeƒ€
-        std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2ƒ}ƒl[ƒWƒƒ[
+        shared_ptr<SoundItem> m_BGM;                   // ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ãƒŸãƒ¥ãƒ¼ã‚¸ãƒƒã‚¯ã®ã‚µã‚¦ãƒ³ãƒ‰ã‚¢ã‚¤ãƒ†ãƒ 
+        std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager();
 
-        float m_updateTime;                          //@Œv‘ªŠÔ
-        bool m_startFlag = false;                    // ƒ^ƒCƒgƒ‹‚Ìƒtƒ‰ƒO
-        // ƒrƒ…[‚Ìì¬
+        float m_updateTime;                          //ã€€è¨ˆæ¸¬æ™‚é–“
+        bool m_startFlag = false;                    // ã‚¿ã‚¤ãƒˆãƒ«ã®ãƒ•ãƒ©ã‚°
+        // ãƒ“ãƒ¥ãƒ¼ã®ä½œæˆ
         void CreateViewLight();
 
     public:
-        // ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+        // ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
         TitleStage() : Stage() {}
         virtual ~TitleStage() {}
 
-        // ‰Šú‰»
+        // åˆæœŸåŒ–
         virtual void OnCreate() override;
 
-        // XVˆ—
+        // æ›´æ–°å‡¦ç†
         virtual void OnUpdate() override;
 
-        // BGM”jŠüˆ—
+        // BGMç ´æ£„å‡¦ç†
         void OnDestroy();
 
-        // ƒ{ƒ^ƒ“A‚ª‰Ÿ‚³‚ê‚½‚Ìˆ—
+        // ãƒœã‚¿ãƒ³AãŒæŠ¼ã•ã‚ŒãŸæ™‚ã®å‡¦ç†
         void OnPushA();
 
-        // ƒ^ƒCƒgƒ‹ƒXƒvƒ‰ƒCƒg‚Ì•`‰æ
+        // ã‚¿ã‚¤ãƒˆãƒ«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æç”»
         void OnTitleSprite();
 
-        // ƒoƒbƒNƒOƒ‰ƒEƒ“ƒhƒ~ƒ…[ƒWƒbƒN‚ğÄ¶‚·‚é
+        // ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ãƒŸãƒ¥ãƒ¼ã‚¸ãƒƒã‚¯ã‚’å†ç”Ÿã™ã‚‹
         void PlayBGM(const wstring& StageBGM);
 
-        // ƒTƒEƒ“ƒhƒGƒtƒFƒNƒg‚ğÄ¶‚·‚é
+        // ã‚µã‚¦ãƒ³ãƒ‰ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å†ç”Ÿã™ã‚‹
         void PlaySE(wstring path, float loopcnt, float volume);
     };
 

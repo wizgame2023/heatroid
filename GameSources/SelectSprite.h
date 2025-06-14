@@ -1,7 +1,7 @@
 /*!
 @file SelectSprite.h
-@brief@ƒZƒŒƒNƒgƒXƒe[ƒW‚ÌUI ‚È‚Ç
-’S“–FˆíŒ©
+@briefã€€ã‚»ãƒ¬ã‚¯ãƒˆã‚¹ãƒ†ãƒ¼ã‚¸ã®UI ãªã©
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
