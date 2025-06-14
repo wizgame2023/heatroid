@@ -32,6 +32,7 @@ namespace basecross {
     public:
         bool m_pause = false;                          // ポーズ状態かどうかのフラグ
         bool m_soundFlg = false;
+
         // 構築と破棄
         GameStage() :Stage() {}
         virtual ‾GameStage() {}
