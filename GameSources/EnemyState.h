@@ -1,7 +1,7 @@
 /*!
 @file Enemy.h
-@brief “G‚È‚Ç
-’S“–FˆíŒ©
+@brief æ•µãªã©
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -10,7 +10,7 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class EnemyState	//“G‚ÌƒfƒtƒHƒ‹ƒgƒXƒe[ƒg
+	//	class EnemyState	//æ•µã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class EnemyState {
 	protected:
@@ -20,7 +20,7 @@ namespace basecross {
 			m_enemy(enemy)
 		{
 		}
-		virtual ~EnemyState(){}
+		virtual â€¾EnemyState(){}
 
 		virtual void Enter(){}
 		virtual void Execute(){}
@@ -29,7 +29,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class ChaseState : public EnemyState	//ƒvƒŒƒCƒ„[‚ğ’Ç‚¢‚©‚¯‚éƒXƒe[ƒg
+	//	class ChaseState : public EnemyState	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’è¿½ã„ã‹ã‘ã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class ChaseState :public EnemyState {
 	private:
@@ -45,7 +45,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class OverHeatState : public EnemyState	@//ƒI[ƒo[ƒq[ƒgƒXƒe[ƒg
+	//	class OverHeatState : public EnemyState	ã€€//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class OverHeatState : public EnemyState {
 	public:
@@ -59,7 +59,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class ThrowAwayState : public EnemyState	//ƒI[ƒo[ƒq[ƒg’†‚É“Š‚°‚éƒXƒe[ƒg
+	//	class ThrowAwayState : public EnemyState	//ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆä¸­ã«æŠ•ã’ã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class ThrowAwayState : public EnemyState {
 	public:
@@ -73,7 +73,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class MoveBulletState : public EnemyState	//’Ç‚¢‚©‚¯‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚éƒXƒe[ƒg
+	//	class MoveBulletState : public EnemyState	//è¿½ã„ã‹ã‘ãªãŒã‚‰å¼¾ã‚’æ’ƒã£ã¦ãã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class MoveBulletState : public EnemyState {
 	public:
@@ -86,7 +86,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class SlideState : public EnemyState	@//¶‰EˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚éƒXƒe[ƒg
+	//	class SlideState : public EnemyState	ã€€//å·¦å³ç§»å‹•ã—ãªãŒã‚‰å¼¾ã‚’æ’ƒã£ã¦ãã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class SlideState : public EnemyState {
 	public:
@@ -99,7 +99,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class PlungeState : public EnemyState	@//ƒvƒŒƒCƒ„[‚ÉŒü‚©‚Á‚Ä“Ë‚Á‚ŞƒXƒe[ƒg
+	//	class PlungeState : public EnemyState	ã€€//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«å‘ã‹ã£ã¦çªã£è¾¼ã‚€ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class PlungeState : public EnemyState {
 	private:
@@ -117,7 +117,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class ParabolaBulletState : public EnemyState	//“®‚©‚¸•ú•¨üã‚É’e‚ğŒ‚‚Á‚Ä‚­‚éƒXƒe[ƒg
+	//	class ParabolaBulletState : public EnemyState	//å‹•ã‹ãšæ”¾ç‰©ç·šä¸Šã«å¼¾ã‚’æ’ƒã£ã¦ãã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class ParabolaBulletState : public EnemyState {
 	public:

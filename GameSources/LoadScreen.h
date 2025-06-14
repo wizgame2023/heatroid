@@ -1,7 +1,7 @@
 /*!
 @file LoadScreen.h
-@brief ƒ[ƒh’†‚ÉChildStage‚Æ‚µ‚Ä•\¦‚·‚é‰æ–Ê
-@author ’Øˆä—D–í
+@brief ãƒ­ãƒ¼ãƒ‰ä¸­ã«ChildStageã¨ã—ã¦è¡¨ç¤ºã™ã‚‹ç”»é¢
+@author åªäº•å„ªå¼¥
 */
 
 #pragma once
@@ -17,17 +17,17 @@ namespace basecross {
 
 	//====================================================================
 	// class LoadScreen
-	// ƒ[ƒh‰æ–Ê‚à‚Ç‚«
+	// ãƒ­ãƒ¼ãƒ‰ç”»é¢ã‚‚ã©ã
 	//====================================================================
 	class LoadScreen : public Stage
 	{
-		//ƒ[ƒhI—¹
+		//ãƒ­ãƒ¼ãƒ‰çµ‚äº†
 		bool m_loadEnd;
-		//Œo‰ßŠÔ
+		//çµŒéæ™‚é–“
 		float m_time;
-		//is“x‡‚¢‚ğŠÇ—‚·‚é‚½‚ß‚Ìvector
+		//é€²è¡Œåº¦åˆã„ã‚’ç®¡ç†ã™ã‚‹ãŸã‚ã®vector
 		vector<float> m_progress;
-		//‰½”Ô–Ú‚Ü‚Åi‚ñ‚Å‚¢‚é‚©‚ÌƒJƒEƒ“ƒg
+		//ä½•ç•ªç›®ã¾ã§é€²ã‚“ã§ã„ã‚‹ã‹ã®ã‚«ã‚¦ãƒ³ãƒˆ
 		int m_progCnt = 1;
 
 		const float loadLength = .05f;
@@ -37,16 +37,16 @@ namespace basecross {
 
 	public:
 		LoadScreen(): Stage() {}
-		virtual ~LoadScreen() {}
+		virtual â€¾LoadScreen() {}
 
 		void CreateViewLight();
-		virtual void OnCreate()override; //‰Šú‰»
-		virtual void OnUpdate()override; //‰Šú‰»
+		virtual void OnCreate()override; //åˆæœŸåŒ–
+		virtual void OnUpdate()override; //åˆæœŸåŒ–
 	};
 
 	//====================================================================
 	// class SpriteLoadBG
-	// ƒ[ƒfƒBƒ“ƒO‰æ–Ê”wŒi
+	// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ç”»é¢èƒŒæ™¯
 	//====================================================================
 	class SpriteLoadBG : public GameObject {
 		int m_loadState;
@@ -60,7 +60,7 @@ namespace basecross {
 			GameObject(StagePtr)
 		{}
 
-		~SpriteLoadBG() {}
+		â€¾SpriteLoadBG() {}
 
 		virtual void OnCreate() override;
 
@@ -69,7 +69,7 @@ namespace basecross {
 
 	//====================================================================
 	// class SpriteLoadCircle
-	// ƒ[ƒfƒBƒ“ƒO‰æ–Ê‚Ì‚®‚é‚®‚é‚·‚é‚â‚Â
+	// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ç”»é¢ã®ãã‚‹ãã‚‹ã™ã‚‹ã‚„ã¤
 	//====================================================================
 	class SpriteLoadCircle : public GameObject {
 		shared_ptr<PCTSpriteDraw> m_DrawComp;
@@ -86,7 +86,7 @@ namespace basecross {
 			GameObject(StagePtr)
 		{}
 
-		~SpriteLoadCircle() {}
+		â€¾SpriteLoadCircle() {}
 
 		virtual void OnCreate() override;
 
@@ -97,7 +97,7 @@ namespace basecross {
 
 	//====================================================================
 	// class SpriteLoad
-	// ƒ[ƒfƒBƒ“ƒO‚Ì•¶š
+	// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã®æ–‡å­—
 	//====================================================================
 	class SpriteLoad : public GameObject {
 		float m_time;
@@ -111,19 +111,19 @@ namespace basecross {
 			GameObject(StagePtr)
 		{}
 
-		~SpriteLoad() {}
+		â€¾SpriteLoad() {}
 
 		virtual void OnCreate() override;
 
 		virtual void OnUpdate() override;
 
-		//‚±‚±‚ÉŠO•”‚©‚çis“x‚ÌŒ©‚½–Ú‚ğ•Ï‚¦‚ç‚ê‚éŠÖ”‚ğì‚é
+		//ã“ã“ã«å¤–éƒ¨ã‹ã‚‰é€²è¡Œåº¦ã®è¦‹ãŸç›®ã‚’å¤‰ãˆã‚‰ã‚Œã‚‹é–¢æ•°ã‚’ä½œã‚‹
 		void UpdateProgress(float load);
 	};
 
 	//====================================================================
 	// class SpriteLoadFade
-	// ƒ[ƒfƒBƒ“ƒO‰æ–Ê‚Ì‰æ–Ê‘JˆÚ
+	// ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ç”»é¢ã®ç”»é¢é·ç§»
 	//====================================================================
 	class SpriteLoadFade : public GameObject {
 		bool m_loadState = false;
@@ -140,7 +140,7 @@ namespace basecross {
 			GameObject(StagePtr)
 		{}
 
-		~SpriteLoadFade() {}
+		â€¾SpriteLoadFade() {}
 
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;

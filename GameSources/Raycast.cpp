@@ -1,7 +1,7 @@
 /*!
 @file Raycast.cpp
-@brief ƒŒƒC‚ğ”ò‚Î‚·
-’S“–FˆíŒ©
+@brief ãƒ¬ã‚¤ã‚’é£›ã°ã™
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -9,7 +9,7 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class LineObject : public GameObject; //ü‚ğ•`‰æ‚·‚éƒIƒuƒWƒFƒNƒg
+	//	class LineObject : public GameObject; //ç·šã‚’æç”»ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	//--------------------------------------------------------------------------------------
 	LineObject::LineObject(const shared_ptr<Stage>& stage
 	):
@@ -29,22 +29,22 @@ namespace basecross {
 		m_endColor(Col4(1.0f))
 	{}
 	void LineObject::OnCreate() {
-		//ü‚ğ\¬‚·‚é2“_
+		//ç·šã‚’æ§‹æˆã™ã‚‹2ç‚¹
 		m_vertices = {
 			{m_startPos, m_startColor},
 			{m_endPos, m_endColor}
 		};
-		//n“_‚ÆI“_‚ğ‚Â‚È‚®ƒCƒ“ƒfƒbƒNƒX
+		//å§‹ç‚¹ã¨çµ‚ç‚¹ã‚’ã¤ãªãã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 		m_indices = {
 			0,1
 		};
 
-		//•`‰æ
-		m_draw = AddComponent<PCStaticDraw>(); //ˆÊ’u‚ÆF‚Ì‚İ
-		m_draw->SetOriginalMeshUse(true); //©ì‚µ‚½ƒƒbƒVƒ…‚ğg—p
-		m_draw->CreateOriginalMesh(m_vertices, m_indices); //ƒƒbƒVƒ…‚Ìì¬
-		auto meshResoure = m_draw->GetMeshResource(); //ƒƒbƒVƒ…ƒŠƒ\[ƒX‚ğæ“¾‚µAƒvƒŠƒ~ƒeƒBƒuƒ|ƒƒW[i’¸“_—˜—p•û–@j‚ğ•ÏX‚·‚é
-		meshResoure->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP); //ƒ|ƒŠƒSƒ“‚Å‚Í‚È‚­—Åü‚ğ•\¦
+		//æç”»
+		m_draw = AddComponent<PCStaticDraw>(); //ä½ç½®ã¨è‰²ã®ã¿
+		m_draw->SetOriginalMeshUse(true); //è‡ªä½œã—ãŸãƒ¡ãƒƒã‚·ãƒ¥ã‚’ä½¿ç”¨
+		m_draw->CreateOriginalMesh(m_vertices, m_indices); //ãƒ¡ãƒƒã‚·ãƒ¥ã®ä½œæˆ
+		auto meshResoure = m_draw->GetMeshResource(); //ãƒ¡ãƒƒã‚·ãƒ¥ãƒªã‚½ãƒ¼ã‚¹ã‚’å–å¾—ã—ã€ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ãƒãƒ­ã‚¸ãƒ¼ï¼ˆé ‚ç‚¹åˆ©ç”¨æ–¹æ³•ï¼‰ã‚’å¤‰æ›´ã™ã‚‹
+		meshResoure->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP); //ãƒãƒªã‚´ãƒ³ã§ã¯ãªãç¨œç·šã‚’è¡¨ç¤º
 	}
 	void LineObject::OnUpdate() {
 		auto player = m_player.lock();
@@ -69,7 +69,7 @@ namespace basecross {
 		}
 	}
 
-	//’¸“_‚ÌXV
+	//é ‚ç‚¹ã®æ›´æ–°
 	void LineObject::VerticesUpdate() {
 		m_vertices = {
 			{m_startPos, m_startColor},
@@ -79,7 +79,7 @@ namespace basecross {
 		m_draw->UpdateVertices(m_vertices);
 	}
 
-	//’¸“_‚Ìİ’è
+	//é ‚ç‚¹ã®è¨­å®š
 	void LineObject::SetLinePosition(const Vec3& startPos, const Vec3& endPos) {
 		m_startPos = startPos;
 		m_endPos = endPos;
@@ -89,7 +89,7 @@ namespace basecross {
 		VerticesUpdate();
 	}
 
-	//ü‚ÌF‚Ìİ’è
+	//ç·šã®è‰²ã®è¨­å®š
 	void LineObject::SetLineColor(const Col4& startColor, const Col4& endColor) {
 		m_startColor = startColor;
 		m_endColor = endColor;
@@ -107,7 +107,7 @@ namespace basecross {
 		return m_direc;
 	}
 	//--------------------------------------------------------------------------------------
-	//	class RayMark : public GameObject; //Õ“Ë‚µ‚½‚Æ‚«‚Ì•\¦‚³‚ê‚éƒIƒuƒWƒFƒNƒg
+	//	class RayMark : public GameObject; //è¡çªã—ãŸã¨ãã®è¡¨ç¤ºã•ã‚Œã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	//--------------------------------------------------------------------------------------
 
 	RayMark::RayMark(const shared_ptr<Stage>& stage
@@ -140,7 +140,7 @@ namespace basecross {
 	void RayMark::OnUpdate() {
 		auto stage = GetStage();
 
-		//•K—v‚È•Ï”‚ÌéŒ¾
+		//å¿…è¦ãªå¤‰æ•°ã®å®£è¨€
 		Vec3 pos = Vec3(0.0f);
 		Vec3 rayStart;
 		Vec3 rayEnd;
@@ -149,28 +149,28 @@ namespace basecross {
 		TRIANGLE triangle;
 		size_t triangleIndex;
 
-		//ƒvƒŒƒCƒ„[
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
 		auto player = m_player.lock();
 		if (!player) return;
-		rayStart = player->GetComponent<Transform>()->GetPosition(); //ƒŒƒC‚ğ”ò‚Î‚·n“_
+		rayStart = player->GetComponent<Transform>()->GetPosition(); //ãƒ¬ã‚¤ã‚’é£›ã°ã™å§‹ç‚¹
 
-		//ƒŒƒC‚ğ”ò‚Î‚·
-		//“G
+		//ãƒ¬ã‚¤ã‚’é£›ã°ã™
+		//æ•µ
 		auto enemy = m_enemy.lock();
 		if (!enemy) return;
 		auto enemyDraw = enemy->GetComponent<PNTBoneModelDraw>();
-		rayEnd = enemyPos(Vec3(0.0f,3.0f,0.0f));		             //ƒŒƒC‚ğ”ò‚Î‚·I“_
-		//“–‚½‚Á‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
+		rayEnd = enemyPos(Vec3(0.0f,3.0f,0.0f));		             //ãƒ¬ã‚¤ã‚’é£›ã°ã™çµ‚ç‚¹
+		//å½“ãŸã£ã¦ã„ã‚‹ã‹ã®ãƒ•ãƒ©ã‚°
 		m_hitEnemyFlag = enemyDraw->HitTestStaticMeshSegmentTriangles
 		(rayStart, rayEnd, enemyCrossPos, triangle, triangleIndex);
 
-		//•Ç
+		//å£
 		auto wallGroup = GetStage()->GetSharedObjectGroup(L"Wall");
 		auto& wallVec = wallGroup->GetGroupVector();
 		for (auto v : wallVec) {
 			auto walls = v.lock();
 			auto wallDraw = walls->GetComponent<PNTStaticDraw>();
-			//‚·‚×‚Ä‚Ì•Ç‚ğƒ`ƒFƒbƒNAƒŒƒC‚ª‚ ‚Á‚½‚Ä‚¢‚½‚çtrue
+			//ã™ã¹ã¦ã®å£ã‚’ãƒã‚§ãƒƒã‚¯ã€ãƒ¬ã‚¤ãŒã‚ã£ãŸã¦ã„ãŸã‚‰true
 			m_hitWallFlag.push_back(wallDraw->HitTestStaticMeshSegmentTriangles
 			(rayStart, rayEnd, objCrossPos, triangle, triangleIndex));
 		}
@@ -180,7 +180,7 @@ namespace basecross {
 			}
 		}
 
-		//ƒhƒA
+		//ãƒ‰ã‚¢
 		auto doorGroup = GetStage()->GetSharedObjectGroup(L"Door");
 		auto& doorVec = doorGroup->GetGroupVector();
 		for (auto v : doorVec) {
@@ -196,7 +196,7 @@ namespace basecross {
 		}
 
 
-		//•Ç‚©ƒhƒA‚É‚ ‚½‚Á‚Ä‚¢‚é‚©
+		//å£ã‹ãƒ‰ã‚¢ã«ã‚ãŸã£ã¦ã„ã‚‹ã‹
 		if (m_wallCnt == m_hitWallFlag.size() && m_doorCnt == m_hitDoorFlag.size()) {
 			m_activeFlag = true;
 			m_wallCnt = 0;
@@ -212,8 +212,8 @@ namespace basecross {
 			m_hitDoorFlag.clear();
 		}
 
-		//ƒfƒoƒbƒN—p
-		//“–‚½‚Á‚Ä‚¢‚éêŠ‚Ì•`‰æ
+		//ãƒ‡ãƒãƒƒã‚¯ç”¨
+		//å½“ãŸã£ã¦ã„ã‚‹å ´æ‰€ã®æç”»
 		if (m_hitEnemyFlag) {
 			pos = enemyCrossPos;
 		}
@@ -221,7 +221,7 @@ namespace basecross {
 		//m_draw->SetDrawActive(m_activeFlag);
 	}
 
-	//ƒŒƒC‚ğ”ò‚Î‚·ˆÊ’u‚Ì’²®
+	//ãƒ¬ã‚¤ã‚’é£›ã°ã™ä½ç½®ã®èª¿æ•´
 	Vec3 RayMark::enemyPos(Vec3 pos) {
 		auto enemy = m_enemy.lock();
 		if (enemy) {

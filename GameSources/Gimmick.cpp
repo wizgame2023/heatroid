@@ -14,7 +14,7 @@ namespace basecross {
 		GameObject(StagePtr)
 	{
 	}
-	GimmickObject::‾GimmickObject(){}
+	GimmickObject::~GimmickObject(){}
 
 	void GimmickObject::OnCreate()
 	{
@@ -72,7 +72,7 @@ namespace basecross {
 		m_Texname(Texname)
 	{
 	}
-	TilingFixedBox::‾TilingFixedBox() {}
+	TilingFixedBox::~TilingFixedBox() {}
 	//初期化
 	void TilingFixedBox::OnCreate() {
 		auto Trans = AddComponent<Transform>();
@@ -107,7 +107,7 @@ namespace basecross {
 		m_Texname(Texname)
 	{	}
 
-	GimmickButton::‾GimmickButton() {}
+	GimmickButton::~GimmickButton() {}
 	//初期化
 	void GimmickButton::OnCreate() {
 		m_open = false;
@@ -229,7 +229,7 @@ namespace basecross {
 		m_Texname(Texname)
 	{
 	}
-	GimmickDoor::‾GimmickDoor() {}
+	GimmickDoor::~GimmickDoor() {}
 
 	//初期化
 	void GimmickDoor::OnCreate() {
@@ -377,7 +377,7 @@ namespace basecross {
 		m_Max(Max)
 	{
 	}
-	GimmickUp::‾GimmickUp() {}
+	GimmickUp::~GimmickUp() {}
 
 	//初期化
 	void GimmickUp::OnCreate() {
@@ -495,7 +495,7 @@ namespace basecross {
 		m_Texname(Texname)
 
 	{}
-	Elevator::‾Elevator() {}
+	Elevator::~Elevator() {}
 
 	void Elevator::OnCreate()
 	{

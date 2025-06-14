@@ -1,7 +1,7 @@
 /*!
 @file GameStageSprite.h
-@brief ƒQ[ƒ€ƒXƒe[ƒW‚ÌƒXƒvƒ‰ƒCƒg‚È‚ÇÀ‘Ì
-’S“–FˆíŒ©
+@brief ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãªã©å®Ÿä½“
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -9,14 +9,14 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class GameSprite : public GameObject;   //UI‚Ì•\¦
+	//	class GameSprite : public GameObject;   //UIã®è¡¨ç¤º
 	//--------------------------------------------------------------------------------------
 	class GameSprite : public GameObject {
 	private:
-		//•\¦ƒTƒCƒY
-		float m_width;  //‰¡‚ÌƒTƒCƒY
-		float m_height; //c‚ÌƒTƒCƒY
-		int m_layer;   //•\¦ƒŒƒCƒ„[
+		//è¡¨ç¤ºã‚µã‚¤ã‚º
+		float m_width;  //æ¨ªã®ã‚µã‚¤ã‚º
+		float m_height; //ç¸¦ã®ã‚µã‚¤ã‚º
+		int m_layer;   //è¡¨ç¤ºãƒ¬ã‚¤ãƒ¤ãƒ¼
 		Vec3 m_pos;
 		wstring m_meshName;
 		Col4 m_color;
@@ -33,14 +33,14 @@ namespace basecross {
 			Col4 color = Col4(1.0f, 1.0f, 1.0f, 1.0f),
 			int layer = 1
 		);
-		virtual ~GameSprite() {};
+		virtual â€¾GameSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void SetColor(Col4 color);
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class FadeOut : public GameObject;   //ƒtƒF[ƒhƒAƒEƒg
+	//	class FadeOut : public GameObject;   //ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class FadeOut : public GameObject {
 	private: 
@@ -49,14 +49,14 @@ namespace basecross {
 		shared_ptr<GameSprite> m_sprite;
 	public:
 		FadeOut(const shared_ptr<Stage>& stage);
-		virtual ~FadeOut() {};
+		virtual â€¾FadeOut() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		bool GetFadeOutEnd();
 		void SetColor(Col4 color);
 	};
 	//--------------------------------------------------------------------------------------
-	//	class FadeIn : public GameObject;   //ƒtƒF[ƒhƒCƒ“
+	//	class FadeIn : public GameObject;   //ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
 	//--------------------------------------------------------------------------------------
 	class FadeIn : public GameObject {
 	private:
@@ -64,12 +64,12 @@ namespace basecross {
 		shared_ptr<GameSprite> m_sprite;
 	public:
 		FadeIn(const shared_ptr<Stage>& stage);
-		virtual ~FadeIn() {};
+		virtual â€¾FadeIn() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 
 	};
-	//ƒS[ƒ‹‚ÌƒtƒF[ƒhƒAƒEƒg/ƒtƒF[ƒhƒCƒ“(Player‚©‚çŒÄ‚Ño‚·H)
+	//ã‚´ãƒ¼ãƒ«æ™‚ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ/ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³(Playerã‹ã‚‰å‘¼ã³å‡ºã™ï¼Ÿ)
 	class GoalFade : public GameObject {
 	private:
 		float m_time;
@@ -78,14 +78,14 @@ namespace basecross {
 		shared_ptr<GameSprite> m_sprite;
 	public:
 		GoalFade(const shared_ptr<Stage>& stage);
-		virtual ~GoalFade() {};
+		virtual â€¾GoalFade() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class GameOverSprite : public GameObject;   //ƒQ[ƒ€ƒI[ƒo[‚Ì‰‰o—pUI
+	//	class GameOverSprite : public GameObject;   //ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã®æ¼”å‡ºç”¨UI
 	//--------------------------------------------------------------------------------------
 	class GameOverSprite :public GameObject {
 	private:
@@ -94,13 +94,13 @@ namespace basecross {
 		shared_ptr<GameSprite> m_backEffSprite;
 	public:
 		GameOverSprite(const shared_ptr<Stage>& stage);
-		virtual ~GameOverSprite() {};
+		virtual â€¾GameOverSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class NumberSprite : public GameObject;   //”š‚Ì•\¦—pUI
+	//	class NumberSprite : public GameObject;   //æ•°å­—ã®è¡¨ç¤ºç”¨UI
 	//--------------------------------------------------------------------------------------
 	class NumberSprite :public GameObject {
 	private:
@@ -120,7 +120,7 @@ namespace basecross {
 
 	public:
 		NumberSprite(const shared_ptr<Stage>& stage,const int& number,const Vec3& pos);
-		virtual ~NumberSprite() {};
+		virtual â€¾NumberSprite() {};
 		virtual void OnCreate() override;
 		virtual void OnUpdate() override;
 		void UpdateVar(int num);

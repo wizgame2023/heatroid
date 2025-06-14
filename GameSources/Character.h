@@ -1,6 +1,6 @@
 /*!
 @file Character.h
-@brief ƒLƒƒƒ‰ƒNƒ^[‚È‚Ç
+@brief ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãªã©
 */
 
 #pragma once
@@ -15,18 +15,18 @@ namespace basecross{
 	class Foo : public GameObject
 	{
 	public:
-		// \’z‚Æ”jŠü
+		// æ§‹ç¯‰ã¨ç ´æ£„
 		Foo(const shared_ptr<Stage>& stage) :
 			GameObject(stage)
 		{
 		}
-		virtual ~Foo()
+		virtual â€¾Foo()
 		{
 		}
 
-		virtual void OnCreate() override; // ‰Šú‰»
-		//virtual void OnUpdate() override; // XV
-		//virtual void OnDraw() override; // •`‰æ
+		virtual void OnCreate() override; // åˆæœŸåŒ–
+		//virtual void OnUpdate() override; // æ›´æ–°
+		//virtual void OnDraw() override; // æç”»
 	};
 
 }
