@@ -53,7 +53,7 @@ namespace basecross {
 		m_objFlag(false),
 		m_pGrabFlag(false),
 		m_playerFlag(false),
-		m_activeFlag(true),
+		m_activeFlag(false),
 		m_throwFlag(false),
 		m_overHeatFlag(false),
 		m_throwTime(0.5f)
@@ -292,7 +292,6 @@ namespace basecross {
 					if (Switchs->GetButton() == false)
 					{
 						Switchs->SetButton(true);
-						m_activeFlag = true;
 					}
 				}
 			}
@@ -317,41 +316,13 @@ namespace basecross {
 	//衝突判定
 	void Enemy::OnCollisionExit(shared_ptr<GameObject>& other)
 	{
-		if ((other->FindTag(L"GimmickButton")))
-		{
-			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
-			auto& vec = group->GetGroupVector();
-			for (auto& v : vec) {
-				auto shObj = v.lock();
-				if (other == shObj) {
-					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					if (Switchs->GetButton() == false)
-					{
-						Switchs->SetButton(false);
-						m_activeFlag = false;
-					}
-				}
-			}
-		}
+
 		if (other->FindTag(L"Player")) {
 			m_playerFlag = false;
 		}
 		if (other->FindTag(L"Floor")) {
 			m_objFlag = false;
 		}
-
-	}
-	void Enemy::OnCollisionExcute(shared_ptr<GameObject>& other)
-	{
-		if (other->FindTag(L"Floor")) {
-			m_objFlag = true;
-		}
-		if (other->FindTag(L"Wall")) {
-			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
-			m_objFlag = true;
-		}
-
-
 		if ((other->FindTag(L"GimmickButton")))
 		{
 			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
@@ -360,11 +331,37 @@ namespace basecross {
 				auto shObj = v.lock();
 				if (other == shObj) {
 					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
-					
+					if (Switchs->GetButton() == true)
+					{
+						Switchs->SetButton(false);
+					}
+				}
+			}
+		}
+
+	}
+	void Enemy::OnCollisionExcute(shared_ptr<GameObject>& other)
+	{
+		if ((other->FindTag(L"GimmickButton")))
+		{
+			auto group = GetStage()->GetSharedObjectGroup(L"Switch");
+			auto& vec = group->GetGroupVector();
+			for (auto& v : vec) {
+				auto shObj = v.lock();
+				if (other == shObj) {
+					auto Switchs = dynamic_pointer_cast<GimmickButton>(shObj);
+
 					Switchs->SetButton(true);
 					m_activeFlag = true;
 				}
 			}
+		}
+		if (other->FindTag(L"Floor")) {
+			m_objFlag = true;
+		}
+		if (other->FindTag(L"Wall")) {
+			auto breakWall = dynamic_pointer_cast<BreakWall>(other);
+			m_objFlag = true;
 		}
 
 		if (other->FindTag(L"Player")) {

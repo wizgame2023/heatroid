@@ -508,7 +508,7 @@ namespace basecross {
 				if (rayptr->GetEnemy() == shObj)
 				{
 					bool Activ = rayptr->GetActiveFlag();
-					if (Activ == false && enemyActiv == true)
+					if (Activ == false && enemyActiv != true)
 					{
 						enemyptr->SetUpdateActive(false);
 					}

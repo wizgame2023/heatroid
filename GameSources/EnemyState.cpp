@@ -66,6 +66,7 @@ namespace basecross {
 		auto gaugeFram = enemy->m_gaugeFram.lock();
 		if (!gaugeFram) return;
 		gaugeFram->DrawGauge(true);
+		enemy->m_activeFlag = true;
 	}
 	void OverHeatState::Execute() {
 		auto enemy = m_enemy.lock();
@@ -78,7 +79,6 @@ namespace basecross {
 		auto pos = enemy->GetPos();
 
 		pos.y = enemy->Grav().y;
-
 		enemy->m_playerFlag = false;
 		if (enemy->m_heat > 0.0f) {
 			enemy->m_heat -= elapsed * 2.5f;
@@ -138,6 +138,7 @@ namespace basecross {
 		enemy->EffectStop(enemy->m_heatEffect);
 		enemy->m_overHeatFlag = false;
 		enemy->m_throwFlag = false;
+		enemy->m_activeFlag = false;
 
 		auto gauge = enemy->m_gauge.lock();
 		if (!gauge) return;
