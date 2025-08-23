@@ -51,6 +51,7 @@ namespace basecross {
 	//----------------------------------------------------------------
 	// ここからステート(PlayerStateBase継承)
 	//----------------------------------------------------------------
+	//立ち
 	class PlayerStandState : public PlayerStateBase {
 	public:
 		PlayerStandState(const shared_ptr<Player>& obj) : PlayerStateBase(obj) { }
@@ -58,6 +59,7 @@ namespace basecross {
 		virtual void Update(float deltatime) override;
 		virtual void Exit() override;
 	};
+	//空中
 	class PlayerAirState : public PlayerStateBase {
 	public:
 		PlayerAirState(const shared_ptr<Player>& obj) : PlayerStateBase(obj) {}
@@ -65,6 +67,7 @@ namespace basecross {
 		virtual void Update(float deltatime) override;
 		virtual void Exit() override;
 	};
+	//喰らい
 	class PlayerHitState : public PlayerStateBase {
 	public:
 		PlayerHitState(const shared_ptr<Player>& obj) : PlayerStateBase(obj) {}
@@ -72,6 +75,7 @@ namespace basecross {
 		virtual void Update(float deltatime) override;
 		virtual void Exit() override;
 	};
+	//飛び道具発射
 	class PlayerReleaseState : public PlayerStateBase {
 	public:
 		PlayerReleaseState(const shared_ptr<Player>& obj) : PlayerStateBase(obj) {}
@@ -79,6 +83,7 @@ namespace basecross {
 		virtual void Update(float deltatime) override;
 		virtual void Exit() override;
 	};
+	//ステージ開始演出
 	class PlayerStartState : public PlayerStateBase {
 	public:
 		PlayerStartState(const shared_ptr<Player>& obj) : PlayerStateBase(obj) {}
@@ -86,6 +91,7 @@ namespace basecross {
 		virtual void Update(float deltatime) override;
 		virtual void Exit() override;
 	};
+	//クリア演出前
 	class PlayerGoalStandbyState : public PlayerStateBase {
 	public:
 		PlayerGoalStandbyState(const shared_ptr<Player>& obj) : PlayerStateBase(obj) {}
@@ -93,6 +99,7 @@ namespace basecross {
 		virtual void Update(float deltatime) override;
 		virtual void Exit() override;
 	};
+	//クリア演出
 	class PlayerGoalState : public PlayerStateBase {
 	public:
 		PlayerGoalState(const shared_ptr<Player>& obj) : PlayerStateBase(obj) {}
@@ -100,6 +107,7 @@ namespace basecross {
 		virtual void Update(float deltatime) override;
 		virtual void Exit() override;
 	};
+	//死亡
 	class PlayerDiedState : public PlayerStateBase {
 	public:
 		PlayerDiedState(const shared_ptr<Player>& obj) : PlayerStateBase(obj) {}
@@ -129,16 +137,16 @@ namespace basecross {
 		void ChangeState(PlayerStateType type);
 		void Update(float deltatime);
 
-		PlayerStateType GetStateType() {
+		PlayerStateType GetStateType() const {
 			return _stateType;
 		}
 	private:
 		//現在のステートタイプ
 		PlayerStateType _stateType;
 		//ステート一覧
-		unordered_map<PlayerStateType, shared_ptr<PlayerStateBase>> _stateList;
+		unordered_map<PlayerStateType, unique_ptr<PlayerStateBase>> _stateList;
 
-		void AddState(PlayerStateType type, const shared_ptr<PlayerStateBase> state) {
+		void AddState(PlayerStateType type, const unique_ptr<PlayerStateBase> state) {
 			_stateList[type] = state;
 		}
 	public:
@@ -146,21 +154,21 @@ namespace basecross {
 		PlayerStateMachine(shared_ptr<Player> obj) {
 
 			//立ち
-			AddState(player_stand, shared_ptr<PlayerStandState>(new PlayerStandState(obj)));
+			AddState(player_stand, unique_ptr<PlayerStandState>(new PlayerStandState(obj)));
 			//空中
-			AddState(player_air, shared_ptr<PlayerAirState>(new PlayerAirState(obj)));
+			AddState(player_air, unique_ptr<PlayerAirState>(new PlayerAirState(obj)));
 			//喰らい
-			AddState(player_hit, shared_ptr<PlayerHitState>(new PlayerHitState(obj)));
+			AddState(player_hit, unique_ptr<PlayerHitState>(new PlayerHitState(obj)));
 			//発射
-			AddState(player_release, shared_ptr<PlayerReleaseState>(new PlayerReleaseState(obj)));
+			AddState(player_release, unique_ptr<PlayerReleaseState>(new PlayerReleaseState(obj)));
 			//スタート
-			AddState(player_start, shared_ptr<PlayerStartState>(new PlayerStartState(obj)));
+			AddState(player_start, unique_ptr<PlayerStartState>(new PlayerStartState(obj)));
 			//死亡
-			AddState(player_died, shared_ptr<PlayerDiedState>(new PlayerDiedState(obj)));
+			AddState(player_died, unique_ptr<PlayerDiedState>(new PlayerDiedState(obj)));
 			//ゴール演出待機中
-			AddState(player_goalstandby, shared_ptr<PlayerGoalStandbyState>(new PlayerGoalStandbyState(obj)));
+			AddState(player_goalstandby, unique_ptr<PlayerGoalStandbyState>(new PlayerGoalStandbyState(obj)));
 			//ゴール
-			AddState(player_goal, shared_ptr<PlayerGoalState>(new PlayerGoalState(obj)));
+			AddState(player_goal, unique_ptr<PlayerGoalState>(new PlayerGoalState(obj)));
 
 			//初期ステート
 			ChangeState(player_start);
