@@ -1,7 +1,7 @@
 /*!
 @file EmenyImage.h
-@brief “G‚ÌƒQ[ƒW
-’S“–FˆíŒ©
+@brief æ•µã®ã‚²ãƒ¼ã‚¸
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -9,14 +9,14 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class Square : public GameObject;   //ƒXƒNƒGƒA‚Ì•\¦
+	//	class Square : public GameObject;   //ã‚¹ã‚¯ã‚¨ã‚¢ã®è¡¨ç¤º
 	//--------------------------------------------------------------------------------------
 	class Square : public GameObject{
 
 	protected:
-		float m_width;    //•\¦ƒXƒNƒGƒA‚Ì‰¡•
-		float m_height;   //@@@@V@@c•
-		float m_posHight; //•\¦‚Ì‚‚³
+		float m_width;    //è¡¨ç¤ºã‚¹ã‚¯ã‚¨ã‚¢ã®æ¨ªå¹…
+		float m_height;   //ã€€ã€€ã€€ã€€ã€ƒã€€ã€€ç¸¦å¹…
+		float m_posHight; //è¡¨ç¤ºã®é«˜ã•
 
 		float m_test;
 		Vec3 m_pos;
@@ -50,7 +50,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class GaugeSquare : public Square;   //ƒXƒNƒGƒA‚ÌƒQ[ƒW•\¦
+	//	class GaugeSquare : public Square;   //ã‚¹ã‚¯ã‚¨ã‚¢ã®ã‚²ãƒ¼ã‚¸è¡¨ç¤º
 	//--------------------------------------------------------------------------------------
 	class GaugeSquare : public Square {
 	private:

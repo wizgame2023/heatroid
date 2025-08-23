@@ -1,7 +1,7 @@
 /*!
 @file GameStageSprite.cpp
-@brief ƒQ[ƒ€ƒXƒe[ƒW‚ÌƒXƒvƒ‰ƒCƒg‚È‚ÇÀ‘Ì
-’S“–FˆíŒ©
+@brief ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãªã©å®Ÿä½“
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -9,7 +9,7 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class GameSprite : public GameObject;   //UI‚Ì•\¦
+	//	class GameSprite : public GameObject;   //UIã®è¡¨ç¤º
 	//--------------------------------------------------------------------------------------
 	GameSprite::GameSprite(const shared_ptr<Stage>& stage,
 		float width, float heigth,
@@ -41,6 +41,7 @@ namespace basecross {
 		m_draw->SetDiffuse(Col4(m_color));
 		SetAlphaActive(true);
 		m_draw->SetDrawActive(true);
+		m_draw->SetDepthStencilState(DepthStencilState::Read);
 
 		m_trans = GetComponent<Transform>();
 		m_trans->SetPosition(m_pos);
@@ -55,7 +56,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class FadeOut : public GameObject;   //ƒtƒF[ƒhƒAƒEƒg
+	//	class FadeOut : public GameObject;   //ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
 	//--------------------------------------------------------------------------------------
 	FadeOut::FadeOut(const shared_ptr<Stage>& stage
 	):
@@ -110,7 +111,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class FadeIn : public GameObject;   //ƒtƒF[ƒhƒCƒ“
+	//	class FadeIn : public GameObject;   //ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
 	//--------------------------------------------------------------------------------------
 	FadeIn::FadeIn(const shared_ptr<Stage>& stage
 	) :
@@ -133,7 +134,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class GameOverSprite : public GameObject;   //ƒQ[ƒ€ƒI[ƒo[‚Ì‰‰o—pUI
+	//	class GameOverSprite : public GameObject;   //ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã®æ¼”å‡ºç”¨UI
 	//--------------------------------------------------------------------------------------
 	GameOverSprite::GameOverSprite(const shared_ptr<Stage>& stage
 	):
@@ -161,7 +162,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class NumberSprite : public GameObject;   //”š‚Ì•\¦—pUI
+	//	class NumberSprite : public GameObject;   //æ•°å­—ã®è¡¨ç¤ºç”¨UI
 	//--------------------------------------------------------------------------------------
 	NumberSprite::NumberSprite(const shared_ptr<Stage>& stage,
 		const int& number,

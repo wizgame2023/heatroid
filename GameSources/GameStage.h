@@ -1,7 +1,7 @@
 /*!
-Š™“c‘å‹P
+éŒç”°å¤§è¼
 @file GameStage.h
-@brief ƒQ[ƒ€ƒXƒe[ƒW
+@brief ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸
 */
 
 #pragma once
@@ -10,63 +10,68 @@
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
-	//	ƒQ[ƒ€ƒXƒe[ƒWƒNƒ‰ƒX
+	//	ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒ©ã‚¹
 	//--------------------------------------------------------------------------------------
     class GameStage : public Stage {
-        CsvFile m_GameStage1;                          // ƒQ[ƒ€ƒXƒe[ƒW‚ÌCSVƒtƒ@ƒCƒ‹
-        shared_ptr<SoundItem> m_BGM;                   // ƒoƒbƒNƒOƒ‰ƒEƒ“ƒhƒ~ƒ…[ƒWƒbƒN‚ÌƒTƒEƒ“ƒhƒAƒCƒeƒ€
-        std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2ƒ}ƒl[ƒWƒƒ[
-        shared_ptr<GameObject> m_fadeIn;               // ƒtƒF[ƒhƒCƒ“ƒGƒtƒFƒNƒg—pƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_fadeOut;              // ƒtƒF[ƒhƒAƒEƒgƒGƒtƒFƒNƒg—pƒIƒuƒWƒFƒNƒg
+        CsvFile m_GameStage1;                          // ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®CSVãƒ•ã‚¡ã‚¤ãƒ«
+        shared_ptr<SoundItem> m_BGM;                   // ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ãƒŸãƒ¥ãƒ¼ã‚¸ãƒƒã‚¯ã®ã‚µã‚¦ãƒ³ãƒ‰ã‚¢ã‚¤ãƒ†ãƒ 
+        std::shared_ptr<basecross::XAudio2Manager> m_PtrXA = App::GetApp()->GetXAudio2Manager(); // XAudio2ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼
+        shared_ptr<GameObject> m_fadeIn;               // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã‚¨ãƒ•ã‚§ã‚¯ãƒˆç”¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_fadeOut;              // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã‚¨ãƒ•ã‚§ã‚¯ãƒˆç”¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 
-        shared_ptr<GameObject> m_pauseBackGround;      // ƒ|[ƒY‚Ì”wŒiƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_PauseSelect;          // ƒ|[ƒY‘I‘ğƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_PauseTitle;           // ƒ|[ƒY‚Ìƒ^ƒCƒgƒ‹ƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_PauseBack;            // ƒ|[ƒY‚Ì”wŒiƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_selectCharge;         // ‘I‘ğ‰æ–Ê‚Ìƒ`ƒƒ[ƒWƒIƒuƒWƒFƒNƒg
-        shared_ptr<GameObject> m_titleCharge;          // ƒ^ƒCƒgƒ‹‰æ–Ê‚Ìƒ`ƒƒ[ƒWƒIƒuƒWƒFƒNƒg
-        float totaltime = 0.0f;                        // ‡ŒvŠÔ‚ğŒv‘ª‚·‚é•Ï”
+        shared_ptr<GameObject> m_pauseBackGround;      // ãƒãƒ¼ã‚ºæ™‚ã®èƒŒæ™¯ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_PauseSelect;          // ãƒãƒ¼ã‚ºé¸æŠã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_PauseTitle;           // ãƒãƒ¼ã‚ºæ™‚ã®ã‚¿ã‚¤ãƒˆãƒ«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_PauseBack;            // ãƒãƒ¼ã‚ºæ™‚ã®èƒŒæ™¯ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_selectCharge;         // é¸æŠç”»é¢ã®ãƒãƒ£ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        shared_ptr<GameObject> m_titleCharge;          // ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®ãƒãƒ£ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+        float totaltime = 0.0f;                        // åˆè¨ˆæ™‚é–“ã‚’è¨ˆæ¸¬ã™ã‚‹å¤‰æ•°
+        // ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
+        shared_ptr<EffectManeger> m_EfkInterface;
 
     public:
-        bool m_pause = false;                          // ƒ|[ƒYó‘Ô‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+        bool m_pause = false;                          // ãƒãƒ¼ã‚ºçŠ¶æ…‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
         bool m_soundFlg = false;
-        shared_ptr<EfkEffect> m_EfkEffect;             // ƒGƒtƒFƒNƒgƒIƒuƒWƒFƒNƒg
-        shared_ptr<EfkPlay> m_EfkPlay;                 // ƒGƒtƒFƒNƒgÀsƒIƒuƒWƒFƒNƒg
 
-        // \’z‚Æ”jŠü
+        // æ§‹ç¯‰ã¨ç ´æ£„
         GameStage() :Stage() {}
         virtual ~GameStage() {}
 
-        // ‰Šú‰»
+        // åˆæœŸåŒ–
         virtual void OnCreate() override;
 
-        // XVˆ—
+        // æ›´æ–°å‡¦ç†
         virtual void OnUpdate() override;
 
-        // •`‰æˆ—
+        // æç”»å‡¦ç†
         virtual void OnDraw() override;
 
-        // ƒ{ƒ^ƒ“A‚ª‰Ÿ‚³‚ê‚½‚Ìˆ—
-        void OnPushA();
-
-        // ƒoƒbƒNƒOƒ‰ƒEƒ“ƒhƒ~ƒ…[ƒWƒbƒN‚ğÄ¶‚·‚é
+        // ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ãƒŸãƒ¥ãƒ¼ã‚¸ãƒƒã‚¯ã‚’å†ç”Ÿã™ã‚‹
         void PlayBGM(const wstring& StageBGM);
 
-        // SEƒ~ƒ…[ƒWƒbƒN‚ğÄ¶‚·‚é
+        // SEãƒŸãƒ¥ãƒ¼ã‚¸ãƒƒã‚¯ã‚’å†ç”Ÿã™ã‚‹
         void  PlaySE(wstring path, float loopcnt, float volume);
 
-        // ƒQ[ƒ€ƒXƒe[ƒW‚Ì”jŠüˆ—
+        // ã‚²ãƒ¼ãƒ ã‚¹ãƒ†ãƒ¼ã‚¸ã®ç ´æ£„å‡¦ç†
         void OnDestroy();
 
-        // ƒXƒe[ƒW‚Ìì¬
+        // ã‚¹ãƒ†ãƒ¼ã‚¸ã®ä½œæˆ
         void CreateStagegenerator();
 
-        // ƒQ[ƒ€‚ğƒ|[ƒY‚·‚é
+        // ã‚²ãƒ¼ãƒ ã‚’ãƒãƒ¼ã‚ºã™ã‚‹
         void GamePause();
 
         void SpriteCreate();
 
         void EnemyUpdateChange();
+
+        void CreateEffect();
+
+        // ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’å–å¾—ã™ã‚‹
+        shared_ptr<EffectManeger> GetEfkInterface() const {
+            return m_EfkInterface;
+        }
+
     };
 
 }

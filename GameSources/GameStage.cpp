@@ -28,10 +28,8 @@ namespace basecross {
 		auto KeyState = App::GetApp()->GetInputDevice().GetKeyState();
 		auto stageMane = GetSharedGameObject<StageGenerator>(L"StageManager");
 		int camerastatus = stageMane->GetNowCameraStatus();
-		auto ShEfkInterface = stageMane->GetEfkInterface();
 		if (stageMane->m_nowGameStatus == StageGenerator::GameStatus::GAME_PLAYING)
 		{
-			ShEfkInterface->OnUpdate();
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::OPENINGCAMERA)
 			{
 				EnemyUpdateChange();
@@ -55,8 +53,6 @@ namespace basecross {
 		}
 		if (stageMane->m_nowGameStatus == StageGenerator::GameStatus::TEST_PLAY)
 		{
-			ShEfkInterface->OnUpdate();
-
 			if (stageMane->m_CameraSelect == StageGenerator::CameraSelect::OPENINGCAMERA)
 			{
 				EnemyUpdateChange();
@@ -76,15 +72,6 @@ namespace basecross {
 	}
 
 	void GameStage::OnDraw()
-	{
-		auto& camera = GetView()->GetTargetCamera();
-		auto stageMane = GetSharedGameObject<StageGenerator>(L"StageManager");
-		auto ShEfkInterface = stageMane->GetEfkInterface();
-		ShEfkInterface->SetViewProj(camera->GetViewMatrix(), camera->GetProjMatrix());
-		ShEfkInterface->OnDraw();
-	}
-
-	void GameStage::OnPushA()
 	{
 	}
 
@@ -291,6 +278,27 @@ namespace basecross {
 		}
 	}
 
+	void GameStage::CreateEffect()
+	{
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		wstring EffectPath = DataDir + L"Effects\\";
+
+		m_EfkInterface = AddGameObject<EffectManeger>();
+		m_EfkInterface->RegisterResource(L"Switch", EffectPath + L"Switch.efk");
+		m_EfkInterface->RegisterResource(L"SwitchLoop", EffectPath + L"SwitchLoop.efk");
+		m_EfkInterface->RegisterResource(L"playerproj", EffectPath + L"playerproj.efk");
+		m_EfkInterface->RegisterResource(L"playerprojend", EffectPath + L"playerprojend.efk");
+		m_EfkInterface->RegisterResource(L"Muzzle", EffectPath + L"Muzzle.efk");
+		m_EfkInterface->RegisterResource(L"Hit", EffectPath + L"Hit.efk");
+		m_EfkInterface->RegisterResource(L"PlayerJump", EffectPath + L"PlayerJump.efk");
+		m_EfkInterface->RegisterResource(L"PlayerLand", EffectPath + L"PlayerLand.efk");
+		m_EfkInterface->RegisterResource(L"smoke", EffectPath + L"smoke.efk");
+		m_EfkInterface->RegisterResource(L"EnemyEye", EffectPath + L"EnemyEye.efk");
+		m_EfkInterface->RegisterResource(L"EnemyBurst", EffectPath + L"EnemyBurst.efk");
+
+	}
+
 	void GameStage::PlayBGM(const wstring& StageBGM)
 	{
 		m_BGM = m_PtrXA->Start(StageBGM, XAUDIO2_LOOP_INFINITE, 0.8f);
@@ -308,6 +316,7 @@ namespace basecross {
 		auto& app = App::GetApp();
 		auto scene = app->GetScene<Scene>();
 		auto ptrStageManager = AddGameObject<StageGenerator>();
+		CreateEffect();
 		SetSharedGameObject(L"StageManager", ptrStageManager);
 		if (scene->GetSelectedMap() == L"ToTitle")
 		{
@@ -320,6 +329,7 @@ namespace basecross {
 			ptrStageManager->CreateEnemy();
 			ptrStageManager->CreateSprite();
 			ptrStageManager->CreateGimmick();
+
 		}
 		else
 		{

@@ -1,7 +1,7 @@
 /*!
 @file Emenyobj.cpp
-@brief “G‚ÌƒIƒuƒWƒFƒNƒg
-’S“–FˆíŒ©
+@brief æ•µã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #include "stdafx.h"
@@ -10,7 +10,7 @@
 namespace basecross {
 	class Enemy;
 	//--------------------------------------------------------------------------------------
-	//	class Enemy : public GameObject;  //’Ç‚¢‚©‚¯‚Ä“Ëi‚·‚é“G
+	//	class Enemy : public GameObject;  //è¿½ã„ã‹ã‘ã¦çªé€²ã™ã‚‹æ•µ
 	//--------------------------------------------------------------------------------------
 	ChasingEnemy::ChasingEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
@@ -32,7 +32,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class MoveBulletEnemy : public Enemy;  //¶‰E‚É’Ç‚¢‚©‚¯‚Ä’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//	class MoveBulletEnemy : public Enemy;  //å·¦å³ã«è¿½ã„ã‹ã‘ã¦å¼¾ã‚’æ’ƒã£ã¦ãã‚‹æ•µ
 	//--------------------------------------------------------------------------------------
 	MoveBulletEnemy::MoveBulletEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
@@ -55,7 +55,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class ParabolaBulletEnemy : public Enemy;  //•ú•¨ü‚É’e‚ğ”ò‚Î‚µ‚Ä‚­‚é“G
+	//	class ParabolaBulletEnemy : public Enemy;  //æ”¾ç‰©ç·šã«å¼¾ã‚’é£›ã°ã—ã¦ãã‚‹æ•µ
 	//--------------------------------------------------------------------------------------
 	ParabolaBulletEnemy::ParabolaBulletEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
@@ -78,7 +78,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class SlideEnemy : public Enemy;  //¶‰EˆÚ“®‚µ‚È‚ª‚ç’e‚ğŒ‚‚Á‚Ä‚­‚é“G
+	//	class SlideEnemy : public Enemy;  //å·¦å³ç§»å‹•ã—ãªãŒã‚‰å¼¾ã‚’æ’ƒã£ã¦ãã‚‹æ•µ
 	//--------------------------------------------------------------------------------------
 	SlideEnemy::SlideEnemy(const shared_ptr<Stage>& stage,
 		const Vec3& position,
@@ -121,7 +121,7 @@ namespace basecross {
 
 		m_trans->SetScale(m_firstScal);
 		m_trans->SetPosition(pos);
-		//•`‰æ
+		//æç”»
 		m_draw->SetMeshResource(m_meshName);
 		m_draw->SetOwnShadowActive(true);
 
@@ -132,7 +132,7 @@ namespace basecross {
 		m_draw->AddAnimation(L"kaihi", 40, 60, true, 35);
 		m_draw->AddAnimation(L"hassya", 100, 10, false, 30);
 		m_draw->AddAnimation(L"stand", 160, 20, false, 30);
-		m_draw->AddAnimation(L"wait", 120, 30, false, 30);   //ƒI[ƒo[ƒq[ƒgó‘Ô
+		m_draw->AddAnimation(L"wait", 120, 30, false, 30);   //ã‚ªãƒ¼ãƒãƒ¼ãƒ’ãƒ¼ãƒˆçŠ¶æ…‹
 
 	}
 	void SlideEnemy::OnUpdate() {

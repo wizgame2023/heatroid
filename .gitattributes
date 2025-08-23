@@ -1,0 +1,2 @@
+*.cpp text working-tree-encoding=CP932 diff=sjis
+*.h text working-tree-encoding=CP932 diff=sjis

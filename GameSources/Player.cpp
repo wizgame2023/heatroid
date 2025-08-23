@@ -140,25 +140,13 @@ namespace basecross {
 	void Player::OnCreate() {
 		AddTag(L"Player");
 
-		//ステージマネージャ
-		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 		//敵を掴む判定用オブジェクト
 		m_pGrab = GetStage()->AddGameObject<PlayerGrab>(GetThis<Player>());
 
-		//エフェクト読み込み
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring MuzzleDir = DataDir + L"Effects\\Muzzle.efk";
-		wstring HitDir = DataDir + L"Effects\\Hit.efk";
-		wstring JumpDir = DataDir + L"Effects\\PlayerJump.efk";
-		wstring LandDir = DataDir + L"Effects\\PlayerLand.efk";
+		//ステージマネージャ
+		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 
-		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
-		m_EfkMuzzle = ObjectFactory::Create<EfkEffect>(ShEfkInterface, MuzzleDir);
-		m_EfkHit = ObjectFactory::Create<EfkEffect>(ShEfkInterface, HitDir);
-		m_EfkJump = ObjectFactory::Create<EfkEffect>(ShEfkInterface, JumpDir);
-		m_EfkLand = ObjectFactory::Create<EfkEffect>(ShEfkInterface, LandDir);
-
+		m_Effect = m_stageMgr.lock()->GetEfkInterface();
 		//初期位置などの設定
 		auto ptr = AddComponent<Transform>();
 		ptr->SetScale(m_initSca);
@@ -381,8 +369,8 @@ namespace basecross {
 		plPos.x += m_moveVel.x * _delta;
 		plPos.z += m_moveVel.z * _delta;
 		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
-		m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkJump, plPos, 1);
-		m_EfkPlay[2]->SetScale(Vec3(.35f));
+		m_Effect->PlayEffect(m_EfkJump, L"PlayerJump", GetComponent<Transform>()->GetPosition(), 0.0f);
+		m_Effect->SetScale(m_EfkJump, Vec3(.35f));
 
 		PlaySnd(L"PlayerJump", 1, 0);
 
@@ -428,8 +416,8 @@ namespace basecross {
 					plPos.x += m_moveVel.x * _delta;
 					plPos.z += m_moveVel.z * _delta;
 					auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
-					m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkLand, plPos, 1);
-					m_EfkPlay[2]->SetScale(Vec3(.25f));
+					m_Effect->PlayEffect(m_EfkLand, L"PlayerLand", plPos, 1);
+					m_Effect->SetScale(m_EfkLand, Vec3(.25f));
 					return;
 				}
 				else
@@ -444,8 +432,8 @@ namespace basecross {
 					plPos.x += m_moveVel.x * _delta;
 					plPos.z += m_moveVel.z * _delta;
 					auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
-					m_EfkPlay[2] = ObjectFactory::Create<EfkPlay>(m_EfkLand, plPos, 1);
-					m_EfkPlay[2]->SetScale(Vec3(.25f));
+					m_Effect->PlayEffect(m_EfkLand, L"PlayerLand", plPos, 1);
+					m_Effect->SetScale(m_EfkLand, Vec3(.25f));
 				}
 			}
 		}
@@ -617,7 +605,9 @@ namespace basecross {
 		auto plPos = GetComponent<Transform>()->GetPosition();
 		auto shPos = target->GetComponent<Transform>()->GetPosition();
 		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
-		m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
+		m_Effect->PlayEffect(m_EfkHit, L"Hit", Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
+
+		//m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
 
 		ChangeState(PlayerStateMachine::player_hit);
 
@@ -654,9 +644,10 @@ namespace basecross {
 
 		//エフェクトのプレイ
 		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
-		m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkMuzzle, pos + firepos, 0.0f);
-		m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
-		m_EfkPlay[0]->SetScale(Vec3(.25f));
+		m_Effect->PlayEffect(m_EfkMuzzle, L"Muzzle", pos + firepos, 0.0f);
+
+		m_Effect->SetRotation(m_EfkMuzzle, Vec3(0, 1, 0), -face);
+		m_Effect->SetScale(m_EfkMuzzle, Vec3(.25f));
 		PlaySnd(L"PlayerProj", .6f, 0);
 
 		//敵運搬中の処理
@@ -832,14 +823,7 @@ namespace basecross {
 		//ステージマネージャ
 		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 
-		//エフェクト読み込み
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring ProjEffectStr = DataDir + L"Effects\\playerproj.efk";
-		wstring EndEffectStr = DataDir + L"Effects\\playerprojend.efk";
-		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
-		m_EfkProj = ObjectFactory::Create<EfkEffect>(ShEfkInterface, ProjEffectStr);
-		m_EfkProjEnd = ObjectFactory::Create<EfkEffect>(ShEfkInterface, EndEffectStr);
+		m_Effect = m_stageMgr.lock()->GetEfkInterface();
 
 		auto trans = GetComponent<Transform>();
 		trans->SetScale(Vec3(8.0f));
@@ -886,8 +870,8 @@ namespace basecross {
 		auto delta = App::GetApp()->GetElapsedTime();
 		m_playTime += delta;
 
-		if (m_EfkPlay[0]) {
-			m_EfkPlay[0]->SetLocation(trans->GetPosition());
+		if (m_EfkProj) {
+			m_Effect->SetLocation(m_EfkProj, trans->GetPosition());
 		}
 
 		if (!m_stopped) {
@@ -902,18 +886,19 @@ namespace basecross {
 			auto fwd = -1 * trans->GetForward();
 			auto face = atan2f(fwd.z, fwd.x);
 
-			if (m_EfkPlay[0]) {
-				m_EfkPlay[0]->StopEffect();
+			if (m_EfkProj) {
+				m_Effect->StopEffect(m_EfkProj);
 			}
-			m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkProjEnd, trans->GetPosition(), 0.0f);
-			m_EfkPlay[1]->SetRotation(Vec3(0, 1, 0), -face);
-			m_EfkPlay[1]->SetScale(Vec3(.8f));
+			m_Effect->PlayEffect(m_EfkProjEnd, L"playerprojend", GetComponent<Transform>()->GetPosition(), 0.0f);
+
+			m_Effect->SetRotation(m_EfkProjEnd, Vec3(0, 1, 0), -face);
+			m_Effect->SetScale(m_EfkProjEnd, Vec3(.8f));
 		}
 
 		if (m_lifeEnded) {
-			m_EfkPlay[1]->SetLocation(trans->GetPosition());
+			m_Effect->SetLocation(m_EfkProjEnd, trans->GetPosition());
 			if (m_range <= -.3f) {
-				m_EfkPlay[1]->StopEffect();
+				m_Effect->StopEffect(m_EfkProjEnd);
 				m_used = false;
 				SetUpdateActive(false);
 			}

@@ -1,6 +1,6 @@
 /*!
 @file Sprite.cpp
-@brief ƒXƒvƒ‰ƒCƒgÀ‘Ì
+@brief ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå®Ÿä½“
 */
 
 #include "stdafx.h"
@@ -19,24 +19,25 @@ namespace basecross {
 
 	void Sprite::OnCreate() {
 		float helfSize = 1.0f;
-		//’¸“_”z—ñ(c‰¡5ŒÂ‚¸‚Â•\¦)
+		//é ‚ç‚¹é…åˆ—(ç¸¦æ¨ª5å€‹ãšã¤è¡¨ç¤º)
 		vector<VertexPositionColorTexture> vertices = {
 			{ VertexPositionColorTexture(Vec3(-helfSize, helfSize,  0),Col4(1.0f,1.0f,1.0f,1.0f),      Vec2(0.0f, 0.0f)) },
 			{ VertexPositionColorTexture(Vec3(helfSize, helfSize,   0), Col4(1.0f, 1.0f, 1.0f, 1.0f),   Vec2(1.0f, 0.0f)) },
 			{ VertexPositionColorTexture(Vec3(-helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(0.0f, 1.0f)) },
 			{ VertexPositionColorTexture(Vec3(helfSize, -helfSize,  0), Col4(1.0f, 1.0f, 1.0f, 1.0f),  Vec2(1.0f, 1.0f)) },
 		};
-		//ƒCƒ“ƒfƒbƒNƒX”z—ñ
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹é…åˆ—
 		vector<uint16_t> indices = { 0, 1, 2, 1, 3, 2 };
 		SetAlphaActive(m_Trace);
 		auto ptrTrans = GetComponent<Transform>();
 		ptrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0.2f);
 		ptrTrans->SetRotation(0, 0, 0);
 		ptrTrans->SetPosition(m_StartPos);
-		//’¸“_‚ÆƒCƒ“ƒfƒbƒNƒX‚ğw’è‚µ‚ÄƒXƒvƒ‰ƒCƒgì¬
+		//é ‚ç‚¹ã¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æŒ‡å®šã—ã¦ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä½œæˆ
 		auto ptrDraw = AddComponent<PCTSpriteDraw>(vertices, indices);
 		ptrDraw->SetSamplerState(SamplerState::LinearWrap);
 		ptrDraw->SetTextureResource(m_TextureKey);
+		ptrDraw->SetDepthStencilState(DepthStencilState::Read);
 	}
 
 	SelectCharge::SelectCharge(const shared_ptr<Stage>& StagePtr, const wstring& TextureKey, bool Trace,
@@ -55,23 +56,24 @@ namespace basecross {
 
 		float halfW = 1.0f;
 		float halfH = 1.0f;
-		//’¸“_”z—ñ(c‰¡5ŒÂ‚¸‚Â•\¦)
+		//é ‚ç‚¹é…åˆ—(ç¸¦æ¨ª5å€‹ãšã¤è¡¨ç¤º)
 		m_Vertices = {
 			{Vec3(-halfW, halfH, 0.0f), color,Vec2(0.0f, 0.0f)},
 			{Vec3(halfW, halfH,   0.0f), color, Vec2(1.0f, 0.0f)},
 			{Vec3(-halfW, -halfH, 0.0f), color, Vec2(0.0f, 1.0f)},
 			{Vec3(halfW, -halfH, 0.0f), color,	Vec2(1.0f, 1.0f)},
 		};
-		//ƒCƒ“ƒfƒbƒNƒX”z—ñ
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹é…åˆ—
 		vector<uint16_t> indices = { 0, 1, 2, 1, 3, 2 };
 		SetAlphaActive(m_Trace);
 		auto ptrTrans = GetComponent<Transform>();
 		ptrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0.2f);
 		ptrTrans->SetRotation(0, 0, 0);
 		ptrTrans->SetPosition(m_StartPos);
-		//’¸“_‚ÆƒCƒ“ƒfƒbƒNƒX‚ğw’è‚µ‚ÄƒXƒvƒ‰ƒCƒgì¬
+		//é ‚ç‚¹ã¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æŒ‡å®šã—ã¦ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä½œæˆ
 		auto ptrDraw = AddComponent<PCTSpriteDraw>(m_Vertices, indices);
 		ptrDraw->SetTextureResource(m_TextureKey);
+		ptrDraw->SetDepthStencilState(DepthStencilState::Read);
 
 		auto group = GetStage()->GetSharedObjectGroup(L"Sprite");
 		group->IntoGroup(GetThis<GameObject>());
@@ -120,21 +122,21 @@ namespace basecross {
 
 	void BlinkingSprite::OnCreate() {
 		float helfSize = 1.0f;
-		//’¸“_”z—ñ(c‰¡5ŒÂ‚¸‚Â•\¦)
+		//é ‚ç‚¹é…åˆ—(ç¸¦æ¨ª5å€‹ãšã¤è¡¨ç¤º)
 		vector<VertexPositionColorTexture> vertices = {
 			{ VertexPositionColorTexture(Vec3(-helfSize, helfSize, 0),Col4(1.0f,1.0f,1.0f,1.0f), Vec2(0.0f, 0.0f)) },
 			{ VertexPositionColorTexture(Vec3(helfSize, helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, 0.0f)) },
 			{ VertexPositionColorTexture(Vec3(-helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(0.0f, 1.0f)) },
 			{ VertexPositionColorTexture(Vec3(helfSize, -helfSize, 0), Col4(1.0f, 1.0f, 1.0f, 1.0f), Vec2(1.0f, 1.0f)) },
 		};
-		//ƒCƒ“ƒfƒbƒNƒX”z—ñ
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹é…åˆ—
 		vector<uint16_t> indices = { 0, 1, 2, 1, 3, 2 };
 		SetAlphaActive(m_Trace);
 		auto ptrTrans = GetComponent<Transform>();
 		ptrTrans->SetScale(m_StartScale.x, m_StartScale.y, 0.2f);
 		ptrTrans->SetRotation(0, 0, 0);
 		ptrTrans->SetPosition(m_StartPos);
-		//’¸“_‚ÆƒCƒ“ƒfƒbƒNƒX‚ğw’è‚µ‚ÄƒXƒvƒ‰ƒCƒgì¬
+		//é ‚ç‚¹ã¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æŒ‡å®šã—ã¦ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä½œæˆ
 		auto ptrDraw = AddComponent<PCTSpriteDraw>(vertices, indices);
 		ptrDraw->SetSamplerState(SamplerState::LinearWrap);
 		ptrDraw->SetTextureResource(m_TextureKey);

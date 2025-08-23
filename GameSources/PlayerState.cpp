@@ -1,6 +1,6 @@
 /*!
 @file PlayerState.cpp
-@brief ƒvƒŒƒCƒ„[‚ÌƒXƒe[ƒgƒ}ƒVƒ“EƒXƒe[ƒgÀ‘Ì
+@brief ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³ãƒ»ã‚¹ãƒ†ãƒ¼ãƒˆå®Ÿä½“
 */
 
 #pragma once
@@ -11,7 +11,7 @@
 namespace basecross {
 
 	/// <summary>
-	/// ƒXƒe[ƒgØ‘Ö
+	/// ã‚¹ãƒ†ãƒ¼ãƒˆåˆ‡æ›¿
 	/// </summary>
 	void PlayerStateMachine::ChangeState(PlayerStateType type) {
 		if (_stateList[_stateType] != nullptr) {
@@ -26,7 +26,7 @@ namespace basecross {
 	}
 
 	/// <summary>
-	/// —§‚¿ƒXƒe[ƒg
+	/// ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½g
 	/// </summary>
 	void PlayerStandState::Enter() {
 
@@ -34,34 +34,34 @@ namespace basecross {
 	void PlayerStandState::Update(float deltatime) {
 		PlayerStateBase::Update(deltatime);
 
-		//€–SƒXƒe[ƒg‚Ö
+		//ï¿½ï¿½ï¿½Sï¿½Xï¿½eï¿½[ï¿½gï¿½ï¿½
 		if (m_player.lock()->GetHP() <= 0) {
 			m_player.lock()->ChangeState(PlayerStateMachine::player_died);
 		}
-		//ƒvƒŒƒCƒ„[‚ÌˆÚ“®
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•
 		m_player.lock()->MovePlayer();
 		m_player.lock()->Friction();
 		m_player.lock()->Gravity();
 
-		//Aƒ{ƒ^ƒ“‚ÅƒWƒƒƒ“ƒv
+		//Aãƒœã‚¿ãƒ³ã§ã‚¸ãƒ£ãƒ³ãƒ—
 		if ((m_pad[0].wPressedButtons & XINPUT_GAMEPAD_A) || m_key.m_bPressedKeyTbl[VK_SPACE] == true)
 		{
 			m_player.lock()->Jump();
 		}
 
-		//Bƒ{ƒ^ƒ“‚ÅËo
+		//Bãƒœã‚¿ãƒ³ã§å°„å‡º
 		if ((m_pad[0].wReleasedButtons & XINPUT_GAMEPAD_B) || m_key.m_bUpKeyTbl[VK_LCONTROL] == true)
 		{
 			m_player.lock()->Projectile();
 		}
 
-		//Bƒ{ƒ^ƒ“‚Åƒ`ƒƒ[ƒW
+		//Bãƒœã‚¿ãƒ³ã§ãƒãƒ£ãƒ¼ã‚¸
 		m_player.lock()->Charging((m_pad[0].wButtons & XINPUT_GAMEPAD_B) || m_key.m_bPushKeyTbl[VK_LCONTROL] == true);
 
-		//Rƒ{ƒ^ƒ“‚Å“G‚ğ‚Â
+		//Rãƒœã‚¿ãƒ³ã§æ•µã‚’æŒã¤
 		m_player.lock()->GrabEnemy();
 
-		//‹ó’†‚Ö
+		//ç©ºä¸­ã¸
 		if (m_player.lock()->IsAir()) {
 			m_player.lock()->ChangeState(PlayerStateMachine::player_air);
 		}
@@ -71,19 +71,19 @@ namespace basecross {
 
 	}
 
-	//‹ó’†
+	//ç©ºä¸­
 	void PlayerAirState::Enter() {
 
 	}
 	void PlayerAirState::Update(float deltatime) {
 		PlayerStateBase::Update(deltatime);
 
-		//€–SƒXƒe[ƒg‚Ö
+		//ï¿½ï¿½ï¿½Sï¿½Xï¿½eï¿½[ï¿½gï¿½ï¿½
 		if (m_player.lock()->GetHP() <= 0) {
 			m_player.lock()->ChangeState(PlayerStateMachine::player_died);
 		}
 
-		//ƒvƒŒƒCƒ„[‚ÌˆÚ“®
+		//ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ÌˆÚ“ï¿½
 		m_player.lock()->MovePlayer();
 		m_player.lock()->Gravity();
 
@@ -93,10 +93,10 @@ namespace basecross {
 	}
 
 	/// <summary>
-	/// ‹ò‚ç‚¢
+	/// å–°ã‚‰ã„
 	/// </summary>
 	void PlayerHitState::Enter() {
-		//ƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+		//ï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Äï¿½
 		m_player.lock()->SetAnim(L"GetHit_Stand");
 	}
 	void PlayerHitState::Update(float deltatime) {
@@ -105,14 +105,14 @@ namespace basecross {
 			m_player.lock()->ChangeState(PlayerStateMachine::player_died);
 		}
 
-		//ƒvƒŒƒCƒ„[‚ÌˆÚ“®
+		//ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ÌˆÚ“ï¿½
 		m_player.lock()->Friction();
 		m_player.lock()->Gravity();
 
 		if (m_player.lock()->GetDrawPtr()->GetCurrentAnimation() == L"GetHit_Stand" && 
 			m_player.lock()->GetDrawPtr()->GetCurrentAnimationTime() >= .33f) 
 		{		
-			//‹ó’†or’nã
+			//ï¿½ï¿½orï¿½nï¿½ï¿½
 			bool air = m_player.lock()->IsAir();
 			m_player.lock()->ChangeState(air ? PlayerStateMachine::player_air : PlayerStateMachine::player_stand);
 		}
@@ -121,16 +121,16 @@ namespace basecross {
 
 	}
 
-	//”­Ë
+	//ç™ºå°„
 	void PlayerReleaseState::Enter() {
 		m_player.lock()->SetAnim(L"Release");
 	}
 	void PlayerReleaseState::Update(float deltatime) {
-		//ƒvƒŒƒCƒ„[‚ÌˆÚ“®
+		//ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ÌˆÚ“ï¿½
 		m_player.lock()->Gravity();
 		m_player.lock()->Friction();
 
-		//d’¼I‚í‚è
+		//ï¿½dï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½
 		if (m_player.lock()->GetDrawPtr()->GetCurrentAnimation() == L"Release" &&
 			m_player.lock()->GetDrawPtr()->GetCurrentAnimationTime() >= 8.0f / 30.0f)
 		{
@@ -141,30 +141,30 @@ namespace basecross {
 
 	}
 
-	//”­Ë
+	//ç™ºå°„
 	void PlayerStartState::Enter() {
 		m_animTime = 0;
 		m_player.lock()->SetAnim(L"Idle");
 	}
 	void PlayerStartState::Update(float deltatime) {
-		//‡ŒvŠÔƒJƒEƒ“ƒg
+		//ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ÔƒJï¿½Eï¿½ï¿½ï¿½g
 		m_animTime += deltatime;
 
 		if (m_animTime > 1.0f && m_animTime <= 3.0f) {
-			//ƒAƒjƒ[ƒVƒ‡ƒ“•‘Oi
+			//ï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½i
 			m_player.lock()->SetAnim(L"Walk");
 			Vec3 fwd = m_player.lock()->ForwardConvert(Vec3(1, 0, 0));
 			m_player.lock()->AddMoveVel(fwd * .0035, true);
 		}
 		else if (m_animTime > 3.0f) {
-			//~‚Ü‚é
+			//ï¿½~ï¿½Ü‚ï¿½
 			m_player.lock()->SetAnim(L"Idle");
 
 		}
 		m_player.lock()->FrictionMovie();
 		m_player.lock()->SpeedLimit();
 
-		//ƒXƒe[ƒWƒ}ƒl[ƒWƒƒæ“¾AƒJƒƒ‰Œ³‚É–ß‚Á‚½‚ç‘€ì‰Â”\‚É
+		//ã‚¹ãƒ†ãƒ¼ã‚¸ãƒãƒãƒ¼ã‚¸ãƒ£å–å¾—ã€ã‚«ãƒ¡ãƒ©å…ƒã«æˆ»ã£ãŸã‚‰æ“ä½œå¯èƒ½ã«
 		if (m_player.lock()->GetStageGen()->m_CameraSelect != StageGenerator::CameraSelect::OPENINGCAMERA) {
 			m_player.lock()->ChangeState(PlayerStateMachine::player_stand);
 		}
@@ -174,12 +174,12 @@ namespace basecross {
 
 	}
 
-	//ƒS[ƒ‹‘Ò‹@
+	//ã‚´ãƒ¼ãƒ«å¾…æ©Ÿ
 	void PlayerGoalStandbyState::Enter() {
 
 	}
 	void PlayerGoalStandbyState::Update(float deltatime) {
-		//“®ì
+		//ï¿½ï¿½ï¿½ï¿½
 		m_player.lock()->GoalStandbyBehavior();
 
 	}
@@ -188,12 +188,12 @@ namespace basecross {
 	}
 
 	/// <summary>
-	/// ƒS[ƒ‹
+	/// ã‚´ãƒ¼ãƒ«
 	/// </summary>
 	void PlayerGoalState::Enter() {
 	}
 	void PlayerGoalState::Update(float deltatime) {
-		//“®ì
+		//ï¿½ï¿½ï¿½ï¿½
 		m_player.lock()->GoalBehavior();
 	}
 	void PlayerGoalState::Exit() {
@@ -201,7 +201,7 @@ namespace basecross {
 	}
 
 	/// <summary>
-	/// €–S
+	/// æ­»äº¡
 	/// </summary>
 	void PlayerDiedState::Enter() {
 	}

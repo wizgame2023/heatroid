@@ -21,13 +21,12 @@ namespace basecross {
 	class Player : public GameObject {
 		shared_ptr<PlayerStateMachine> m_state;
 
-		//エフェクト
-		shared_ptr<EfkEffect> m_EfkMuzzle;
-		shared_ptr<EfkEffect> m_EfkHit;
-		shared_ptr<EfkEffect> m_EfkJump;
-		shared_ptr<EfkEffect> m_EfkLand;
-		//エフェクト実行オブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay[3];
+		shared_ptr<EffectManeger> m_Effect;
+		Effekseer::Handle m_Handle;
+		Effekseer::Handle m_EfkMuzzle;
+		Effekseer::Handle m_EfkHit;
+		Effekseer::Handle m_EfkJump;
+		Effekseer::Handle m_EfkLand;
 
 		//飛び道具オブジェクト(前以て3つ呼び出しておく)
 		shared_ptr<FireProjectile> m_proj[3];
@@ -366,18 +365,16 @@ namespace basecross {
 		//ステージマネージャ
 		weak_ptr<StageGenerator> m_stageMgr;
 
-		//エフェクト
-		shared_ptr<EfkEffect> m_EfkProj;
-		shared_ptr<EfkEffect> m_EfkProjEnd;
-		//エフェクト実行オブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay[2];
+		shared_ptr<EffectManeger> m_Effect;
+		Effekseer::Handle m_EfkProj;
+		Effekseer::Handle m_EfkProjEnd;
 
 		//時間計測
 		float m_playTime = 0;
 
 		//どれくらいの位置からスタートするか
 		Vec3 m_dist;
-		//速度と発射する力(0.0f～1.0f)
+		//速度と発射する力(0.0f〜1.0f)
 		float m_speed, m_power;
 		//跳んでいく方向
 		Vec3 m_angle;
@@ -414,10 +411,9 @@ namespace basecross {
 			auto fwd = -1 * GetComponent<Transform>()->GetForward();
 			auto face = atan2f(fwd.z, fwd.x);
 			
-			m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkProj, GetComponent<Transform>()->GetPosition(), 0.0f);
-			m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
-			m_EfkPlay[0]->SetScale(Vec3(.8f));
-
+			m_Effect->PlayEffect(m_EfkProj, L"playerproj", GetComponent<Transform>()->GetPosition(), 0.0f);
+			m_Effect->SetRotation(m_EfkProj, Vec3(0, 1, 0), -face);
+			m_Effect->SetScale(m_EfkProj, Vec3(.8f));
 		}
 
 		//使用中か否か

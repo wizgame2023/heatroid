@@ -1,6 +1,6 @@
 /*!
 @file Timer.h
-@brief ƒ^ƒCƒ}[‚È‚Ç
+@brief ã‚¿ã‚¤ãƒãƒ¼ãªã©
 */
 
 #pragma once
@@ -18,12 +18,12 @@ namespace basecross{
 		Vec3 m_pos;
 		shared_ptr<NumberSprite> m_numSprite[4];
 	public:
-		// \’z‚Æ”jŠü
+		// æ§‹ç¯‰ã¨ç ´æ£„
 		Timer(const shared_ptr<Stage>& stage, const Vec3 pos);
 		virtual ~Timer(){}
 
-		virtual void OnCreate() override; // ‰Šú‰»
-		virtual void OnUpdate() override; // XV
+		virtual void OnCreate() override; // åˆæœŸåŒ–
+		virtual void OnUpdate() override; // æ›´æ–°
 		float GetTime();
 
 		void Debug();

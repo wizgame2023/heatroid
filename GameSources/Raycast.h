@@ -1,7 +1,7 @@
 /*!
 @file Raycast.h
-@brief ƒŒƒC‚ğ”ò‚Î‚·
-’S“–FˆíŒ©
+@brief ãƒ¬ã‚¤ã‚’é£›ã°ã™
+æ‹…å½“ï¼šé€¸è¦‹
 */
 
 #pragma once
@@ -11,7 +11,7 @@
 
 namespace basecross {
 	//--------------------------------------------------------------------------------------
-	//	class LineObject : public GameObject; //ü‚ğ•`‰æ‚·‚éƒIƒuƒWƒFƒNƒg
+	//	class LineObject : public GameObject; //ç·šã‚’æç”»ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	//--------------------------------------------------------------------------------------
 	class LineObject : public GameObject {
 	private:
@@ -46,7 +46,7 @@ namespace basecross {
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class RayMark : public GameObject; //ƒIƒuƒWƒFƒNƒg‚ÉG‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	//	class RayMark : public GameObject; //ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«è§¦ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹
 	//--------------------------------------------------------------------------------------
 	class RayMark : public GameObject {
 	private : 

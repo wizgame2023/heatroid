@@ -11,13 +11,7 @@ namespace basecross {
 	class GimmickObject : public GameObject
 	{
 	public:
-		// エフェクト関連のメンバ変数
-		shared_ptr<EfkEffect> m_EfkEffect;           // エフェクトオブジェクト（単発エフェクト用）
-		shared_ptr<EfkEffect> m_EfkEffectLoop;       // ループエフェクトオブジェクト（繰り返しエフェクト用）
-
-		// エフェクト再生オブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay;               // エフェクトを制御および再生するためのオブジェクト
-
+		shared_ptr<SoundItem> m_Sound; // サウンドアイテムの共有ポインタ
 		// コンストラクタ
 		GimmickObject(const shared_ptr<Stage>& StagePtr);
 
@@ -160,9 +154,10 @@ namespace basecross {
 
 	class GimmickButton : public GimmickObject
 	{
-		shared_ptr<EfkEffect> m_EfkEffect;      // 単発で再生されるエフェクトオブジェクト
-		shared_ptr<EfkEffect> m_EfkEffectLoop;  // ループ再生されるエフェクトオブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay;          // エフェクトを制御および再生するためのオブジェクト
+		shared_ptr<EffectManeger> m_Effect;
+		Effekseer::Handle m_Handle;
+		Effekseer::Handle m_EfkEffectLoop;
+
 		Vec3 m_Position;                        // ボタンの位置を保持（設置されている座標）
 		Vec3 m_Rotation;                        // ボタンの回転情報を保持
 		Vec3 m_Scale;                           // ボタンのサイズ（スケール情報）を保持

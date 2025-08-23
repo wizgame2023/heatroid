@@ -464,9 +464,6 @@ namespace basecross {
 	}
 	void StageGenerator::OnCreate() {
 		try {
-			//エフェクト作成
-			m_EfkInterface = ObjectFactory::Create<EfkInterface>();
-
 			auto& app = App::GetApp();
 			auto scene = app->GetScene<Scene>();
 			// mediaパスを取得
@@ -511,7 +508,7 @@ namespace basecross {
 				if (rayptr->GetEnemy() == shObj)
 				{
 					bool Activ = rayptr->GetActiveFlag();
-					if (Activ == false && enemyActiv == true)
+					if (Activ == false && enemyActiv != true)
 					{
 						enemyptr->SetUpdateActive(false);
 					}
@@ -522,6 +519,11 @@ namespace basecross {
 				}
 			}
 		}
+	}
+
+	shared_ptr<EffectManeger> StageGenerator::GetEfkInterface()
+	{
+		return GetTypeStage<GameStage>()->GetEfkInterface();
 	}
 
 	void StageGenerator::CreateSprite()

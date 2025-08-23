@@ -1,6 +1,6 @@
 /*!
 @file MainCamera.cpp
-@brief ƒJƒƒ‰‚È‚ÇÀ‘Ì
+@brief ã‚«ãƒ¡ãƒ©ãªã©å®Ÿä½“
 */
 
 #include "stdafx.h"
@@ -32,7 +32,7 @@ namespace basecross {
 		ptrtrans->SetPosition(pos);
 		TargetPos = Vec3(0.0f, 0.0f, 0.0f);
 		GetPos = Vec3(0.0f, 1.0f, 0.0f);
-		//“–‚½‚è”»’è
+		//å½“ãŸã‚Šåˆ¤å®š
 		auto ptrTarget = ptrCamera->GetTargetObject();
 		auto m_camera = AddComponent<CollisionSphere>();
 		auto draw = AddComponent<BcPNTStaticDraw>();
@@ -59,20 +59,20 @@ namespace basecross {
 		auto cntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		auto keyData = App::GetApp()->GetInputDevice().GetKeyState();
 
-		//‘O‰ñ‚Ìƒ^[ƒ“‚©‚ç‚ÌŠÔ
+		//å‰å›ã®ã‚¿ãƒ¼ãƒ³ã‹ã‚‰ã®æ™‚é–“
 		float elapsedTime = App::GetApp()->GetElapsedTime();
 		Vec3 newEye = ptrCamera->GetEye();
 		Vec3 newAt = ptrCamera->GetAt();
-		//ŒvZ‚Ég‚¤‚½‚ß‚Ì˜rŠp“xiƒxƒNƒgƒ‹j
+		//è¨ˆç®—ã«ä½¿ã†ãŸã‚ã®è…•è§’åº¦ï¼ˆãƒ™ã‚¯ãƒˆãƒ«ï¼‰
 		bsm::Vec3 armVec = newEye - newAt;
-		//³‹K‰»‚µ‚Ä‚¨‚­
+		//æ­£è¦åŒ–ã—ã¦ãŠã
 		armVec.normalize();
 		float fThumbRX = 0.0f;
 
 		if (cntlVec[0].bConnected) {
 			fThumbRX = cntlVec[0].fThumbRX;
 		}
-		//ƒL[ƒ{[ƒh‘€ì‚Ìê‡
+		//ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰æ“ä½œã®å ´åˆ
 		if (keyData.m_bPushKeyTbl[VK_LEFT] || keyData.m_bPushKeyTbl[VK_RIGHT]) {
 			if (keyData.m_bPushKeyTbl[VK_LEFT]) {
 				fThumbRX = (IsLRBaseMode() ? -1.0f : 1.0f);
@@ -82,15 +82,15 @@ namespace basecross {
 			}
 		}
 
-		//ƒvƒŒƒCƒ„[‚ÌŒü‚«‚ÉƒJƒƒ‰‚ğ–ß‚·
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‘ãã«ã‚«ãƒ¡ãƒ©ã‚’æˆ»ã™
 		float tempFixedRad = FixCameraDirection(ptrTarget, (cntlVec[0].wPressedButtons & XINPUT_GAMEPAD_Y || keyData.m_bPressedKeyTbl['C']));
 		if (tempFixedRad != 0)
 			fThumbRX = tempFixedRad;
 
 		armVec.y = sin(m_RadY);
-		//‚±‚±‚ÅY²‰ñ“]‚ğì¬
+		//ã“ã“ã§Yè»¸å›è»¢ã‚’ä½œæˆ
 		if (fThumbRX != 0) {
-			//‰ñ“]ƒXƒs[ƒh‚ğ”½‰f
+			//å›è»¢ã‚¹ãƒ”ãƒ¼ãƒ‰ã‚’åæ˜ 
 			if (IsLRBaseMode()) {
 				m_RadXZ += -fThumbRX * elapsedTime * m_RotSpeed;
 			}
@@ -99,7 +99,7 @@ namespace basecross {
 			}
 
 			if (m_RadXZ > XM_2PI) {
-				//1T‰ñ‚Á‚½‚ç0‰ñ“]‚É‚·‚é
+				//1é€±å›ã£ãŸã‚‰0å›è»¢ã«ã™ã‚‹
 				m_RadXZ -= XM_2PI;
 			}
 			else if (m_RadXZ < 0) {
@@ -107,11 +107,11 @@ namespace basecross {
 			}
 		}
 
-		//ƒNƒI[ƒ^ƒjƒIƒ“‚ÅY‰ñ“]i‚Â‚Ü‚èXZƒxƒNƒgƒ‹‚Ì’lj‚ğŒvZ
+		//ã‚¯ã‚ªãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ã§Yå›è»¢ï¼ˆã¤ã¾ã‚ŠXZãƒ™ã‚¯ãƒˆãƒ«ã®å€¤ï¼‰ã‚’è¨ˆç®—
 		Quat qtXZ;
 		qtXZ.rotation(m_RadXZ, bsm::Vec3(0, 1.0f, 0));
 		qtXZ.normalize();
-		//ˆÚ“®æs‚Ìs—ñŒvZ‚·‚é‚±‚Æ‚ÅAXZ‚Ì’l‚ğZo
+		//ç§»å‹•å…ˆè¡Œã®è¡Œåˆ—è¨ˆç®—ã™ã‚‹ã“ã¨ã§ã€XZã®å€¤ã‚’ç®—å‡º
 		Mat4x4 Mat;
 		Mat.strTransformation(
 			bsm::Vec3(1.0f, 1.0f, 1.0f),
@@ -120,18 +120,18 @@ namespace basecross {
 		);
 
 		Vec3 posXZ = Mat.transInMatrix();
-		//XZ‚Ì’l‚ª‚í‚©‚Á‚½‚Ì‚Å˜rŠp“x‚É‘ã“ü
+		//XZã®å€¤ãŒã‚ã‹ã£ãŸã®ã§è…•è§’åº¦ã«ä»£å…¥
 		armVec.x = posXZ.x;
 		armVec.z = posXZ.z;
-		//˜rŠp“x‚ğ³‹K‰»
+		//è…•è§’åº¦ã‚’æ­£è¦åŒ–
 		armVec.normalize();
 		if (ptrTarget) {
-			//–Úw‚µ‚½‚¢êŠ
+			//ç›®æŒ‡ã—ãŸã„å ´æ‰€
 			Vec3 toAt = ptrTarget->GetComponent<Transform>()->GetWorldMatrix().transInMatrix();
 			toAt += m_TargetToAt;
 			TargetPos = Lerp::CalculateLerp(newAt, toAt, 0, 1.0f, 1.0, Lerp::Linear);
 		}
-		////–Úw‚µ‚½‚¢êŠ‚ÉƒA[ƒ€‚Ì’l‚Æ˜rƒxƒNƒgƒ‹‚ÅEye‚ğ’²®
+		////ç›®æŒ‡ã—ãŸã„å ´æ‰€ã«ã‚¢ãƒ¼ãƒ ã®å€¤ã¨è…•ãƒ™ã‚¯ãƒˆãƒ«ã§Eyeã‚’èª¿æ•´
 
 		UpdateArmLengh();
 		Vec3 toEye = newAt + armVec * m_ArmLen;
@@ -140,7 +140,7 @@ namespace basecross {
 		//{
 		//	GetPos = Afterpos;
 		//}
-		//’Ç”öƒVƒXƒeƒ€
+		//è¿½å°¾ã‚·ã‚¹ãƒ†ãƒ 
 		GetComponent<Transform>()->SetPosition(GetPos);
 		GetComponent<Transform>()->SetRotation(TargetPos);
 	}
@@ -152,15 +152,15 @@ namespace basecross {
 
 	float CameraCollision::FixCameraDirection(shared_ptr<GameObject>& Other, bool Input)
 	{
-		//ƒJƒƒ‰‚ÌˆÚ“®ŠJn
+		//ã‚«ãƒ¡ãƒ©ã®ç§»å‹•é–‹å§‹
 		if (Input == true) {
 			if (m_isMovingToFixedDir == false) {
-				//ƒvƒŒƒCƒ„[‚ÌŒü‚«ƒxƒNƒgƒ‹‚ğæ“¾
+				//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‘ããƒ™ã‚¯ãƒˆãƒ«ã‚’å–å¾—
 				Vec3 fwd = -1 * Other->GetComponent<Transform>()->GetForward();
 				float angle = atan2f(-fwd.z, fwd.x) - XM_PIDIV2;
 				m_fixedDirY = (angle - m_RadXZ);
 
-				//180‹‚æ‚è‘å‚«‚¢Šp“x‚ª“ü‚Á‚Ä‚¢‚éê‡
+				//180Â°ã‚ˆã‚Šå¤§ãã„è§’åº¦ãŒå…¥ã£ã¦ã„ã‚‹å ´åˆ
 				if (m_fixedDirY > XM_PI) {
 					m_fixedDirY = -XM_2PI + m_fixedDirY;
 				}
@@ -172,7 +172,7 @@ namespace basecross {
 			}
 		}
 
-		//‰ñ‚·Šp“x‚ğ•Ô‚·
+		//å›ã™è§’åº¦ã‚’è¿”ã™
 		if (m_isMovingToFixedDir == true) {
 			float delta = App::GetApp()->GetElapsedTime();
 			if (abs(m_fixedDirY) > m_fixSpeed * delta * abs(m_RotSpeed)) {
@@ -210,7 +210,7 @@ namespace basecross {
 		}
 
 		if (m_ArmLen >= ptrCamera->m_MaxArm) {
-			//m_MaxArmˆÈã—£‚ê‚È‚¢‚æ‚¤‚É‚·‚é
+			//m_MaxArmä»¥ä¸Šé›¢ã‚Œãªã„ã‚ˆã†ã«ã™ã‚‹
 			m_ArmLen = ptrCamera->m_MaxArm;
 		}
 	}
@@ -271,7 +271,7 @@ namespace basecross {
 	}
 
 	MainCamera::~MainCamera() {}
-	//ƒAƒNƒZƒT
+	//ã‚¢ã‚¯ã‚»ã‚µ
 
 	void MainCamera::SetEye(const bsm::Vec3& Eye) {
 		Camera::SetEye(Eye);
@@ -309,11 +309,11 @@ namespace basecross {
 		auto vec = GetEye() - GetAt();
 		m_ArmLen = bsm::length(vec);
 		if (m_ArmLen >= m_MaxArm) {
-			//m_MaxArmˆÈã—£‚ê‚È‚¢‚æ‚¤‚É‚·‚é
+			//m_MaxArmä»¥ä¸Šé›¢ã‚Œãªã„ã‚ˆã†ã«ã™ã‚‹
 			m_ArmLen = m_MaxArm;
 		}
 		if (m_ArmLen <= m_MinArm) {
-			//m_MinArmˆÈ‰º‹ß‚Ã‚©‚È‚¢‚æ‚¤‚É‚·‚é
+			//m_MinArmä»¥ä¸‹è¿‘ã¥ã‹ãªã„ã‚ˆã†ã«ã™ã‚‹
 			m_ArmLen = m_MinArm;
 		}
 	}
@@ -375,11 +375,11 @@ namespace basecross {
 
 	}
 	void MainCamera::OnUpdate() {
-		//‘O‰ñ‚Ìƒ^[ƒ“‚©‚ç‚ÌŠÔ
+		//å‰å›ã®ã‚¿ãƒ¼ãƒ³ã‹ã‚‰ã®æ™‚é–“
 		Vec3 newAt = GetAt();
 		auto ptrTarget = GetTargetObject();
 		if (ptrTarget) {
-			//–Úw‚µ‚½‚¢êŠ
+			//ç›®æŒ‡ã—ãŸã„å ´æ‰€
 			Vec3 toAt = ptrTarget->GetComponent<Transform>()->GetWorldMatrix().transInMatrix();
 			toAt += m_TargetToAt;
 			newAt = Lerp::CalculateLerp(GetAt(), toAt, 0, 1.0f, 1.0, Lerp::Linear);
@@ -395,7 +395,7 @@ namespace basecross {
 	}
 
 	//--------------------------------------------------------------------------------------
-//	class RayMark : public GameObject; //Õ“Ë‚µ‚½‚Æ‚«‚Ì•\¦‚³‚ê‚éƒIƒuƒWƒFƒNƒg
+//	class RayMark : public GameObject; //è¡çªã—ãŸã¨ãã®è¡¨ç¤ºã•ã‚Œã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 //--------------------------------------------------------------------------------------
 
 	RayCameraMark::RayCameraMark(const shared_ptr<Stage>& stage
@@ -430,7 +430,7 @@ namespace basecross {
 	void RayCameraMark::OnUpdate() {
 		auto stage = GetStage();
 
-		//•K—v‚È•Ï”‚ÌéŒ¾
+		//å¿…è¦ãªå¤‰æ•°ã®å®£è¨€
 		Vec3 pos = Vec3(0.0f);
 		Vec3 rayStart;
 		Vec3 rayEnd;
@@ -439,29 +439,29 @@ namespace basecross {
 		TRIANGLE triangle;
 		size_t triangleIndex;
 
-		//ƒvƒŒƒCƒ„[
+		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
 		auto player = m_player.lock();
 		if (!player) return;
-		rayStart = player->GetComponent<Transform>()->GetPosition(); //ƒŒƒC‚ğ”ò‚Î‚·n“_
+		rayStart = player->GetComponent<Transform>()->GetPosition(); //ãƒ¬ã‚¤ã‚’é£›ã°ã™å§‹ç‚¹
 
-		//ƒŒƒC‚ğ”ò‚Î‚·
-		//“G
+		//ãƒ¬ã‚¤ã‚’é£›ã°ã™
+		//æ•µ
 		auto camera = m_camera.lock();
 		if (!camera) return;
 		auto cameraObj = camera->GetCameraObject();
 		auto cameraDraw = cameraObj->GetComponent<BcPNTStaticDraw>();
-		rayEnd = camera->GetEye();		             //ƒŒƒC‚ğ”ò‚Î‚·I“_
-		//“–‚½‚Á‚Ä‚¢‚é‚©‚Ìƒtƒ‰ƒO
+		rayEnd = camera->GetEye();		             //ãƒ¬ã‚¤ã‚’é£›ã°ã™çµ‚ç‚¹
+		//å½“ãŸã£ã¦ã„ã‚‹ã‹ã®ãƒ•ãƒ©ã‚°
 		m_hitEnemyFlag = cameraDraw->HitTestStaticMeshSegmentTriangles
 		(rayStart, rayEnd, enemyCrossPos, triangle, triangleIndex);
 
-		//•Ç
+		//å£
 		auto wallGroup = GetStage()->GetSharedObjectGroup(L"Wall");
 		auto& wallVec = wallGroup->GetGroupVector();
 		for (auto v : wallVec) {
 			auto walls = v.lock();
 			auto wallDraw = walls->GetComponent<PNTStaticDraw>();
-			//‚·‚×‚Ä‚Ì•Ç‚ğƒ`ƒFƒbƒNAƒŒƒC‚ª‚ ‚Á‚½‚Ä‚¢‚½‚çtrue
+			//ã™ã¹ã¦ã®å£ã‚’ãƒã‚§ãƒƒã‚¯ã€ãƒ¬ã‚¤ãŒã‚ã£ãŸã¦ã„ãŸã‚‰true
 			m_hitWallFlag.push_back(wallDraw->HitTestStaticMeshSegmentTriangles
 			(rayStart, rayEnd, objCrossPos, triangle, triangleIndex));
 		}
@@ -471,7 +471,7 @@ namespace basecross {
 			}
 		}
 
-		//ƒhƒA
+		//ãƒ‰ã‚¢
 		auto doorGroup = GetStage()->GetSharedObjectGroup(L"Door");
 		auto& doorVec = doorGroup->GetGroupVector();
 		for (auto v : doorVec) {
@@ -487,7 +487,7 @@ namespace basecross {
 		}
 
 
-		//•Ç‚©ƒhƒA‚É‚ ‚½‚Á‚Ä‚¢‚é‚©
+		//å£ã‹ãƒ‰ã‚¢ã«ã‚ãŸã£ã¦ã„ã‚‹ã‹
 		if (m_wallCnt == m_hitWallFlag.size() && m_doorCnt == m_hitDoorFlag.size()) {
 			m_activeFlag = true;
 			m_wallCnt = 0;
@@ -503,8 +503,8 @@ namespace basecross {
 			m_hitDoorFlag.clear();
 		}
 
-		//ƒfƒoƒbƒN—p
-		//“–‚½‚Á‚Ä‚¢‚éêŠ‚Ì•`‰æ
+		//ãƒ‡ãƒãƒƒã‚¯ç”¨
+		//å½“ãŸã£ã¦ã„ã‚‹å ´æ‰€ã®æç”»
 		if (m_hitEnemyFlag) {
 			pos = enemyCrossPos;
 			m_pos = objCrossPos;
@@ -547,19 +547,19 @@ namespace basecross {
 	}
 	OpeningCameraman::~OpeningCameraman() {}
 
-	//‰Šú‰»
+	//åˆæœŸåŒ–
 	void OpeningCameraman::OnCreate() {
-		//‰ŠúˆÊ’u‚È‚Ç‚Ìİ’è
+		//åˆæœŸä½ç½®ãªã©ã®è¨­å®š
 		auto ptr = GetComponent<Transform>();
-		ptr->SetScale(0.25f, 0.25f, 0.25f);	//’¼Œa25ƒZƒ“ƒ`‚Ì‹…‘Ì
+		ptr->SetScale(0.25f, 0.25f, 0.25f);	//ç›´å¾„25ã‚»ãƒ³ãƒã®çƒä½“
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(m_startPos);
-		//ƒXƒe[ƒgƒ}ƒVƒ“‚Ì\’z
+		//ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³ã®æ§‹ç¯‰
 		m_StateMachine.reset(new StateMachine<OpeningCameraman>(GetThis<OpeningCameraman>()));
-		//Å‰‚ÌƒXƒe[ƒg‚ğOpeningCameramanToGoalState‚Éİ’è
+		//æœ€åˆã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚’OpeningCameramanToGoalStateã«è¨­å®š
 		m_StateMachine->ChangeState(OpeningCameramanToFirstState::Instance());
 
-		//Œã”¼—p‚Ìˆê“I‚ÈŠi”[êŠ
+		//å¾ŒåŠç”¨ã®ä¸€æ™‚çš„ãªæ ¼ç´å ´æ‰€
 		m_tempStartPos = m_startPos;
 		m_tempEndPos = m_endPos;
 		m_tempAtStartPos = m_atStartPos;
@@ -568,28 +568,28 @@ namespace basecross {
 		m_tempTotalTime = m_totalTime;
 	}
 
-	//‘€ì
+	//æ“ä½œ
 	void OpeningCameraman::OnUpdate() {
-		//ƒXƒe[ƒgƒ}ƒVƒ“‚ÌUpdate‚ğs‚¤
-		//‚±‚Ì’†‚ÅƒXƒe[ƒg‚ÌØ‚è‘Ö‚¦‚ªs‚í‚ê‚é
+		//ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³ã®Updateã‚’è¡Œã†
+		//ã“ã®ä¸­ã§ã‚¹ãƒ†ãƒ¼ãƒˆã®åˆ‡ã‚Šæ›¿ãˆãŒè¡Œã‚ã‚Œã‚‹
 		m_StateMachine->Update();
 	}
 
-	void OpeningCameraman::ToGoalEnterBehavior() { //Œã”¼•”
-		m_startPos; //ƒJƒƒ‰‚ÌÅ‰‚ÌˆÊ’u
-		m_endPos; //ƒJƒƒ‰‚ÌÅŒã‚ÌˆÊ’u
-		m_atStartPos; //Å‰‚ÉŒ©‚Ä‚é•ûŠp
-		m_atEndPos; //ÅŒã‚ÉŒ©‚Ä‚é•ûŠp
-		m_atPos;//ƒJƒƒ‰ÅŒã‚ÌˆÊ’u
+	void OpeningCameraman::ToGoalEnterBehavior() { //å¾ŒåŠéƒ¨
+		m_startPos; //ã‚«ãƒ¡ãƒ©ã®æœ€åˆã®ä½ç½®
+		m_endPos; //ã‚«ãƒ¡ãƒ©ã®æœ€å¾Œã®ä½ç½®
+		m_atStartPos; //æœ€åˆã«è¦‹ã¦ã‚‹æ–¹è§’
+		m_atEndPos; //æœ€å¾Œã«è¦‹ã¦ã‚‹æ–¹è§’
+		m_atPos;//ã‚«ãƒ¡ãƒ©æœ€å¾Œã®ä½ç½®
 		m_totalTime;
 	}
 
-	void OpeningCameraman::ToStartEnterBehavior() { //‘O”¼•”
-		m_startPos = m_tempEndPos; //ƒJƒƒ‰‚ÌÅ‰‚ÌˆÊ’u
-		m_endPos = m_secondEndPos; //ƒJƒƒ‰‚ÌÅŒã‚ÌˆÊ’u
-		m_atStartPos = m_tempAtEndPos; //Å‰‚ÉŒ©‚Ä‚é•ûŠp
-		m_atEndPos = m_secondAtEndPos; //ÅŒã‚ÉŒ©‚Ä‚é•ûŠp
-		m_atPos;//ƒJƒƒ‰ÅŒã‚ÌˆÊ’u
+	void OpeningCameraman::ToStartEnterBehavior() { //å‰åŠéƒ¨
+		m_startPos = m_tempEndPos; //ã‚«ãƒ¡ãƒ©ã®æœ€åˆã®ä½ç½®
+		m_endPos = m_secondEndPos; //ã‚«ãƒ¡ãƒ©ã®æœ€å¾Œã®ä½ç½®
+		m_atStartPos = m_tempAtEndPos; //æœ€åˆã«è¦‹ã¦ã‚‹æ–¹è§’
+		m_atEndPos = m_secondAtEndPos; //æœ€å¾Œã«è¦‹ã¦ã‚‹æ–¹è§’
+		m_atPos;//ã‚«ãƒ¡ãƒ©æœ€å¾Œã®ä½ç½®
 		m_totalTime = m_tempTotalTime;
 	}
 
@@ -686,7 +686,7 @@ namespace basecross {
 		}
 	}
 
-	//ƒXƒe[ƒWƒNƒŠƒA‚ÌƒJƒƒ‰‰‰o
+	//ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒªã‚¢æ™‚ã®ã‚«ãƒ¡ãƒ©æ¼”å‡º
 	EndingCameraman::EndingCameraman(const shared_ptr<Stage>& StagePtr, const Vec3& StartPos, const Vec3& EndPos,
 		const Vec3& AtStartPos, const Vec3& AtEndPos, const float& TotalTime) :
 		GameObject(StagePtr),
@@ -699,22 +699,22 @@ namespace basecross {
 	}
 	EndingCameraman::~EndingCameraman() {}
 
-	//‰Šú‰»
+	//åˆæœŸåŒ–
 	void EndingCameraman::OnCreate() {
-		//‰ŠúˆÊ’u‚È‚Ç‚Ìİ’è
+		//åˆæœŸä½ç½®ãªã©ã®è¨­å®š
 		auto ptr = GetComponent<Transform>();
-		ptr->SetScale(0.25f, 0.25f, 0.25f);	//’¼Œa25ƒZƒ“ƒ`‚Ì‹…‘Ì
+		ptr->SetScale(0.25f, 0.25f, 0.25f);	//ç›´å¾„25ã‚»ãƒ³ãƒã®çƒä½“
 		ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		ptr->SetPosition(m_startPos);
-		//ƒXƒe[ƒgƒ}ƒVƒ“‚Ì\’z
+		//ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³ã®æ§‹ç¯‰
 		m_StateMachine.reset(new StateMachine<EndingCameraman>(GetThis<EndingCameraman>()));
-		//ƒXƒe[ƒgİ’è
+		//ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
 		m_StateMachine->ChangeState(EndingCameramanBasicState::Instance());
 	}
 
-	//‘€ì
+	//æ“ä½œ
 	void EndingCameraman::OnUpdate() {
-		//ƒXƒe[ƒgƒ}ƒVƒ“‚ÌUpdate‚ğs‚¤
+		//ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³ã®Updateã‚’è¡Œã†
 		m_StateMachine->Update();
 	}
 
