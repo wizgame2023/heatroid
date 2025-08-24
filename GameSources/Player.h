@@ -8,7 +8,9 @@
 #include "EffectManager.h"
 #include "StageManager.h"
 #include "PlayerState.h"
-#include "Collision.h"
+#include "PlayerGrab.h"
+#include "PlayerProj.h"
+#include "PlayerUI.h"
 
 namespace basecross {
 
@@ -17,7 +19,7 @@ namespace basecross {
 	// プレイヤークラス
 	//====================================================================
 	class PlayerGrab;
-	class FireProjectile;
+	class PlayerProj;
 	class Player : public GameObject {
 		shared_ptr<PlayerStateMachine> m_state;
 
@@ -29,7 +31,7 @@ namespace basecross {
 		Effekseer::Handle m_EfkLand;
 
 		//飛び道具オブジェクト(前以て3つ呼び出しておく)
-		shared_ptr<FireProjectile> m_proj[3];
+		shared_ptr<PlayerProj> m_proj[3];
 
 		//Transformの初期化
 		Vec3 m_initPos;
@@ -303,244 +305,6 @@ namespace basecross {
 				if (m_isCharging) return L"Fire_";
 				else return L"";
 			}
-	};
-
-	//====================================================================
-	// class PlayerGrab
-	// プレイヤーの掴み判定
-	//====================================================================
-	class Enemy;
-	class PlayerGrab : public GameObject {
-		//プレイヤーとの相対位置・判定の大きさ
-		Vec3 m_dist, m_scale;
-		//プレイヤーに追従させるためのポインタ
-		weak_ptr<Player> m_player;
-		//触れた敵のポインタを保管しておく
-		shared_ptr<Enemy> m_target;
-		//敵に当たっているかどうか
-		bool m_isHit;
-
-		shared_ptr<CollisionSphere> m_collPtr;
-	public:
-		PlayerGrab(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player) :
-			GameObject(StagePtr),
-			m_player(player),
-			m_dist(Vec3(-5.0f, 1, 0)),
-			m_scale(Vec3(8.0f)),
-			m_isHit(false)
-		{
-		};
-
-		~PlayerGrab() {};
-
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-
-		void SetCollActive(bool update) {
-			GetComponent<CollisionSphere>()->SetUpdateActive(update);
-		}
-
-		bool IsHit() {
-			return m_isHit;
-		}
-
-		//掴み状態を解除
-		void ClearTarget();
-
-		//敵を投げる処理
-		void ThrowTarget(float charge);
-
-		//何かに接触している判定
-		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
-
-	};
-
-
-	//====================================================================
-	// class FireProjectile
-	// プレイヤーの飛び道具
-	//====================================================================
-
-	class FireProjectile : public GameObject {
-		//ステージマネージャ
-		weak_ptr<StageGenerator> m_stageMgr;
-
-		shared_ptr<EffectManeger> m_Effect;
-		Effekseer::Handle m_EfkProj;
-		Effekseer::Handle m_EfkProjEnd;
-
-		//時間計測
-		float m_playTime = 0;
-
-		//どれくらいの位置からスタートするか
-		Vec3 m_dist;
-		//速度と発射する力(0.0f〜1.0f)
-		float m_speed, m_power;
-		//跳んでいく方向
-		Vec3 m_angle;
-		//変動する速度、基底速度
-		const float m_speedAdd, m_speedBase;
-		//射程
-		float m_range = 0, m_rangeMax;
-		//壁に当たって停止
-		bool m_stopped;
-		//消去フラグ
-		bool m_lifeEnded;
-
-		//使用中フラグ
-		bool m_used = false;
-
-	public:
-		//構築と破棄
-
-		FireProjectile(const shared_ptr<Stage>& StagePtr);
-
-		virtual ~FireProjectile() {}
-		//アクセサ
-		//初期化
-		virtual void OnCreate() override;
-		//更新
-		virtual void OnUpdate() override;
-
-		//何かに接触している判定
-		virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
-
-
-		//エフェクト再生
-		void EffectStart() {
-			auto fwd = -1 * GetComponent<Transform>()->GetForward();
-			auto face = atan2f(fwd.z, fwd.x);
-			
-			m_Effect->PlayEffect(m_EfkProj, L"playerproj", GetComponent<Transform>()->GetPosition(), 0.0f);
-			m_Effect->SetRotation(m_EfkProj, Vec3(0, 1, 0), -face);
-			m_Effect->SetScale(m_EfkProj, Vec3(.8f));
-		}
-
-		//使用中か否か
-		bool GetUsed() {
-			return m_used;
-		}
-
-		//呼び出す
-		void Invoke(const Vec3 dist, const Vec3 angle, const float power) {
-			m_used = true;
-			GetComponent<TriggerSphere>()->SetUpdateActive(true);
-			SetUpdateActive(true);
-
-			m_stopped = false;
-			m_lifeEnded = false;
-			m_angle = angle;
-
-			GetComponent<Transform>()->SetPosition(dist);
-
-			//速度×倍率+基底速度
-			m_speed = (m_speedAdd * power) + m_speedBase;
-			//持続時間
-			m_range = m_rangeMax;
-			EffectStart();
-		}
-
-	};
-
-	//====================================================================
-	// class SpritePlayerUI
-	// プレイヤーのゲージ類
-	//====================================================================
-	class SpriteHealth;
-	class SpriteCharge;
-
-	class SpritePlayerUI : public GameObject {
-		wstring m_resKey;
-		int m_layer;
-		weak_ptr<Player> m_player;
-		shared_ptr<PCTSpriteDraw> m_DrawComp;
-		vector<VertexPositionColorTexture> m_Vertices;
-
-		shared_ptr<SpriteHealth> m_health;
-		shared_ptr<SpriteCharge> m_charge;
-		shared_ptr<SpritePlayerUI> m_frame;
-
-		const float m_width = 600.0f;
-		const float m_height = 150.0f;
-		const float windowWidth = App::GetApp()->GetGameWidth();
-		const float windowHeight = App::GetApp()->GetGameHeight();
-	public:
-		SpritePlayerUI(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const wstring& resKey, const int& layer = 1) :
-			GameObject(StagePtr),
-			m_player(player),
-			m_resKey(resKey),
-			m_layer(layer)
-		{
-		}
-
-		~SpritePlayerUI() {};
-
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-	};
-
-
-	//====================================================================
-	// class PlayerMeterBase
-	// プレイヤーのゲージ類の親
-	//====================================================================
-	class PlayerMeterBase : public GameObject {
-	protected:
-		weak_ptr<Player> m_player;
-		shared_ptr<SpritePlayerUI> m_meter;
-		shared_ptr<PCTSpriteDraw> m_DrawComp;
-		vector<VertexPositionColorTexture> m_Vertices;
-
-		float m_width;
-		float m_height;
-		float m_bottomSlip;
-		Vec3 addPos;
-	public:
-		PlayerMeterBase(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
-			GameObject(StagePtr),
-			m_player(player),
-			m_meter(meter)
-		{
-		}
-		void Init(wstring ResKey);
-	};
-
-	//====================================================================
-	// class SpriteHealth
-	// プレイヤーのライフ
-	//====================================================================
-	class SpriteHealth : public PlayerMeterBase {
-
-	public:
-		SpriteHealth(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
-			PlayerMeterBase(StagePtr, player, meter)
-		{
-		}
-
-		~SpriteHealth() {}
-
-		virtual void OnCreate() override;
-
-		virtual void OnUpdate() override;
-	};
-
-	//====================================================================
-	// class SpriteCharge
-	// プレイヤーの長押しゲージ
-	//====================================================================
-	class SpriteCharge : public PlayerMeterBase {
-
-	public:
-		SpriteCharge(const shared_ptr<Stage>& StagePtr, const shared_ptr<Player>& player, const shared_ptr<SpritePlayerUI>& meter) :
-			PlayerMeterBase(StagePtr, player, meter)
-		{
-		}
-
-		~SpriteCharge() {}
-
-		virtual void OnCreate() override;
-
-		virtual void OnUpdate() override;
 	};
 
 }
