@@ -6,6 +6,7 @@
 
 #pragma once
 #include "stdafx.h"
+#include "EffectManager.h"
 
 namespace basecross {
 	//====================================================================
@@ -18,10 +19,9 @@ namespace basecross {
 		weak_ptr<StageGenerator> m_stageMgr;
 
 		//エフェクト
-		shared_ptr<EfkEffect> m_EfkProj;
-		shared_ptr<EfkEffect> m_EfkProjEnd;
-		//エフェクト実行オブジェクト
-		shared_ptr<EfkPlay> m_EfkPlay[2];
+		shared_ptr<EffectManeger> m_efkInterface;
+		Effekseer::Handle m_efkProj;
+		Effekseer::Handle m_efkProjEnd;
 
 		//時間計測
 		float m_playTime = 0;
@@ -64,10 +64,9 @@ namespace basecross {
 			auto fwd = -1 * GetComponent<Transform>()->GetForward();
 			auto face = atan2f(fwd.z, fwd.x);
 
-			m_EfkPlay[0] = ObjectFactory::Create<EfkPlay>(m_EfkProj, GetComponent<Transform>()->GetPosition(), 0.0f);
-			m_EfkPlay[0]->SetRotation(Vec3(0, 1, 0), -face);
-			m_EfkPlay[0]->SetScale(Vec3(.8f));
-
+			m_efkInterface->PlayEffect(m_efkProj, L"playerproj", GetComponent<Transform>()->GetPosition(), 0.0f);
+			m_efkInterface->SetRotation(m_efkProj, Vec3(0, 1, 0), -face);
+			m_efkInterface->SetScale(m_efkProj, Vec3(.8f));
 		}
 
 		//使用中か否か

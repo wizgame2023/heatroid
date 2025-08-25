@@ -303,12 +303,11 @@ namespace basecross {
 			m_animTime = 0.0f;
 			ChangeState(PlayerStateMachine::player_goal);
 		}
-
 	}
 
 	void Player::GoalBehavior() {
-
 		m_animTime += _delta;
+		
 		//しばらく歩いてからエレベータに入ったところで180°振り向く
 		if (m_animTime > 0.0f && m_animTime <= 3.0f) {
 			SetAnim(L"Walk");
@@ -332,6 +331,7 @@ namespace basecross {
 
 	}
 
+	//デバッグ表示
 	void Player::ShowDebug() {
 		wstringstream wss;
 		auto pos = RoundOff(GetComponent<Transform>()->GetPosition(), 3);
@@ -356,12 +356,15 @@ namespace basecross {
 			wss << "goalrot : " << grot.w << " / " << grot.x << " / " << grot.y << " / " << grot.z << endl;
 		}
 
+		//
 		auto scene = App::GetApp()->GetScene<Scene>();
 		scene->SetDebugString(L"Player\n" + wss.str());
 	}
 
+
 	void Player::Jump() {
-		if (m_isCarrying == true) return;	//敵を持った状態でもジャンプしない
+		//敵を持った状態でジャンプしない
+		if (m_isCarrying == true) return;
 
 		//ジャンプ時のエフェクト
 		auto plPos = GetComponent<Transform>()->GetPosition();
@@ -372,8 +375,10 @@ namespace basecross {
 		m_Effect->PlayEffect(m_EfkJump, L"PlayerJump", GetComponent<Transform>()->GetPosition(), 0.0f);
 		m_Effect->SetScale(m_EfkJump, Vec3(.35f));
 
+		//音を鳴らす
 		PlaySnd(L"PlayerJump", 1, 0);
 
+		//速度を代入
 		m_moveVel.y = m_jumpHeight;
 		m_collideCount = 0;
 		ChangeState(PlayerStateMachine::player_air);
@@ -607,7 +612,7 @@ namespace basecross {
 		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
 		m_Effect->PlayEffect(m_EfkHit, L"Hit", Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
 
-		//m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
+		//m_efkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkHit, Lerp::CalculateLerp(plPos, shPos, .0f, 1.0f, .5f, Lerp::rate::Linear), 0.0f);
 
 		ChangeState(PlayerStateMachine::player_hit);
 
@@ -616,7 +621,6 @@ namespace basecross {
 		auto fwd = trans->GetForward();
 		m_moveVel.x = fwd.x * 30.0f;
 		m_moveVel.z = fwd.z * 30.0f;
-
 
 		m_HP -= 1;
 		m_invincibleTime = m_invincibleTimeMax;
@@ -668,7 +672,7 @@ namespace basecross {
 	}
 
 	//火炎放射しているアニメとしていないアニメの切り替え
-	void Player::SwitchAnim(const float time, const float condition, const wstring prefix) {
+	void Player::SwitchAnim(const float time, const float condition, const wstring& prefix) {
 		const float animTime = time;
 		auto draw = GetComponent<PNTBoneModelDraw>();
 		if (condition) {

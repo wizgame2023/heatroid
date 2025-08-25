@@ -31,19 +31,15 @@ namespace basecross {
 		//ステージマネージャ
 		m_stageMgr = GetStage()->GetSharedGameObject<StageGenerator>(L"StageManager");
 
-		//エフェクト読み込み
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		wstring ProjEffectStr = DataDir + L"Effects\\playerproj.efk";
-		wstring EndEffectStr = DataDir + L"Effects\\playerprojend.efk";
-		auto ShEfkInterface = m_stageMgr.lock()->GetEfkInterface();
-		m_EfkProj = ObjectFactory::Create<EfkEffect>(ShEfkInterface, ProjEffectStr);
-		m_EfkProjEnd = ObjectFactory::Create<EfkEffect>(ShEfkInterface, EndEffectStr);
-
 		auto trans = GetComponent<Transform>();
 		trans->SetScale(Vec3(8.0f));
 		trans->SetRotation(Vec3(0));
 		trans->SetPosition(Vec3(0));
+
+		//エフェクト読み込み
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		m_efkInterface = m_stageMgr.lock()->GetEfkInterface();
 
 		auto coll = AddComponent<TriggerSphere>();
 		coll->SetDrawActive(false);//debug
@@ -85,8 +81,8 @@ namespace basecross {
 		auto delta = App::GetApp()->GetElapsedTime();
 		m_playTime += delta;
 
-		if (m_EfkPlay[0]) {
-			m_EfkPlay[0]->SetLocation(trans->GetPosition());
+		if (m_efkProj) {
+			m_efkInterface->SetLocation(m_efkProj, trans->GetPosition());
 		}
 
 		if (!m_stopped) {
@@ -101,18 +97,18 @@ namespace basecross {
 			auto fwd = -1 * trans->GetForward();
 			auto face = atan2f(fwd.z, fwd.x);
 
-			if (m_EfkPlay[0]) {
-				m_EfkPlay[0]->StopEffect();
+			if (m_efkProj) {
+				m_efkInterface->StopEffect(m_efkProj);
 			}
-			m_EfkPlay[1] = ObjectFactory::Create<EfkPlay>(m_EfkProjEnd, trans->GetPosition(), 0.0f);
-			m_EfkPlay[1]->SetRotation(Vec3(0, 1, 0), -face);
-			m_EfkPlay[1]->SetScale(Vec3(.8f));
+			m_efkInterface->PlayEffect(m_efkProjEnd, L"playerprojend", trans->GetPosition(), 0.0f);
+			m_efkInterface->SetRotation(m_efkProjEnd, Vec3(0, 1, 0), -face);
+			m_efkInterface->SetScale(m_efkProjEnd, Vec3(.8f));
 		}
 
 		if (m_lifeEnded) {
-			m_EfkPlay[1]->SetLocation(trans->GetPosition());
+			m_efkInterface->SetLocation(m_efkProjEnd, trans->GetPosition());
 			if (m_range <= -.3f) {
-				m_EfkPlay[1]->StopEffect();
+				m_efkInterface->StopEffect(m_efkProjEnd);
 				m_used = false;
 				SetUpdateActive(false);
 			}

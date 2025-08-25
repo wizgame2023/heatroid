@@ -116,11 +116,10 @@ namespace basecross {
 		float _delta = App::GetApp()->GetElapsedTime();
 
 		//クォータニオン基準での回転処理 1q:最初の回転 v:回転軸 rad:回転量
-		Quat RotateQuat(const Quat q, const Vec3 v, const float rad) {
+		Quat RotateQuat(const Quat q, const Vec3 v, const float rad) const {
 			Quat r = Quat(cos(rad / 2), v.x * sin(rad / 2), v.y * sin(rad / 2), v.z * sin(rad / 2));
 			Quat r2 = Quat(cos(rad / 2), -v.x * sin(rad / 2), -v.y * sin(rad / 2), -v.z * sin(rad / 2));
 			return q * r * r2;
-
 		}
 
 		public:
@@ -143,7 +142,9 @@ namespace basecross {
 			virtual void OnCollisionEnter(shared_ptr<GameObject>& Other) override;
 			virtual void OnCollisionExit(shared_ptr<GameObject>& Other) override;
 
+			//ゴール演出まで待機
 			void GoalStandbyBehavior();
+			//ゴール演出
 			void GoalBehavior();
 
 			//プレイヤーの移動
@@ -171,33 +172,40 @@ namespace basecross {
 			void Jump();
 			//飛び道具発射
 			void Projectile();
-			//攻撃をくらう/死ぬ
+			//攻撃をくらう
 			void GetHit(shared_ptr<GameObject>& target);
+			//死ぬ
 			void Died();
 
-			shared_ptr<StageGenerator> GetStageGen() {
+			//ステージ生成オブジェクトを取得
+			shared_ptr<StageGenerator> GetStageGen() const {
 				return m_stageMgr.lock();
 			}
 
-			void ChangeState(PlayerStateMachine::PlayerStateType type) {
+			//ステート変更
+			void ChangeState(PlayerStateMachine::PlayerStateType type) const {
 				m_state->ChangeState(type);
 			}
 
-			shared_ptr<GameObject> GetGoalObj() {
+			//ゴール判定のオブジェクトを取得
+			shared_ptr<GameObject> GetGoalObj() const {
 				return m_goal;
 			}
 
-			bool IsAir() {
+			//空中にいるか
+			bool IsAir() const {
 				return m_isAir;
 			}
 
+			//速度を設定
 			void SetMoveVel(Vec3 vel) {
 				m_moveVel = vel;
 			}
-			Vec3 GetMoveVel() {
+			//速度を取得
+			Vec3 GetMoveVel() const {
 				return m_moveVel;
 			}
-
+			//速度を加算
 			void AddMoveVel(Vec3 vel, bool mulAccel = false) {
 				m_moveVel += vel * (mulAccel ? m_accel : 1.0f);
 			}
@@ -237,7 +245,7 @@ namespace basecross {
 			const bool Player::IsCarryingEnemy();
 
 			//SEの再生
-			void Player::PlaySnd(wstring sndname, float volume, float loopcount) {
+			void Player::PlaySnd(const wstring& sndname, float volume, float loopcount) {
 				auto audio = App::GetApp()->GetXAudio2Manager();
 				audio->Start(sndname, loopcount, volume);
 			}
@@ -256,11 +264,12 @@ namespace basecross {
 			Vec3 ForwardConvert(Vec3 v) {
 				Vec3 ret;
 
+				//プレイヤーと同じ方向を向いた単位ベクトルを作成
 				auto trans = GetComponent<Transform>();
 				auto fwd = -1 * trans->GetForward();
 				auto face = atan2f(fwd.z, fwd.x);
-				auto scale = trans->GetScale();
 
+				//渡されたvの分だけずらす
 				ret.x = (cosf(face) * v.x) - (sinf(face) * v.z);
 				ret.y = v.y;
 				ret.z = (cosf(face) * v.z) + (sinf(face) * v.x);
@@ -269,26 +278,30 @@ namespace basecross {
 			}
 
 			//アニメーションを変更する(既にそのアニメを再生中なら何もしない)
-			const void SetAnim(wstring animname, float time = 0.0f) {
+			const void SetAnim(const wstring& animname, float time = 0.0f) {
 				auto draw = GetComponent<PNTBoneModelDraw>();
 				if (draw->GetCurrentAnimation() != animname)
 					draw->ChangeCurrentAnimation(animname, time);
 			}
 
 			//通常時・チャージ中、敵運搬中でアニメーションを切り替える
-			void SwitchAnim(const float time, const float condition, const wstring prefix);
+			void SwitchAnim(const float time, const float condition, const wstring& prefix);
 
+			//長押しチャージ
 			void Charging(bool charge) {
 				m_isCharging = charge;
 				if (charge == false) return;
 
+				//1を超えたら少しずつ減らす
 				if (m_isOverCharge) {
 					m_chargePerc += m_chargeReduceSpeed * m_chargePerc * _delta;
 				}
+				//普通は増やしていく
 				else {
 					m_chargePerc += m_chargeSpeed * _delta;
 				}
 
+				//1を超えたフラグ
 				if (m_chargePerc > 1.0f) m_isOverCharge = true;
 			}
 
@@ -301,7 +314,9 @@ namespace basecross {
 
 			//状態に応じてアニメーションを変える
 			const wstring AddPrefix() {
+				//敵運搬中
 				if (m_isCarrying) return L"Grab_";
+				//チャージ中
 				if (m_isCharging) return L"Fire_";
 				else return L"";
 			}
