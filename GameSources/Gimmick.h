@@ -11,6 +11,7 @@ namespace basecross {
 	class GimmickObject : public GameObject
 	{
 	public:
+		shared_ptr<SoundItem> m_Sound; // サウンドアイテムの共有ポインタ
 		// コンストラクタ
 		GimmickObject(const shared_ptr<Stage>& StagePtr);
 

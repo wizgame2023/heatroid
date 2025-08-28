@@ -23,7 +23,8 @@ namespace basecross {
 	void GimmickObject::PlaySE(wstring path, float loopcnt, float volume)
 	{
 		auto SE = App::GetApp()->GetXAudio2Manager();
-		SE->Start(path, loopcnt, volume);
+		SE->Stop(m_Sound);
+		m_Sound = SE->Start(path, loopcnt, volume);
 	}
 
 	void GimmickObject::TilingBox(const Vec3& Scale ,const float& UPic, const float& VPic, const wstring& m_Texname)
