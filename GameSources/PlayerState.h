@@ -146,8 +146,8 @@ namespace basecross {
 		//ステート一覧
 		unordered_map<PlayerStateType, unique_ptr<PlayerStateBase>> _stateList;
 
-		void AddState(PlayerStateType type, const unique_ptr<PlayerStateBase> state) {
-			_stateList[type] = state;
+		void AddState(PlayerStateType type, unique_ptr<PlayerStateBase> state) {
+			_stateList[type] = move(state);
 		}
 	public:
 		//コンストラクタ
